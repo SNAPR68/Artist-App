@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: artist-booking-api
+    runtime: node
+    region: singapore
+    plan: free
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @artist-booking/shared build && pnpm --filter @artist-booking/api build
+    startCommand: node apps/api/dist/app.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: PII_ENCRYPTION_KEY
+        sync: false
+      - key: LOG_LEVEL
+        value: info
+    healthCheckPath: /health
