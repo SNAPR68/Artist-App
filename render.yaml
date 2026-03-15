@@ -4,7 +4,7 @@ services:
     runtime: node
     region: singapore
     plan: free
-    buildCommand: HUSKY=0 NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @artist-booking/shared build && pnpm --filter @artist-booking/api build && cp -r packages/shared/dist apps/api/node_modules/@artist-booking/shared/dist && cp packages/shared/package.json apps/api/node_modules/@artist-booking/shared/package.json
+    buildCommand: HUSKY=0 NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @artist-booking/shared build && pnpm --filter @artist-booking/api build && rm -f apps/api/node_modules/@artist-booking/shared && mkdir -p apps/api/node_modules/@artist-booking/shared && cp -r packages/shared/dist packages/shared/package.json apps/api/node_modules/@artist-booking/shared/
     startCommand: cd apps/api && node dist/app.js
     envVars:
       - key: NODE_ENV
