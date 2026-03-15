@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+
+# Turbo
+.turbo/
+
+# Terraform
+infrastructure/terraform/**/.terraform/
+infrastructure/terraform/**/*.tfstate
+infrastructure/terraform/**/*.tfstate.backup
+infrastructure/terraform/**/*.tfvars
+!infrastructure/terraform/**/*.tfvars.example
+
+# Keys / Secrets
+*.pem
+apps/api/keys/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+.vercel

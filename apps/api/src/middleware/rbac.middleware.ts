@@ -1,0 +1,133 @@
+import type { FastifyRequest, FastifyReply } from 'fastify';
+import { UserRole } from '@artist-booking/shared';
+
+/**
+ * Permission matrix: defines which roles can access which resources/actions.
+ */
+const PERMISSIONS: Record<string, UserRole[]> = {
+  // Artist profile management
+  'artist:create': [UserRole.ARTIST],
+  'artist:read_own': [UserRole.ARTIST],
+  'artist:update_own': [UserRole.ARTIST],
+  'artist:read_public': [UserRole.ARTIST, UserRole.AGENT, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.ADMIN],
+
+  // Agent management
+  'agent:create': [UserRole.AGENT],
+  'agent:read_own': [UserRole.AGENT],
+  'agent:update_own': [UserRole.AGENT],
+  'agent:manage_roster': [UserRole.AGENT],
+
+  // Client management
+  'client:create': [UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'client:read_own': [UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'client:update_own': [UserRole.CLIENT, UserRole.EVENT_COMPANY],
+
+  // Search
+  'search:artists': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT, UserRole.ADMIN],
+
+  // Booking
+  'booking:create': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'booking:read_own': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'booking:respond': [UserRole.ARTIST],
+  'booking:cancel': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.ADMIN],
+
+  // Quotes
+  'quote:create': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'quote:read': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+
+  // Payment
+  'payment:create': [UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'payment:read_own': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+
+  // Calendar
+  'calendar:manage': [UserRole.ARTIST],
+  'calendar:read_own': [UserRole.ARTIST],
+  'calendar:update_own': [UserRole.ARTIST],
+  'calendar:read_public': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT, UserRole.ADMIN],
+
+  // Media
+  'media:upload': [UserRole.ARTIST],
+  'media:manage': [UserRole.ARTIST],
+  'media:delete_own': [UserRole.ARTIST],
+  'media:read_public': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT, UserRole.ADMIN],
+
+  // Reviews
+  'review:create': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'review:read': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT, UserRole.ADMIN],
+
+  // Shortlists
+  'shortlist:manage': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+
+  // Admin
+  'admin:users': [UserRole.ADMIN],
+  'admin:bookings': [UserRole.ADMIN],
+  'admin:payments': [UserRole.ADMIN],
+  'admin:moderate': [UserRole.ADMIN],
+};
+
+/**
+ * Create an RBAC guard for specific permissions.
+ *
+ * Usage: `{ preHandler: [authMiddleware, requirePermission('booking:create')] }`
+ */
+export function requirePermission(...permissions: string[]) {
+  return async (request: FastifyRequest, reply: FastifyReply) => {
+    const user = request.user;
+
+    if (!user) {
+      return reply.status(401).send({
+        success: false,
+        data: null,
+        errors: [{ code: 'UNAUTHORIZED', message: 'Authentication required' }],
+      });
+    }
+
+    // Admin has access to everything
+    if (user.role === UserRole.ADMIN) return;
+
+    const hasPermission = permissions.every((perm) => {
+      const allowedRoles = PERMISSIONS[perm];
+      if (!allowedRoles) return false;
+      return allowedRoles.includes(user.role as UserRole);
+    });
+
+    if (!hasPermission) {
+      return reply.status(403).send({
+        success: false,
+        data: null,
+        errors: [{
+          code: 'FORBIDDEN',
+          message: `Insufficient permissions. Required: ${permissions.join(', ')}`,
+        }],
+      });
+    }
+  };
+}
+
+/**
+ * Require that the authenticated user has one of the specified roles.
+ */
+export function requireRole(...roles: UserRole[]) {
+  return async (request: FastifyRequest, reply: FastifyReply) => {
+    const user = request.user;
+
+    if (!user) {
+      return reply.status(401).send({
+        success: false,
+        data: null,
+        errors: [{ code: 'UNAUTHORIZED', message: 'Authentication required' }],
+      });
+    }
+
+    if (!roles.includes(user.role as UserRole)) {
+      return reply.status(403).send({
+        success: false,
+        data: null,
+        errors: [{
+          code: 'FORBIDDEN',
+          message: `This action requires one of: ${roles.join(', ')}`,
+        }],
+      });
+    }
+  };
+}

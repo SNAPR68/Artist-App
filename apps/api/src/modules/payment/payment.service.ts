@@ -1,0 +1,219 @@
+import { razorpayClient } from './razorpay.client.js';
+import { paymentRepository } from './payment.repository.js';
+import { bookingRepository } from '../booking/booking.repository.js';
+import { calculatePaymentSplit, calculateRefund } from './split-calculator.js';
+import { BookingState, PaymentStatus, FINANCIAL } from '@artist-booking/shared';
+export class PaymentService {
+  /**
+   * Create a Razorpay order for a confirmed booking.
+   */
+  async createOrder(bookingId: string, userId: string) {
+    const booking = await bookingRepository.findByIdWithDetails(bookingId);
+    if (!booking) {
+      throw new PaymentError('NOT_FOUND', 'Booking not found', 404);
+    }
+
+    if (booking.client_user_id !== userId) {
+      throw new PaymentError('FORBIDDEN', 'Only the client can initiate payment', 403);
+    }
+
+    if (booking.status !== BookingState.CONFIRMED) {
+      throw new PaymentError('INVALID_STATE', 'Booking must be confirmed before payment', 400);
+    }
+
+    // Idempotency: check if order already exists
+    const idempotencyKey = `pay:${bookingId}`;
+    const existing = await paymentRepository.findByIdempotencyKey(idempotencyKey);
+    if (existing && existing.status === 'pending') {
+      return existing;
+    }
+
+    const split = calculatePaymentSplit({
+      baseAmountPaise: booking.final_amount_paise,
+    });
+
+    const order = await razorpayClient.createOrder({
+      amount_paise: split.total_client_pays_paise,
+      currency: FINANCIAL.CURRENCY,
+      receipt: `booking_${bookingId}`,
+      notes: { booking_id: bookingId },
+    });
+
+    const payment = await paymentRepository.create({
+      booking_id: bookingId,
+      razorpay_order_id: order.id,
+      amount_paise: split.total_client_pays_paise,
+      currency: FINANCIAL.CURRENCY,
+      platform_fee_paise: split.platform_fee_paise,
+      gst_paise: split.gst_on_platform_fee_paise,
+      tds_paise: split.tds_paise,
+      artist_payout_paise: split.artist_net_paise,
+      idempotency_key: idempotencyKey,
+    });
+
+    return {
+      payment_id: payment.id,
+      razorpay_order_id: order.id,
+      amount_paise: split.total_client_pays_paise,
+      currency: FINANCIAL.CURRENCY,
+      key_id: process.env.RAZORPAY_KEY_ID,
+    };
+  }
+
+  /**
+   * Verify payment after Razorpay checkout.
+   */
+  async verifyPayment(params: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+  }) {
+    const isValid = razorpayClient.verifySignature(params);
+    if (!isValid) {
+      throw new PaymentError('INVALID_SIGNATURE', 'Payment signature verification failed', 400);
+    }
+
+    const payment = await paymentRepository.findByOrderId(params.razorpay_order_id);
+    if (!payment) {
+      throw new PaymentError('NOT_FOUND', 'Payment not found', 404);
+    }
+
+    // Update payment status
+    await paymentRepository.updateStatus(payment.id, PaymentStatus.CAPTURED, params.razorpay_payment_id);
+
+    // Transition booking to pre_event
+    const booking = await bookingRepository.findById(payment.booking_id);
+    if (booking && booking.status === BookingState.CONFIRMED) {
+      await bookingRepository.updateStatus(payment.booking_id, BookingState.PRE_EVENT);
+      await bookingRepository.addEvent(payment.booking_id, {
+        from_status: BookingState.CONFIRMED,
+        to_status: BookingState.PRE_EVENT,
+        triggered_by: 'system:payment',
+        metadata: { razorpay_payment_id: params.razorpay_payment_id },
+      });
+    }
+
+    return payment;
+  }
+
+  /**
+   * Handle Razorpay webhook events.
+   */
+  async handleWebhook(event: string, payload: Record<string, unknown>) {
+    const paymentObj = payload.payment as { entity?: Record<string, unknown> } | undefined;
+    switch (event) {
+      case 'payment.captured': {
+        const entity = paymentObj?.entity as { order_id: string; id: string } | undefined;
+        if (entity) {
+          const payment = await paymentRepository.findByOrderId(entity.order_id);
+          if (payment) {
+            await paymentRepository.updateStatus(payment.id, PaymentStatus.CAPTURED, entity.id);
+          }
+        }
+        break;
+      }
+      case 'payment.failed': {
+        const entity = paymentObj?.entity as { order_id: string } | undefined;
+        if (entity) {
+          const payment = await paymentRepository.findByOrderId(entity.order_id);
+          if (payment) {
+            await paymentRepository.updateStatus(payment.id, PaymentStatus.FAILED);
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  /**
+   * Process cancellation and refund.
+   */
+  async processCancellation(bookingId: string, _userId: string) {
+    const booking = await bookingRepository.findByIdWithDetails(bookingId);
+    if (!booking) {
+      throw new PaymentError('NOT_FOUND', 'Booking not found', 404);
+    }
+
+    const payment = await paymentRepository.findByBookingId(bookingId);
+    if (!payment || payment.status !== PaymentStatus.CAPTURED) {
+      return { refund_amount_paise: 0, refund_percent: 0 };
+    }
+
+    const refund = calculateRefund({
+      totalPaidPaise: payment.amount_paise,
+      eventDate: booking.event_date,
+      cancelDate: new Date().toISOString(),
+    });
+
+    if (refund.refundAmountPaise > 0) {
+      await razorpayClient.initiateRefund(payment.razorpay_payment_id, refund.refundAmountPaise, {
+        booking_id: bookingId,
+        reason: 'cancellation',
+      });
+      await paymentRepository.updateStatus(payment.id, PaymentStatus.REFUND_INITIATED);
+    }
+
+    return refund;
+  }
+
+  /**
+   * Get payment details for a booking.
+   */
+  async getPaymentDetails(bookingId: string) {
+    return paymentRepository.findByBookingId(bookingId);
+  }
+
+  /**
+   * Get earnings summary for an artist.
+   */
+  async getEarningsSummary(userId: string, startDate: string, endDate: string) {
+    return paymentRepository.getEarningsSummary(userId, startDate, endDate);
+  }
+
+  /**
+   * Get payment history for a user.
+   */
+  async getPaymentHistory(userId: string, role: 'artist' | 'client') {
+    return paymentRepository.listByUserId(userId, role);
+  }
+
+  /**
+   * Generate GST invoice for a payment.
+   */
+  async generateInvoice(paymentId: string) {
+    const payment = await paymentRepository.findById(paymentId);
+    if (!payment) {
+      throw new PaymentError('NOT_FOUND', 'Payment not found', 404);
+    }
+
+    const booking = await bookingRepository.findByIdWithDetails(payment.booking_id);
+
+    const { generateInvoice: genInvoice, formatInvoiceDocument } = await import('../document/invoice.generator.js');
+
+    const invoice = genInvoice({
+      payment_id: payment.id,
+      booking_id: payment.booking_id,
+      platform_fee_paise: payment.platform_fee_paise,
+      gst_paise: payment.gst_paise,
+      recipient_name: booking?.client_name ?? 'Client',
+      recipient_gstin: undefined,
+      recipient_state: undefined,
+      event_description: `Live entertainment booking - ${booking?.event_type ?? 'event'} at ${booking?.event_city ?? 'city'}`,
+    });
+
+    return formatInvoiceDocument(invoice);
+  }
+}
+
+export class PaymentError extends Error {
+  constructor(
+    public code: string,
+    message: string,
+    public statusCode: number,
+  ) {
+    super(message);
+    this.name = 'PaymentError';
+  }
+}
+
+export const paymentService = new PaymentService();

@@ -1,0 +1,15 @@
+app = "artist-booking-worker-sync"
+primary_region = "bom"
+
+[build]
+  dockerfile = "../../infrastructure/docker/api.Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+
+[processes]
+  worker = "node dist/workers/sync.worker.js"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
