@@ -5,7 +5,7 @@ services:
     region: singapore
     plan: free
     buildCommand: HUSKY=0 NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @artist-booking/shared build && pnpm --filter @artist-booking/api build
-    startCommand: node apps/api/dist/app.js
+    startCommand: cd apps/api && node dist/app.js
     envVars:
       - key: NODE_ENV
         value: production
