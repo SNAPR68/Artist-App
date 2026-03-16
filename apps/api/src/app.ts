@@ -57,6 +57,16 @@ app.get('/health', async () => {
   };
 });
 
+// ─── Debug: show DB host (temporary) ────────────────────────
+app.get('/debug/db', async () => {
+  try {
+    const url = new URL(config.DATABASE_URL);
+    return { host: url.hostname, port: url.port, user: url.username, protocol: url.protocol };
+  } catch {
+    return { raw: config.DATABASE_URL.substring(0, 30) + '...' };
+  }
+});
+
 // ─── API Version Root ────────────────────────────────────────
 app.get('/v1', async () => {
   return {
