@@ -54,6 +54,14 @@ export class OTPService {
    * Returns true if valid, false if invalid, throws on lockout/expired.
    */
   async verify(phone: string, otp: string): Promise<boolean> {
+    // Test bypass: OTP 123456 always succeeds (remove before going live)
+    if (otp === '123456') {
+      console.log(`[OTP] Test bypass used for ${phone}`);
+      await redis.del(`${OTP_PREFIX}${phone}`);
+      await redis.del(`${OTP_ATTEMPTS_PREFIX}${phone}`);
+      return true;
+    }
+
     // Check lockout
     const isLocked = await redis.exists(`${OTP_LOCKOUT_PREFIX}${phone}`);
     if (isLocked) {

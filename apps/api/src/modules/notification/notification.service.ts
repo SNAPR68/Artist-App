@@ -79,8 +79,8 @@ export class NotificationService {
 
     const apiKey = process.env.GUPSHUP_API_KEY;
     if (!apiKey) {
-      console.warn('GUPSHUP_API_KEY not configured, skipping WhatsApp');
-      throw new Error('WhatsApp not configured');
+      console.log(`[WHATSAPP BYPASS] To: ${phone}, Template: ${template}`, variables);
+      return { status: 'bypassed', channel: 'whatsapp' };
     }
 
     const response = await fetch('https://api.gupshup.io/wa/api/v1/template/msg', {
@@ -110,8 +110,8 @@ export class NotificationService {
 
     const authKey = process.env.MSG91_AUTH_KEY;
     if (!authKey) {
-      console.warn('MSG91_AUTH_KEY not configured, skipping SMS');
-      return null;
+      console.log(`[SMS BYPASS] To: ${phone}, Template: ${template}`, variables);
+      return { status: 'bypassed', channel: 'sms' };
     }
 
     const response = await fetch('https://control.msg91.com/api/v5/flow/', {
@@ -158,8 +158,8 @@ export class NotificationService {
     // Firebase Admin SDK
     const firebaseProjectId = process.env.FIREBASE_PROJECT_ID;
     if (!firebaseProjectId) {
-      console.warn('FIREBASE_PROJECT_ID not configured, skipping push');
-      return null;
+      console.log(`[PUSH BYPASS] To: ${userId}, Template: ${template}`, variables);
+      return { status: 'bypassed', channel: 'push' };
     }
 
     // Use FCM HTTP v1 API (or Admin SDK in production)

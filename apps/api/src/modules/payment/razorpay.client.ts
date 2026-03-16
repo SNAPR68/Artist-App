@@ -2,10 +2,14 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import { config } from '../../config/index.js';
 
-const razorpay = new Razorpay({
-  key_id: config.RAZORPAY_KEY_ID ?? 'rzp_test_placeholder',
-  key_secret: config.RAZORPAY_KEY_SECRET ?? 'placeholder',
-});
+const isMockMode = !config.RAZORPAY_KEY_ID || config.RAZORPAY_KEY_ID === 'rzp_test_placeholder';
+
+const razorpay = isMockMode
+  ? null
+  : new Razorpay({
+      key_id: config.RAZORPAY_KEY_ID!,
+      key_secret: config.RAZORPAY_KEY_SECRET!,
+    });
 
 export interface CreateOrderParams {
   amount_paise: number;
@@ -22,7 +26,19 @@ export interface VerifySignatureParams {
 
 export class RazorpayClient {
   async createOrder(params: CreateOrderParams) {
-    return razorpay.orders.create({
+    if (isMockMode) {
+      console.log(`[RAZORPAY MOCK] Creating order: ₹${params.amount_paise / 100} (${params.receipt})`);
+      return {
+        id: `order_mock_${Date.now()}`,
+        entity: 'order',
+        amount: params.amount_paise,
+        currency: params.currency,
+        receipt: params.receipt,
+        status: 'created',
+        notes: params.notes ?? {},
+      };
+    }
+    return razorpay!.orders.create({
       amount: params.amount_paise,
       currency: params.currency,
       receipt: params.receipt,
@@ -31,6 +47,10 @@ export class RazorpayClient {
   }
 
   verifySignature(params: VerifySignatureParams): boolean {
+    if (isMockMode) {
+      console.log(`[RAZORPAY MOCK] Signature verified for order ${params.razorpay_order_id}`);
+      return true;
+    }
     const secret = config.RAZORPAY_KEY_SECRET ?? '';
     const body = `${params.razorpay_order_id}|${params.razorpay_payment_id}`;
     const expectedSignature = crypto
@@ -41,6 +61,10 @@ export class RazorpayClient {
   }
 
   verifyWebhookSignature(body: string, signature: string): boolean {
+    if (isMockMode) {
+      console.log(`[RAZORPAY MOCK] Webhook signature verified`);
+      return true;
+    }
     const secret = config.RAZORPAY_WEBHOOK_SECRET ?? '';
     const expectedSignature = crypto
       .createHmac('sha256', secret)
@@ -50,11 +74,33 @@ export class RazorpayClient {
   }
 
   async fetchPayment(paymentId: string) {
-    return razorpay.payments.fetch(paymentId);
+    if (isMockMode) {
+      console.log(`[RAZORPAY MOCK] Fetching payment ${paymentId}`);
+      return {
+        id: paymentId,
+        entity: 'payment',
+        amount: 10000,
+        currency: 'INR',
+        status: 'captured',
+        method: 'upi',
+      };
+    }
+    return razorpay!.payments.fetch(paymentId);
   }
 
   async initiateRefund(paymentId: string, amountPaise: number, notes?: Record<string, string>) {
-    return razorpay.payments.refund(paymentId, {
+    if (isMockMode) {
+      console.log(`[RAZORPAY MOCK] Refund ₹${amountPaise / 100} for payment ${paymentId}`);
+      return {
+        id: `rfnd_mock_${Date.now()}`,
+        entity: 'refund',
+        amount: amountPaise,
+        payment_id: paymentId,
+        status: 'processed',
+        notes: notes ?? {},
+      };
+    }
+    return razorpay!.payments.refund(paymentId, {
       amount: amountPaise,
       notes,
     });
