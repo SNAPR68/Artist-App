@@ -13,7 +13,7 @@ export function startCronJobs() {
   // 1. Expire stale calendar holds (48h)
   setInterval(async () => {
     try {
-      const expiredHolds = await db('artist_calendar')
+      const expiredHolds = await db('availability_calendar')
         .where('status', 'hold')
         .where('hold_expires_at', '<', new Date())
         .update({ status: 'available', booking_id: null, hold_expires_at: null });
