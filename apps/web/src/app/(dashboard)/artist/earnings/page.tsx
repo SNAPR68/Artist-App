@@ -138,16 +138,44 @@ export default function EarningsPage() {
                     })}
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium text-gray-900">₹{formatINR(txn.artist_payout_paise)}</p>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    txn.status === 'settled' ? 'bg-green-100 text-green-700' :
-                    txn.status === 'captured' ? 'bg-blue-100 text-blue-700' :
-                    txn.status === 'refund_initiated' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-gray-100 text-gray-600'
-                  }`}>
-                    {txn.status}
-                  </span>
+                <div className="text-right flex items-center gap-2">
+                  <div>
+                    <p className="font-medium text-gray-900">₹{formatINR(txn.artist_payout_paise)}</p>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      txn.status === 'settled' ? 'bg-green-100 text-green-700' :
+                      txn.status === 'captured' ? 'bg-blue-100 text-blue-700' :
+                      txn.status === 'refund_initiated' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-gray-100 text-gray-600'
+                    }`}>
+                      {txn.status}
+                    </span>
+                  </div>
+                  {txn.status === 'settled' && (
+                    <button
+                      onClick={async () => {
+                        const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+                        const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+                        const res = await fetch(`${apiBase}/v1/payments/invoice/${txn.id}/pdf`, {
+                          headers: token ? { Authorization: `Bearer ${token}` } : {},
+                        });
+                        if (res.ok) {
+                          const blob = await res.blob();
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `invoice-${txn.id.slice(0, 8)}.pdf`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        }
+                      }}
+                      className="text-xs text-primary-500 hover:text-primary-600"
+                      title="Download Invoice"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

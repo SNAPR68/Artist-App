@@ -14,29 +14,30 @@
   "dependencies": {
     "@artist-booking/shared": "workspace:*",
     "@artist-booking/ui": "workspace:*",
+    "@hookform/resolvers": "^3.9.0",
+    "@phosphor-icons/react": "^2.1.0",
+    "@sentry/nextjs": "^10.43.0",
+    "@tanstack/react-query": "^5.50.0",
+    "clsx": "^2.1.0",
+    "date-fns": "^3.6.0",
+    "framer-motion": "^11.0.0",
     "next": "^14.2.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "@tanstack/react-query": "^5.50.0",
-    "zustand": "^4.5.0",
-    "@phosphor-icons/react": "^2.1.0",
     "react-hook-form": "^7.52.0",
-    "@hookform/resolvers": "^3.9.0",
+    "tailwind-merge": "^2.5.0",
     "zod": "^3.23.0",
-    "framer-motion": "^11.0.0",
-    "date-fns": "^3.6.0",
-    "clsx": "^2.1.0",
-    "tailwind-merge": "^2.5.0"
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
-    "typescript": "^5.5.0",
-    "tailwindcss": "^3.4.0",
-    "postcss": "^8.4.0",
     "autoprefixer": "^10.4.0",
-    "vitest": "^2.0.0",
-    "eslint-config-next": "^14.2.0"
+    "eslint-config-next": "^14.2.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
   }
 }

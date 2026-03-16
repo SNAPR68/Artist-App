@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import compress from '@fastify/compress';
 import helmet from '@fastify/helmet';
 import { config } from './config/index.js';
 import { checkDatabaseHealth } from './infrastructure/database.js';
@@ -48,6 +49,8 @@ await app.register(cors, {
 await app.register(helmet, {
   contentSecurityPolicy: false, // API-only, no HTML
 });
+
+await app.register(compress, { global: true });
 
 // ─── Health Check ────────────────────────────────────────────
 app.get('/health', async () => {

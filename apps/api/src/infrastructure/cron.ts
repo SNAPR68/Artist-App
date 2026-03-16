@@ -26,9 +26,9 @@ export function startCronJobs() {
 
       // Also expire bookings stuck in inquiry/quoted state for > 48 hours
       const expiredBookings = await db('bookings')
-        .whereIn('status', ['inquiry', 'quoted'])
+        .whereIn('state', ['inquiry', 'quoted'])
         .where('updated_at', '<', new Date(Date.now() - 48 * 60 * 60 * 1000))
-        .update({ status: 'expired', updated_at: new Date() });
+        .update({ state: 'expired', updated_at: new Date() });
 
       if (expiredBookings > 0) {
         console.log(`[CRON] Expired ${expiredBookings} stale bookings`);

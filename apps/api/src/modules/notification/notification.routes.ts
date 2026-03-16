@@ -30,6 +30,17 @@ export async function notificationRoutes(app: FastifyInstance) {
     });
   });
 
+  /** PUT /v1/notifications/read-all — Mark all notifications as read */
+  app.put('/v1/notifications/read-all', {
+    preHandler: [authMiddleware],
+  }, async (request, reply) => {
+    const updated = await db('notifications')
+      .where({ user_id: request.user!.user_id, read_at: null })
+      .update({ read_at: new Date() });
+
+    return reply.send({ success: true, data: { read: true, count: updated }, errors: [] });
+  });
+
   /** PUT /v1/notifications/:id/read — Mark notification as read */
   app.put('/v1/notifications/:id/read', {
     preHandler: [authMiddleware],

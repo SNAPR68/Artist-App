@@ -225,9 +225,9 @@ export default function HomePage() {
           <div>
             <div className="font-semibold text-white text-sm mb-3">Company</div>
             <div className="space-y-2 text-sm">
-              <div><Link href="#" className="hover:text-white transition-colors">About Us</Link></div>
-              <div><Link href="#" className="hover:text-white transition-colors">Contact</Link></div>
-              <div><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></div>
+              <div><Link href="/help" className="hover:text-white transition-colors">Help & FAQ</Link></div>
+              <div><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></div>
+              <div><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></div>
             </div>
           </div>
         </div>
