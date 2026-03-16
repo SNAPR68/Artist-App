@@ -1,8 +1,10 @@
 import { db } from './database.js';
 import { reviewService } from '../modules/review/review.service.js';
+import { paymentService } from '../modules/payment/payment.service.js';
 
 const HOLD_EXPIRY_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 const REVIEW_PUBLISH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
+const SETTLEMENT_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 /**
  * Start background cron jobs for hold expiry and review publishing.
@@ -14,7 +16,7 @@ export function startCronJobs() {
   setInterval(async () => {
     try {
       const expiredHolds = await db('availability_calendar')
-        .where('status', 'hold')
+        .where('status', 'held')
         .where('hold_expires_at', '<', new Date())
         .update({ status: 'available', booking_id: null, hold_expires_at: null });
 
@@ -47,4 +49,16 @@ export function startCronJobs() {
       console.error('[CRON] Review publish check failed:', err);
     }
   }, REVIEW_PUBLISH_INTERVAL_MS);
+
+  // 3. Auto-settle payments 3 days after event completion
+  setInterval(async () => {
+    try {
+      const count = await paymentService.autoSettleEligible();
+      if (count > 0) {
+        console.log(`[CRON] Auto-settled ${count} payments`);
+      }
+    } catch (err) {
+      console.error('[CRON] Settlement check failed:', err);
+    }
+  }, SETTLEMENT_INTERVAL_MS);
 }

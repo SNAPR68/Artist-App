@@ -92,6 +92,114 @@ export async function paymentRoutes(app: FastifyInstance) {
   });
 
   /**
+   * GET /v1/payments/booking/:bookingId — Payment details for a booking
+   */
+  app.get('/v1/payments/booking/:bookingId', {
+    preHandler: [authMiddleware, requirePermission('payment:read_own')],
+  }, async (request, reply) => {
+    const { bookingId } = request.params as { bookingId: string };
+    const payment = await paymentService.getPaymentDetails(bookingId);
+
+    return reply.send({
+      success: true,
+      data: payment,
+      errors: [],
+    });
+  });
+
+  /**
+   * POST /v1/payments/settle/:paymentId — Admin: manually settle a payment
+   */
+  app.post('/v1/payments/settle/:paymentId', {
+    preHandler: [authMiddleware, requirePermission('admin:manage')],
+  }, async (request, reply) => {
+    const { paymentId } = request.params as { paymentId: string };
+    const result = await paymentService.settlePayment(paymentId);
+
+    return reply.send({
+      success: true,
+      data: result,
+      errors: [],
+    });
+  });
+
+  /**
+   * POST /v1/payments/settle-eligible — Admin: trigger auto-settlement
+   */
+  app.post('/v1/payments/settle-eligible', {
+    preHandler: [authMiddleware, requirePermission('admin:manage')],
+  }, async (request, reply) => {
+    const count = await paymentService.autoSettleEligible();
+
+    return reply.send({
+      success: true,
+      data: { settled_count: count },
+      errors: [],
+    });
+  });
+
+  /**
+   * GET /v1/payments/invoice/:paymentId/pdf — Download GST invoice as PDF
+   */
+  app.get('/v1/payments/invoice/:paymentId/pdf', {
+    preHandler: [authMiddleware],
+  }, async (request, reply) => {
+    const { paymentId } = request.params as { paymentId: string };
+    const invoice = await paymentService.generateInvoice(paymentId);
+
+    const { renderInvoicePDF } = await import('../document/pdf.renderer.js');
+    const pdfBuffer = await renderInvoicePDF(invoice);
+
+    return reply
+      .header('Content-Type', 'application/pdf')
+      .header('Content-Disposition', `attachment; filename="invoice-${invoice.invoice_number.replace(/\//g, '-')}.pdf"`)
+      .send(pdfBuffer);
+  });
+
+  /**
+   * GET /v1/payments/contract/:bookingId/pdf — Download booking contract as PDF
+   */
+  app.get('/v1/payments/contract/:bookingId/pdf', {
+    preHandler: [authMiddleware],
+  }, async (request, reply) => {
+    const { bookingId } = request.params as { bookingId: string };
+    const { bookingRepository } = await import('../booking/booking.repository.js');
+    const { generateContract } = await import('../document/contract.generator.js');
+    const { renderContractPDF } = await import('../document/pdf.renderer.js');
+    const { calculatePaymentSplit } = await import('./split-calculator.js');
+
+    const booking = await bookingRepository.findByIdWithDetails(bookingId);
+    if (!booking) {
+      return reply.status(404).send({ success: false, errors: [{ code: 'NOT_FOUND', message: 'Booking not found' }] });
+    }
+
+    const split = calculatePaymentSplit({ baseAmountPaise: booking.final_amount_paise });
+
+    const contract = generateContract({
+      booking_id: bookingId,
+      artist_name: booking.artist_name ?? 'Artist',
+      client_name: booking.client_name ?? 'Client',
+      event_type: booking.event_type ?? 'Event',
+      event_date: booking.event_date,
+      event_city: booking.event_city ?? 'City',
+      event_venue: booking.event_venue,
+      event_duration_hours: booking.event_duration_hours ?? 2,
+      final_amount_paise: booking.final_amount_paise,
+      platform_fee_paise: split.platform_fee_paise,
+      artist_payout_paise: split.artist_net_paise,
+      tds_paise: split.tds_paise,
+      gst_paise: split.gst_on_platform_fee_paise,
+    });
+
+    const pdfBuffer = await renderContractPDF(contract);
+
+    return reply
+      .header('Content-Type', 'application/pdf')
+      .header('Content-Disposition', `attachment; filename="contract-${bookingId.slice(0, 8)}.pdf"`)
+      .send(pdfBuffer);
+  });
+
+  /**
    * GET /v1/payments/earnings — Artist earnings summary
    */
   app.get('/v1/payments/earnings', {

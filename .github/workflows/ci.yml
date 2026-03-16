@@ -112,3 +112,37 @@ jobs:
           PII_ENCRYPTION_KEY: ci-test-encryption-key-32chars!!
           NODE_ENV: test
         run: pnpm turbo test:integration
+
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    needs: [lint-and-typecheck, test]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @artist-booking/shared build
+      - run: cd e2e && npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        env:
+          CI: true
+        run: cd e2e && npx playwright test
+
+      - name: Upload E2E results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: e2e/test-results/
+          retention-days: 7

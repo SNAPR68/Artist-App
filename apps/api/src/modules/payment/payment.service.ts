@@ -78,8 +78,8 @@ export class PaymentService {
       throw new PaymentError('NOT_FOUND', 'Payment not found', 404);
     }
 
-    // Update payment status
-    await paymentRepository.updateStatus(payment.id, PaymentStatus.CAPTURED, params.razorpay_payment_id);
+    // Update payment: captured → in_escrow (funds held until event completion + 3 days)
+    await paymentRepository.updateStatus(payment.id, PaymentStatus.IN_ESCROW, params.razorpay_payment_id);
 
     // Transition booking to pre_event
     const booking = await bookingRepository.findById(payment.booking_id);
@@ -202,6 +202,72 @@ export class PaymentService {
     });
 
     return formatInvoiceDocument(invoice);
+  }
+
+  /**
+   * Settle a payment: release funds from escrow to artist.
+   * Called by cron (auto-settle 3 days after event) or admin (manual).
+   */
+  async settlePayment(paymentId: string) {
+    const payment = await paymentRepository.findById(paymentId);
+    if (!payment) {
+      throw new PaymentError('NOT_FOUND', 'Payment not found', 404);
+    }
+
+    if (payment.status !== PaymentStatus.IN_ESCROW) {
+      throw new PaymentError('INVALID_STATE', `Cannot settle payment in ${payment.status} status`, 400);
+    }
+
+    // Update payment to settled
+    await paymentRepository.updateStatus(payment.id, PaymentStatus.SETTLED);
+    await paymentRepository.recordSettlement(payment.id, {
+      artist_payout_paise: payment.artist_payout_paise,
+      platform_fee_paise: payment.platform_fee_paise,
+      tds_paise: payment.tds_paise,
+      settled_at: new Date(),
+    });
+
+    // Transition booking to settled if completed
+    const booking = await bookingRepository.findById(payment.booking_id);
+    if (booking && booking.status === BookingState.COMPLETED) {
+      await bookingRepository.updateStatus(payment.booking_id, BookingState.SETTLED);
+      await bookingRepository.addEvent(payment.booking_id, {
+        from_status: BookingState.COMPLETED,
+        to_status: BookingState.SETTLED,
+        triggered_by: 'system:settlement',
+        metadata: { payment_id: paymentId, artist_payout_paise: payment.artist_payout_paise },
+      });
+    }
+
+    return {
+      payment_id: payment.id,
+      booking_id: payment.booking_id,
+      artist_payout_paise: payment.artist_payout_paise,
+      status: PaymentStatus.SETTLED,
+    };
+  }
+
+  /**
+   * Auto-settle payments for completed events after 3-day hold.
+   * Called by the cron job.
+   */
+  async autoSettleEligible(): Promise<number> {
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+
+    // Find payments in escrow where the booking is completed and event was 3+ days ago
+    const eligible = await paymentRepository.findSettlementEligible(threeDaysAgo);
+
+    let settledCount = 0;
+    for (const payment of eligible) {
+      try {
+        await this.settlePayment(payment.id);
+        settledCount++;
+      } catch (err) {
+        console.error(`[SETTLEMENT] Failed to settle payment ${payment.id}:`, err);
+      }
+    }
+
+    return settledCount;
   }
 }
 

@@ -80,6 +80,33 @@ export class PaymentRepository {
       .orderBy('p.created_at', 'desc');
   }
 
+  async recordSettlement(paymentId: string, data: {
+    artist_payout_paise: number;
+    platform_fee_paise: number;
+    tds_paise: number;
+    settled_at: Date;
+  }) {
+    const [record] = await db('payment_settlements')
+      .insert({
+        payment_id: paymentId,
+        artist_payout_paise: data.artist_payout_paise,
+        platform_fee_paise: data.platform_fee_paise,
+        tds_paise: data.tds_paise,
+        settled_at: data.settled_at,
+      })
+      .returning('*');
+    return record;
+  }
+
+  async findSettlementEligible(cutoffDate: Date) {
+    return db('payments as p')
+      .join('bookings as b', 'b.id', 'p.booking_id')
+      .where('p.status', 'in_escrow')
+      .where('b.status', 'completed')
+      .where('b.event_date', '<', cutoffDate)
+      .select('p.*');
+  }
+
   async getEarningsSummary(userId: string, startDate: string, endDate: string) {
     const result = await db('payments as p')
       .join('bookings as b', 'b.id', 'p.booking_id')
