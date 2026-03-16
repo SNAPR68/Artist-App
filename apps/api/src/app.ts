@@ -32,7 +32,7 @@ const app = Fastify({
 
 // ─── Plugins ─────────────────────────────────────────────────
 await app.register(cors, {
-  origin: config.NODE_ENV === 'production' ? [config.API_BASE_URL] : true,
+  origin: true,
   credentials: true,
 });
 
