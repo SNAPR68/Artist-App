@@ -5,6 +5,7 @@ import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { validateBody } from '../../middleware/validation.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
 import { createBookingSchema, submitQuoteSchema, BookingState } from '@artist-booking/shared';
+import { generateContract } from '../document/contract.generator.js';
 
 export async function bookingRoutes(app: FastifyInstance) {
   /**
@@ -114,6 +115,46 @@ export async function bookingRoutes(app: FastifyInstance) {
     return reply.send({
       success: true,
       data: breakdown,
+      errors: [],
+    });
+  });
+
+  /**
+   * GET /v1/bookings/:id/contract — Generate booking contract
+   */
+  app.get('/v1/bookings/:id/contract', {
+    preHandler: [authMiddleware, requirePermission('booking:read_own')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const booking = await bookingService.getBooking(id, request.user!.user_id);
+
+    if (!booking.final_amount_paise) {
+      return reply.status(400).send({
+        success: false,
+        data: null,
+        errors: [{ code: 'NO_FINAL_AMOUNT', message: 'Booking must be confirmed with a final amount before generating a contract.' }],
+      });
+    }
+
+    const contract = generateContract({
+      booking_id: booking.id,
+      artist_name: booking.artist_name ?? 'Artist',
+      client_name: booking.client_name ?? 'Client',
+      event_type: booking.event_type,
+      event_date: booking.event_date,
+      event_city: booking.event_city,
+      event_venue: booking.event_venue,
+      event_duration_hours: booking.event_duration_hours,
+      final_amount_paise: booking.final_amount_paise,
+      platform_fee_paise: booking.platform_fee_paise ?? 0,
+      artist_payout_paise: booking.artist_payout_paise ?? 0,
+      tds_paise: booking.tds_amount_paise ?? 0,
+      gst_paise: booking.gst_amount_paise ?? 0,
+    });
+
+    return reply.send({
+      success: true,
+      data: contract,
       errors: [],
     });
   });

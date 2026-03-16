@@ -18,6 +18,7 @@ import { bookingRoutes } from './modules/booking/booking.routes.js';
 import { paymentRoutes } from './modules/payment/payment.routes.js';
 import { reviewRoutes } from './modules/review/review.routes.js';
 import { notificationRoutes } from './modules/notification/notification.routes.js';
+import { adminRoutes } from './modules/admin/admin.routes.js';
 
 const app = Fastify({
   logger: {
@@ -88,6 +89,7 @@ await app.register(bookingRoutes);
 await app.register(paymentRoutes);
 await app.register(reviewRoutes);
 await app.register(notificationRoutes);
+await app.register(adminRoutes);
 
 // ─── Graceful Shutdown ───────────────────────────────────────
 async function shutdown(signal: string) {
