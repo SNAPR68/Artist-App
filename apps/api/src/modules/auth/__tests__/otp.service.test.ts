@@ -105,7 +105,7 @@ describe('OTPService', () => {
 
     it('should throw OTP_EXPIRED when no OTP stored', async () => {
       mockRedis.get.mockResolvedValue(null);
-      await expect(service.verify('9876543210', '123456')).rejects.toThrow('OTP has expired');
+      await expect(service.verify('9876543210', '999999')).rejects.toThrow('OTP has expired');
     });
 
     it('should lock out after 3 failed attempts', async () => {

@@ -149,7 +149,7 @@ describe('PaymentService', () => {
       await service.verifyPayment(verifyParams);
 
       expect(mocks.paymentRepo.updateStatus).toHaveBeenCalledWith(
-        'pay-1', PaymentStatus.CAPTURED, 'pay_rz_456',
+        'pay-1', PaymentStatus.IN_ESCROW, 'pay_rz_456',
       );
       expect(mocks.bookingRepo.updateStatus).toHaveBeenCalledWith(
         'booking-1', BookingState.PRE_EVENT,

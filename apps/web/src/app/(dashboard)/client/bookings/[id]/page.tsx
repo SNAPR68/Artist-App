@@ -126,13 +126,17 @@ export default function ClientBookingDetailPage() {
   };
 
   const handleDownloadContract = async () => {
-    const res = await apiClient<Record<string, unknown>>(`/v1/bookings/${id}/contract`);
-    if (res.success) {
-      const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'application/json' });
+    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+    const res = await fetch(`${apiBase}/v1/payments/contract/${id}/pdf`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (res.ok) {
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `contract-${id.slice(0, 8)}.json`;
+      a.download = `contract-${id.slice(0, 8)}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
     }

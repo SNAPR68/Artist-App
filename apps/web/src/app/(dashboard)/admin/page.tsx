@@ -360,23 +360,37 @@ export default function AdminDashboardPage() {
       {!loading && tab === 'payments' && (
         <div className="space-y-4">
           {paymentStats && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <p className="text-xs text-gray-500 uppercase">Total Payments</p>
-                <p className="text-2xl font-bold text-gray-900">{paymentStats.total_count}</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 uppercase">Total Payments</p>
+                  <p className="text-2xl font-bold text-gray-900">{paymentStats.total_count}</p>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 uppercase">Total Volume</p>
+                  <p className="text-2xl font-bold text-gray-900">₹{formatINR(paymentStats.total_amount_paise)}</p>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 uppercase">Platform Revenue</p>
+                  <p className="text-2xl font-bold text-green-600">₹{formatINR(paymentStats.total_platform_fee_paise)}</p>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 uppercase">Refunded</p>
+                  <p className="text-2xl font-bold text-orange-600">₹{formatINR(paymentStats.refunded_amount_paise)}</p>
+                </div>
               </div>
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <p className="text-xs text-gray-500 uppercase">Total Volume</p>
-                <p className="text-2xl font-bold text-gray-900">₹{formatINR(paymentStats.total_amount_paise)}</p>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <p className="text-xs text-gray-500 uppercase">Platform Revenue</p>
-                <p className="text-2xl font-bold text-green-600">₹{formatINR(paymentStats.total_platform_fee_paise)}</p>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <p className="text-xs text-gray-500 uppercase">Refunded</p>
-                <p className="text-2xl font-bold text-orange-600">₹{formatINR(paymentStats.refunded_amount_paise)}</p>
-              </div>
+              <button
+                onClick={async () => {
+                  setActionLoading('settle');
+                  const res = await apiClient<{ settled_count: number }>('/v1/payments/settle-eligible', { method: 'POST' });
+                  setActionLoading(null);
+                  if (res.success) alert(`Settled ${res.data.settled_count} payment(s)`);
+                }}
+                disabled={actionLoading === 'settle'}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 disabled:opacity-50"
+              >
+                {actionLoading === 'settle' ? 'Settling...' : 'Auto-Settle Eligible Payments'}
+              </button>
             </div>
           )}
 
