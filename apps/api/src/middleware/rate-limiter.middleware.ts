@@ -17,7 +17,7 @@ export function rateLimit(tier: RateLimitTier) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
     // Use user_id if authenticated, otherwise IP
     const identifier = request.user?.user_id ?? request.ip;
-    const key = `ratelimit:${tier}:${identifier}`;
+    const key = `ratelimit:${String(tier)}:${identifier}`;
     const now = Date.now();
     const windowStart = now - windowMs;
 
