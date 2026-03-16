@@ -33,7 +33,7 @@ export class BookingService {
     // Create booking
     const booking = await bookingRepository.create({
       ...data,
-      client_id: client.id,
+      client_id: userId,
     });
 
     // Place hold on the date (48 hours)
@@ -43,8 +43,8 @@ export class BookingService {
 
     // Log event
     await bookingRepository.addEvent(booking.id, {
-      from_status: 'none',
-      to_status: BookingState.INQUIRY,
+      from_state: null as unknown as string,
+      to_state: BookingState.INQUIRY,
       triggered_by: userId,
       metadata: { event_type: data.event_type, event_date: data.event_date },
     });
@@ -66,7 +66,7 @@ export class BookingService {
       throw new BookingError('FORBIDDEN', 'Not a participant in this booking', 403);
     }
 
-    const currentState = booking.status as BookingState;
+    const currentState = booking.state as BookingState;
     BookingStateMachine.transition(currentState, newState);
 
     // Handle state-specific side effects
@@ -79,8 +79,8 @@ export class BookingService {
     const updated = await bookingRepository.updateStatus(bookingId, newState);
 
     await bookingRepository.addEvent(bookingId, {
-      from_status: currentState,
-      to_status: newState,
+      from_state: currentState,
+      to_state: newState,
       triggered_by: userId,
       metadata,
     });
@@ -130,7 +130,7 @@ export class BookingService {
       throw new BookingError('FORBIDDEN', 'Not a participant in this booking', 403);
     }
 
-    const currentState = booking.status as BookingState;
+    const currentState = booking.state as BookingState;
     if (currentState !== BookingState.INQUIRY &&
         currentState !== BookingState.QUOTED &&
         currentState !== BookingState.NEGOTIATING) {
@@ -143,16 +143,16 @@ export class BookingService {
     if (currentState === BookingState.INQUIRY) {
       await bookingRepository.updateStatus(bookingId, BookingState.QUOTED);
       await bookingRepository.addEvent(bookingId, {
-        from_status: currentState,
-        to_status: BookingState.QUOTED,
+        from_state: currentState,
+        to_state: BookingState.QUOTED,
         triggered_by: userId,
         metadata: { quote_round: quote.round },
       });
     } else if (currentState === BookingState.QUOTED && quote.round > 1) {
       await bookingRepository.updateStatus(bookingId, BookingState.NEGOTIATING);
       await bookingRepository.addEvent(bookingId, {
-        from_status: currentState,
-        to_status: BookingState.NEGOTIATING,
+        from_state: currentState,
+        to_state: BookingState.NEGOTIATING,
         triggered_by: userId,
         metadata: { quote_round: quote.round },
       });

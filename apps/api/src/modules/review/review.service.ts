@@ -15,7 +15,7 @@ export class ReviewService {
     }
 
     // Must be completed or settled
-    if (booking.status !== BookingState.COMPLETED && booking.status !== BookingState.SETTLED) {
+    if (booking.state !== BookingState.COMPLETED && booking.state !== BookingState.SETTLED) {
       throw new ReviewError('INVALID_STATE', 'Booking must be completed before reviewing', 400);
     }
 

@@ -44,7 +44,7 @@ export async function adminRoutes(app: FastifyInstance) {
       });
     }
 
-    const [countResult] = await q.clone().clearSelect().count('u.id as total');
+    const [countResult] = await q.clone().clearSelect().clearOrder().count('u.id as total');
     const users = await q.limit(perPage).offset(offset);
 
     return reply.send({
@@ -131,14 +131,14 @@ export async function adminRoutes(app: FastifyInstance) {
     let q = db('payments as p')
       .join('bookings as b', 'b.id', 'p.booking_id')
       .leftJoin('artist_profiles as ap', 'ap.id', 'b.artist_id')
-      .leftJoin('client_profiles as cp', 'cp.id', 'b.client_id')
+      .leftJoin('client_profiles as cp', 'cp.user_id', 'b.client_id')
       .select(
         'p.id',
         'p.booking_id',
         'p.razorpay_order_id',
         'p.razorpay_payment_id',
-        'p.amount_paise',
-        'p.platform_fee_paise',
+        'p.amount',
+        'p.platform_fee',
         'p.status',
         'p.created_at',
         'ap.stage_name as artist_name',
@@ -150,17 +150,17 @@ export async function adminRoutes(app: FastifyInstance) {
       q = q.where('p.status', query.status);
     }
 
-    const [countResult] = await q.clone().clearSelect().count('p.id as total');
+    const [countResult] = await q.clone().clearSelect().clearOrder().count('p.id as total');
     const payments = await q.limit(perPage).offset(offset);
 
     // Summary stats
     const [stats] = await db('payments')
       .select(
         db.raw('COUNT(*) as total_count'),
-        db.raw('COALESCE(SUM(amount_paise), 0) as total_amount_paise'),
-        db.raw('COALESCE(SUM(platform_fee_paise), 0) as total_platform_fee_paise'),
-        db.raw("COALESCE(SUM(CASE WHEN status = 'captured' THEN amount_paise ELSE 0 END), 0) as captured_amount_paise"),
-        db.raw("COALESCE(SUM(CASE WHEN status = 'refunded' THEN amount_paise ELSE 0 END), 0) as refunded_amount_paise"),
+        db.raw('COALESCE(SUM(amount), 0) as total_amount_paise'),
+        db.raw('COALESCE(SUM(platform_fee), 0) as total_platform_fee_paise'),
+        db.raw("COALESCE(SUM(CASE WHEN status = 'captured' THEN amount ELSE 0 END), 0) as captured_amount_paise"),
+        db.raw("COALESCE(SUM(CASE WHEN status = 'refunded' THEN amount ELSE 0 END), 0) as refunded_amount_paise"),
       );
 
     return reply.send({
@@ -203,9 +203,9 @@ export async function adminRoutes(app: FastifyInstance) {
       .where('deleted_at', null)
       .select(
         db.raw('COUNT(*) as total_bookings'),
-        db.raw("COUNT(*) FILTER (WHERE status = 'confirmed') as confirmed"),
-        db.raw("COUNT(*) FILTER (WHERE status = 'completed') as completed"),
-        db.raw("COUNT(*) FILTER (WHERE status = 'cancelled') as cancelled"),
+        db.raw("COUNT(*) FILTER (WHERE state = 'confirmed') as confirmed"),
+        db.raw("COUNT(*) FILTER (WHERE state = 'completed') as completed"),
+        db.raw("COUNT(*) FILTER (WHERE state = 'cancelled') as cancelled"),
       );
 
     const [verifiedCount] = await db('artist_profiles')

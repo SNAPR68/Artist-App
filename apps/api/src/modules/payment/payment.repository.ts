@@ -102,7 +102,7 @@ export class PaymentRepository {
     return db('payments as p')
       .join('bookings as b', 'b.id', 'p.booking_id')
       .where('p.status', 'in_escrow')
-      .where('b.status', 'completed')
+      .where('b.state', 'completed')
       .where('b.event_date', '<', cutoffDate)
       .select('p.*');
   }

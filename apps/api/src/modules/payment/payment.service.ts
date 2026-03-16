@@ -17,7 +17,7 @@ export class PaymentService {
       throw new PaymentError('FORBIDDEN', 'Only the client can initiate payment', 403);
     }
 
-    if (booking.status !== BookingState.CONFIRMED) {
+    if (booking.state !== BookingState.CONFIRMED) {
       throw new PaymentError('INVALID_STATE', 'Booking must be confirmed before payment', 400);
     }
 
@@ -83,11 +83,11 @@ export class PaymentService {
 
     // Transition booking to pre_event
     const booking = await bookingRepository.findById(payment.booking_id);
-    if (booking && booking.status === BookingState.CONFIRMED) {
+    if (booking && booking.state === BookingState.CONFIRMED) {
       await bookingRepository.updateStatus(payment.booking_id, BookingState.PRE_EVENT);
       await bookingRepository.addEvent(payment.booking_id, {
-        from_status: BookingState.CONFIRMED,
-        to_status: BookingState.PRE_EVENT,
+        from_state: BookingState.CONFIRMED,
+        to_state: BookingState.PRE_EVENT,
         triggered_by: 'system:payment',
         metadata: { razorpay_payment_id: params.razorpay_payment_id },
       });
@@ -229,11 +229,11 @@ export class PaymentService {
 
     // Transition booking to settled if completed
     const booking = await bookingRepository.findById(payment.booking_id);
-    if (booking && booking.status === BookingState.COMPLETED) {
+    if (booking && booking.state === BookingState.COMPLETED) {
       await bookingRepository.updateStatus(payment.booking_id, BookingState.SETTLED);
       await bookingRepository.addEvent(payment.booking_id, {
-        from_status: BookingState.COMPLETED,
-        to_status: BookingState.SETTLED,
+        from_state: BookingState.COMPLETED,
+        to_state: BookingState.SETTLED,
         triggered_by: 'system:settlement',
         metadata: { payment_id: paymentId, artist_payout_paise: payment.artist_payout_paise },
       });
