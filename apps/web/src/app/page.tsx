@@ -1,12 +1,12 @@
 import Link from 'next/link';
 
 const CATEGORIES = [
-  { name: 'Singers', icon: '🎤', count: '2,500+' },
-  { name: 'Bands', icon: '🎸', count: '800+' },
-  { name: 'DJs', icon: '🎧', count: '1,200+' },
-  { name: 'Comedians', icon: '😂', count: '400+' },
-  { name: 'Dancers', icon: '💃', count: '900+' },
-  { name: 'Anchors', icon: '🎙️', count: '600+' },
+  { name: 'Bollywood', icon: '🎤', count: '500+' },
+  { name: 'Classical', icon: '🎻', count: '300+' },
+  { name: 'Rock', icon: '🎸', count: '250+' },
+  { name: 'Jazz', icon: '🎷', count: '200+' },
+  { name: 'Electronic', icon: '🎧', count: '400+' },
+  { name: 'Sufi', icon: '🎶', count: '150+' },
 ];
 
 const STEPS = [

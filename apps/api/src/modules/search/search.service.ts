@@ -155,6 +155,42 @@ export class SearchService {
       : [];
     const thumbMap = new Map(thumbnails.map((t: any) => [t.artist_id, t.thumbnail_url ?? t.original_url]));
 
+    // Compute facets from DB
+    const genreFacets = await db('artist_profiles as ap')
+      .join('users as u', 'u.id', 'ap.user_id')
+      .where({ 'u.is_active': true, 'ap.deleted_at': null })
+      .select(db.raw("unnest(ap.genres) as genre"))
+      .groupBy('genre')
+      .orderByRaw('count(*) desc')
+      .limit(20)
+      .select(db.raw("count(*) as count"));
+
+    const cityFacets = await db('artist_profiles as ap')
+      .join('users as u', 'u.id', 'ap.user_id')
+      .where({ 'u.is_active': true, 'ap.deleted_at': null })
+      .whereNotNull('ap.base_city')
+      .groupBy('ap.base_city')
+      .orderByRaw('count(*) desc')
+      .limit(20)
+      .select('ap.base_city as city', db.raw('count(*) as count'));
+
+    const eventTypeFacets = await db('artist_profiles as ap')
+      .join('users as u', 'u.id', 'ap.user_id')
+      .where({ 'u.is_active': true, 'ap.deleted_at': null })
+      .select(db.raw("unnest(ap.event_types) as event_type"))
+      .groupBy('event_type')
+      .orderByRaw('count(*) desc')
+      .limit(20)
+      .select(db.raw("count(*) as count"));
+
+    const [priceRange] = await db('artist_profiles as ap')
+      .join('users as u', 'u.id', 'ap.user_id')
+      .where({ 'u.is_active': true, 'ap.deleted_at': null })
+      .select(
+        db.raw("COALESCE(MIN((ap.pricing->>'base_price')::numeric), 0) as min_price"),
+        db.raw("COALESCE(MAX((ap.pricing->>'base_price')::numeric), 0) as max_price"),
+      );
+
     return {
       data: artists.map((a: any) => ({
         ...a,
@@ -162,7 +198,12 @@ export class SearchService {
         _score: a.trust_score ?? 0,
       })),
       total,
-      facets: { genres: [], cities: [], event_types: [], price_range: { min: 0, max: 0 } },
+      facets: {
+        genres: genreFacets.map((r: any) => ({ value: r.genre, count: Number(r.count) })),
+        cities: cityFacets.map((r: any) => ({ value: r.city, count: Number(r.count) })),
+        event_types: eventTypeFacets.map((r: any) => ({ value: r.event_type, count: Number(r.count) })),
+        price_range: { min: Number(priceRange?.min_price ?? 0), max: Number(priceRange?.max_price ?? 0) },
+      },
     };
   }
 }
