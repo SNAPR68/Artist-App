@@ -3,7 +3,10 @@ import { config } from '../config/index.js';
 
 export const db = knex({
   client: 'pg',
-  connection: config.DATABASE_URL,
+  connection: {
+    connectionString: config.DATABASE_URL,
+    ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  },
   pool: {
     min: config.DATABASE_POOL_MIN,
     max: config.DATABASE_POOL_MAX,
