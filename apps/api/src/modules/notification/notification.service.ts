@@ -6,6 +6,7 @@ interface NotificationPayload {
   template: string;
   variables: Record<string, string>;
   phone?: string;
+  email?: string;
 }
 
 /**
@@ -24,6 +25,8 @@ export class NotificationService {
         return this.sendSMS(phone!, template, variables);
       case NotificationChannel.PUSH:
         return this.sendPush(payload.userId, template, variables);
+      case NotificationChannel.EMAIL:
+        return this.sendEmail(payload.email ?? '', template, variables);
       default:
         console.warn(`Unknown notification channel: ${channel}`);
     }
@@ -36,9 +39,10 @@ export class NotificationService {
     type: 'inquiry_received' | 'quote_received' | 'booking_confirmed' | 'payment_received' | 'booking_cancelled' | 'event_reminder';
     recipientUserId: string;
     recipientPhone: string;
+    recipientEmail?: string;
     variables: Record<string, string>;
   }) {
-    const { type, recipientUserId, recipientPhone, variables } = params;
+    const { type, recipientUserId, recipientPhone, recipientEmail, variables } = params;
 
     // Try WhatsApp first, fallback to SMS
     try {
@@ -67,6 +71,17 @@ export class NotificationService {
       template: type,
       variables,
     });
+
+    // Also send email if address is available
+    if (recipientEmail) {
+      await this.send({
+        userId: recipientUserId,
+        channel: NotificationChannel.EMAIL,
+        template: type,
+        variables,
+        email: recipientEmail,
+      });
+    }
   }
 
   private async sendWhatsApp(phone: string, template: string, variables: Record<string, string>) {
@@ -185,6 +200,53 @@ export class NotificationService {
     }
 
     return { status: 'sent', channel: 'push', count: devices.length };
+  }
+
+  private async sendEmail(to: string, template: string, variables: Record<string, string>) {
+    if (!to) return null;
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Email] To: ${to}, Template: ${template}`, variables);
+      return { status: 'sent', channel: 'email' };
+    }
+
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.log(`[EMAIL BYPASS] To: ${to}, Template: ${template}`, variables);
+      return { status: 'bypassed', channel: 'email' };
+    }
+
+    // Use template registry for subject/body
+    const { NOTIFICATION_TEMPLATES, interpolateTemplate } = await import('./template.registry.js');
+    const tmpl = NOTIFICATION_TEMPLATES[template];
+    if (!tmpl) {
+      console.warn(`No email template for: ${template}`);
+      return null;
+    }
+
+    const subject = interpolateTemplate(tmpl.email_subject ?? tmpl.push_title, variables);
+    const body = interpolateTemplate(tmpl.email_body ?? tmpl.push_body, variables);
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM ?? 'Artist Booking <noreply@artistbooking.in>',
+        to: [to],
+        subject,
+        html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+          <h2 style="color:#6366f1;">${subject}</h2>
+          <p style="color:#374151;line-height:1.6;">${body}</p>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;" />
+          <p style="color:#9ca3af;font-size:12px;">Artist Booking Platform · India's Live Entertainment Marketplace</p>
+        </div>`,
+      }),
+    });
+
+    return response.json();
   }
 }
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../../lib/api-client';
+import { MediaUploader } from '../../../../components/media/MediaUploader';
 
 const EVENT_TYPES = [
   'Wedding', 'Corporate', 'Birthday', 'College Fest', 'Concert',
@@ -51,6 +52,10 @@ export default function OnboardingPage() {
     { event_type: 'Wedding', city_tier: 'tier_1', min_price: 50000, max_price: 200000 },
   ]);
 
+  // Step 4: Media
+  const [media, setMedia] = useState<Array<{ id: string; media_type: 'image' | 'video'; original_url: string; thumbnail_url?: string; transcode_status: string; sort_order: number }>>([]);
+  const [profileCreated, setProfileCreated] = useState(false);
+
   const toggleItem = (list: string[], item: string, setter: (v: string[]) => void) => {
     if (list.includes(item)) {
       setter(list.filter((i) => i !== item));
@@ -73,7 +78,7 @@ export default function OnboardingPage() {
     setPricing(updated);
   };
 
-  const handleSubmit = async () => {
+  const handleCreateProfile = async () => {
     setIsSubmitting(true);
     setError('');
 
@@ -99,11 +104,20 @@ export default function OnboardingPage() {
         return;
       }
 
-      router.push('/artist');
+      setProfileCreated(true);
+      setStep(4);
     } catch {
       setError('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const loadMedia = async () => {
+    // Media is fetched via the artist profile endpoint
+    const res = await apiClient<{ media: typeof media }>('/v1/artists/profile');
+    if (res.success && res.data.media) {
+      setMedia(res.data.media);
     }
   };
 
@@ -368,12 +382,16 @@ export default function OnboardingPage() {
         <div className="space-y-4">
           <h2 className="text-xl font-bold text-gray-900">Upload Media</h2>
           <p className="text-sm text-gray-500">
-            You can add photos and videos after creating your profile. This step is optional for now.
+            Add photos and videos to showcase your performances. This step is optional — you can always add more later from your profile.
           </p>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-            <p className="text-gray-400 mb-2">Media upload will be available from your profile page</p>
-            <p className="text-xs text-gray-400">Supports: JPG, PNG, MP4 (up to 500MB)</p>
-          </div>
+          {profileCreated ? (
+            <MediaUploader media={media} onUpdate={loadMedia} />
+          ) : (
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <p className="text-gray-400 mb-2">Create your profile first to upload media</p>
+              <p className="text-xs text-gray-400">Supports: JPG, PNG, MP4 (up to 500MB)</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -381,13 +399,13 @@ export default function OnboardingPage() {
       <div className="flex justify-between mt-8">
         <button
           onClick={() => setStep(Math.max(1, step - 1))}
-          disabled={step === 1}
+          disabled={step === 1 || (step === 4 && profileCreated)}
           className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Back
         </button>
 
-        {step < 4 ? (
+        {step < 3 ? (
           <button
             onClick={() => setStep(step + 1)}
             disabled={!canProceed()}
@@ -395,13 +413,20 @@ export default function OnboardingPage() {
           >
             Continue
           </button>
-        ) : (
+        ) : step === 3 ? (
           <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
+            onClick={handleCreateProfile}
+            disabled={isSubmitting || !canProceed()}
             className="px-6 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50"
           >
-            {isSubmitting ? 'Creating...' : 'Create Profile'}
+            {isSubmitting ? 'Creating...' : 'Create Profile & Continue'}
+          </button>
+        ) : (
+          <button
+            onClick={() => router.push('/artist')}
+            className="px-6 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600"
+          >
+            {media.length > 0 ? 'Finish' : 'Skip & Finish'}
           </button>
         )}
       </div>

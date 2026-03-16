@@ -18,7 +18,9 @@ import { bookingRoutes } from './modules/booking/booking.routes.js';
 import { paymentRoutes } from './modules/payment/payment.routes.js';
 import { reviewRoutes } from './modules/review/review.routes.js';
 import { notificationRoutes } from './modules/notification/notification.routes.js';
+import { agentRoutes } from './modules/agent/agent.routes.js';
 import { adminRoutes } from './modules/admin/admin.routes.js';
+import { startCronJobs } from './infrastructure/cron.js';
 
 const app = Fastify({
   logger: {
@@ -33,7 +35,13 @@ const app = Fastify({
 
 // ─── Plugins ─────────────────────────────────────────────────
 await app.register(cors, {
-  origin: true,
+  origin: config.NODE_ENV === 'production'
+    ? [
+        /\.vercel\.app$/,
+        /\.onrender\.com$/,
+        'https://artist-booking-api.onrender.com',
+      ]
+    : true,
   credentials: true,
 });
 
@@ -89,6 +97,7 @@ await app.register(bookingRoutes);
 await app.register(paymentRoutes);
 await app.register(reviewRoutes);
 await app.register(notificationRoutes);
+await app.register(agentRoutes);
 await app.register(adminRoutes);
 
 // ─── Graceful Shutdown ───────────────────────────────────────
@@ -108,6 +117,7 @@ try {
   await redis.connect();
   await app.listen({ port: config.PORT, host: '0.0.0.0' });
   app.log.info(`Server running at http://0.0.0.0:${config.PORT}`);
+  startCronJobs();
 } catch (err) {
   app.log.fatal(err);
   process.exit(1);

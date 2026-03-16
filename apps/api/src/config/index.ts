@@ -61,6 +61,10 @@ const envSchema = z.object({
   // Firebase
   FIREBASE_PROJECT_ID: z.string().optional(),
 
+  // Resend (Email)
+  RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().default('Artist Booking <noreply@artistbooking.in>'),
+
   // Logging
   LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
 });
