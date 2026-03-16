@@ -14,11 +14,11 @@ export const db = knex({
   acquireConnectionTimeout: 10_000,
 });
 
-export async function checkDatabaseHealth(): Promise<boolean> {
+export async function checkDatabaseHealth(): Promise<{ ok: boolean; error?: string }> {
   try {
     await db.raw('SELECT 1');
-    return true;
-  } catch {
-    return false;
+    return { ok: true };
+  } catch (err: any) {
+    return { ok: false, error: err?.message || String(err) };
   }
 }

@@ -42,17 +42,18 @@ await app.register(helmet, {
 
 // ─── Health Check ────────────────────────────────────────────
 app.get('/health', async () => {
-  const [dbOk, redisOk] = await Promise.all([checkDatabaseHealth(), checkRedisHealth()]);
+  const [dbResult, redisOk] = await Promise.all([checkDatabaseHealth(), checkRedisHealth()]);
 
-  const status = dbOk && redisOk ? 'ok' : 'degraded';
+  const status = dbResult.ok && redisOk ? 'ok' : 'degraded';
 
   return {
     status,
     timestamp: new Date().toISOString(),
     services: {
-      database: dbOk ? 'ok' : 'error',
+      database: dbResult.ok ? 'ok' : 'error',
       redis: redisOk ? 'ok' : 'error',
     },
+    ...(dbResult.error && { dbError: dbResult.error }),
   };
 });
 
