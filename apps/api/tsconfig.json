@@ -8,12 +8,9 @@
     "lib": ["ES2022"],
     "paths": {
       "@/*": ["./src/*"],
-      "@artist-booking/shared": ["../../packages/shared/src/index.ts"],
-      "@artist-booking/shared/*": ["../../packages/shared/src/*"]
+      "@artist-booking/shared": ["../../packages/shared/dist/index.d.ts"],
+      "@artist-booking/shared/*": ["../../packages/shared/dist/*"]
     }
   },
-  "include": ["src/**/*"],
-  "references": [
-    { "path": "../../packages/shared" }
-  ]
+  "include": ["src/**/*"]
 }
