@@ -2,10 +2,14 @@ import Link from 'next/link';
 
 const CATEGORIES = [
   { name: 'Bollywood', icon: '🎤', count: '500+' },
+  { name: 'Jazz', icon: '🎷', count: '400+' },
+  { name: 'Hip-Hop', icon: '🎧', count: '350+' },
   { name: 'Classical', icon: '🎻', count: '300+' },
+  { name: 'Folk', icon: '🪕', count: '250+' },
   { name: 'Rock', icon: '🎸', count: '250+' },
-  { name: 'Jazz', icon: '🎷', count: '200+' },
-  { name: 'Electronic', icon: '🎧', count: '400+' },
+  { name: 'Pop', icon: '🎵', count: '200+' },
+  { name: 'Electronic', icon: '⚡', count: '200+' },
+  { name: 'Fusion', icon: '🎹', count: '150+' },
   { name: 'Sufi', icon: '🎶', count: '150+' },
 ];
 
@@ -104,7 +108,7 @@ export default function HomePage() {
           <p className="text-neutral-500 text-center mb-12">
             Find the right entertainment for any occasion
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {CATEGORIES.map((cat) => (
               <Link
                 key={cat.name}
