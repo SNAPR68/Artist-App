@@ -7,7 +7,7 @@ import type {
   CalendarStatus,
   EventType,
   CityTier,
-} from '../enums/index';
+} from '../enums/index.js';
 
 // ─── Base Types ──────────────────────────────────────────────
 export interface BaseEntity {

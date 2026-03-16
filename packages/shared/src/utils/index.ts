@@ -1,4 +1,4 @@
-import { CANCELLATION_TIERS, FINANCIAL } from '../constants/index';
+import { CANCELLATION_TIERS, FINANCIAL } from '../constants/index.js';
 
 /**
  * Convert paise to INR display string (e.g., 1500000 -> "₹15,000.00")

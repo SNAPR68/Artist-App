@@ -1,4 +1,4 @@
-import { BookingState } from '../enums/index';
+import { BookingState } from '../enums/index.js';
 
 // ─── Booking State Transitions ───────────────────────────────
 // Maps each state to its allowed next states

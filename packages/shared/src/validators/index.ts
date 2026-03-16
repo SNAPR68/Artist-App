@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserRole, EventType, CityTier, CalendarStatus, MediaType } from '../enums/index';
+import { UserRole, EventType, CityTier, CalendarStatus, MediaType } from '../enums/index.js';
 
 // ─── Auth ────────────────────────────────────────────────────
 export const generateOtpSchema = z.object({
