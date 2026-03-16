@@ -2,13 +2,14 @@ import type { ApiResponse } from '@artist-booking/shared';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
-let accessToken: string | null = null;
-let refreshToken: string | null = null;
+let accessToken: string | null = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+let refreshToken: string | null = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
 
 export function setTokens(access: string, refresh: string) {
   accessToken = access;
   refreshToken = refresh;
   if (typeof window !== 'undefined') {
+    localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
   }
 }
@@ -17,6 +18,7 @@ export function clearTokens() {
   accessToken = null;
   refreshToken = null;
   if (typeof window !== 'undefined') {
+    localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
   }
 }
@@ -64,7 +66,7 @@ export async function apiClient<T>(
   let response = await fetch(url, { ...options, headers });
 
   // Auto-refresh on 401
-  if (response.status === 401 && accessToken) {
+  if (response.status === 401) {
     const refreshed = await refreshAccessToken();
     if (refreshed) {
       headers['Authorization'] = `Bearer ${accessToken}`;
