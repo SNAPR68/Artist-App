@@ -15,6 +15,16 @@ import type {
   TransferMethod,
   EventDayIssueType,
   FailureEventType,
+  VenueStatus,
+  RiderItemCategory,
+  RiderPriority,
+  RiderFulfillmentStatus,
+  CrowdEnergyLevel,
+  DemographicAgeGroup,
+  WhatsAppIntentType,
+  WhatsAppMessageDirection,
+  PricingTier,
+  DemandLevel,
 } from '../enums/index.js';
 
 // ─── Base Types ──────────────────────────────────────────────
@@ -378,5 +388,219 @@ export interface FailureEvent {
   stage: string | null;
   reason: string | null;
   metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+// ─── Venue Profile ────────────────────────────────────────────
+export interface VenueProfile extends BaseEntity {
+  name: string;
+  slug: string;
+  venue_type: string;
+  status: VenueStatus;
+  city: string;
+  city_tier: CityTier;
+  address: string;
+  lat: number | null;
+  lng: number | null;
+  capacity_min: number;
+  capacity_max: number;
+  indoor: boolean;
+  outdoor_covered: boolean;
+  outdoor_open: boolean;
+  stage_width_ft: number | null;
+  stage_depth_ft: number | null;
+  ceiling_height_ft: number | null;
+  power_supply_kva: number | null;
+  has_green_room: boolean;
+  has_parking: boolean;
+  parking_capacity: number | null;
+  load_in_access: string | null;
+  acoustics_rating: number | null;
+  photos: string[];
+  contact_name: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
+  notes: string | null;
+  created_by: string | null;
+  total_events_hosted: number;
+  avg_crowd_rating: number | null;
+}
+
+export interface VenueEquipment {
+  id: string;
+  venue_id: string;
+  category: RiderItemCategory;
+  item_name: string;
+  quantity: number;
+  condition: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+// ─── Artist Rider ─────────────────────────────────────────────
+export interface ArtistRider {
+  id: string;
+  artist_id: string;
+  version: number;
+  notes: string | null;
+  hospitality_requirements: Record<string, unknown>;
+  travel_requirements: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RiderLineItem {
+  id: string;
+  rider_id: string;
+  category: RiderItemCategory;
+  item_name: string;
+  quantity: number;
+  priority: RiderPriority;
+  specifications: string | null;
+  alternatives: string[];
+  sort_order: number;
+  created_at: string;
+}
+
+export interface RiderVenueCheck {
+  id: string;
+  booking_id: string;
+  rider_id: string;
+  venue_id: string;
+  line_item_id: string;
+  fulfillment_status: RiderFulfillmentStatus;
+  alternative_offered: string | null;
+  checked_by: string | null;
+  checked_at: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+// ─── Event Context ────────────────────────────────────────────
+export interface EventContextData {
+  id: string;
+  booking_id: string;
+  submitted_by: string;
+  crowd_size_estimate: number;
+  crowd_energy: CrowdEnergyLevel;
+  primary_age_group: DemographicAgeGroup;
+  secondary_age_group: DemographicAgeGroup | null;
+  gender_ratio_male_pct: number;
+  vibe_tags: string[];
+  genre_reception: Record<string, number>;
+  set_highlights: string | null;
+  would_rebook_artist: boolean;
+  venue_acoustics_rating: number | null;
+  venue_crowd_flow_rating: number | null;
+  audience_requests: string[];
+  weather_conditions: string | null;
+  created_at: string;
+}
+
+// ─── Calendar Intelligence ────────────────────────────────────
+export interface DemandForecast {
+  id: string;
+  signal_date: string;
+  city: string;
+  genre: string | null;
+  event_type: EventType | null;
+  search_count: number;
+  inquiry_count: number;
+  booking_count: number;
+  available_artist_count: number;
+  fill_rate: number;
+  demand_level: DemandLevel;
+  yoy_growth_pct: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CalendarIntelligenceAlert {
+  id: string;
+  artist_id: string;
+  alert_type: string;
+  title: string;
+  message: string;
+  metadata: Record<string, unknown>;
+  is_read: boolean;
+  is_actionable: boolean;
+  action_url: string | null;
+  expires_at: string | null;
+  created_at: string;
+}
+
+// ─── WhatsApp ─────────────────────────────────────────────────
+export interface WhatsAppConversation {
+  id: string;
+  phone_number: string;
+  user_id: string | null;
+  current_intent: WhatsAppIntentType | null;
+  conversation_state: Record<string, unknown>;
+  last_message_at: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WhatsAppMessage {
+  id: string;
+  conversation_id: string;
+  direction: WhatsAppMessageDirection;
+  message_type: string;
+  content: string;
+  parsed_intent: WhatsAppIntentType | null;
+  parsed_entities: Record<string, unknown> | null;
+  provider_message_id: string | null;
+  status: string;
+  created_at: string;
+}
+
+// ─── Pricing Brain ────────────────────────────────────────────
+export interface ArtistMarketPosition {
+  id: string;
+  artist_id: string;
+  genre: string;
+  city: string;
+  event_type: EventType;
+  pricing_tier: PricingTier;
+  percentile_rank: number;
+  market_median_paise: number;
+  artist_avg_paise: number;
+  price_vs_market_pct: number;
+  sample_size: number;
+  market_sample_size: number;
+  last_computed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PricingRecommendation {
+  id: string;
+  artist_id: string;
+  event_type: EventType;
+  city: string | null;
+  recommended_min_paise: number;
+  recommended_max_paise: number;
+  current_min_paise: number;
+  current_max_paise: number;
+  rationale: string;
+  factors: Record<string, unknown>;
+  confidence: number;
+  is_dismissed: boolean;
+  created_at: string;
+  expires_at: string;
+}
+
+// ─── Venue-Artist History ─────────────────────────────────────
+export interface VenueArtistHistory {
+  id: string;
+  venue_id: string;
+  artist_id: string;
+  booking_id: string;
+  event_type: EventType;
+  event_date: string;
+  crowd_energy: CrowdEnergyLevel | null;
+  venue_acoustics_rating: number | null;
+  overall_review_rating: number | null;
   created_at: string;
 }

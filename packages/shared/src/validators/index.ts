@@ -3,6 +3,8 @@ import {
   UserRole, EventType, CityTier, CalendarStatus, MediaType,
   DisputeType, ResolutionType, CancellationSubType,
   CoordinationCheckpoint, EventDayIssueType,
+  RiderItemCategory, RiderPriority, RiderFulfillmentStatus,
+  CrowdEnergyLevel, DemographicAgeGroup,
 } from '../enums/index.js';
 
 // ─── Auth ────────────────────────────────────────────────────
@@ -242,4 +244,125 @@ export const recordFailureSchema = z.object({
   stage: z.string().max(50),
   search_params: z.record(z.unknown()).optional(),
   metadata: z.record(z.unknown()).optional(),
+});
+
+// ─── Event Context ──────────────────────────────────────────────
+export const submitEventContextSchema = z.object({
+  crowd_size_estimate: z.number().int().min(1).max(100000),
+  crowd_energy: z.nativeEnum(CrowdEnergyLevel),
+  primary_age_group: z.nativeEnum(DemographicAgeGroup),
+  secondary_age_group: z.nativeEnum(DemographicAgeGroup).optional(),
+  gender_ratio_male_pct: z.number().int().min(0).max(100),
+  vibe_tags: z.array(z.string().min(1).max(50)).min(1).max(10),
+  genre_reception: z.record(z.number().min(1).max(5)),
+  set_highlights: z.string().max(2000).optional(),
+  would_rebook_artist: z.boolean(),
+  venue_acoustics_rating: z.number().int().min(1).max(5).optional(),
+  venue_crowd_flow_rating: z.number().int().min(1).max(5).optional(),
+  audience_requests: z.array(z.string().max(200)).max(20).default([]),
+  weather_conditions: z.string().max(200).optional(),
+});
+
+// ─── Venue ──────────────────────────────────────────────────────
+export const createVenueSchema = z.object({
+  name: z.string().min(2).max(200),
+  venue_type: z.string().min(2).max(50),
+  city: z.string().min(2).max(100),
+  city_tier: z.nativeEnum(CityTier),
+  address: z.string().min(5).max(500),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+  capacity_min: z.number().int().min(1).max(100000),
+  capacity_max: z.number().int().min(1).max(100000),
+  indoor: z.boolean().default(false),
+  outdoor_covered: z.boolean().default(false),
+  outdoor_open: z.boolean().default(false),
+  stage_width_ft: z.number().min(1).max(500).optional(),
+  stage_depth_ft: z.number().min(1).max(500).optional(),
+  ceiling_height_ft: z.number().min(1).max(200).optional(),
+  power_supply_kva: z.number().int().min(1).optional(),
+  has_green_room: z.boolean().default(false),
+  has_parking: z.boolean().default(false),
+  parking_capacity: z.number().int().min(0).optional(),
+  load_in_access: z.string().max(500).optional(),
+  photos: z.array(z.string().url().max(2048)).max(20).default([]),
+  contact_name: z.string().max(200).optional(),
+  contact_phone: z.string().max(20).optional(),
+  contact_email: z.string().email().max(200).optional(),
+  notes: z.string().max(2000).optional(),
+});
+
+export const updateVenueSchema = createVenueSchema.partial();
+
+export const addVenueEquipmentSchema = z.object({
+  category: z.nativeEnum(RiderItemCategory),
+  item_name: z.string().min(1).max(200),
+  quantity: z.number().int().min(1).default(1),
+  condition: z.enum(['excellent', 'good', 'fair']).optional(),
+  notes: z.string().max(500).optional(),
+});
+
+export const venueSearchSchema = z.object({
+  q: z.string().max(200).optional(),
+  city: z.string().optional(),
+  venue_type: z.string().optional(),
+  capacity_min: z.number().int().min(0).optional(),
+  capacity_max: z.number().int().min(0).optional(),
+  has_green_room: z.boolean().optional(),
+  has_parking: z.boolean().optional(),
+  indoor: z.boolean().optional(),
+  page: z.number().int().min(1).default(1),
+  per_page: z.number().int().min(1).max(100).default(20),
+});
+
+// ─── Rider ──────────────────────────────────────────────────────
+export const createRiderSchema = z.object({
+  notes: z.string().max(2000).optional(),
+  hospitality_requirements: z.record(z.unknown()).default({}),
+  travel_requirements: z.record(z.unknown()).default({}),
+});
+
+export const addRiderLineItemSchema = z.object({
+  category: z.nativeEnum(RiderItemCategory),
+  item_name: z.string().min(1).max(200),
+  quantity: z.number().int().min(1).default(1),
+  priority: z.nativeEnum(RiderPriority),
+  specifications: z.string().max(1000).optional(),
+  alternatives: z.array(z.string().max(200)).max(5).default([]),
+  sort_order: z.number().int().min(0).default(0),
+});
+
+export const updateRiderLineItemSchema = addRiderLineItemSchema.partial();
+
+export const updateRiderCheckSchema = z.object({
+  fulfillment_status: z.nativeEnum(RiderFulfillmentStatus),
+  alternative_offered: z.string().max(500).optional(),
+  notes: z.string().max(1000).optional(),
+});
+
+// ─── Calendar Intelligence ──────────────────────────────────────
+export const demandForecastQuerySchema = z.object({
+  city: z.string().optional(),
+  genre: z.string().optional(),
+  event_type: z.nativeEnum(EventType).optional(),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+});
+
+export const calendarIntelligenceQuerySchema = z.object({
+  alert_type: z.string().optional(),
+  is_read: z.boolean().optional(),
+  page: z.number().int().min(1).default(1),
+  per_page: z.number().int().min(1).max(100).default(20),
+});
+
+// ─── Pricing Brain ──────────────────────────────────────────────
+export const pricingBrainQuerySchema = z.object({
+  event_type: z.nativeEnum(EventType).optional(),
+  city: z.string().optional(),
+  genre: z.string().optional(),
+});
+
+export const dismissRecommendationSchema = z.object({
+  reason: z.string().max(500).optional(),
 });

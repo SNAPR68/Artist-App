@@ -82,6 +82,29 @@ const PERMISSIONS: Record<string, UserRole[]> = {
   // Analytics
   'analytics:read': [UserRole.ADMIN],
   'analytics:fair_price': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+
+  // Event Context
+  'event_context:create': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'event_context:read': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+
+  // Venues
+  'venue:create': [UserRole.ADMIN, UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'venue:read': [UserRole.ARTIST, UserRole.AGENT, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.ADMIN],
+  'venue:update': [UserRole.ADMIN, UserRole.EVENT_COMPANY],
+
+  // Rider
+  'rider:manage': [UserRole.ARTIST],
+  'rider:read': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'rider:check': [UserRole.ADMIN, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+
+  // Calendar Intelligence
+  'calendar_intelligence:read': [UserRole.ARTIST, UserRole.AGENT],
+
+  // Pricing Brain
+  'pricing_brain:read': [UserRole.ARTIST, UserRole.AGENT],
+
+  // WhatsApp Admin
+  'admin:whatsapp': [UserRole.ADMIN],
 };
 
 /**

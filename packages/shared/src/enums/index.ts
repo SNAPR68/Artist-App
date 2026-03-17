@@ -152,3 +152,84 @@ export enum FailureEventType {
   ABANDONED_FLOW = 'abandoned_flow',
   BOOKING_DROPOFF = 'booking_dropoff',
 }
+
+// ─── Venue ──────────────────────────────────────────────────
+export enum VenueStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PENDING_VERIFICATION = 'pending_verification',
+}
+
+// ─── Rider ──────────────────────────────────────────────────
+export enum RiderItemCategory {
+  SOUND = 'sound',
+  LIGHTING = 'lighting',
+  BACKLINE = 'backline',
+  STAGING = 'staging',
+  POWER = 'power',
+  HOSPITALITY = 'hospitality',
+  TRANSPORT = 'transport',
+  OTHER = 'other',
+}
+
+export enum RiderPriority {
+  MUST_HAVE = 'must_have',
+  NICE_TO_HAVE = 'nice_to_have',
+  FLEXIBLE = 'flexible',
+}
+
+export enum RiderFulfillmentStatus {
+  NOT_CHECKED = 'not_checked',
+  AVAILABLE = 'available',
+  PARTIAL = 'partial',
+  UNAVAILABLE = 'unavailable',
+  ALTERNATIVE_OFFERED = 'alternative_offered',
+}
+
+// ─── Event Context ──────────────────────────────────────────
+export enum CrowdEnergyLevel {
+  LOW = 'low',
+  MODERATE = 'moderate',
+  HIGH = 'high',
+  ELECTRIC = 'electric',
+}
+
+export enum DemographicAgeGroup {
+  UNDER_18 = 'under_18',
+  AGE_18_25 = '18_25',
+  AGE_25_35 = '25_35',
+  AGE_35_50 = '35_50',
+  AGE_50_PLUS = '50_plus',
+  MIXED = 'mixed',
+}
+
+// ─── WhatsApp ───────────────────────────────────────────────
+export enum WhatsAppMessageDirection {
+  INBOUND = 'inbound',
+  OUTBOUND = 'outbound',
+}
+
+export enum WhatsAppIntentType {
+  SEARCH_ARTIST = 'search_artist',
+  CHECK_AVAILABILITY = 'check_availability',
+  CREATE_INQUIRY = 'create_inquiry',
+  GET_QUOTE = 'get_quote',
+  CHECK_STATUS = 'check_status',
+  GENERAL_QUESTION = 'general_question',
+  UNKNOWN = 'unknown',
+}
+
+// ─── Pricing Intelligence ───────────────────────────────────
+export enum PricingTier {
+  BUDGET = 'budget',
+  MID_RANGE = 'mid_range',
+  PREMIUM = 'premium',
+  LUXURY = 'luxury',
+}
+
+export enum DemandLevel {
+  LOW = 'low',
+  MODERATE = 'moderate',
+  HIGH = 'high',
+  PEAK = 'peak',
+}

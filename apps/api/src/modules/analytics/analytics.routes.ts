@@ -1,10 +1,12 @@
 import type { FastifyInstance } from 'fastify';
 import { failureService } from './failure.service.js';
 import { priceIntelligenceService } from './price-intelligence.service.js';
+import { calendarIntelligenceService } from './calendar-intelligence.service.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
-import { recordFailureSchema } from '@artist-booking/shared';
+import { recordFailureSchema, demandForecastQuerySchema, calendarIntelligenceQuerySchema } from '@artist-booking/shared';
+import { db } from '../../infrastructure/database.js';
 
 export async function analyticsRoutes(app: FastifyInstance) {
   /**
@@ -83,5 +85,64 @@ export async function analyticsRoutes(app: FastifyInstance) {
     );
 
     return reply.status(201).send({ success: true, data: { recorded: true }, errors: [] });
+  });
+
+  // ─── Calendar Intelligence ──────────────────────────────────
+
+  /**
+   * GET /v1/analytics/demand-forecast — Demand forecast by city/genre/date
+   */
+  app.get('/v1/analytics/demand-forecast', {
+    preHandler: [authMiddleware, requirePermission('analytics:fair_price'), rateLimit('SEARCH')],
+  }, async (request, reply) => {
+    const filters = demandForecastQuerySchema.parse(request.query);
+    const data = await calendarIntelligenceService.getDemandForecast(filters);
+
+    return reply.send({ success: true, data, errors: [] });
+  });
+
+  /**
+   * GET /v1/analytics/demand-heatmap — Admin: city x date demand heatmap
+   */
+  app.get('/v1/analytics/demand-heatmap', {
+    preHandler: [authMiddleware, requirePermission('analytics:read')],
+  }, async (_request, reply) => {
+    const data = await calendarIntelligenceService.getDemandHeatmap();
+
+    return reply.send({ success: true, data, errors: [] });
+  });
+
+  /**
+   * GET /v1/artists/me/calendar-intelligence — Artist's personalized alerts
+   */
+  app.get('/v1/artists/me/calendar-intelligence', {
+    preHandler: [authMiddleware, requirePermission('calendar_intelligence:read')],
+  }, async (request, reply) => {
+    const profile = await db('artist_profiles').where({ user_id: request.user!.user_id }).first();
+    if (!profile) {
+      return reply.status(404).send({ success: false, data: null, errors: [{ code: 'NOT_FOUND', message: 'Artist profile not found' }] });
+    }
+
+    const filters = calendarIntelligenceQuerySchema.parse(request.query);
+    const result = await calendarIntelligenceService.getArtistAlerts(profile.id, filters);
+
+    return reply.send({ success: true, data: result.data, meta: result.meta, errors: [] });
+  });
+
+  /**
+   * PUT /v1/artists/me/calendar-intelligence/:alertId/read — Mark alert read
+   */
+  app.put('/v1/artists/me/calendar-intelligence/:alertId/read', {
+    preHandler: [authMiddleware, requirePermission('calendar_intelligence:read')],
+  }, async (request, reply) => {
+    const { alertId } = request.params as { alertId: string };
+    const profile = await db('artist_profiles').where({ user_id: request.user!.user_id }).first();
+    if (!profile) {
+      return reply.status(404).send({ success: false, data: null, errors: [{ code: 'NOT_FOUND', message: 'Artist profile not found' }] });
+    }
+
+    const updated = await calendarIntelligenceService.markAlertRead(alertId, profile.id);
+
+    return reply.send({ success: true, data: updated, errors: [] });
   });
 }

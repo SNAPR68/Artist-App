@@ -137,6 +137,70 @@ export const NOTIFICATION_TEMPLATES: Record<string, NotificationTemplate> = {
     email_subject: 'Event Completed — {{event_type}}',
     email_body: 'Your <strong>{{event_type}}</strong> at <strong>{{venue}}</strong> has been marked complete by both parties. Settlement will be processed automatically.',
   },
+
+  // ─── Event Context Templates ──────────────────────────────
+  event_context_request: {
+    whatsapp_template_id: 'event_context_request_v1',
+    sms_flow_id: 'flow_event_context',
+    push_title: 'Share Event Details',
+    push_body: 'How was the event? Share crowd details for {{event_type}} to improve future matches.',
+    email_subject: 'Share Event Details — {{event_type}}',
+    email_body: 'Your <strong>{{event_type}}</strong> is complete! Share crowd demographics and event details to help improve future artist-venue matching.',
+  },
+
+  // ─── Calendar Intelligence Templates ──────────────────────
+  calendar_intelligence_opportunity: {
+    whatsapp_template_id: 'cal_intel_opportunity_v1',
+    sms_flow_id: 'flow_cal_opportunity',
+    push_title: 'High Demand Opportunity',
+    push_body: 'High demand for {{genre}} in {{city}} on {{date}}. You\'re available — consider marketing this date!',
+    email_subject: 'High Demand Opportunity — {{genre}} in {{city}}',
+    email_body: 'There is <strong>high demand</strong> for <strong>{{genre}}</strong> in <strong>{{city}}</strong> on <strong>{{date}}</strong>. You\'re available on this date — consider marketing it!',
+  },
+  calendar_intelligence_seasonal: {
+    whatsapp_template_id: 'cal_intel_seasonal_v1',
+    sms_flow_id: 'flow_cal_seasonal',
+    push_title: 'Seasonal Opportunity',
+    push_body: '{{event_type}} season approaching in {{city}}. Update your pricing and availability.',
+    email_subject: 'Seasonal Alert — {{event_type}} in {{city}}',
+    email_body: '<strong>{{event_type}}</strong> season is approaching in <strong>{{city}}</strong>. Update your pricing and availability to capture demand.',
+  },
+
+  // ─── Pricing Brain Templates ──────────────────────────────
+  pricing_recommendation: {
+    whatsapp_template_id: 'pricing_rec_v1',
+    sms_flow_id: 'flow_pricing_rec',
+    push_title: 'Pricing Insight',
+    push_body: 'Price check: You may be {{direction}} for {{event_type}} in {{city}}. See our recommendation.',
+    email_subject: 'Pricing Recommendation — {{event_type}} in {{city}}',
+    email_body: 'Our pricing intelligence suggests you may be <strong>{{direction}}</strong> for <strong>{{event_type}}</strong> in <strong>{{city}}</strong>. Log in to review the recommendation and market data.',
+  },
+  pricing_opportunity: {
+    whatsapp_template_id: 'pricing_opp_v1',
+    sms_flow_id: 'flow_pricing_opp',
+    push_title: 'Pricing Opportunity',
+    push_body: 'High demand for {{genre}} in {{city}} next month. Consider adjusting your rates.',
+    email_subject: 'Demand-Based Pricing Opportunity — {{genre}}',
+    email_body: 'High demand for <strong>{{genre}}</strong> in <strong>{{city}}</strong> is expected next month. Consider adjusting your rates to capture this opportunity.',
+  },
+
+  // ─── WhatsApp Flow Templates ──────────────────────────────
+  whatsapp_welcome: {
+    whatsapp_template_id: 'wa_welcome_v1',
+    sms_flow_id: 'flow_wa_welcome',
+    push_title: 'Welcome',
+    push_body: 'Welcome! I can help you find and book artists. What are you looking for?',
+    email_subject: 'Welcome to Artist Booking',
+    email_body: 'Welcome! You can find and book artists for your event via WhatsApp. Just send a message to get started.',
+  },
+  whatsapp_inquiry_created: {
+    whatsapp_template_id: 'wa_inquiry_v1',
+    sms_flow_id: 'flow_wa_inquiry',
+    push_title: 'Booking Inquiry Created',
+    push_body: 'Booking inquiry #{{booking_id}} created! The artist will respond within {{response_hours}}h.',
+    email_subject: 'Booking Inquiry Created via WhatsApp',
+    email_body: 'Your booking inquiry <strong>#{{booking_id}}</strong> has been created via WhatsApp. The artist will respond within <strong>{{response_hours}} hours</strong>.',
+  },
 };
 
 /**

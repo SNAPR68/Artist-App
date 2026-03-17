@@ -122,3 +122,31 @@ export const COORDINATION_ESCALATION_THRESHOLDS = {
 
 // ─── Event Day ─────────────────────────────────────────────────
 export const ARRIVAL_VERIFICATION_RADIUS_M = 500;
+
+// ─── Venue-Artist Compatibility ─────────────────────────────────
+export const VENUE_COMPATIBILITY_WEIGHTS = {
+  CAPACITY: 0.30,
+  EQUIPMENT: 0.35,
+  LOCATION: 0.15,
+  PAST_SUCCESS: 0.20,
+} as const;
+
+// ─── Demand Intelligence ────────────────────────────────────────
+export const DEMAND_THRESHOLDS = {
+  LOW: 0.3,
+  MODERATE: 0.5,
+  HIGH: 0.7,
+  PEAK: 0.9,
+} as const;
+
+export const PRICING_TIER_PERCENTILES = {
+  BUDGET: { min: 0, max: 25 },
+  MID_RANGE: { min: 25, max: 50 },
+  PREMIUM: { min: 50, max: 75 },
+  LUXURY: { min: 75, max: 100 },
+} as const;
+
+export const CALENDAR_INTELLIGENCE_LOOKAHEAD_DAYS = 90;
+
+// ─── WhatsApp ───────────────────────────────────────────────────
+export const WHATSAPP_SESSION_TIMEOUT_HOURS = 24;

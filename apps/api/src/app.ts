@@ -26,6 +26,11 @@ import { conciergeRoutes } from './modules/concierge/concierge.routes.js';
 import { coordinationRoutes } from './modules/coordination/coordination.routes.js';
 import { eventDayRoutes } from './modules/event-day/event-day.routes.js';
 import { analyticsRoutes } from './modules/analytics/analytics.routes.js';
+import { eventContextRoutes } from './modules/event-context/event-context.routes.js';
+import { venueRoutes } from './modules/venue/venue.routes.js';
+import { riderRoutes } from './modules/rider/rider.routes.js';
+import { pricingBrainRoutes } from './modules/pricing-brain/pricing-brain.routes.js';
+import { whatsappRoutes } from './modules/whatsapp/whatsapp.routes.js';
 import { startCronJobs } from './infrastructure/cron.js';
 
 const app = Fastify({
@@ -112,6 +117,11 @@ await app.register(conciergeRoutes);
 await app.register(coordinationRoutes);
 await app.register(eventDayRoutes);
 await app.register(analyticsRoutes);
+await app.register(eventContextRoutes);
+await app.register(venueRoutes);
+await app.register(riderRoutes);
+await app.register(pricingBrainRoutes);
+await app.register(whatsappRoutes);
 
 // ─── Graceful Shutdown ───────────────────────────────────────
 async function shutdown(signal: string) {

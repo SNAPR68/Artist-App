@@ -1,5 +1,6 @@
 import { eventDayRepository } from './event-day.repository.js';
 import { bookingRepository } from '../booking/booking.repository.js';
+import { db } from '../../infrastructure/database.js';
 import { BookingState, ARRIVAL_VERIFICATION_RADIUS_M } from '@artist-booking/shared';
 
 class EventDayError extends Error {
@@ -173,6 +174,24 @@ export class EventDayService {
             client_confirmed_at: updated.completion_client_at,
           },
         });
+
+        // Create venue_artist_history stub if booking has a venue
+        if (booking.venue_id) {
+          try {
+            await db('venue_artist_history')
+              .insert({
+                venue_id: booking.venue_id,
+                artist_id: booking.artist_id,
+                booking_id: bookingId,
+                event_type: booking.event_type,
+                event_date: booking.event_date,
+              })
+              .onConflict('booking_id')
+              .ignore();
+          } catch {
+            // Non-critical — don't fail completion
+          }
+        }
       }
     }
 
