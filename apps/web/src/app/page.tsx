@@ -112,7 +112,7 @@ export default function HomePage() {
             {CATEGORIES.map((cat) => (
               <Link
                 key={cat.name}
-                href={`/search?genre=${cat.name.toLowerCase()}`}
+                href={`/search?genre=${encodeURIComponent(cat.name)}`}
                 className="group flex flex-col items-center p-6 bg-neutral-50 hover:bg-primary-50 rounded-2xl transition-colors"
               >
                 <span className="text-4xl mb-3">{cat.icon}</span>

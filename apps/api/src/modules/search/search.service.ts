@@ -94,7 +94,7 @@ export class SearchService {
     }
 
     if (genre) {
-      query = query.whereRaw('? = ANY(ap.genres)', [genre]);
+      query = query.whereRaw('LOWER(?) = ANY(SELECT LOWER(unnest(ap.genres)))', [genre]);
     }
 
     if (city) {
@@ -102,7 +102,7 @@ export class SearchService {
     }
 
     if (event_type) {
-      query = query.whereRaw('? = ANY(ap.event_types)', [event_type]);
+      query = query.whereRaw('LOWER(?) = ANY(SELECT LOWER(unnest(ap.event_types)))', [event_type]);
     }
 
     if (budget_min !== undefined) {
@@ -156,14 +156,17 @@ export class SearchService {
     const thumbMap = new Map(thumbnails.map((t: any) => [t.artist_id, t.thumbnail_url ?? t.original_url]));
 
     // Compute facets from DB
-    const genreFacets = await db('artist_profiles as ap')
-      .join('users as u', 'u.id', 'ap.user_id')
-      .where({ 'u.is_active': true, 'ap.deleted_at': null })
-      .select(db.raw("unnest(ap.genres) as genre"))
-      .groupBy('genre')
-      .orderByRaw('count(*) desc')
-      .limit(20)
-      .select(db.raw("count(*) as count"));
+    const genreFacets = await db.raw(`
+      SELECT genre, count(*) as count FROM (
+        SELECT unnest(ap.genres) as genre
+        FROM artist_profiles ap
+        JOIN users u ON u.id = ap.user_id
+        WHERE u.is_active = true AND ap.deleted_at IS NULL
+      ) sub
+      GROUP BY genre
+      ORDER BY count(*) DESC
+      LIMIT 20
+    `).then((r: any) => r.rows);
 
     const cityFacets = await db('artist_profiles as ap')
       .join('users as u', 'u.id', 'ap.user_id')
@@ -174,14 +177,17 @@ export class SearchService {
       .limit(20)
       .select('ap.base_city as city', db.raw('count(*) as count'));
 
-    const eventTypeFacets = await db('artist_profiles as ap')
-      .join('users as u', 'u.id', 'ap.user_id')
-      .where({ 'u.is_active': true, 'ap.deleted_at': null })
-      .select(db.raw("unnest(ap.event_types) as event_type"))
-      .groupBy('event_type')
-      .orderByRaw('count(*) desc')
-      .limit(20)
-      .select(db.raw("count(*) as count"));
+    const eventTypeFacets = await db.raw(`
+      SELECT event_type, count(*) as count FROM (
+        SELECT unnest(ap.event_types) as event_type
+        FROM artist_profiles ap
+        JOIN users u ON u.id = ap.user_id
+        WHERE u.is_active = true AND ap.deleted_at IS NULL
+      ) sub
+      GROUP BY event_type
+      ORDER BY count(*) DESC
+      LIMIT 20
+    `).then((r: any) => r.rows);
 
     const [priceRange] = await db('artist_profiles as ap')
       .join('users as u', 'u.id', 'ap.user_id')
