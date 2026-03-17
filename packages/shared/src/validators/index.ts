@@ -1,5 +1,9 @@
 import { z } from 'zod';
-import { UserRole, EventType, CityTier, CalendarStatus, MediaType } from '../enums/index.js';
+import {
+  UserRole, EventType, CityTier, CalendarStatus, MediaType,
+  DisputeType, ResolutionType, CancellationSubType,
+  CoordinationCheckpoint, EventDayIssueType,
+} from '../enums/index.js';
 
 // ─── Auth ────────────────────────────────────────────────────
 export const generateOtpSchema = z.object({
@@ -152,4 +156,90 @@ export const verifyPaymentSchema = z.object({
   razorpay_order_id: z.string(),
   razorpay_payment_id: z.string(),
   razorpay_signature: z.string(),
+});
+
+// ─── Dispute ────────────────────────────────────────────────────
+export const submitDisputeSchema = z.object({
+  booking_id: z.string().uuid(),
+  dispute_type: z.nativeEnum(DisputeType),
+  description: z.string().min(20).max(5000),
+});
+
+export const addDisputeEvidenceSchema = z.object({
+  evidence_type: z.enum(['photo', 'video', 'audio', 'document', 'screenshot', 'communication_log']),
+  file_url: z.string().url().max(2048),
+  description: z.string().max(2000).optional(),
+});
+
+export const resolveDisputeSchema = z.object({
+  resolution_type: z.nativeEnum(ResolutionType),
+  resolution_notes: z.string().min(10).max(5000),
+  financial_resolution: z.object({
+    refund_amount_paise: z.number().int().min(0).optional(),
+    artist_payout_paise: z.number().int().min(0).optional(),
+    platform_absorbs_paise: z.number().int().min(0).optional(),
+  }).optional(),
+  trust_impact: z.object({
+    artist_adjustment: z.number().min(-20).max(0).optional(),
+    client_adjustment: z.number().min(-20).max(0).optional(),
+  }).optional(),
+});
+
+export const appealDisputeSchema = z.object({
+  reason: z.string().min(20).max(5000),
+});
+
+// ─── Cancellation ───────────────────────────────────────────────
+export const cancelBookingSchema = z.object({
+  sub_type: z.nativeEnum(CancellationSubType),
+  reason: z.string().min(10).max(2000),
+});
+
+// ─── Bank Account ───────────────────────────────────────────────
+export const addBankAccountSchema = z.object({
+  account_holder_name: z.string().min(2).max(200),
+  account_number: z.string().min(8).max(20).regex(/^\d+$/, 'Account number must be digits only'),
+  ifsc_code: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, 'Invalid IFSC code format'),
+  bank_name: z.string().min(2).max(200),
+  upi_id: z.string().max(100).optional(),
+  is_primary: z.boolean().default(true),
+});
+
+export const updateBankAccountSchema = addBankAccountSchema.partial();
+
+// ─── Coordination ──────────────────────────────────────────────
+export const confirmCheckpointSchema = z.object({
+  checkpoint: z.nativeEnum(CoordinationCheckpoint),
+});
+
+export const updateLogisticsSchema = z.object({
+  travel_mode: z.enum(['flight', 'train', 'car', 'local']).optional(),
+  hotel_booked: z.boolean().optional(),
+  hotel_details: z.object({
+    name: z.string().max(200),
+    address: z.string().max(500),
+    check_in: z.string(),
+    confirmation_id: z.string().max(100).optional(),
+  }).optional(),
+  parking_arranged: z.boolean().optional(),
+  special_rider_notes: z.string().max(2000).optional(),
+});
+
+// ─── Event Day ─────────────────────────────────────────────────
+export const recordArrivalSchema = z.object({
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
+});
+
+export const flagIssueSchema = z.object({
+  type: z.nativeEnum(EventDayIssueType),
+  description: z.string().min(10).max(2000),
+});
+
+// ─── Failure Capture ───────────────────────────────────────────
+export const recordFailureSchema = z.object({
+  event_type: z.enum(['abandoned_flow']),
+  stage: z.string().max(50),
+  search_params: z.record(z.unknown()).optional(),
+  metadata: z.record(z.unknown()).optional(),
 });

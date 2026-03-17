@@ -21,6 +21,11 @@ import { reviewRoutes } from './modules/review/review.routes.js';
 import { notificationRoutes } from './modules/notification/notification.routes.js';
 import { agentRoutes } from './modules/agent/agent.routes.js';
 import { adminRoutes } from './modules/admin/admin.routes.js';
+import { disputeRoutes } from './modules/dispute/dispute.routes.js';
+import { conciergeRoutes } from './modules/concierge/concierge.routes.js';
+import { coordinationRoutes } from './modules/coordination/coordination.routes.js';
+import { eventDayRoutes } from './modules/event-day/event-day.routes.js';
+import { analyticsRoutes } from './modules/analytics/analytics.routes.js';
 import { startCronJobs } from './infrastructure/cron.js';
 
 const app = Fastify({
@@ -102,6 +107,11 @@ await app.register(reviewRoutes);
 await app.register(notificationRoutes);
 await app.register(agentRoutes);
 await app.register(adminRoutes);
+await app.register(disputeRoutes);
+await app.register(conciergeRoutes);
+await app.register(coordinationRoutes);
+await app.register(eventDayRoutes);
+await app.register(analyticsRoutes);
 
 // ─── Graceful Shutdown ───────────────────────────────────────
 async function shutdown(signal: string) {

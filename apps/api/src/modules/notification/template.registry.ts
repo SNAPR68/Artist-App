@@ -77,6 +77,66 @@ export const NOTIFICATION_TEMPLATES: Record<string, NotificationTemplate> = {
     email_subject: 'New Review Published',
     email_body: 'A new review has been published for your recent booking. Log in to your dashboard to read it.',
   },
+
+  // ─── Coordination Templates ─────────────────────────────────
+  coordination_rider: {
+    whatsapp_template_id: 'coordination_rider_v1',
+    sms_flow_id: 'flow_coord_rider',
+    push_title: 'Rider Confirmation Needed',
+    push_body: 'Please confirm the technical rider for {{event_type}} on {{event_date}}. Due by {{deadline}}.',
+    email_subject: 'Action Required: Confirm Rider — {{event_type}}',
+    email_body: 'The technical rider for your <strong>{{event_type}}</strong> on <strong>{{event_date}}</strong> needs confirmation by <strong>{{deadline}}</strong>. Log in to review and confirm.',
+  },
+  coordination_logistics: {
+    whatsapp_template_id: 'coordination_logistics_v1',
+    sms_flow_id: 'flow_coord_logistics',
+    push_title: 'Logistics Details Needed',
+    push_body: 'Please update travel & hotel details for {{event_type}} on {{event_date}}. Due by {{deadline}}.',
+    email_subject: 'Action Required: Logistics Details — {{event_type}}',
+    email_body: 'Logistics details (travel, hotel, parking) for <strong>{{event_type}}</strong> on <strong>{{event_date}}</strong> need to be confirmed by <strong>{{deadline}}</strong>.',
+  },
+  coordination_final_reminder: {
+    whatsapp_template_id: 'coordination_final_v1',
+    sms_flow_id: 'flow_coord_final',
+    push_title: 'Final Confirmation Needed',
+    push_body: 'Final confirmation needed for {{event_type}} on {{event_date}} — event is in {{days_until}} days!',
+    email_subject: 'Final Confirmation — {{event_type}} in {{days_until}} Days',
+    email_body: 'Your <strong>{{event_type}}</strong> is in <strong>{{days_until}} days</strong>. Please complete your final confirmation checklist now.',
+  },
+  coordination_escalation: {
+    whatsapp_template_id: 'coordination_escalation_v1',
+    sms_flow_id: 'flow_coord_escalation',
+    push_title: 'Urgent: Overdue Coordination',
+    push_body: '⚠ Coordination checkpoint overdue for {{event_type}} on {{event_date}}. Please respond immediately.',
+    email_subject: 'URGENT: Overdue Coordination — {{event_type}}',
+    email_body: 'A coordination checkpoint for <strong>{{event_type}}</strong> on <strong>{{event_date}}</strong> is overdue. This has been escalated. Please respond immediately to avoid booking issues.',
+  },
+
+  // ─── Event-Day Templates ────────────────────────────────────
+  event_day_arrival: {
+    whatsapp_template_id: 'event_day_arrival_v1',
+    sms_flow_id: 'flow_ed_arrival',
+    push_title: 'Artist Arrived',
+    push_body: '{{artist_name}} has checked in at {{venue}} for {{event_type}}',
+    email_subject: 'Artist Arrived — {{event_type}}',
+    email_body: '<strong>{{artist_name}}</strong> has checked in at <strong>{{venue}}</strong> for your <strong>{{event_type}}</strong>. GPS verified.',
+  },
+  event_day_issue: {
+    whatsapp_template_id: 'event_day_issue_v1',
+    sms_flow_id: 'flow_ed_issue',
+    push_title: 'Issue Flagged',
+    push_body: 'An issue was flagged for {{event_type}} at {{venue}}: {{issue_type}}',
+    email_subject: 'Issue Flagged — {{event_type}}',
+    email_body: 'An issue has been flagged for <strong>{{event_type}}</strong> at <strong>{{venue}}</strong>: <strong>{{issue_type}}</strong>. Details: {{description}}',
+  },
+  event_day_completed: {
+    whatsapp_template_id: 'event_day_completed_v1',
+    sms_flow_id: 'flow_ed_completed',
+    push_title: 'Event Completed',
+    push_body: '{{event_type}} at {{venue}} has been marked complete by both parties. 🎉',
+    email_subject: 'Event Completed — {{event_type}}',
+    email_body: 'Your <strong>{{event_type}}</strong> at <strong>{{venue}}</strong> has been marked complete by both parties. Settlement will be processed automatically.',
+  },
 };
 
 /**

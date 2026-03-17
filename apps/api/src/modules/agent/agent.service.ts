@@ -76,6 +76,35 @@ export class AgentService {
     await agentRepository.removeFromRoster(profile.id, artistId);
     return { removed: true };
   }
+
+  async getCommissionDashboard(userId: string) {
+    const profile = await agentRepository.findByUserId(userId);
+    if (!profile) {
+      throw new AgentError('NOT_FOUND', 'Agent profile not found', 404);
+    }
+
+    const commissionPct = Number(profile.commission_pct ?? 10);
+    return agentRepository.getCommissionSummary(profile.id, commissionPct);
+  }
+
+  async getCommissionHistory(userId: string, limit?: number, offset?: number) {
+    const profile = await agentRepository.findByUserId(userId);
+    if (!profile) {
+      throw new AgentError('NOT_FOUND', 'Agent profile not found', 404);
+    }
+
+    const commissionPct = Number(profile.commission_pct ?? 10);
+    return agentRepository.getCommissionHistory(profile.id, commissionPct, limit, offset);
+  }
+
+  async getRosterPerformance(userId: string) {
+    const profile = await agentRepository.findByUserId(userId);
+    if (!profile) {
+      throw new AgentError('NOT_FOUND', 'Agent profile not found', 404);
+    }
+
+    return agentRepository.getRosterPerformance(profile.id);
+  }
 }
 
 export class AgentError extends Error {

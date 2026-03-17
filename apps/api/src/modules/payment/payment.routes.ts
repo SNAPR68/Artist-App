@@ -4,6 +4,7 @@ import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
 import { razorpayClient } from './razorpay.client.js';
+import { payoutService } from './payout.service.js';
 
 export async function paymentRoutes(app: FastifyInstance) {
   /**
@@ -215,6 +216,65 @@ export async function paymentRoutes(app: FastifyInstance) {
     return reply.send({
       success: true,
       data: summary,
+      errors: [],
+    });
+  });
+
+  // ─── Payout Routes ──────────────────────────────────────────
+
+  /**
+   * GET /v1/admin/payouts — Admin: list pending payouts
+   */
+  app.get('/v1/admin/payouts', {
+    preHandler: [authMiddleware, requirePermission('admin:payments')],
+  }, async (request, reply) => {
+    const payouts = await payoutService.listPendingPayouts();
+
+    return reply.send({
+      success: true,
+      data: payouts,
+      errors: [],
+    });
+  });
+
+  /**
+   * POST /v1/admin/payouts/:id/mark-paid — Admin: mark payout as paid
+   */
+  app.post('/v1/admin/payouts/:id/mark-paid', {
+    preHandler: [authMiddleware, requirePermission('admin:payments')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const { reference } = request.body as { reference: string };
+    const payout = await payoutService.markAsPaid(id, request.user!.user_id, reference);
+
+    return reply.send({
+      success: true,
+      data: payout,
+      errors: [],
+    });
+  });
+
+  /**
+   * GET /v1/artists/payouts — Artist: payout history
+   */
+  app.get('/v1/artists/payouts', {
+    preHandler: [authMiddleware, requirePermission('payment:read_own')],
+  }, async (request, reply) => {
+    const query = request.query as Record<string, string>;
+    const page = Math.max(1, parseInt(query.page ?? '1'));
+    const perPage = Math.min(100, Math.max(1, parseInt(query.per_page ?? '20')));
+
+    const result = await payoutService.getArtistPayouts(request.user!.user_id, page, perPage);
+
+    return reply.send({
+      success: true,
+      data: result.data,
+      meta: {
+        page,
+        per_page: perPage,
+        total: result.total,
+        total_pages: Math.ceil(result.total / perPage),
+      },
       errors: [],
     });
   });

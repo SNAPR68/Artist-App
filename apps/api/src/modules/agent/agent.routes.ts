@@ -107,4 +107,42 @@ export async function agentRoutes(app: FastifyInstance) {
       errors: [],
     });
   });
+
+  /**
+   * GET /v1/agents/commissions — Commission dashboard summary
+   */
+  app.get('/v1/agents/commissions', {
+    preHandler: [authMiddleware, requirePermission('agent:read_own')],
+  }, async (request, reply) => {
+    const data = await agentService.getCommissionDashboard(request.user!.user_id);
+
+    return reply.send({ success: true, data, errors: [] });
+  });
+
+  /**
+   * GET /v1/agents/commissions/history — Commission history (paginated)
+   */
+  app.get('/v1/agents/commissions/history', {
+    preHandler: [authMiddleware, requirePermission('agent:read_own')],
+  }, async (request, reply) => {
+    const { limit, offset } = request.query as { limit?: string; offset?: string };
+    const data = await agentService.getCommissionHistory(
+      request.user!.user_id,
+      limit ? Number(limit) : undefined,
+      offset ? Number(offset) : undefined,
+    );
+
+    return reply.send({ success: true, data, errors: [] });
+  });
+
+  /**
+   * GET /v1/agents/roster/performance — Roster performance breakdown
+   */
+  app.get('/v1/agents/roster/performance', {
+    preHandler: [authMiddleware, requirePermission('agent:manage_roster')],
+  }, async (request, reply) => {
+    const data = await agentService.getRosterPerformance(request.user!.user_id);
+
+    return reply.send({ success: true, data, errors: [] });
+  });
 }

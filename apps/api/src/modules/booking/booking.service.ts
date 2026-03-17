@@ -61,19 +61,29 @@ export class BookingService {
       throw new BookingError('NOT_FOUND', 'Booking not found', 404);
     }
 
-    // Verify user is participant
-    if (booking.artist_user_id !== userId && booking.client_user_id !== userId) {
+    // Verify user is participant (system triggers bypass this check)
+    const isSystem = userId.startsWith('system:');
+    if (!isSystem && booking.artist_user_id !== userId && booking.client_user_id !== userId) {
       throw new BookingError('FORBIDDEN', 'Not a participant in this booking', 403);
     }
 
     const currentState = booking.state as BookingState;
     BookingStateMachine.transition(currentState, newState);
 
+    // Block raw CANCELLED transitions — must use POST /v1/bookings/:id/cancel
+    if (newState === BookingState.CANCELLED) {
+      throw new BookingError('USE_CANCEL_ENDPOINT', 'Use POST /v1/bookings/:id/cancel for cancellations', 400);
+    }
+
     // Handle state-specific side effects
     if (newState === BookingState.CONFIRMED) {
       await this.onConfirmed(booking);
-    } else if (newState === BookingState.CANCELLED) {
-      await this.onCancelled(booking);
+    }
+    if (newState === BookingState.PRE_EVENT) {
+      await this.onPreEvent(booking);
+    }
+    if (newState === BookingState.EVENT_DAY) {
+      await this.onEventDay(booking);
     }
 
     const updated = await bookingRepository.updateStatus(bookingId, newState);
@@ -214,6 +224,16 @@ export class BookingService {
       booking.artist_id as string,
       booking.event_date as string,
     );
+  }
+
+  private async onPreEvent(booking: Record<string, unknown>) {
+    const { coordinationService } = await import('../coordination/coordination.service.js');
+    await coordinationService.initializeChecklist(booking.id as string);
+  }
+
+  private async onEventDay(booking: Record<string, unknown>) {
+    const { eventDayService } = await import('../event-day/event-day.service.js');
+    await eventDayService.initializeEventDay(booking.id as string);
   }
 }
 

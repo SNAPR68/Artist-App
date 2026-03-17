@@ -1,6 +1,8 @@
 import { razorpayClient } from './razorpay.client.js';
+import { payoutService } from './payout.service.js';
 import { paymentRepository } from './payment.repository.js';
 import { bookingRepository } from '../booking/booking.repository.js';
+import { bookingService } from '../booking/booking.service.js';
 import { calculatePaymentSplit, calculateRefund } from './split-calculator.js';
 import { BookingState, PaymentStatus, FINANCIAL } from '@artist-booking/shared';
 export class PaymentService {
@@ -81,15 +83,11 @@ export class PaymentService {
     // Update payment: captured → in_escrow (funds held until event completion + 3 days)
     await paymentRepository.updateStatus(payment.id, PaymentStatus.IN_ESCROW, params.razorpay_payment_id);
 
-    // Transition booking to pre_event
+    // Transition booking to pre_event (triggers onPreEvent side effects)
     const booking = await bookingRepository.findById(payment.booking_id);
     if (booking && booking.state === BookingState.CONFIRMED) {
-      await bookingRepository.updateStatus(payment.booking_id, BookingState.PRE_EVENT);
-      await bookingRepository.addEvent(payment.booking_id, {
-        from_state: BookingState.CONFIRMED,
-        to_state: BookingState.PRE_EVENT,
-        triggered_by: 'system:payment',
-        metadata: { razorpay_payment_id: params.razorpay_payment_id },
+      await bookingService.transitionState(payment.booking_id, 'system:payment', BookingState.PRE_EVENT, {
+        razorpay_payment_id: params.razorpay_payment_id,
       });
     }
 
@@ -157,6 +155,26 @@ export class PaymentService {
   }
 
   /**
+   * Process a partial refund (used by dispute resolution).
+   */
+  async processPartialRefund(bookingId: string, refundAmountPaise: number) {
+    const payment = await paymentRepository.findByBookingId(bookingId);
+    if (!payment || !payment.razorpay_payment_id) {
+      return { refund_amount_paise: 0 };
+    }
+
+    if (refundAmountPaise > 0) {
+      await razorpayClient.initiateRefund(payment.razorpay_payment_id, refundAmountPaise, {
+        booking_id: bookingId,
+        reason: 'dispute_resolution',
+      });
+      await paymentRepository.updateStatus(payment.id, PaymentStatus.PARTIALLY_REFUNDED);
+    }
+
+    return { refund_amount_paise: refundAmountPaise };
+  }
+
+  /**
    * Get payment details for a booking.
    */
   async getPaymentDetails(bookingId: string) {
@@ -220,12 +238,19 @@ export class PaymentService {
 
     // Update payment to settled
     await paymentRepository.updateStatus(payment.id, PaymentStatus.SETTLED);
-    await paymentRepository.recordSettlement(payment.id, {
+    const settlement = await paymentRepository.recordSettlement(payment.id, {
       artist_payout_paise: payment.artist_payout_paise,
       platform_fee_paise: payment.platform_fee_paise,
       tds_paise: payment.tds_paise,
       settled_at: new Date(),
     });
+
+    // Auto-create payout transfer record
+    try {
+      await payoutService.createPayout(settlement.id);
+    } catch (err) {
+      console.error(`[SETTLEMENT] Failed to create payout for settlement ${settlement.id}:`, err);
+    }
 
     // Transition booking to settled if completed
     const booking = await bookingRepository.findById(payment.booking_id);

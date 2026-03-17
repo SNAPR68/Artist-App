@@ -1,10 +1,19 @@
 import { db } from './database.js';
 import { reviewService } from '../modules/review/review.service.js';
 import { paymentService } from '../modules/payment/payment.service.js';
+import { disputeService } from '../modules/dispute/dispute.service.js';
+import { coordinationService } from '../modules/coordination/coordination.service.js';
+import { eventDayService } from '../modules/event-day/event-day.service.js';
+import { trustService } from '../modules/trust/trust.service.js';
+import { priceIntelligenceService } from '../modules/analytics/price-intelligence.service.js';
 
 const HOLD_EXPIRY_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 const REVIEW_PUBLISH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 const SETTLEMENT_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const COORDINATION_ESCALATION_INTERVAL_MS = 2 * 60 * 60 * 1000; // 2 hours
+const EVENT_DAY_TRANSITION_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+const TRUST_RECOMPUTE_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const PRICE_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * Start background cron jobs for hold expiry and review publishing.
@@ -61,4 +70,62 @@ export function startCronJobs() {
       console.error('[CRON] Settlement check failed:', err);
     }
   }, SETTLEMENT_INTERVAL_MS);
+
+  // 4. Auto-close dispute evidence windows past 48h deadline (every hour)
+  setInterval(async () => {
+    try {
+      const count = await disputeService.autoCloseEvidenceWindows();
+      if (count > 0) {
+        console.log(`[CRON] Auto-closed ${count} dispute evidence windows`);
+      }
+    } catch (err) {
+      console.error('[CRON] Dispute evidence window check failed:', err);
+    }
+  }, 60 * 60 * 1000); // 1 hour
+
+  // 5. Coordination escalation — flag overdue pre-event checkpoints (every 2h)
+  setInterval(async () => {
+    try {
+      const count = await coordinationService.checkEscalations();
+      if (count > 0) {
+        console.log(`[CRON] Escalated ${count} overdue coordination checkpoints`);
+      }
+    } catch (err) {
+      console.error('[CRON] Coordination escalation check failed:', err);
+    }
+  }, COORDINATION_ESCALATION_INTERVAL_MS);
+
+  // 6. Event-day auto-transition — move pre_event → event_day on event date (every 30min)
+  setInterval(async () => {
+    try {
+      const count = await eventDayService.autoTransitionToEventDay();
+      if (count > 0) {
+        console.log(`[CRON] Auto-transitioned ${count} bookings to event_day`);
+      }
+    } catch (err) {
+      console.error('[CRON] Event-day transition check failed:', err);
+    }
+  }, EVENT_DAY_TRANSITION_INTERVAL_MS);
+
+  // 7. Trust score recomputation — recalculate for artists with recent completions (every 6h)
+  setInterval(async () => {
+    try {
+      const count = await trustService.recomputeRecent();
+      if (count > 0) {
+        console.log(`[CRON] Recomputed trust scores for ${count} artists`);
+      }
+    } catch (err) {
+      console.error('[CRON] Trust recomputation failed:', err);
+    }
+  }, TRUST_RECOMPUTE_INTERVAL_MS);
+
+  // 8. Price intelligence refresh — refresh materialized view (every 24h)
+  setInterval(async () => {
+    try {
+      await priceIntelligenceService.refreshStats();
+      console.log('[CRON] Price intelligence materialized view refreshed');
+    } catch (err) {
+      console.error('[CRON] Price intelligence refresh failed:', err);
+    }
+  }, PRICE_REFRESH_INTERVAL_MS);
 }

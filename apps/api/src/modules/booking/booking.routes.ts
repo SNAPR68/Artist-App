@@ -1,10 +1,11 @@
 import type { FastifyInstance } from 'fastify';
 import { bookingService } from './booking.service.js';
+import { cancellationService } from './cancellation.service.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { validateBody } from '../../middleware/validation.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
-import { createBookingSchema, submitQuoteSchema, BookingState } from '@artist-booking/shared';
+import { createBookingSchema, submitQuoteSchema, cancelBookingSchema, BookingState, CancellationSubType } from '@artist-booking/shared';
 import { generateContract } from '../document/contract.generator.js';
 
 export async function bookingRoutes(app: FastifyInstance) {
@@ -77,6 +78,30 @@ export async function bookingRoutes(app: FastifyInstance) {
     return reply.send({
       success: true,
       data: booking,
+      errors: [],
+    });
+  });
+
+
+  /**
+   * POST /v1/bookings/:id/cancel — Cancel a booking with reason and sub-type
+   */
+  app.post('/v1/bookings/:id/cancel', {
+    preHandler: [
+      authMiddleware,
+      requirePermission('booking:cancel'),
+      rateLimit('WRITE'),
+      validateBody(cancelBookingSchema),
+    ],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const { sub_type, reason } = request.body as { sub_type: CancellationSubType; reason: string };
+
+    const result = await cancellationService.cancelBooking(id, request.user!.user_id, sub_type, reason);
+
+    return reply.send({
+      success: true,
+      data: result,
       errors: [],
     });
   });

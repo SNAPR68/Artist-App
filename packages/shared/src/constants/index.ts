@@ -1,4 +1,4 @@
-import { BookingState } from '../enums/index.js';
+import { BookingState, DisputeStatus } from '../enums/index.js';
 
 // ─── Booking State Transitions ───────────────────────────────
 // Maps each state to its allowed next states
@@ -65,13 +65,60 @@ export const FINANCIAL = {
   CURRENCY: 'INR',
 } as const;
 
-// ─── Trust Score Weights ─────────────────────────────────────
+// ─── Trust Score Weights (70% Behavioral / 30% Stated) ──────
 export const TRUST_SCORE_WEIGHTS = {
-  COMPLETION_RATE: 0.30,
-  ON_TIME_RATE: 0.15,
-  RATINGS_AVG: 0.35,
-  REPEAT_RATE: 0.20,
+  BEHAVIORAL_WEIGHT: 0.70,
+  STATED_WEIGHT: 0.30,
+  // Behavioral components (sum to 1.0)
+  COMPLETION_RATE: 0.25,
+  PUNCTUALITY: 0.20,
+  RESPONSE_TIME: 0.10,
+  REBOOKING_RATE: 0.10,
+  CANCELLATION_RATE: 0.15,
+  CONTRACT_COMPLIANCE: 0.20,
+  // Stated components (sum to 1.0)
+  AVG_RATING: 0.60,
+  WOULD_REBOOK: 0.25,
+  DIMENSIONAL_VARIANCE: 0.15,
 } as const;
 
 // ─── Review ──────────────────────────────────────────────────
 export const REVIEW_HOLD_HOURS = 48;
+
+// ─── Dispute ────────────────────────────────────────────────────
+export const DISPUTE_EVIDENCE_WINDOW_HOURS = 48;
+export const DISPUTE_REVIEW_SLA_HOURS = 72;
+export const DISPUTE_APPEAL_WINDOW_DAYS = 7;
+
+export const DISPUTE_STATUS_TRANSITIONS: Record<DisputeStatus, DisputeStatus[]> = {
+  [DisputeStatus.SUBMITTED]: [DisputeStatus.EVIDENCE_COLLECTION, DisputeStatus.UNDER_REVIEW],
+  [DisputeStatus.EVIDENCE_COLLECTION]: [DisputeStatus.UNDER_REVIEW],
+  [DisputeStatus.UNDER_REVIEW]: [DisputeStatus.RESOLVED],
+  [DisputeStatus.RESOLVED]: [DisputeStatus.APPEALED, DisputeStatus.CLOSED],
+  [DisputeStatus.APPEALED]: [DisputeStatus.UNDER_REVIEW, DisputeStatus.CLOSED],
+  [DisputeStatus.CLOSED]: [],
+};
+
+// ─── Cancellation ───────────────────────────────────────────────
+export const CANCELLATION_TRUST_PENALTY_THRESHOLD_DAYS = 7;
+export const CANCELLATION_TRUST_PENALTY_POINTS = -5;
+
+// ─── Payout ─────────────────────────────────────────────────────
+export const PAYOUT_MAX_RETRY_COUNT = 3;
+
+// ─── Coordination ──────────────────────────────────────────────
+export const COORDINATION_CHECKPOINTS = {
+  RIDER_CONFIRM_DAYS_BEFORE: 14,
+  LOGISTICS_CONFIRM_DAYS_BEFORE: 7,
+  FINAL_CONFIRM_DAYS_BEFORE: 3,
+  BRIEFING_DAYS_BEFORE: 1,
+} as const;
+
+export const COORDINATION_ESCALATION_THRESHOLDS = {
+  RIDER_ESCALATE_DAYS_BEFORE: 5,
+  LOGISTICS_ESCALATE_DAYS_BEFORE: 4,
+  FINAL_ESCALATE_DAYS_BEFORE: 2,
+} as const;
+
+// ─── Event Day ─────────────────────────────────────────────────
+export const ARRIVAL_VERIFICATION_RADIUS_M = 500;

@@ -77,3 +77,78 @@ export enum CityTier {
   TIER_2 = 'tier_2',
   TIER_3 = 'tier_3',
 }
+
+// ─── Dispute ──────────────────────────────────────────────────
+export enum DisputeType {
+  PARTIAL_PERFORMANCE = 'partial_performance',
+  NO_SHOW = 'no_show',
+  EQUIPMENT_FAILURE = 'equipment_failure',
+  QUALITY_COMPLAINT = 'quality_complaint',
+  PAYMENT_DISPUTE = 'payment_dispute',
+  FORCE_MAJEURE = 'force_majeure',
+}
+
+export enum DisputeStatus {
+  SUBMITTED = 'submitted',
+  EVIDENCE_COLLECTION = 'evidence_collection',
+  UNDER_REVIEW = 'under_review',
+  RESOLVED = 'resolved',
+  APPEALED = 'appealed',
+  CLOSED = 'closed',
+}
+
+export enum ResolutionType {
+  FULL_REFUND = 'full_refund',
+  PARTIAL_REFUND = 'partial_refund',
+  NO_REFUND = 'no_refund',
+  REBOOKING = 'rebooking',
+  MEDIATED_AGREEMENT = 'mediated_agreement',
+}
+
+// ─── Cancellation ─────────────────────────────────────────────
+export enum CancellationSubType {
+  BY_CLIENT = 'by_client',
+  BY_ARTIST = 'by_artist',
+  FORCE_MAJEURE = 'force_majeure',
+  BY_PLATFORM = 'by_platform',
+}
+
+// ─── Payout ───────────────────────────────────────────────────
+export enum PayoutStatus {
+  PENDING = 'pending',
+  INITIATED = 'initiated',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+}
+
+export enum TransferMethod {
+  BANK_TRANSFER = 'bank_transfer',
+  UPI = 'upi',
+  MANUAL = 'manual',
+}
+
+// ─── Coordination ────────────────────────────────────────────
+export enum CoordinationCheckpoint {
+  RIDER_CONFIRMED = 'rider_confirmed',
+  LOGISTICS_CONFIRMED = 'logistics_confirmed',
+  FINAL_CONFIRMED = 'final_confirmed',
+  BRIEFING_SENT = 'briefing_sent',
+}
+
+// ─── Event Day ───────────────────────────────────────────────
+export enum EventDayIssueType {
+  SOUND_ISSUES = 'sound_issues',
+  LATE_START = 'late_start',
+  VENUE_NOT_READY = 'venue_not_ready',
+  EQUIPMENT_FAILURE = 'equipment_failure',
+  ARTIST_LATE = 'artist_late',
+  OTHER = 'other',
+}
+
+// ─── Failure Tracking ────────────────────────────────────────
+export enum FailureEventType {
+  EMPTY_SEARCH = 'empty_search',
+  REJECTED_QUOTE = 'rejected_quote',
+  ABANDONED_FLOW = 'abandoned_flow',
+  BOOKING_DROPOFF = 'booking_dropoff',
+}

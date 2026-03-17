@@ -63,6 +63,25 @@ const PERMISSIONS: Record<string, UserRole[]> = {
   'admin:bookings': [UserRole.ADMIN],
   'admin:payments': [UserRole.ADMIN],
   'admin:moderate': [UserRole.ADMIN],
+
+  // Disputes
+  'dispute:create': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'dispute:read_own': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'admin:disputes': [UserRole.ADMIN],
+
+  // Concierge
+  'concierge:manage': [UserRole.ADMIN],
+
+  // Coordination (pre-event)
+  'coordination:read': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'coordination:update': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+
+  // Event-day operations
+  'event_day:manage': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY],
+
+  // Analytics
+  'analytics:read': [UserRole.ADMIN],
+  'analytics:fair_price': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
 };
 
 /**

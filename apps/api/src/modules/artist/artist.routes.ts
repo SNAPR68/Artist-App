@@ -7,8 +7,11 @@ import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
 import {
   createArtistProfileSchema,
   updateArtistProfileSchema,
+  addBankAccountSchema,
+  updateBankAccountSchema,
   PAGINATION,
 } from '@artist-booking/shared';
+import { bankAccountService } from './bank-account.service.js';
 export async function artistRoutes(app: FastifyInstance) {
   /**
    * POST /v1/artists/profile — Create artist profile
@@ -107,6 +110,80 @@ export async function artistRoutes(app: FastifyInstance) {
         total: result.total,
         total_pages: Math.ceil(result.total / per_page),
       },
+      errors: [],
+    });
+  });
+
+  // ─── Bank Account Routes ────────────────────────────────────
+
+  /**
+   * POST /v1/artists/bank-account — Add bank account
+   */
+  app.post('/v1/artists/bank-account', {
+    preHandler: [
+      authMiddleware,
+      requirePermission('artist:update_own'),
+      rateLimit('WRITE'),
+      validateBody(addBankAccountSchema),
+    ],
+  }, async (request, reply) => {
+    const account = await bankAccountService.addBankAccount(request.user!.user_id, request.body as never);
+
+    return reply.status(201).send({
+      success: true,
+      data: account,
+      errors: [],
+    });
+  });
+
+  /**
+   * GET /v1/artists/bank-account — List bank accounts
+   */
+  app.get('/v1/artists/bank-account', {
+    preHandler: [authMiddleware, requirePermission('artist:read_own')],
+  }, async (request, reply) => {
+    const accounts = await bankAccountService.getBankAccounts(request.user!.user_id);
+
+    return reply.send({
+      success: true,
+      data: accounts,
+      errors: [],
+    });
+  });
+
+  /**
+   * PUT /v1/artists/bank-account/:id — Update bank account
+   */
+  app.put('/v1/artists/bank-account/:id', {
+    preHandler: [
+      authMiddleware,
+      requirePermission('artist:update_own'),
+      rateLimit('WRITE'),
+      validateBody(updateBankAccountSchema),
+    ],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const account = await bankAccountService.updateBankAccount(request.user!.user_id, id, request.body as never);
+
+    return reply.send({
+      success: true,
+      data: account,
+      errors: [],
+    });
+  });
+
+  /**
+   * DELETE /v1/artists/bank-account/:id — Delete bank account
+   */
+  app.delete('/v1/artists/bank-account/:id', {
+    preHandler: [authMiddleware, requirePermission('artist:update_own')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const result = await bankAccountService.deleteBankAccount(request.user!.user_id, id);
+
+    return reply.send({
+      success: true,
+      data: result,
       errors: [],
     });
   });

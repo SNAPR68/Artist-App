@@ -7,6 +7,14 @@ import type {
   CalendarStatus,
   EventType,
   CityTier,
+  DisputeType,
+  DisputeStatus,
+  ResolutionType,
+  CancellationSubType,
+  PayoutStatus,
+  TransferMethod,
+  EventDayIssueType,
+  FailureEventType,
 } from '../enums/index.js';
 
 // ─── Base Types ──────────────────────────────────────────────
@@ -235,4 +243,140 @@ export interface SearchFacets {
   genres: { key: string; count: number }[];
   cities: { key: string; count: number }[];
   price_ranges: { key: string; count: number }[];
+}
+
+// ─── Dispute ────────────────────────────────────────────────────
+export interface Dispute extends BaseEntity {
+  booking_id: string;
+  dispute_type: DisputeType;
+  status: DisputeStatus;
+  initiated_by: string;
+  description: string;
+  resolution_type: ResolutionType | null;
+  resolution_notes: string | null;
+  resolved_by: string | null;
+  resolved_at: string | null;
+  financial_resolution: Record<string, unknown> | null;
+  trust_impact: Record<string, unknown> | null;
+  evidence_deadline: string | null;
+}
+
+export interface DisputeEvidence {
+  id: string;
+  dispute_id: string;
+  submitted_by: string;
+  evidence_type: string;
+  file_url: string;
+  description: string | null;
+  created_at: string;
+}
+
+// ─── Cancellation ───────────────────────────────────────────────
+export interface CancellationDetail {
+  id: string;
+  booking_id: string;
+  sub_type: CancellationSubType;
+  initiated_by: string;
+  reason: string;
+  backup_artist_triggered: boolean;
+  refund_amount_paise: number;
+  artist_amount_paise: number;
+  trust_impact: Record<string, unknown> | null;
+  created_at: string;
+}
+
+// ─── Bank Account ───────────────────────────────────────────────
+export interface ArtistBankAccount extends BaseEntity {
+  artist_id: string;
+  account_holder_name: string;
+  account_number_encrypted: string;
+  ifsc_code: string;
+  bank_name: string;
+  upi_id_encrypted: string | null;
+  is_verified: boolean;
+  is_primary: boolean;
+}
+
+// ─── Payout ─────────────────────────────────────────────────────
+export interface PayoutTransfer {
+  id: string;
+  settlement_id: string;
+  artist_id: string;
+  amount_paise: number;
+  transfer_method: TransferMethod;
+  transfer_reference: string | null;
+  status: PayoutStatus;
+  initiated_at: string | null;
+  completed_at: string | null;
+  failed_reason: string | null;
+  retry_count: number;
+  created_at: string;
+}
+
+// ─── Coordination ──────────────────────────────────────────────
+export interface CoordinationChecklist {
+  id: string;
+  booking_id: string;
+  rider_confirmed: boolean;
+  rider_confirmed_at: string | null;
+  logistics_confirmed: boolean;
+  logistics_confirmed_at: string | null;
+  final_confirmed: boolean;
+  final_confirmed_at: string | null;
+  briefing_sent: boolean;
+  briefing_sent_at: string | null;
+  travel_mode: string | null;
+  hotel_booked: boolean;
+  hotel_details: { name: string; address: string; check_in: string; confirmation_id?: string } | null;
+  parking_arranged: boolean;
+  special_rider_notes: string | null;
+  escalation_level: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// ─── Event Day ─────────────────────────────────────────────────
+export interface EventDayLog {
+  id: string;
+  booking_id: string;
+  arrival_lat: number | null;
+  arrival_lng: number | null;
+  arrival_verified: boolean;
+  arrival_distance_m: number | null;
+  arrival_at: string | null;
+  soundcheck_artist: boolean;
+  soundcheck_artist_at: string | null;
+  soundcheck_client: boolean;
+  soundcheck_client_at: string | null;
+  set_start_at: string | null;
+  set_end_at: string | null;
+  actual_duration_min: number | null;
+  completion_artist: boolean;
+  completion_artist_at: string | null;
+  completion_client: boolean;
+  completion_client_at: string | null;
+  issues: EventDayIssue[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EventDayIssue {
+  type: EventDayIssueType;
+  description: string;
+  reported_by: string;
+  reported_at: string;
+}
+
+// ─── Failure Event ─────────────────────────────────────────────
+export interface FailureEvent {
+  id: string;
+  event_type: FailureEventType;
+  user_id: string | null;
+  session_id: string | null;
+  search_params: Record<string, unknown> | null;
+  booking_id: string | null;
+  stage: string | null;
+  reason: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
 }
