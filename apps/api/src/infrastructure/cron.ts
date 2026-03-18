@@ -12,6 +12,9 @@ import { whatsAppConversationService } from '../modules/whatsapp/whatsapp-conver
 import { artistIntelligenceService } from '../modules/artist-intelligence/artist-intelligence.service.js';
 import { recommendationService } from '../modules/recommendation/recommendation.service.js';
 import { dynamicPricingService } from '../modules/pricing-brain/dynamic-pricing.service.js';
+import { seasonalDemandService } from '../modules/seasonal-demand/seasonal-demand.service.js';
+import { reputationDefenseService } from '../modules/reputation-defense/reputation-defense.service.js';
+import { emergencySubstitutionService } from '../modules/emergency-substitution/emergency-substitution.service.js';
 
 const HOLD_EXPIRY_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 const REVIEW_PUBLISH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
@@ -28,6 +31,10 @@ const WHATSAPP_CLEANUP_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
 const INTELLIGENCE_BATCH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const RECOMMENDATION_BATCH_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
 const DYNAMIC_PRICE_CACHE_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const SEASONAL_CURVE_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const SEASONAL_ALERT_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
+const VENUE_WEIGHT_RECOMPUTE_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const SUBSTITUTION_EXPIRY_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
 
 /**
  * Start background cron jobs for hold expiry and review publishing.
@@ -254,4 +261,52 @@ export function startCronJobs() {
       console.error('[CRON] Dynamic price cache failed:', err);
     }
   }, DYNAMIC_PRICE_CACHE_INTERVAL_MS);
+
+  // 17. Seasonal demand curve computation (every 24h)
+  setInterval(async () => {
+    try {
+      const count = await seasonalDemandService.computeAllCurves();
+      if (count > 0) {
+        console.log(`[CRON] Computed ${count} seasonal demand curves`);
+      }
+    } catch (err) {
+      console.error('[CRON] Seasonal curve computation failed:', err);
+    }
+  }, SEASONAL_CURVE_INTERVAL_MS);
+
+  // 18. Seasonal alert generation (every 12h)
+  setInterval(async () => {
+    try {
+      const count = await seasonalDemandService.generateAlertsBatch();
+      if (count > 0) {
+        console.log(`[CRON] Generated ${count} seasonal alerts`);
+      }
+    } catch (err) {
+      console.error('[CRON] Seasonal alert generation failed:', err);
+    }
+  }, SEASONAL_ALERT_INTERVAL_MS);
+
+  // 19. Venue review weight recomputation (every 24h)
+  setInterval(async () => {
+    try {
+      const count = await reputationDefenseService.recomputeVenueWeights();
+      if (count.venues_processed > 0) {
+        console.log(`[CRON] Recomputed venue review weights for ${count.venues_processed} venues`);
+      }
+    } catch (err) {
+      console.error('[CRON] Venue weight recomputation failed:', err);
+    }
+  }, VENUE_WEIGHT_RECOMPUTE_INTERVAL_MS);
+
+  // 20. Emergency substitution expiry — expire unresponded candidates (every 30min)
+  setInterval(async () => {
+    try {
+      const count = await emergencySubstitutionService.expireUnresponded();
+      if (count > 0) {
+        console.log(`[CRON] Expired ${count} substitution requests`);
+      }
+    } catch (err) {
+      console.error('[CRON] Substitution expiry failed:', err);
+    }
+  }, SUBSTITUTION_EXPIRY_INTERVAL_MS);
 }

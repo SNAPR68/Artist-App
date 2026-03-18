@@ -245,6 +245,94 @@ export const NOTIFICATION_TEMPLATES: Record<string, NotificationTemplate> = {
     email_subject: 'Opportunity Alert — {{event_type}} in {{city}}',
     email_body: 'There is <strong>high demand</strong> for <strong>{{event_type}}</strong> in <strong>{{city}}</strong> and it\'s a great match for your profile. Log in to check your Gig Advisor for details.',
   },
+
+  // ─── Emergency Substitution Templates ─────────────────────
+  substitution_request_created: {
+    whatsapp_template_id: 'sub_request_v1',
+    sms_flow_id: 'flow_sub_request',
+    push_title: 'Substitution Search Started',
+    push_body: 'We\'re finding a replacement for {{artist_name}} for your {{event_type}} on {{event_date}}.',
+    email_subject: 'Replacement Search Started — {{event_type}}',
+    email_body: 'We\'re actively searching for a replacement for <strong>{{artist_name}}</strong> for your <strong>{{event_type}}</strong> on <strong>{{event_date}}</strong>. You\'ll be notified as soon as candidates are found.',
+  },
+  substitution_candidate_notified: {
+    whatsapp_template_id: 'sub_candidate_v1',
+    sms_flow_id: 'flow_sub_candidate',
+    push_title: 'Urgent Booking Opportunity',
+    push_body: '{{urgency}} — {{event_type}} in {{event_city}} on {{event_date}} needs a replacement. ₹{{amount}} with {{premium_pct}}% premium.',
+    email_subject: '{{urgency}} Booking Opportunity — {{event_type}} in {{event_city}}',
+    email_body: 'A <strong>{{event_type}}</strong> in <strong>{{event_city}}</strong> on <strong>{{event_date}}</strong> needs a replacement artist. Budget: <strong>₹{{amount}}</strong> with a <strong>{{premium_pct}}% premium</strong> for short notice. Log in to accept or decline.',
+  },
+  substitution_accepted: {
+    whatsapp_template_id: 'sub_accepted_v1',
+    sms_flow_id: 'flow_sub_accepted',
+    push_title: 'Replacement Found!',
+    push_body: '{{artist_name}} has accepted the replacement for your {{event_type}} on {{event_date}}.',
+    email_subject: 'Replacement Confirmed — {{artist_name}} for {{event_type}}',
+    email_body: 'Great news! <strong>{{artist_name}}</strong> has accepted the replacement booking for your <strong>{{event_type}}</strong> on <strong>{{event_date}}</strong>. Log in to confirm the booking details.',
+  },
+  substitution_expired: {
+    whatsapp_template_id: 'sub_expired_v1',
+    sms_flow_id: 'flow_sub_expired',
+    push_title: 'Substitution Search Expired',
+    push_body: 'No replacement accepted for your {{event_type}} on {{event_date}}. Try expanding your search criteria.',
+    email_subject: 'Substitution Search Expired — {{event_type}}',
+    email_body: 'Unfortunately, no replacement artist accepted the booking for your <strong>{{event_type}}</strong> on <strong>{{event_date}}</strong>. Consider expanding your search criteria or budget.',
+  },
+
+  // ─── Seasonal Demand Templates ────────────────────────────
+  seasonal_peak_approaching: {
+    whatsapp_template_id: 'seasonal_peak_v1',
+    sms_flow_id: 'flow_seasonal_peak',
+    push_title: 'Peak Season Ahead',
+    push_body: '{{event_type}} season peaks in {{city}} in {{month}}. High demand for your genre — great time to market yourself!',
+    email_subject: 'Peak Season Alert — {{event_type}} in {{city}}',
+    email_body: '<strong>{{event_type}}</strong> season peaks in <strong>{{city}}</strong> in <strong>{{month}}</strong>. High demand for your genre — update your pricing and availability to capture this opportunity!',
+  },
+  seasonal_valley_advisory: {
+    whatsapp_template_id: 'seasonal_valley_v1',
+    sms_flow_id: 'flow_seasonal_valley',
+    push_title: 'Quiet Month Ahead',
+    push_body: '{{month}} is typically quieter for {{genre}} in {{city}}. Consider expanding to new event types or nearby cities.',
+    email_subject: 'Seasonal Advisory — {{month}} in {{city}}',
+    email_body: '<strong>{{month}}</strong> is typically a quieter period for <strong>{{genre}}</strong> in <strong>{{city}}</strong>. Consider expanding to corporate events or nearby cities to maintain your booking momentum.',
+  },
+  seasonal_urgency_signal: {
+    whatsapp_template_id: 'seasonal_urgency_v1',
+    sms_flow_id: 'flow_seasonal_urgency',
+    push_title: 'Limited Availability',
+    push_body: 'Only {{available}} of {{total}} matching artists available for {{event_type}} in {{city}} on {{date}}. Book soon!',
+    email_subject: 'Limited Availability — {{event_type}} in {{city}}',
+    email_body: 'Only <strong>{{available}} of {{total}}</strong> matching artists are still available for <strong>{{event_type}}</strong> in <strong>{{city}}</strong> on <strong>{{date}}</strong>. We recommend booking soon to secure your preferred artist.',
+  },
+
+  // ─── Reputation Defense Templates ─────────────────────────
+  review_dispute_submitted: {
+    whatsapp_template_id: 'review_dispute_v1',
+    sms_flow_id: 'flow_review_dispute',
+    push_title: 'Review Dispute Received',
+    push_body: 'A dispute has been submitted for a review on your booking. Our team will review it within 48 hours.',
+    email_subject: 'Review Dispute Submitted',
+    email_body: 'A dispute has been submitted regarding a review on your recent booking. Our team will review the evidence and respond within <strong>48 hours</strong>.',
+  },
+  review_dispute_resolved: {
+    whatsapp_template_id: 'review_dispute_resolved_v1',
+    sms_flow_id: 'flow_review_resolved',
+    push_title: 'Review Dispute Resolved',
+    push_body: 'Your review dispute has been {{resolution}}. {{message}}',
+    email_subject: 'Review Dispute Resolution — {{resolution}}',
+    email_body: 'Your review dispute has been <strong>{{resolution}}</strong>. {{message}} Log in to see the full details.',
+  },
+
+  // ─── Financial Command Center Templates ───────────────────
+  financial_light_month_alert: {
+    whatsapp_template_id: 'financial_light_v1',
+    sms_flow_id: 'flow_financial_light',
+    push_title: 'Light Month Ahead',
+    push_body: '{{month}} looks lighter than usual — forecast ₹{{forecast}} vs ₹{{average}} average. Consider accepting more inquiries.',
+    email_subject: 'Cash Flow Advisory — {{month}}',
+    email_body: 'Your forecast for <strong>{{month}}</strong> is <strong>₹{{forecast}}</strong>, below your 3-month average of <strong>₹{{average}}</strong>. Consider accepting more inquiries or expanding to new event types to boost your bookings.',
+  },
 };
 
 /**

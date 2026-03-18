@@ -120,6 +120,40 @@ const PERMISSIONS: Record<string, UserRole[]> = {
   'recommendations:read_client': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
   'recommendations:read_artist': [UserRole.ARTIST, UserRole.AGENT],
   'recommendations:feedback': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+
+  // Artist Intelligence (extended)
+  'artist_intelligence:read': [UserRole.ARTIST],
+  'artist_intelligence:read_agent': [UserRole.AGENT],
+  'artist_intelligence:gig_advisor': [UserRole.ARTIST, UserRole.AGENT],
+
+  // Dynamic Pricing
+  'dynamic_pricing:read': [UserRole.ARTIST, UserRole.AGENT],
+  'dynamic_pricing:manage_rules': [UserRole.ARTIST],
+  'dynamic_pricing:surge_indicator': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT, UserRole.ADMIN],
+
+  // Voice Query
+  'voice:query': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'voice:manage_sessions': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+
+  // Financial Command Center
+  'financial:read_own': [UserRole.ARTIST, UserRole.AGENT],
+  'financial:certificate': [UserRole.ARTIST],
+
+  // Seasonal Demand Intelligence
+  'seasonal:read_artist': [UserRole.ARTIST, UserRole.AGENT],
+  'seasonal:read_client': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'seasonal:alerts': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+
+  // Reputation Defense
+  'reputation:dispute': [UserRole.ARTIST],
+  'reputation:respond': [UserRole.ARTIST],
+  'reputation:report_venue': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'admin:reputation': [UserRole.ADMIN],
+
+  // Emergency Substitution
+  'substitution:create': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT, UserRole.ADMIN],
+  'substitution:respond': [UserRole.ARTIST],
+  'substitution:read': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
 };
 
 /**

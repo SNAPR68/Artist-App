@@ -165,3 +165,48 @@ export const RISING_STAR_MIN_TRUST = 3.5;
 // ─── Dynamic Pricing ────────────────────────────────────────────
 export const DYNAMIC_PRICING_MAX_SURGE_PCT = 50;
 export const DYNAMIC_PRICE_LOOKAHEAD_DAYS = 30;
+
+// ─── Voice Query ───────────────────────────────────────────────
+export const VOICE_QUERY_CONFIDENCE_THRESHOLD = 0.4;
+export const VOICE_SESSION_TIMEOUT_MINUTES = 30;
+
+// ─── Emergency Substitution ───────────────────────────────────
+export const SUBSTITUTION_WEIGHTS = {
+  GENRE_OVERLAP: 0.30,
+  TIER_PROXIMITY: 0.25,
+  VENUE_FIT: 0.20,
+  GEOGRAPHIC: 0.15,
+  HISTORICAL_SUCCESS: 0.10,
+} as const;
+export const SUBSTITUTION_MAX_CANDIDATES = 5;
+export const SUBSTITUTION_PREMIUM_MULTIPLIER = 1.25;
+export const SUBSTITUTION_EXPIRY_HOURS = {
+  CRITICAL: 4,
+  URGENT: 24,
+  STANDARD: 72,
+} as const;
+export const SUBSTITUTION_SEARCH_RADIUS_KM = 500;
+
+// ─── Seasonal Demand Intelligence ─────────────────────────────
+export const SEASONAL_DEMAND_LOOKBACK_MONTHS = 24;
+export const SEASONAL_DEMAND_LOOKAHEAD_MONTHS = 3;
+export const SEASONAL_PEAK_THRESHOLD = 0.8;
+export const SEASONAL_VALLEY_THRESHOLD = 0.3;
+
+// ─── Reputation Defense ───────────────────────────────────────
+export const VENUE_ISSUE_REVIEW_WEIGHT_REDUCTION = 0.40;
+export const VENUE_ISSUE_FLAG_THRESHOLD = 2;
+
+// ─── Financial Command Center ─────────────────────────────────
+export const FINANCIAL_FORECAST_WEEKS_AHEAD = 12;
+export const INCOME_CERTIFICATE_VALID_DAYS = 30;
+export const LIGHT_MONTH_THRESHOLD_PCT = 50;
+
+// ─── Gig Advisor v2 ──────────────────────────────────────────
+export const GIG_TRAVEL_COST_TIERS_PAISE = {
+  SAME_CITY: 0,
+  UNDER_200KM: 500000,
+  UNDER_500KM: 1500000,
+  OVER_500KM: 2500000,
+} as const;
+export const GIG_ADVISOR_MAX_CONCURRENT = 5;

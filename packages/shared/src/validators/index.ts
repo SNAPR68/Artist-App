@@ -6,6 +6,8 @@ import {
   RiderItemCategory, RiderPriority, RiderFulfillmentStatus,
   CrowdEnergyLevel, DemographicAgeGroup,
   WorkspaceRole, WorkspaceEventStatus,
+  SubstitutionUrgencyLevel,
+  FinancialPeriod,
 } from '../enums/index.js';
 
 // ─── Auth ────────────────────────────────────────────────────
@@ -489,4 +491,112 @@ export const earningsQuerySchema = z.object({
   period_type: z.enum(['monthly', 'quarterly', 'yearly']).default('monthly'),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+});
+
+// ─── Voice Query ───────────────────────────────────────────────
+
+export const voiceQuerySchema = z.object({
+  text: z.string().min(1).max(1000),
+  session_id: z.string().uuid().optional(),
+});
+
+export const voiceSessionQuerySchema = z.object({
+  limit: z.number().int().min(1).max(50).default(20),
+});
+
+// ─── Emergency Substitution ───────────────────────────────────
+
+export const createSubstitutionRequestSchema = z.object({
+  original_booking_id: z.string().uuid(),
+  urgency_level: z.nativeEnum(SubstitutionUrgencyLevel).default(SubstitutionUrgencyLevel.URGENT),
+});
+
+export const respondSubstitutionSchema = z.object({
+  response: z.enum(['accepted', 'declined']),
+  decline_reason: z.string().max(500).optional(),
+  quoted_amount_paise: z.number().int().min(0).optional(),
+});
+
+// ─── Seasonal Demand Intelligence ─────────────────────────────
+
+export const seasonalDemandQuerySchema = z.object({
+  city: z.string().optional(),
+  genre: z.string().optional(),
+  event_type: z.nativeEnum(EventType).optional(),
+});
+
+export const seasonalAlertQuerySchema = z.object({
+  is_read: z.boolean().optional(),
+  limit: z.number().int().min(1).max(50).default(20),
+});
+
+export const availabilityUrgencyQuerySchema = z.object({
+  event_type: z.nativeEnum(EventType),
+  city: z.string(),
+  event_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+
+// ─── Reputation Defense ──────────────────────────────────────
+
+export const submitReviewDisputeSchema = z.object({
+  reason: z.string().min(10).max(2000),
+  evidence_urls: z.array(z.string().url()).max(10).default([]),
+});
+
+export const respondReviewSchema = z.object({
+  response_text: z.string().min(10).max(1000),
+});
+
+export const resolveReviewDisputeSchema = z.object({
+  resolution: z.enum(['upheld', 'overturned', 'dismissed']),
+  admin_notes: z.string().max(2000).optional(),
+});
+
+export const venueIssueReportSchema = z.object({
+  venue_id: z.string().uuid(),
+  booking_id: z.string().uuid().optional(),
+  issue_type: z.string().min(1).max(100),
+  description: z.string().min(10).max(2000),
+});
+
+export const verifyVenueIssueSchema = z.object({
+  is_verified: z.boolean(),
+  auto_advisory: z.string().max(500).optional(),
+});
+
+// ─── Financial Command Center ────────────────────────────────
+
+export const financialSnapshotQuerySchema = z.object({
+  artist_id: z.string().uuid().optional(),
+});
+
+export const cashFlowForecastQuerySchema = z.object({
+  period: z.nativeEnum(FinancialPeriod).optional(),
+});
+
+export const incomeCertificateRequestSchema = z.object({
+  period_start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  period_end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+
+export const taxSummaryQuerySchema = z.object({
+  period_start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  period_end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+
+// ─── Gig Advisor v2 ──────────────────────────────────────────
+
+export const gigComparisonSchema = z.object({
+  booking_ids: z.array(z.string().uuid()).min(1).max(5),
+});
+
+export const gigAdvisorV2QuerySchema = z.object({
+  include_all_active: z.boolean().default(true),
+});
+
+// ─── Backup Preferences ─────────────────────────────────────
+
+export const updateBackupPreferencesSchema = z.object({
+  is_reliable_backup: z.boolean(),
+  backup_premium_pct: z.number().int().min(0).max(100).default(25),
 });

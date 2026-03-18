@@ -27,6 +27,13 @@ import type {
   DemandLevel,
   WorkspaceRole,
   WorkspaceEventStatus,
+  VoiceIntentType,
+  SubstitutionRequestStatus,
+  SubstitutionUrgencyLevel,
+  SeasonalAlertType,
+  ReviewDisputeStatus,
+  FinancialPeriod,
+  IncomeCertificateStatus,
 } from '../enums/index.js';
 
 // ─── Base Types ──────────────────────────────────────────────
@@ -809,4 +816,245 @@ export interface SurgeIndicator {
   event_type: EventType | null;
   demand_level: DemandLevel;
   indicator_text: string;
+}
+
+// ─── Voice Query ───────────────────────────────────────────────
+
+export interface VoiceQuery {
+  text: string;
+  session_id?: string;
+}
+
+export interface VoiceParsedIntent {
+  intent: VoiceIntentType;
+  confidence: number;
+  entities: VoiceEntity[];
+  raw_text: string;
+}
+
+export interface VoiceEntity {
+  type: 'date' | 'city' | 'budget' | 'event_type' | 'artist_name' | 'booking_id' | 'genre';
+  value: string;
+  normalized_value: string | number | null;
+}
+
+export interface VoiceConversation {
+  id: string;
+  user_id: string;
+  session_state: Record<string, unknown>;
+  current_intent: VoiceIntentType | null;
+  conversation_memory: Record<string, unknown>;
+  is_active: boolean;
+  last_message_at: string;
+  created_at: string;
+}
+
+export interface VoiceExecutionResult {
+  success: boolean;
+  response_text: string;
+  data: Record<string, unknown> | null;
+  suggestions: string[];
+}
+
+// ─── Emergency Substitution ───────────────────────────────────
+
+export interface SubstitutionRequest {
+  id: string;
+  original_booking_id: string;
+  cancelled_artist_id: string;
+  requested_by: string;
+  urgency_level: SubstitutionUrgencyLevel;
+  event_date: string;
+  event_city: string;
+  event_type: string;
+  genres: string[];
+  budget_paise: number;
+  status: SubstitutionRequestStatus;
+  accepted_artist_id: string | null;
+  new_booking_id: string | null;
+  premium_multiplier: number;
+  expires_at: string;
+  created_at: string;
+}
+
+export interface SubstitutionCandidate {
+  id: string;
+  request_id: string;
+  artist_id: string;
+  similarity_score: number;
+  score_breakdown: {
+    genre_overlap: number;
+    tier_proximity: number;
+    venue_fit: number;
+    geographic: number;
+    historical_success: number;
+  };
+  is_reliable_backup: boolean;
+  response: 'pending' | 'accepted' | 'declined' | 'expired';
+  responded_at: string | null;
+}
+
+export interface SubstitutionMatch {
+  request: SubstitutionRequest;
+  candidates: SubstitutionCandidate[];
+}
+
+// ─── Seasonal Demand Intelligence ─────────────────────────────
+
+export interface SeasonalDemandCurve {
+  id: string;
+  city: string;
+  genre: string | null;
+  event_type: string | null;
+  month: number;
+  avg_fill_rate: number;
+  avg_booking_count: number;
+  avg_inquiry_count: number;
+  demand_classification: string;
+  yoy_trend_pct: number | null;
+  sample_months: number;
+}
+
+export interface SeasonalAlert {
+  id: string;
+  recipient_id: string;
+  recipient_role: string;
+  alert_type: SeasonalAlertType;
+  title: string;
+  message: string;
+  metadata: Record<string, unknown>;
+  city: string;
+  season_month: number;
+  is_read: boolean;
+  is_dismissed: boolean;
+  created_at: string;
+  expires_at: string;
+}
+
+export interface AvailabilityUrgencySignal {
+  event_type: string;
+  city: string;
+  event_date: string;
+  total_matching_artists: number;
+  available_artists: number;
+  urgency_text: string;
+}
+
+// ─── Gig Advisor v2 ──────────────────────────────────────────
+
+export interface GigComparison {
+  id: string;
+  artist_id: string;
+  inquiry_ids: string[];
+  comparison_data: GigExpectedValue[];
+  computed_at: string;
+}
+
+export interface GigExpectedValue {
+  booking_id: string;
+  event_type: string;
+  event_city: string;
+  event_date: string;
+  client_name: string | null;
+  agreed_amount_paise: number;
+  estimated_travel_cost_paise: number;
+  net_revenue_paise: number;
+  conversion_probability: number;
+  expected_value_paise: number;
+  career_value_bonus: number;
+  client_quality_score: number;
+  recommendation: 'accept' | 'hold' | 'decline';
+  reasoning: string;
+}
+
+export interface GigAdvisorV2Recommendation {
+  inquiries: GigExpectedValue[];
+  summary: string;
+}
+
+// ─── Reputation Defense ──────────────────────────────────────
+
+export interface ReviewDispute {
+  id: string;
+  review_id: string;
+  disputed_by: string;
+  reason: string;
+  evidence_urls: string[];
+  status: ReviewDisputeStatus;
+  admin_notes: string | null;
+  resolution: 'upheld' | 'overturned' | 'dismissed' | null;
+  resolved_by: string | null;
+  resolved_at: string | null;
+  created_at: string;
+}
+
+export interface VenueIssueFlag {
+  id: string;
+  venue_id: string;
+  booking_id: string | null;
+  issue_type: string;
+  description: string;
+  flagged_by: string;
+  is_verified: boolean;
+  auto_advisory: string | null;
+  created_at: string;
+}
+
+export interface VenueReviewWeight {
+  venue_id: string;
+  review_id: string;
+  weight: number;
+  weight_reason: string | null;
+}
+
+// ─── Financial Command Center ────────────────────────────────
+
+export interface FinancialSnapshot {
+  available_balance_paise: number;
+  in_escrow_paise: number;
+  pending_settlement_paise: number;
+  total_earned_paise: number;
+  total_payouts_paise: number;
+}
+
+export interface CashFlowForecast {
+  id: string;
+  artist_id: string;
+  period_label: FinancialPeriod;
+  period_start: string;
+  period_end: string;
+  confirmed_income_paise: number;
+  probable_income_paise: number;
+  pending_settlement_paise: number;
+  net_forecast_paise: number;
+  is_light_month: boolean;
+  advisory: string | null;
+}
+
+export interface IncomeCertificate {
+  id: string;
+  artist_id: string;
+  period_start: string;
+  period_end: string;
+  total_gross_paise: number;
+  total_tds_paise: number;
+  total_gst_paise: number;
+  total_platform_fee_paise: number;
+  total_net_paise: number;
+  booking_count: number;
+  certificate_number: string;
+  status: IncomeCertificateStatus;
+  valid_until: string;
+}
+
+export interface TaxSummary {
+  period_start: string;
+  period_end: string;
+  total_gross_paise: number;
+  total_tds_paise: number;
+  total_gst_paise: number;
+  total_platform_fee_paise: number;
+  total_net_paise: number;
+  booking_count: number;
+  quarterly_breakdown: { quarter: string; gross_paise: number; tds_paise: number; net_paise: number }[];
 }

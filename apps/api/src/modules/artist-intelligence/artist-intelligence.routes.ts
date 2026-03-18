@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { artistIntelligenceService } from './artist-intelligence.service.js';
 import { artistIntelligenceRepository } from './artist-intelligence.repository.js';
+import { gigAdvisorV2Service } from './gig-advisor-v2.service.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { db } from '../../infrastructure/database.js';
@@ -141,5 +142,66 @@ export async function artistIntelligenceRoutes(app: FastifyInstance) {
     const data = await artistIntelligenceService.getCareerTrajectory(artist.user_id);
 
     return reply.send({ success: true, data, errors: [] });
+  });
+
+  // ─── Gig Advisor V2 ──────────────────────────────────────────
+
+  /**
+   * GET /v1/artist-intelligence/gig-advisor-v2 — Compare all active inquiries
+   */
+  app.get('/v1/artist-intelligence/gig-advisor-v2', {
+    preHandler: [authMiddleware, requirePermission('artist_intelligence:gig_advisor')],
+  }, async (request, reply) => {
+    const artistProfile = await db('artist_profiles').where({ user_id: request.user!.user_id }).first();
+    if (!artistProfile) {
+      return reply.status(404).send({
+        success: false,
+        data: null,
+        errors: [{ code: 'NOT_FOUND', message: 'Artist profile not found' }],
+      });
+    }
+
+    const result = await gigAdvisorV2Service.compareInquiries(artistProfile.id);
+    return reply.send({ success: true, data: result, errors: [] });
+  });
+
+  /**
+   * GET /v1/artist-intelligence/gig-advisor-v2/:bookingId — Single inquiry analysis
+   */
+  app.get('/v1/artist-intelligence/gig-advisor-v2/:bookingId', {
+    preHandler: [authMiddleware, requirePermission('artist_intelligence:gig_advisor')],
+  }, async (request, reply) => {
+    const { bookingId } = request.params as { bookingId: string };
+    const artistProfile = await db('artist_profiles').where({ user_id: request.user!.user_id }).first();
+    if (!artistProfile) {
+      return reply.status(404).send({
+        success: false,
+        data: null,
+        errors: [{ code: 'NOT_FOUND', message: 'Artist profile not found' }],
+      });
+    }
+
+    const result = await gigAdvisorV2Service.analyzeInquiry(artistProfile.id, bookingId);
+    return reply.send({ success: true, data: result, errors: [] });
+  });
+
+  /**
+   * POST /v1/artist-intelligence/gig-advisor-v2/compare — Compare specific inquiry IDs
+   */
+  app.post('/v1/artist-intelligence/gig-advisor-v2/compare', {
+    preHandler: [authMiddleware, requirePermission('artist_intelligence:gig_advisor')],
+  }, async (request, reply) => {
+    const { booking_ids } = request.body as { booking_ids: string[] };
+    const artistProfile = await db('artist_profiles').where({ user_id: request.user!.user_id }).first();
+    if (!artistProfile) {
+      return reply.status(404).send({
+        success: false,
+        data: null,
+        errors: [{ code: 'NOT_FOUND', message: 'Artist profile not found' }],
+      });
+    }
+
+    const result = await gigAdvisorV2Service.compareInquiries(artistProfile.id, booking_ids);
+    return reply.send({ success: true, data: result, errors: [] });
   });
 }

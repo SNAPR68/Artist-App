@@ -248,3 +248,58 @@ export enum WorkspaceEventStatus {
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
 }
+
+// ─── Voice Query ───────────────────────────────────────────
+export enum VoiceIntentType {
+  DISCOVER = 'discover',
+  STATUS = 'status',
+  ACTION = 'action',
+  INTELLIGENCE = 'intelligence',
+  EMERGENCY = 'emergency',
+}
+
+// ─── Emergency Substitution ────────────────────────────────
+export enum SubstitutionRequestStatus {
+  PENDING = 'pending',
+  MATCHING = 'matching',
+  NOTIFIED = 'notified',
+  ACCEPTED = 'accepted',
+  EXPIRED = 'expired',
+}
+
+export enum SubstitutionUrgencyLevel {
+  CRITICAL = 'critical',
+  URGENT = 'urgent',
+  STANDARD = 'standard',
+}
+
+// ─── Seasonal Demand ───────────────────────────────────────
+export enum SeasonalAlertType {
+  PEAK_APPROACHING = 'peak_approaching',
+  VALLEY_APPROACHING = 'valley_approaching',
+  BOOKING_WINDOW_CLOSING = 'booking_window_closing',
+  PRICE_OPPORTUNITY = 'price_opportunity',
+}
+
+// ─── Reputation Defense ────────────────────────────────────
+export enum ReviewDisputeStatus {
+  SUBMITTED = 'submitted',
+  UNDER_REVIEW = 'under_review',
+  UPHELD = 'upheld',
+  OVERTURNED = 'overturned',
+  DISMISSED = 'dismissed',
+}
+
+// ─── Financial Command Center ──────────────────────────────
+export enum FinancialPeriod {
+  THIS_WEEK = 'this_week',
+  NEXT_WEEK = 'next_week',
+  THIS_MONTH = 'this_month',
+  NEXT_3_MONTHS = 'next_3_months',
+}
+
+export enum IncomeCertificateStatus {
+  GENERATING = 'generating',
+  READY = 'ready',
+  EXPIRED = 'expired',
+}

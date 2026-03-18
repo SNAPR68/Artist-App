@@ -35,6 +35,11 @@ import { workspaceRoutes } from './modules/workspace/workspace.routes.js';
 import { recommendationRoutes } from './modules/recommendation/recommendation.routes.js';
 import { artistIntelligenceRoutes } from './modules/artist-intelligence/artist-intelligence.routes.js';
 import { dynamicPricingRoutes } from './modules/pricing-brain/dynamic-pricing.routes.js';
+import { voiceQueryRoutes } from './modules/voice-query/voice-query.routes.js';
+import { financialCommandRoutes } from './modules/financial-command/financial-command.routes.js';
+import { seasonalDemandRoutes } from './modules/seasonal-demand/seasonal-demand.routes.js';
+import { reputationDefenseRoutes } from './modules/reputation-defense/reputation-defense.routes.js';
+import { emergencySubstitutionRoutes } from './modules/emergency-substitution/emergency-substitution.routes.js';
 import { startCronJobs } from './infrastructure/cron.js';
 
 const app = Fastify({
@@ -130,6 +135,11 @@ await app.register(workspaceRoutes);
 await app.register(recommendationRoutes);
 await app.register(artistIntelligenceRoutes);
 await app.register(dynamicPricingRoutes);
+await app.register(voiceQueryRoutes);
+await app.register(financialCommandRoutes);
+await app.register(seasonalDemandRoutes);
+await app.register(reputationDefenseRoutes);
+await app.register(emergencySubstitutionRoutes);
 
 // ─── Graceful Shutdown ───────────────────────────────────────
 async function shutdown(signal: string) {
