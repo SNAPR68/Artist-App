@@ -109,16 +109,17 @@ This is NOT a booking marketplace. It is the intelligence and operations layer f
 3. Operational workflow replacement that makes leaving expensive
 
 ## Current Build Status
-**Fully implemented (Weeks 1-12)**:
+**Fully implemented (Weeks 1-16)**:
 - **Core**: Booking state machine (12 states), calendar holds, quote negotiation, Razorpay payments/escrow/refunds, contract/invoice generation, 4-channel notifications, reviews, search, auth/RBAC, profiles, admin dashboard
 - **Disputes & Cancellations**: Dispute resolution (submit/evidence/resolve/appeal), connected cancellation pipeline (sub-types + refund + calendar + trust)
 - **Payouts & Concierge**: Payout integration (bank accounts + settlement auto-payout), concierge dashboard (search/book on behalf)
 - **Operational Intelligence**: Pre-event coordination (T-minus checklists + rider + logistics + escalation), event-day operations (GPS arrival + soundcheck + set timing + dual-party completion), trust score redesign (70% behavioral / 30% stated), failure data capture, agent commission dashboard
 - **Intelligence Layer v1**: Event context data capture (crowd demographics + vibe matching), venue profiles + equipment + artist compatibility scoring, technical rider management + venue cross-reference + gap reports, calendar intelligence (demand signals + fill rates + proactive artist alerts), pricing brain (market positioning + percentile rank + underpriced/overpriced recommendations), WhatsApp conversational booking (intent parsing + conversation state machine + stub provider)
 - **Price Intelligence**: Materialized views v1 + v2 (trust-tier breakdown + temporal trends), fair price ranges, city comparison
-- **Infrastructure**: 13 cron jobs, 23 notification templates, 49 database migrations, full RBAC (30+ permissions)
+- **Marketplace Intelligence (Weeks 13-16)**: Event company workspace CRM (team roles + event grouping + booking pipeline + branded presentations), artist intelligence dashboard (earnings snapshots + career metrics + gig advisor), recommendation engine (Jaccard similarity + collaborative signals + Rising Star detection), dynamic pricing engine (rule-based surge + elasticity tracking + demand-aware auto-adjustment + 30-day price cache)
+- **Infrastructure**: 16 cron jobs, 28 notification templates, 64 database migrations, full RBAC (44+ permissions)
 
-**Missing (priority order)**: Event company workspace, dynamic pricing engine, recommendation system, voice/IVR interface, artist intelligence dashboard.
+**Missing (priority order)**: Voice/IVR interface, frontend implementation.
 
 ## DOCX Generation
 When generating strategy/product documents:
