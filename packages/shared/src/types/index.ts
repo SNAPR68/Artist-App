@@ -25,6 +25,8 @@ import type {
   WhatsAppMessageDirection,
   PricingTier,
   DemandLevel,
+  WorkspaceRole,
+  WorkspaceEventStatus,
 } from '../enums/index.js';
 
 // ─── Base Types ──────────────────────────────────────────────
@@ -603,4 +605,208 @@ export interface VenueArtistHistory {
   venue_acoustics_rating: number | null;
   overall_review_rating: number | null;
   created_at: string;
+}
+
+// ─── Workspace ───────────────────────────────────────────────
+export interface Workspace extends BaseEntity {
+  name: string;
+  slug: string;
+  owner_user_id: string;
+  logo_url: string | null;
+  brand_color: string | null;
+  description: string | null;
+  website: string | null;
+  city: string | null;
+  company_type: string | null;
+  is_active: boolean;
+}
+
+export interface WorkspaceMember {
+  id: string;
+  workspace_id: string;
+  user_id: string;
+  role: WorkspaceRole;
+  invited_by: string | null;
+  invited_at: string | null;
+  accepted_at: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkspaceEvent {
+  id: string;
+  workspace_id: string;
+  name: string;
+  event_date: string;
+  event_end_date: string | null;
+  event_city: string;
+  venue_id: string | null;
+  event_type: EventType;
+  guest_count: number | null;
+  budget_min_paise: number | null;
+  budget_max_paise: number | null;
+  notes: string | null;
+  status: WorkspaceEventStatus;
+  client_name: string | null;
+  client_phone: string | null;
+  client_email: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+export interface WorkspaceEventBooking {
+  id: string;
+  workspace_event_id: string;
+  booking_id: string;
+  role_label: string | null;
+  sort_order: number;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface WorkspacePresentation {
+  id: string;
+  workspace_id: string;
+  workspace_event_id: string | null;
+  title: string;
+  slug: string;
+  artist_ids: string[];
+  notes_per_artist: Record<string, string>;
+  custom_header: string | null;
+  custom_footer: string | null;
+  include_pricing: boolean;
+  include_media: boolean;
+  is_active: boolean;
+  view_count: number;
+  created_by: string;
+  expires_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ─── Artist Intelligence ─────────────────────────────────────
+export interface ArtistEarningsSnapshot {
+  id: string;
+  artist_id: string;
+  period_type: 'monthly' | 'quarterly' | 'yearly';
+  period_start: string;
+  period_end: string;
+  total_bookings: number;
+  completed_bookings: number;
+  total_revenue_paise: number;
+  avg_booking_paise: number | null;
+  revenue_by_event_type: Record<string, number>;
+  revenue_by_city: Record<string, number>;
+  market_avg_paise: number | null;
+  created_at: string;
+}
+
+export interface ArtistCareerMetrics {
+  id: string;
+  artist_id: string;
+  computed_at: string;
+  trust_score_history: Array<{ date: string; score: number }>;
+  price_progression: Array<{ date: string; avg_paise: number }>;
+  booking_velocity: { last_30d: number; last_90d: number; yoy_change_pct: number };
+  top_cities: Array<{ city: string; count: number; revenue: number }>;
+  top_event_types: Array<{ event_type: string; count: number; revenue: number }>;
+  rebook_rate: number | null;
+  avg_crowd_energy: string | null;
+  demand_alignment: number | null;
+  gig_advisor: GigAdvisorRecommendation[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GigAdvisorRecommendation {
+  city: string;
+  event_type: string;
+  opportunity_score: number;
+  rationale: string;
+}
+
+// ─── Recommendation ──────────────────────────────────────────
+export interface RecommendationScore {
+  id: string;
+  source_type: 'artist' | 'booking' | 'event_type';
+  source_id: string;
+  target_artist_id: string;
+  score: number;
+  score_breakdown: Record<string, number>;
+  recommendation_type: 'similar_artist' | 'popular_for_event' | 'rising_star' | 'events_for_artist';
+  context: Record<string, unknown>;
+  computed_at: string;
+  expires_at: string;
+}
+
+export interface CollaborativeSignal {
+  id: string;
+  artist_a_id: string;
+  artist_b_id: string;
+  signal_type: 'booked_together' | 'similar_crowd' | 'same_client_booked';
+  strength: number;
+  occurrence_count: number;
+  last_occurred_at: string | null;
+  computed_at: string;
+}
+
+export interface RecommendationFeedback {
+  id: string;
+  user_id: string;
+  recommendation_score_id: string;
+  action: 'clicked' | 'booked' | 'dismissed' | 'shortlisted';
+  created_at: string;
+}
+
+// ─── Dynamic Pricing ─────────────────────────────────────────
+export interface ArtistPriceRule {
+  id: string;
+  artist_id: string;
+  rule_type: 'demand_surge' | 'last_minute_discount' | 'repeat_client' | 'seasonal';
+  is_active: boolean;
+  conditions: Record<string, unknown>;
+  action: Record<string, unknown>;
+  max_adjustment_pct: number | null;
+  min_price_paise: number | null;
+  event_types: string[] | null;
+  cities: string[] | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DynamicPriceResult {
+  base_min_paise: number;
+  base_max_paise: number;
+  adjusted_min_paise: number;
+  adjusted_max_paise: number;
+  fair_price_min_paise: number | null;
+  fair_price_max_paise: number | null;
+  demand_level: DemandLevel;
+  adjustments_applied: Array<{ rule_id: string; type: string; value: number; source: string }>;
+}
+
+export interface PriceElasticityEntry {
+  id: string;
+  artist_id: string;
+  booking_id: string | null;
+  event_type: EventType;
+  city: string;
+  quoted_paise: number;
+  demand_level: DemandLevel;
+  surge_applied: boolean;
+  surge_pct: number | null;
+  outcome: 'booked' | 'declined' | 'expired' | 'counter_offered';
+  days_before_event: number | null;
+  created_at: string;
+}
+
+export interface SurgeIndicator {
+  city: string;
+  event_date: string;
+  event_type: EventType | null;
+  demand_level: DemandLevel;
+  indicator_text: string;
 }

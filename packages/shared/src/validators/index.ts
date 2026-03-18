@@ -5,6 +5,7 @@ import {
   CoordinationCheckpoint, EventDayIssueType,
   RiderItemCategory, RiderPriority, RiderFulfillmentStatus,
   CrowdEnergyLevel, DemographicAgeGroup,
+  WorkspaceRole, WorkspaceEventStatus,
 } from '../enums/index.js';
 
 // ─── Auth ────────────────────────────────────────────────────
@@ -365,4 +366,127 @@ export const pricingBrainQuerySchema = z.object({
 
 export const dismissRecommendationSchema = z.object({
   reason: z.string().max(500).optional(),
+});
+
+// ─── Workspace ──────────────────────────────────────────────────
+export const createWorkspaceSchema = z.object({
+  name: z.string().min(2).max(255),
+  description: z.string().max(2000).optional(),
+  website: z.string().url().max(500).optional(),
+  city: z.string().max(100).optional(),
+  company_type: z.enum(['event_management', 'wedding_planner', 'corporate', 'agency']).optional(),
+  logo_url: z.string().url().max(2048).optional(),
+  brand_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+});
+
+export const updateWorkspaceSchema = createWorkspaceSchema.partial();
+
+export const inviteWorkspaceMemberSchema = z.object({
+  phone: z.string().regex(/^[6-9]\d{9}$/, 'Invalid Indian phone number'),
+  role: z.nativeEnum(WorkspaceRole),
+});
+
+export const updateWorkspaceMemberSchema = z.object({
+  role: z.nativeEnum(WorkspaceRole),
+});
+
+export const createWorkspaceEventSchema = z.object({
+  name: z.string().min(2).max(255),
+  event_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  event_end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  event_city: z.string().min(2).max(100),
+  venue_id: z.string().uuid().optional(),
+  event_type: z.nativeEnum(EventType),
+  guest_count: z.number().int().min(1).max(100000).optional(),
+  budget_min_paise: z.number().int().min(0).optional(),
+  budget_max_paise: z.number().int().min(0).optional(),
+  notes: z.string().max(5000).optional(),
+  client_name: z.string().max(255).optional(),
+  client_phone: z.string().max(20).optional(),
+  client_email: z.string().email().max(200).optional(),
+});
+
+export const updateWorkspaceEventSchema = createWorkspaceEventSchema.partial().extend({
+  status: z.nativeEnum(WorkspaceEventStatus).optional(),
+});
+
+export const linkBookingsToEventSchema = z.object({
+  bookings: z.array(z.object({
+    booking_id: z.string().uuid(),
+    role_label: z.string().max(100).optional(),
+  })).min(1).max(20),
+});
+
+export const createPresentationSchema = z.object({
+  title: z.string().min(2).max(255),
+  workspace_event_id: z.string().uuid().optional(),
+  artist_ids: z.array(z.string().uuid()).min(1).max(50),
+  notes_per_artist: z.record(z.string().max(500)).default({}),
+  custom_header: z.string().max(2000).optional(),
+  custom_footer: z.string().max(2000).optional(),
+  include_pricing: z.boolean().default(false),
+  include_media: z.boolean().default(true),
+  expires_at: z.string().datetime().optional(),
+});
+
+export const bulkActionSchema = z.object({
+  booking_ids: z.array(z.string().uuid()).min(1).max(50),
+  action: z.enum(['confirm', 'cancel']),
+  reason: z.string().max(2000).optional(),
+});
+
+export const workspacePipelineQuerySchema = z.object({
+  state: z.string().optional(),
+  event_type: z.nativeEnum(EventType).optional(),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  page: z.number().int().min(1).default(1),
+  per_page: z.number().int().min(1).max(100).default(20),
+});
+
+// ─── Dynamic Pricing ────────────────────────────────────────────
+export const createPriceRuleSchema = z.object({
+  rule_type: z.enum(['demand_surge', 'last_minute_discount', 'repeat_client', 'seasonal']),
+  conditions: z.record(z.unknown()),
+  action: z.record(z.unknown()),
+  max_adjustment_pct: z.number().min(1).max(100).optional(),
+  min_price_paise: z.number().int().min(0).optional(),
+  event_types: z.array(z.string()).optional(),
+  cities: z.array(z.string()).optional(),
+});
+
+export const updatePriceRuleSchema = createPriceRuleSchema.partial().extend({
+  is_active: z.boolean().optional(),
+});
+
+export const dynamicPriceQuerySchema = z.object({
+  event_type: z.nativeEnum(EventType),
+  city: z.string().min(1),
+  event_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+
+export const surgeIndicatorQuerySchema = z.object({
+  city: z.string().min(1),
+  event_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  event_type: z.nativeEnum(EventType).optional(),
+});
+
+// ─── Recommendation ─────────────────────────────────────────────
+export const recommendationQuerySchema = z.object({
+  event_type: z.nativeEnum(EventType).optional(),
+  city: z.string().optional(),
+  budget_min: z.number().int().min(0).optional(),
+  budget_max: z.number().int().min(0).optional(),
+  limit: z.number().int().min(1).max(50).default(10),
+});
+
+export const recommendationFeedbackSchema = z.object({
+  action: z.enum(['clicked', 'booked', 'dismissed', 'shortlisted']),
+});
+
+// ─── Artist Intelligence ────────────────────────────────────────
+export const earningsQuerySchema = z.object({
+  period_type: z.enum(['monthly', 'quarterly', 'yearly']).default('monthly'),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 });

@@ -201,6 +201,50 @@ export const NOTIFICATION_TEMPLATES: Record<string, NotificationTemplate> = {
     email_subject: 'Booking Inquiry Created via WhatsApp',
     email_body: 'Your booking inquiry <strong>#{{booking_id}}</strong> has been created via WhatsApp. The artist will respond within <strong>{{response_hours}} hours</strong>.',
   },
+
+  // ─── Workspace Templates ──────────────────────────────────
+  workspace_invitation: {
+    whatsapp_template_id: 'workspace_invite_v1',
+    sms_flow_id: 'flow_ws_invite',
+    push_title: 'Team Invitation',
+    push_body: 'You\'ve been invited to join {{workspace_name}} as {{role}}',
+    email_subject: 'You\'re Invited — Join {{workspace_name}}',
+    email_body: 'You\'ve been invited to join <strong>{{workspace_name}}</strong> as a <strong>{{role}}</strong>. Log in to accept the invitation and start managing events together.',
+  },
+  workspace_booking_update: {
+    whatsapp_template_id: 'workspace_booking_v1',
+    sms_flow_id: 'flow_ws_booking',
+    push_title: 'Booking Updated',
+    push_body: 'Booking for {{event_type}} updated in {{workspace_name}} — status: {{status}}',
+    email_subject: 'Booking Update — {{event_type}} in {{workspace_name}}',
+    email_body: 'A booking for <strong>{{event_type}}</strong> in <strong>{{workspace_name}}</strong> has been updated to <strong>{{status}}</strong>. Log in to review details.',
+  },
+  workspace_event_reminder: {
+    whatsapp_template_id: 'workspace_event_reminder_v1',
+    sms_flow_id: 'flow_ws_event_reminder',
+    push_title: 'Event Coming Up',
+    push_body: 'Event {{event_name}} at {{venue}} is in {{days_until}} days. {{booked_artists}} artists booked.',
+    email_subject: 'Event Reminder — {{event_name}} in {{days_until}} Days',
+    email_body: 'Your event <strong>{{event_name}}</strong> at <strong>{{venue}}</strong> is in <strong>{{days_until}} days</strong>. You have <strong>{{booked_artists}} artists</strong> booked. Log in to review the event details.',
+  },
+
+  // ─── Intelligence Templates ────────────────────────────────
+  intelligence_monthly_summary: {
+    whatsapp_template_id: 'intel_monthly_v1',
+    sms_flow_id: 'flow_intel_monthly',
+    push_title: 'Monthly Career Summary',
+    push_body: 'Your {{month}} career summary is ready — {{total_bookings}} bookings, ₹{{revenue}} earned.',
+    email_subject: 'Your {{month}} Career Summary',
+    email_body: 'Your <strong>{{month}}</strong> career summary is ready! You had <strong>{{total_bookings}} bookings</strong> and earned <strong>₹{{revenue}}</strong>. Log in to see your full career insights.',
+  },
+  gig_advisor_opportunity: {
+    whatsapp_template_id: 'gig_advisor_v1',
+    sms_flow_id: 'flow_gig_advisor',
+    push_title: 'New Opportunity',
+    push_body: 'High demand for {{event_type}} in {{city}} — great match for your profile!',
+    email_subject: 'Opportunity Alert — {{event_type}} in {{city}}',
+    email_body: 'There is <strong>high demand</strong> for <strong>{{event_type}}</strong> in <strong>{{city}}</strong> and it\'s a great match for your profile. Log in to check your Gig Advisor for details.',
+  },
 };
 
 /**

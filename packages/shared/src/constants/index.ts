@@ -150,3 +150,18 @@ export const CALENDAR_INTELLIGENCE_LOOKAHEAD_DAYS = 90;
 
 // ─── WhatsApp ───────────────────────────────────────────────────
 export const WHATSAPP_SESSION_TIMEOUT_HOURS = 24;
+
+// ─── Recommendation Engine ──────────────────────────────────────
+export const RECOMMENDATION_WEIGHTS = {
+  SIMILAR_ARTIST: { GENRE: 0.30, PRICE_FIT: 0.25, EVENT_TYPE: 0.20, VIBE: 0.15, CITY: 0.10 },
+  POPULAR_FOR_EVENT: { TRUST: 0.30, BOOKING_COUNT: 0.25, AVG_REVIEW: 0.20, PRICE_FIT: 0.15, REBOOK: 0.10 },
+  EVENTS_FOR_ARTIST: { DEMAND: 0.30, GENRE_MATCH: 0.25, CROWD_HISTORY: 0.20, VENUE_COMPAT: 0.15, PRICE: 0.10 },
+} as const;
+
+export const RECOMMENDATION_EXPIRY_DAYS = 7;
+export const RISING_STAR_MAX_BOOKINGS = 20;
+export const RISING_STAR_MIN_TRUST = 3.5;
+
+// ─── Dynamic Pricing ────────────────────────────────────────────
+export const DYNAMIC_PRICING_MAX_SURGE_PCT = 50;
+export const DYNAMIC_PRICE_LOOKAHEAD_DAYS = 30;

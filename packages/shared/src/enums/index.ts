@@ -233,3 +233,18 @@ export enum DemandLevel {
   HIGH = 'high',
   PEAK = 'peak',
 }
+
+// ─── Workspace ──────────────────────────────────────────────
+export enum WorkspaceRole {
+  OWNER = 'owner',
+  MANAGER = 'manager',
+  COORDINATOR = 'coordinator',
+}
+
+export enum WorkspaceEventStatus {
+  PLANNING = 'planning',
+  CONFIRMED = 'confirmed',
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+}

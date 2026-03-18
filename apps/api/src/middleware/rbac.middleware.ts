@@ -105,6 +105,21 @@ const PERMISSIONS: Record<string, UserRole[]> = {
 
   // WhatsApp Admin
   'admin:whatsapp': [UserRole.ADMIN],
+
+  // Workspace
+  'workspace:create': [UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'workspace:read': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'workspace:manage': [UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'workspace:invite': [UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'workspace:events': [UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'workspace:presentations': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'workspace:bulk_actions': [UserRole.CLIENT, UserRole.EVENT_COMPANY],
+  'workspace:analytics': [UserRole.CLIENT, UserRole.EVENT_COMPANY],
+
+  // Recommendations
+  'recommendations:read_client': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'recommendations:read_artist': [UserRole.ARTIST, UserRole.AGENT],
+  'recommendations:feedback': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
 };
 
 /**

@@ -9,6 +9,9 @@ import { priceIntelligenceService } from '../modules/analytics/price-intelligenc
 import { calendarIntelligenceService } from '../modules/analytics/calendar-intelligence.service.js';
 import { pricingBrainService } from '../modules/pricing-brain/pricing-brain.service.js';
 import { whatsAppConversationService } from '../modules/whatsapp/whatsapp-conversation.service.js';
+import { artistIntelligenceService } from '../modules/artist-intelligence/artist-intelligence.service.js';
+import { recommendationService } from '../modules/recommendation/recommendation.service.js';
+import { dynamicPricingService } from '../modules/pricing-brain/dynamic-pricing.service.js';
 
 const HOLD_EXPIRY_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 const REVIEW_PUBLISH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
@@ -22,6 +25,9 @@ const ALERT_GENERATION_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
 const VENUE_STATS_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const PRICING_BRAIN_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const WHATSAPP_CLEANUP_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const INTELLIGENCE_BATCH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const RECOMMENDATION_BATCH_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
+const DYNAMIC_PRICE_CACHE_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 /**
  * Start background cron jobs for hold expiry and review publishing.
@@ -214,4 +220,38 @@ export function startCronJobs() {
       console.error('[CRON] WhatsApp cleanup failed:', err);
     }
   }, WHATSAPP_CLEANUP_INTERVAL_MS);
+
+  // 14. Artist intelligence batch — earnings snapshots + career metrics + gig advisor (every 24h)
+  setInterval(async () => {
+    try {
+      const count = await artistIntelligenceService.batchComputeAll();
+      if (count > 0) {
+        console.log(`[CRON] Computed intelligence for ${count} artists`);
+      }
+    } catch (err) {
+      console.error('[CRON] Artist intelligence batch failed:', err);
+    }
+  }, INTELLIGENCE_BATCH_INTERVAL_MS);
+
+  // 15. Recommendation batch — similar artists, popular-for-event, collaborative signals (every 12h)
+  setInterval(async () => {
+    try {
+      const result = await recommendationService.batchCompute();
+      console.log(`[CRON] Computed ${result.total_scores} recommendation scores, cleaned ${result.expired_cleaned} expired`);
+    } catch (err) {
+      console.error('[CRON] Recommendation batch failed:', err);
+    }
+  }, RECOMMENDATION_BATCH_INTERVAL_MS);
+
+  // 16. Dynamic price cache — pre-compute next 30 days for artists with active rules (every 6h)
+  setInterval(async () => {
+    try {
+      const count = await dynamicPricingService.batchComputeDynamicPrices();
+      if (count > 0) {
+        console.log(`[CRON] Cached ${count} dynamic prices`);
+      }
+    } catch (err) {
+      console.error('[CRON] Dynamic price cache failed:', err);
+    }
+  }, DYNAMIC_PRICE_CACHE_INTERVAL_MS);
 }
