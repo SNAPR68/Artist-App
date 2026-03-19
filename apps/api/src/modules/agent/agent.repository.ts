@@ -78,7 +78,7 @@ export class AgentRepository {
         db.raw(`COALESCE(SUM(b.final_amount) FILTER (WHERE b.state IN ('completed', 'settled')), 0) as total_gmv`),
         db.raw(`COALESCE(SUM(b.final_amount) FILTER (WHERE b.state IN ('confirmed', 'pre_event', 'event_day')), 0) as pending_gmv`),
       )
-      .first();
+      .first() as any;
 
     const totalGmv = Number(stats?.total_gmv ?? 0);
     const pendingGmv = Number(stats?.pending_gmv ?? 0);

@@ -303,7 +303,7 @@ export class EmergencySubstitutionService {
       // 5. Historical Success (0.10)
       const trustNorm = (candidate.trust_score ?? 0) / 5.0;
       // Fetch completion rate
-      const completionStats = await db('bookings')
+      const completionStats: any = await db('bookings')
         .where({ artist_id: candidate.id })
         .whereIn('state', ['completed', 'cancelled'])
         .select(
@@ -381,7 +381,7 @@ export class EmergencySubstitutionService {
     // 3. Transaction with row-level lock
     const result = await db.transaction(async (trx) => {
       // Lock the request row
-      const lockedRequest = await trx('substitution_requests')
+      const lockedRequest: any = await trx('substitution_requests')
         .where({ id: request.id })
         .forUpdate()
         .first();

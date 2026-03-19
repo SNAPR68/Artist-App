@@ -44,7 +44,7 @@ export async function adminRoutes(app: FastifyInstance) {
       });
     }
 
-    const [countResult] = await q.clone().clearSelect().clearOrder().count('u.id as total');
+    const [countResult]: any[] = await q.clone().clearSelect().clearOrder().count('u.id as total');
     const users = await q.limit(perPage).offset(offset);
 
     return reply.send({
@@ -150,11 +150,11 @@ export async function adminRoutes(app: FastifyInstance) {
       q = q.where('p.status', query.status);
     }
 
-    const [countResult] = await q.clone().clearSelect().clearOrder().count('p.id as total');
+    const [countResult]: any[] = await q.clone().clearSelect().clearOrder().count('p.id as total');
     const payments = await q.limit(perPage).offset(offset);
 
     // Summary stats
-    const [stats] = await db('payments')
+    const [stats]: any[] = await db('payments')
       .select(
         db.raw('COUNT(*) as total_count'),
         db.raw('COALESCE(SUM(amount), 0) as total_amount_paise'),
@@ -190,7 +190,7 @@ export async function adminRoutes(app: FastifyInstance) {
   app.get('/v1/admin/stats', {
     preHandler: [authMiddleware, requirePermission('admin:users')],
   }, async (_request, reply) => {
-    const [userStats] = await db('users')
+    const [userStats]: any[] = await db('users')
       .where('deleted_at', null)
       .select(
         db.raw('COUNT(*) as total_users'),
@@ -199,7 +199,7 @@ export async function adminRoutes(app: FastifyInstance) {
         db.raw("COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days') as new_this_week"),
       );
 
-    const [bookingStats] = await db('bookings')
+    const [bookingStats]: any[] = await db('bookings')
       .where('deleted_at', null)
       .select(
         db.raw('COUNT(*) as total_bookings'),
@@ -208,7 +208,7 @@ export async function adminRoutes(app: FastifyInstance) {
         db.raw("COUNT(*) FILTER (WHERE state = 'cancelled') as cancelled"),
       );
 
-    const [verifiedCount] = await db('artist_profiles')
+    const [verifiedCount]: any[] = await db('artist_profiles')
       .where({ is_verified: true })
       .count('id as count');
 

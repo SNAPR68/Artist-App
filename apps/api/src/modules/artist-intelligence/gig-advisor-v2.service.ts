@@ -222,7 +222,7 @@ export class GigAdvisorV2Service {
 
     // Check if client is high-profile (event_company with 10+ bookings)
     if (booking.client_id) {
-      const [clientBookingCount] = await db('bookings')
+      const [clientBookingCount]: any[] = await db('bookings')
         .where('client_id', booking.client_id)
         .whereIn('state', ['completed', 'settled'])
         .count('* as count');
@@ -432,7 +432,7 @@ export class GigAdvisorV2Service {
   async getConversionRate(artistId: string, eventType: string | null): Promise<number> {
     if (!eventType) return 0.5;
 
-    const [stats] = await db('bookings')
+    const [stats]: any[] = await db('bookings')
       .where({ artist_id: artistId, event_type: eventType })
       .select(
         db.raw('COUNT(*)::int as total_count'),
@@ -457,7 +457,7 @@ export class GigAdvisorV2Service {
     if (!client) return 0.5;
 
     // Reviews where reviewer_role='artist' and reviewee is the client
-    const reviewStats = await db('reviews')
+    const reviewStats: any = await db('reviews')
       .where({ reviewee_id: clientId, reviewer_role: 'artist' })
       .select(
         db.raw('AVG(overall_rating) as avg_rating'),

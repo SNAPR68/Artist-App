@@ -164,25 +164,25 @@ export class ArtistIntelligenceService {
     const oneYearAgo = new Date(now.getTime() - 365 * 86400000);
     const twoYearsAgo = new Date(now.getTime() - 730 * 86400000);
 
-    const [last30d] = await db('bookings')
+    const [last30d]: any[] = await db('bookings')
       .where('artist_id', artistId)
       .whereIn('state', ['completed', 'settled', 'confirmed', 'in_progress'])
       .where('created_at', '>=', thirtyDaysAgo.toISOString())
       .count('* as count');
 
-    const [last90d] = await db('bookings')
+    const [last90d]: any[] = await db('bookings')
       .where('artist_id', artistId)
       .whereIn('state', ['completed', 'settled', 'confirmed', 'in_progress'])
       .where('created_at', '>=', ninetyDaysAgo.toISOString())
       .count('* as count');
 
-    const [currentYear] = await db('bookings')
+    const [currentYear]: any[] = await db('bookings')
       .where('artist_id', artistId)
       .whereIn('state', ['completed', 'settled'])
       .where('created_at', '>=', oneYearAgo.toISOString())
       .count('* as count');
 
-    const [previousYear] = await db('bookings')
+    const [previousYear]: any[] = await db('bookings')
       .where('artist_id', artistId)
       .whereIn('state', ['completed', 'settled'])
       .where('created_at', '>=', twoYearsAgo.toISOString())
@@ -412,7 +412,7 @@ export class ArtistIntelligenceService {
 
     const careerMetrics = await artistIntelligenceRepository.getCareerMetrics(artist.id);
 
-    const [totalBookings] = await db('bookings')
+    const [totalBookings]: any[] = await db('bookings')
       .where('artist_id', artist.id)
       .whereIn('state', ['completed', 'settled'])
       .count('* as count');
@@ -473,7 +473,7 @@ export class ArtistIntelligenceService {
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
     // Reviews for last 6 months
-    const reviewStats = await db('reviews')
+    const reviewStats: any = await db('reviews')
       .where('reviewee_id', artist.user_id)
       .where('created_at', '>=', sixMonthsAgo.toISOString())
       .select(

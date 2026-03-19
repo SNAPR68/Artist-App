@@ -189,7 +189,7 @@ export class SearchService {
       LIMIT 20
     `).then((r: any) => r.rows);
 
-    const [priceRange] = await db('artist_profiles as ap')
+    const [priceRange]: any[] = await db('artist_profiles as ap')
       .join('users as u', 'u.id', 'ap.user_id')
       .where({ 'u.is_active': true, 'ap.deleted_at': null })
       .select(

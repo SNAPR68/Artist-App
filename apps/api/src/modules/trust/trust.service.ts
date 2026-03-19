@@ -43,7 +43,7 @@ export class TrustScoreService {
 
   private async computeBehavioral(artistId: string) {
     // Completion rate: completed+settled / total confirmed+ bookings
-    const bookingStats = await db('bookings')
+    const bookingStats: any = await db('bookings')
       .where({ artist_id: artistId })
       .whereIn('state', ['confirmed', 'pre_event', 'event_day', 'completed', 'settled', 'cancelled'])
       .select(
@@ -57,7 +57,7 @@ export class TrustScoreService {
       : 50; // default for new artists
 
     // Punctuality: from event_day_logs where arrival_verified=true
-    const arrivalStats = await db('event_day_logs as edl')
+    const arrivalStats: any = await db('event_day_logs as edl')
       .join('bookings as b', 'b.id', 'edl.booking_id')
       .where('b.artist_id', artistId)
       .whereNotNull('edl.arrival_at')
@@ -78,7 +78,7 @@ export class TrustScoreService {
     const responseTime = Math.max(0, Math.min(100, 100 - (responseHours / 48) * 100));
 
     // Rebooking rate: clients who booked 2+ times / total distinct clients
-    const rebookStats = await db('bookings')
+    const rebookStats: any = await db('bookings')
       .where({ artist_id: artistId })
       .whereIn('state', ['completed', 'settled', 'confirmed', 'pre_event', 'event_day'])
       .select(
@@ -96,7 +96,7 @@ export class TrustScoreService {
 
     // Cancellation rate (by artist, last 12 months)
     const oneYearAgo = new Date(Date.now() - 365 * 86400000).toISOString();
-    const cancelStats = await db('cancellation_details as cd')
+    const cancelStats: any = await db('cancellation_details as cd')
       .join('bookings as b', 'b.id', 'cd.booking_id')
       .where('b.artist_id', artistId)
       .where('cd.sub_type', 'by_artist')
@@ -104,7 +104,7 @@ export class TrustScoreService {
       .count('cd.id as count')
       .first();
 
-    const totalRecentBookings = await db('bookings')
+    const totalRecentBookings: any = await db('bookings')
       .where({ artist_id: artistId })
       .where('created_at', '>=', oneYearAgo)
       .count('id as count')
@@ -115,7 +115,7 @@ export class TrustScoreService {
       : 0;
 
     // Contract compliance: actual_duration / contracted_duration
-    const complianceStats = await db('event_day_logs as edl')
+    const complianceStats: any = await db('event_day_logs as edl')
       .join('bookings as b', 'b.id', 'edl.booking_id')
       .where('b.artist_id', artistId)
       .whereNotNull('edl.actual_duration_min')
@@ -137,7 +137,7 @@ export class TrustScoreService {
     if (!profile) return { avgRating: 50, wouldRebook: 50, consistencyScore: 50 };
 
     // Average rating (scale to 0-100)
-    const ratingStats = await db('reviews')
+    const ratingStats: any = await db('reviews')
       .where({ reviewee_id: profile.user_id, is_published: true })
       .select(
         db.raw(`AVG(overall_rating) as avg_rating`),
@@ -150,7 +150,7 @@ export class TrustScoreService {
       : 50;
 
     // Would rebook percentage
-    const rebookStats = await db('reviews')
+    const rebookStats: any = await db('reviews')
       .where({ reviewee_id: profile.user_id, is_published: true })
       .whereNotNull('would_rebook')
       .select(
