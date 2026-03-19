@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
@@ -69,20 +69,27 @@ function getHomeHref(role?: string): string {
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isAuthenticated, _initialized, logout } = useAuthStore();
+  const { user, isAuthenticated, _initialized, initialize, logout } = useAuthStore();
   const { t } = useI18n();
   const navItems = getNavItems(user?.role);
   const homeHref = getHomeHref(user?.role);
+  const [mounted, setMounted] = useState(false);
 
-  // Auth guard: redirect to login if not authenticated after hydration
+  // Ensure auth is initialized on client
   useEffect(() => {
-    if (_initialized && !isAuthenticated) {
+    initialize();
+    setMounted(true);
+  }, [initialize]);
+
+  // Auth guard: redirect to login if not authenticated after client mount
+  useEffect(() => {
+    if (mounted && _initialized && !isAuthenticated) {
       router.replace('/login');
     }
-  }, [_initialized, isAuthenticated, router]);
+  }, [mounted, _initialized, isAuthenticated, router]);
 
-  // Show loading while auth is initializing
-  if (!_initialized) {
+  // Show loading until client-side auth check is done
+  if (!mounted || !_initialized) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
