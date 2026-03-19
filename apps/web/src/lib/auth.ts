@@ -35,11 +35,39 @@ interface AuthState {
   setUser: (user: AuthState['user']) => void;
 }
 
+// Eagerly compute initial auth state from localStorage (runs once at module load)
+function getInitialAuthState(): Pick<AuthState, 'user' | 'isAuthenticated' | '_initialized'> {
+  if (typeof window === 'undefined') {
+    return { user: null, isAuthenticated: false, _initialized: false };
+  }
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    return { user: null, isAuthenticated: false, _initialized: true };
+  }
+  const payload = decodeJWT(token);
+  if (payload?.sub && payload?.role) {
+    return {
+      user: {
+        id: payload.sub,
+        phone: payload.phone ?? '',
+        role: payload.role as UserRole,
+        is_new: false,
+      },
+      isAuthenticated: true,
+      _initialized: true,
+    };
+  }
+  clearTokens();
+  return { user: null, isAuthenticated: false, _initialized: true };
+}
+
+const initialAuth = getInitialAuthState();
+
 export const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
-  isAuthenticated: false,
+  user: initialAuth.user,
+  isAuthenticated: initialAuth.isAuthenticated,
   isLoading: false,
-  _initialized: false,
+  _initialized: initialAuth._initialized,
 
   initialize: () => {
     if (get()._initialized) return;
@@ -64,7 +92,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         _initialized: true,
       });
     } else {
-      // Invalid token — clear it
       clearTokens();
       set({ _initialized: true });
     }
