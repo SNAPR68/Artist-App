@@ -1,9 +1,5 @@
 import { DashboardLayout } from '../../../components/layout/DashboardLayout';
 
-export default function ClientDashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AgentDashboardLayout({ children }: { children: React.ReactNode }) {
   return <DashboardLayout>{children}</DashboardLayout>;
 }

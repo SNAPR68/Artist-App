@@ -82,7 +82,17 @@ const EVENT_TYPES = [
 // ─── Component ──────────────────────────────────────────────
 
 export default function GigsPage() {
-  const { user } = useAuthStore();
+  const { user, _initialized } = useAuthStore();
+
+  // Wait for auth to initialize before deciding which view to show
+  if (!_initialized) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+      </div>
+    );
+  }
+
   const isArtist = user?.role === 'artist';
   const isClient = user?.role === 'client' || user?.role === 'event_company' || user?.role === 'agent';
 
