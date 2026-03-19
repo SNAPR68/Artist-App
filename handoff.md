@@ -1,53 +1,56 @@
-# Handoff — 2026-03-16
+# Session Handoff — March 19, 2026
 
-## Session Summary
-This session focused on **deploying the Artist Booking Platform** to production (Vercel + Render + Supabase).
+## What Was Built This Session
 
-## What Was Accomplished
-1. **Fixed shared package build**: Removed stale `tsconfig.tsbuildinfo` from git that was causing `tsc` to skip emitting `dist/` (incremental build thought it was up-to-date)
-2. **Added `*.tsbuildinfo` to `.gitignore`** to prevent this from recurring
-3. **Deployed frontend to Vercel**: `artist-booking-web` project is live and rendering all pages
-4. **Configured Vercel build settings**: Root dir blank, custom build/output commands, env vars set
-5. **Identified database connection issue**: Supabase direct connection is IPv6-only; Render needs IPv4
-6. **Added SSL configuration** to `database.ts` for production (commit `eace8b3`)
+### Backend (ALL WORKING — Render deployed, health check passing)
+- **76 migrations** on Supabase (batches 1-10)
+- **35 backend modules** registered in app.ts
+- **165+ API endpoints** across all modules
+- **23 cron jobs** in infrastructure/cron.ts
+- **42 notification templates** in template.registry.ts
+- **92 RBAC permissions** in rbac.middleware.ts
+- **API URL**: https://artist-booking-api.onrender.com (health: ok)
 
-## Immediate Next Steps (Priority Order)
+### Frontend (Vercel deployed, 41 pages compile)
+- **45+ page.tsx files** across artist/client/agent/admin/public routes
+- **Voice assistant floating component** (VoiceAssistant.tsx + useVoiceRecognition.ts)
+- **Multi-language** (EN + Hindi) with i18n provider
+- **Vercel URL**: https://artist-booking-web.vercel.app
 
-### 1. Fix Database Connection (CRITICAL)
-The API health check still shows `"database":"error"`. After commit `eace8b3` deploys:
+### Seed Data (FIXED)
+- 20 users, 40 bookings, 20 reviews, 62 demand signals, 5 venues, 2 workspaces
+- Phone hashes fixed — orphan users deleted, seed users properly linked
+- Login works: phone 9876543210 (DJ Arjun) — OTP 123456
+- DJ Arjun dashboard shows: 45 bookings, 4.20 trust score, verified badge, real bookings
 
-1. **Verify Render env var**: Go to Render → Environment → check `DATABASE_URL` is exactly:
-   ```
-   postgresql://postgres.wqfzlkkkcsjrwksjpxfp:Aaryav%40182015@aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres
-   ```
-2. **Check Render deploy logs**: Look for the specific database error message
-3. **If still failing**, try appending `?sslmode=require` to the URL
-4. **If still failing**, check if knex needs the `pg` driver to support SSL — may need to set `NODE_TLS_REJECT_UNAUTHORIZED=0` as env var on Render temporarily
-5. **Test**: `curl https://artist-booking-api.onrender.com/health` should return `{"status":"healthy",...,"database":"ok"}`
+### Seed User Phones (all work with OTP 123456)
+- 9876543210 — artist — DJ Arjun
+- 9876543218 — artist — The Wedding Band
+- 9876543211 — artist — Shreya Acoustic
+- 9876543213 — artist — Priya Sharma
+- 9876543215 — client/event_company
+- 9876543216 — client/event_company
 
-### 2. Delete Unnecessary Vercel Project
-- Delete `artist-app-api` from Vercel dashboard (API runs on Render, not Vercel)
+## What's WORKING (Verified in Browser)
+1. Login: phone → OTP → auth token → role detection
+2. Artist dashboard (/artist): DJ Arjun, 45 bookings, 4.20 trust, verified
+3. Artist bookings (/artist/bookings): TechNova Solutions, Shaadi Celebrations, Tito's Lane Club
+4. Nav: Home, Bookings, Gigs, Intelligence, Finances tabs
 
-### 3. Verify End-to-End
-Once DB connects:
-- `curl https://artist-booking-api.onrender.com/v1/search/artists` should return artist data
-- Visit Vercel URL → search page should show artists
-- Test login flow (OTP)
+## What's BROKEN (Priority for next session)
+1. Post-login redirect goes to / instead of /artist or /client
+2. Homepage has no event company CTA or voice prominence
+3. Most dashboard pages UNTESTED — may show empty or errors
+4. Voice floating button not verified visible
+5. Event company flow completely untested
+6. Admin dashboard untested
+7. Public pages untested
 
-### 4. Remaining MVP Work
-- Custom domain setup
-- Razorpay integration testing
-- WhatsApp/SMS notification setup
-- E2E tests with Playwright
-- Load testing with k6
+## Key Technical Details
+- Auth: HMAC-SHA256 phone_hash lookup, JWT tokens, any 6-digit OTP works
+- PII: AES-256-GCM encrypted phones, HMAC search hashes
+- Build shared first: pnpm --filter @artist-booking/shared build
+- API build: npx tsc -p tsconfig.build.json && npx tsc-alias -p tsconfig.build.json
+- Web build: pnpm turbo build --filter=@artist-booking/web
 
-## Architecture Reference
-```
-Users → Vercel (Next.js) → Render (Fastify API) → Supabase (PostgreSQL) + Upstash (Redis)
-```
-
-## Key Files Modified This Session
-- `apps/api/src/infrastructure/database.ts` — Added SSL config
-- `apps/api/tsconfig.build.json` — Relaxed TS config for builds
-- `.gitignore` — Added `*.tsbuildinfo`
-- `render.yaml` — Build command (unchanged this session but key file)
+## GitHub: SNAPR68/Artist-App (main branch, latest commit: 55db69c)
