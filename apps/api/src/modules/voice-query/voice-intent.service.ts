@@ -1,7 +1,7 @@
 /**
  * Rule-based intent parser for voice queries.
  * v1: Keyword matching in Hindi/English (Hinglish) + regex entity extraction.
- * Supports 5 voice intents: DISCOVER, STATUS, ACTION, INTELLIGENCE, EMERGENCY.
+ * Supports 6 voice intents: DISCOVER, STATUS, ACTION, INTELLIGENCE, EMERGENCY, NAVIGATE.
  */
 
 import { db } from '../../infrastructure/database.js';
@@ -19,6 +19,7 @@ export interface VoiceParsedIntent {
     booking_id?: string;
     event_type?: string;
     action_verb?: string;
+    page_target?: string;
   };
   confidence: number;
   raw_text: string;
@@ -47,6 +48,11 @@ const INTENT_KEYWORDS: Record<string, string[]> = {
   EMERGENCY: [
     'cancel ho gaya', 'replacement', 'substitute', 'urgent',
     'emergency', 'backup', 'last minute', 'who can replace',
+  ],
+  NAVIGATE: [
+    'go to', 'show me', 'open', 'navigate', 'take me to',
+    'jao', 'dikhao', 'kholo', 'dekho',
+    'page', 'dashboard', 'screen',
   ],
 };
 
@@ -100,6 +106,32 @@ const GENRE_KEYWORDS = [
   'electronic', 'edm', 'folk', 'ghazal', 'jazz', 'fusion', 'indie',
   'punjabi', 'rap', 'acoustic', 'devotional', 'bhajan',
 ];
+
+// ─── Page target map (for NAVIGATE intent) ──────────────────
+
+const PAGE_TARGETS: Record<string, string> = {
+  'bookings': 'bookings', 'booking': 'bookings',
+  'calendar': 'calendar', 'availability': 'calendar',
+  'earnings': 'earnings', 'kamaai': 'earnings', 'income': 'earnings',
+  'financial': 'financial', 'paisa': 'financial', 'money': 'financial',
+  'intelligence': 'intelligence', 'insights': 'intelligence',
+  'gig advisor': 'gig-advisor', 'advisor': 'gig-advisor',
+  'profile': 'profile', 'settings': 'settings',
+  'workspace': 'workspace', 'crm': 'workspace', 'pipeline': 'workspace',
+  'gigs': 'gigs', 'marketplace': 'gigs', 'jobs': 'gigs', 'opportunities': 'gigs',
+  'search': 'search', 'find': 'search', 'discover': 'search',
+  'notifications': 'notifications', 'alerts': 'notifications',
+  'home': 'home', 'dashboard': 'home', 'ghar': 'home',
+  'seasonal': 'seasonal', 'demand': 'seasonal', 'trends': 'seasonal',
+  'reputation': 'reputation',
+  'gamification': 'gamification', 'points': 'gamification', 'badges': 'gamification',
+  'recommendations': 'recommendations', 'suggested': 'recommendations',
+  'shortlist': 'shortlists', 'shortlists': 'shortlists', 'saved': 'shortlists',
+  'substitution': 'substitutions', 'replacement': 'substitutions',
+};
+
+// Sorted page target keys: longest first for multi-word matching
+const SORTED_PAGE_TARGETS = Object.keys(PAGE_TARGETS).sort((a, b) => b.length - a.length);
 
 // ─── Cache refresh interval ─────────────────────────────────
 
@@ -239,6 +271,19 @@ export class VoiceIntentService {
           entities.action_verb = verb;
           break;
         }
+      }
+    }
+
+    // Page target extraction (for NAVIGATE intent)
+    for (const key of SORTED_PAGE_TARGETS) {
+      if (lower.includes(key)) {
+        entities.page_target = PAGE_TARGETS[key];
+        // If we found a page target and intent is unknown, default to NAVIGATE
+        if (bestIntent === 'unknown') {
+          bestIntent = 'NAVIGATE';
+          bestScore = Math.max(bestScore, 1);
+        }
+        break;
       }
     }
 

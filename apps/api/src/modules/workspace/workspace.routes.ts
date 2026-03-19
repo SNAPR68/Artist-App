@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { workspaceService } from './workspace.service.js';
+import { generatePresentationPdf } from './presentation-pdf.service.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { validateBody, validateQuery } from '../../middleware/validation.middleware.js';
@@ -15,6 +16,8 @@ import {
   createPresentationSchema,
   bulkActionSchema,
   workspacePipelineQuerySchema,
+  updateWorkspaceCommissionSchema,
+  updateBookingCommissionSchema,
 } from '@artist-booking/shared';
 
 export async function workspaceRoutes(app: FastifyInstance) {
@@ -362,6 +365,27 @@ export async function workspaceRoutes(app: FastifyInstance) {
     });
   });
 
+  /**
+   * GET /v1/presentations/:slug/pdf — Download presentation as PDF (NO AUTH)
+   */
+  app.get('/v1/presentations/:slug/pdf', async (request, reply) => {
+    const { slug } = request.params as { slug: string };
+    const data = await workspaceService.getPublicPresentation(slug);
+
+    const pdfBuffer = await generatePresentationPdf(data as any);
+
+    const safeTitle = data.presentation.title
+      .replace(/[^a-zA-Z0-9_\- ]/g, '')
+      .replace(/\s+/g, '_')
+      .slice(0, 60);
+
+    return reply
+      .header('Content-Type', 'application/pdf')
+      .header('Content-Disposition', `attachment; filename="${safeTitle}.pdf"`)
+      .header('Content-Length', pdfBuffer.length)
+      .send(pdfBuffer);
+  });
+
   // ─── Analytics ─────────────────────────────────────────────
 
   /**
@@ -382,6 +406,58 @@ export async function workspaceRoutes(app: FastifyInstance) {
     return reply.send({
       success: true,
       data: analytics,
+      errors: [],
+    });
+  });
+
+  // ─── Commission ───────────────────────────────────────────
+
+  /**
+   * GET /v1/workspaces/:id/commission — Get commission summary
+   */
+  app.get('/v1/workspaces/:id/commission', {
+    preHandler: [authMiddleware, requirePermission('workspace:analytics')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const summary = await workspaceService.getCommissionSummary(id, request.user!.user_id);
+
+    return reply.send({
+      success: true,
+      data: summary,
+      errors: [],
+    });
+  });
+
+  /**
+   * PUT /v1/workspaces/:id/commission — Update default commission %
+   */
+  app.put('/v1/workspaces/:id/commission', {
+    preHandler: [authMiddleware, requirePermission('workspace:manage'), rateLimit('WRITE'), validateBody(updateWorkspaceCommissionSchema)],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const { default_commission_pct } = request.body as { default_commission_pct: number };
+    const workspace = await workspaceService.updateWorkspaceCommission(id, request.user!.user_id, default_commission_pct);
+
+    return reply.send({
+      success: true,
+      data: workspace,
+      errors: [],
+    });
+  });
+
+  /**
+   * PUT /v1/workspaces/:id/events/:eventId/bookings/:bookingId/commission — Override per-booking commission
+   */
+  app.put('/v1/workspaces/:id/events/:eventId/bookings/:bookingId/commission', {
+    preHandler: [authMiddleware, requirePermission('workspace:manage'), rateLimit('WRITE'), validateBody(updateBookingCommissionSchema)],
+  }, async (request, reply) => {
+    const { id, eventId, bookingId } = request.params as { id: string; eventId: string; bookingId: string };
+    const { commission_pct } = request.body as { commission_pct: number };
+    const updated = await workspaceService.updateBookingCommission(id, request.user!.user_id, eventId, bookingId, commission_pct);
+
+    return reply.send({
+      success: true,
+      data: updated,
       errors: [],
     });
   });

@@ -497,6 +497,106 @@ export class WorkspaceRepository {
     };
   }
 
+  // ─── Commission ───────────────────────────────────────────
+
+  async getCommissionSummary(workspaceId: string) {
+    // Get workspace default commission
+    const workspace = await db('workspaces')
+      .where({ id: workspaceId, is_active: true })
+      .select('default_commission_pct')
+      .first();
+
+    const defaultPct = Number(workspace?.default_commission_pct ?? 0);
+
+    // Get all event bookings with booking details for this workspace
+    const rows = await db('workspace_event_bookings as web')
+      .join('workspace_events as we', 'we.id', 'web.workspace_event_id')
+      .join('bookings as b', 'b.id', 'web.booking_id')
+      .leftJoin('artist_profiles as ap', 'ap.id', 'b.artist_id')
+      .where({ 'we.workspace_id': workspaceId, 'we.deleted_at': null })
+      .select(
+        'web.id as workspace_event_booking_id',
+        'web.commission_pct',
+        'web.commission_amount_paise',
+        'web.workspace_event_id',
+        'we.name as event_name',
+        'b.id as booking_id',
+        'b.final_amount_paise',
+        'b.quoted_amount_paise',
+        'b.state',
+        'ap.id as artist_id',
+        'ap.stage_name as artist_name',
+      )
+      .orderBy('web.commission_amount_paise', 'desc');
+
+    let totalBookingValuePaise = 0;
+    let totalCommissionPaise = 0;
+
+    const bookings = rows.map((row: Record<string, unknown>) => {
+      const agreedAmount = Number(row.final_amount_paise ?? row.quoted_amount_paise ?? 0);
+      const commPct = row.commission_pct != null ? Number(row.commission_pct) : defaultPct;
+      const commAmount = row.commission_amount_paise != null
+        ? Number(row.commission_amount_paise)
+        : Math.round(agreedAmount * (commPct / 100));
+
+      totalBookingValuePaise += agreedAmount;
+      totalCommissionPaise += commAmount;
+
+      return {
+        workspace_event_booking_id: row.workspace_event_booking_id,
+        workspace_event_id: row.workspace_event_id,
+        event_name: row.event_name,
+        booking_id: row.booking_id,
+        artist_id: row.artist_id,
+        artist_name: row.artist_name,
+        booking_amount_paise: agreedAmount,
+        commission_pct: commPct,
+        commission_amount_paise: commAmount,
+        state: row.state,
+      };
+    });
+
+    return {
+      default_commission_pct: defaultPct,
+      total_bookings: bookings.length,
+      total_booking_value_paise: totalBookingValuePaise,
+      total_commission_paise: totalCommissionPaise,
+      bookings,
+    };
+  }
+
+  async updateWorkspaceCommission(workspaceId: string, defaultCommissionPct: number) {
+    const [updated] = await db('workspaces')
+      .where({ id: workspaceId })
+      .update({
+        default_commission_pct: defaultCommissionPct,
+        updated_at: new Date(),
+      })
+      .returning('*');
+    return updated;
+  }
+
+  async updateBookingCommission(workspaceEventBookingId: string, commissionPct: number) {
+    // Get the booking amount to compute commission
+    const row = await db('workspace_event_bookings as web')
+      .join('bookings as b', 'b.id', 'web.booking_id')
+      .where({ 'web.id': workspaceEventBookingId })
+      .select('b.final_amount_paise', 'b.quoted_amount_paise')
+      .first();
+
+    const agreedAmount = Number(row?.final_amount_paise ?? row?.quoted_amount_paise ?? 0);
+    const commissionAmountPaise = Math.round(agreedAmount * (commissionPct / 100));
+
+    const [updated] = await db('workspace_event_bookings')
+      .where({ id: workspaceEventBookingId })
+      .update({
+        commission_pct: commissionPct,
+        commission_amount_paise: commissionAmountPaise,
+      })
+      .returning('*');
+    return updated;
+  }
+
   // ─── Analytics ─────────────────────────────────────────────
 
   async getAnalytics(workspaceId: string, dateRange?: DateRange) {

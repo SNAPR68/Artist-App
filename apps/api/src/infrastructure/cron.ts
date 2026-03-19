@@ -15,6 +15,8 @@ import { dynamicPricingService } from '../modules/pricing-brain/dynamic-pricing.
 import { seasonalDemandService } from '../modules/seasonal-demand/seasonal-demand.service.js';
 import { reputationDefenseService } from '../modules/reputation-defense/reputation-defense.service.js';
 import { emergencySubstitutionService } from '../modules/emergency-substitution/emergency-substitution.service.js';
+import { gigMarketplaceService } from '../modules/gig-marketplace/gig-marketplace.service.js';
+import { gamificationService } from '../modules/gamification/gamification.service.js';
 
 const HOLD_EXPIRY_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 const REVIEW_PUBLISH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
@@ -35,6 +37,9 @@ const SEASONAL_CURVE_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const SEASONAL_ALERT_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
 const VENUE_WEIGHT_RECOMPUTE_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const SUBSTITUTION_EXPIRY_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+const GIG_EXPIRY_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const GAMIFICATION_STREAK_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const GAMIFICATION_BADGE_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
 
 /**
  * Start background cron jobs for hold expiry and review publishing.
@@ -309,4 +314,40 @@ export function startCronJobs() {
       console.error('[CRON] Substitution expiry failed:', err);
     }
   }, SUBSTITUTION_EXPIRY_INTERVAL_MS);
+
+  // 21. Gig marketplace — expire old/past gig posts (every 6h)
+  setInterval(async () => {
+    try {
+      const count = await gigMarketplaceService.expireOldPosts();
+      if (count > 0) {
+        console.log(`[CRON] Expired ${count} gig posts`);
+      }
+    } catch (err) {
+      console.error('[CRON] Gig post expiry failed:', err);
+    }
+  }, GIG_EXPIRY_INTERVAL_MS);
+
+  // 22. Gamification streak check — daily streak update + 7-day bonus (every 24h)
+  setInterval(async () => {
+    try {
+      const count = await gamificationService.updateStreaks();
+      if (count > 0) {
+        console.log(`[CRON] Updated ${count} gamification streaks`);
+      }
+    } catch (err) {
+      console.error('[CRON] Gamification streak update failed:', err);
+    }
+  }, GAMIFICATION_STREAK_INTERVAL_MS);
+
+  // 23. Gamification badge eligibility — batch check badges (every 12h)
+  setInterval(async () => {
+    try {
+      const count = await gamificationService.batchCheckBadges();
+      if (count > 0) {
+        console.log(`[CRON] Awarded ${count} gamification badges`);
+      }
+    } catch (err) {
+      console.error('[CRON] Gamification badge check failed:', err);
+    }
+  }, GAMIFICATION_BADGE_INTERVAL_MS);
 }

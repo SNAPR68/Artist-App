@@ -4,10 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Input, Card } from '@artist-booking/ui';
 import { useAuthStore } from '@/lib/auth';
+import { useI18n } from '@/i18n';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 export default function LoginPage() {
   const router = useRouter();
   const { generateOTP, isLoading } = useAuthStore();
+  const { t } = useI18n();
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
 
@@ -17,7 +20,7 @@ export default function LoginPage() {
 
     // Validate Indian phone number
     if (!/^[6-9]\d{9}$/.test(phone)) {
-      setError('Please enter a valid 10-digit Indian mobile number');
+      setError(t('auth.invalidPhone'));
       return;
     }
 
@@ -26,16 +29,20 @@ export default function LoginPage() {
       // Navigate to OTP verification with phone in query
       router.push(`/verify?phone=${encodeURIComponent(phone)}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send OTP');
+      setError(err instanceof Error ? err.message : t('auth.otpFailed'));
     }
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-neutral-50 p-4">
       <Card variant="elevated" padding="lg" className="w-full max-w-md">
+        <div className="flex justify-end mb-2">
+          <LanguageSwitcher />
+        </div>
+
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-neutral-900 mb-2">Welcome</h1>
-          <p className="text-neutral-500">Enter your phone number to get started</p>
+          <h1 className="text-2xl font-bold text-neutral-900 mb-2">{t('auth.welcome')}</h1>
+          <p className="text-neutral-500">{t('auth.enterPhone')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -46,7 +53,7 @@ export default function LoginPage() {
             <div className="flex-1">
               <Input
                 type="tel"
-                placeholder="Enter mobile number"
+                placeholder={t('auth.phonePlaceholder')}
                 value={phone}
                 onChange={(e) => {
                   const val = e.target.value.replace(/\D/g, '').slice(0, 10);
@@ -62,12 +69,12 @@ export default function LoginPage() {
           </div>
 
           <Button type="submit" fullWidth loading={isLoading}>
-            Send OTP
+            {t('auth.sendOtp')}
           </Button>
         </form>
 
         <p className="text-xs text-neutral-400 text-center mt-6">
-          By continuing, you agree to our Terms of Service and Privacy Policy
+          {t('auth.termsNotice')}
         </p>
       </Card>
     </main>

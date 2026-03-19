@@ -4,6 +4,7 @@ import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { validateBody } from '../../middleware/validation.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
+import { db } from '../../infrastructure/database.js';
 import {
   submitReviewDisputeSchema,
   respondReviewSchema,
@@ -191,6 +192,86 @@ export async function reputationDefenseRoutes(app: FastifyInstance) {
     return reply.send({
       success: true,
       data: issue,
+      errors: [],
+    });
+  });
+
+  // ─── Admin List Routes ───────────────────────────────────────
+
+  /**
+   * GET /v1/admin/reputation/disputes — List all disputes with pagination
+   */
+  app.get('/v1/admin/reputation/disputes', {
+    preHandler: [authMiddleware, requirePermission('admin:reputation')],
+  }, async (request, reply) => {
+    const { status, page = '1', per_page = '20' } = request.query as {
+      status?: string;
+      page?: string;
+      per_page?: string;
+    };
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const perPage = Math.min(100, Math.max(1, parseInt(per_page, 10) || 20));
+    const offset = (pageNum - 1) * perPage;
+
+    let query = db('review_disputes')
+      .leftJoin('reviews', 'review_disputes.review_id', 'reviews.id')
+      .leftJoin('users', 'review_disputes.disputed_by', 'users.id')
+      .select(
+        'review_disputes.*',
+        'users.id as disputed_by_user_id',
+      );
+
+    let countQuery = db('review_disputes').count('* as total');
+
+    if (status) {
+      query = query.where('review_disputes.status', status);
+      countQuery = countQuery.where('status', status);
+    }
+
+    const [disputes, [{ total }]] = await Promise.all([
+      query.orderBy('review_disputes.created_at', 'desc').limit(perPage).offset(offset),
+      countQuery,
+    ]);
+
+    return reply.send({
+      success: true,
+      data: { disputes, total: Number(total) },
+      errors: [],
+    });
+  });
+
+  /**
+   * GET /v1/admin/reputation/venue-issues — List all venue issue flags
+   */
+  app.get('/v1/admin/reputation/venue-issues', {
+    preHandler: [authMiddleware, requirePermission('admin:reputation')],
+  }, async (request, reply) => {
+    const { venue_id, is_verified } = request.query as {
+      venue_id?: string;
+      is_verified?: string;
+    };
+
+    let query = db('venue_issue_flags')
+      .leftJoin('venue_profiles', 'venue_issue_flags.venue_id', 'venue_profiles.id')
+      .select(
+        'venue_issue_flags.*',
+        'venue_profiles.name as venue_name',
+      );
+
+    if (venue_id) {
+      query = query.where('venue_issue_flags.venue_id', venue_id);
+    }
+
+    if (is_verified !== undefined) {
+      query = query.where('venue_issue_flags.is_verified', is_verified === 'true');
+    }
+
+    const issues = await query.orderBy('venue_issue_flags.created_at', 'desc');
+
+    return reply.send({
+      success: true,
+      data: issues,
       errors: [],
     });
   });

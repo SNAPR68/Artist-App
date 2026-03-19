@@ -303,3 +303,47 @@ export enum IncomeCertificateStatus {
   READY = 'ready',
   EXPIRED = 'expired',
 }
+
+// ─── Gig Marketplace ──────────────────────────────────────
+export enum GigPostStatus {
+  OPEN = 'open',
+  CLOSED = 'closed',
+  FILLED = 'filled',
+  CANCELLED = 'cancelled',
+  EXPIRED = 'expired',
+}
+
+export enum GigApplicationStatus {
+  PENDING = 'pending',
+  SHORTLISTED = 'shortlisted',
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected',
+  WITHDRAWN = 'withdrawn',
+}
+
+// ─── Gamification ──────────────────────────────────────────
+export enum GamificationLevel {
+  BRONZE = 'bronze',
+  SILVER = 'silver',
+  GOLD = 'gold',
+  PLATINUM = 'platinum',
+}
+
+export enum BadgeType {
+  VERIFIED_ARTIST = 'verified_artist',
+  TOP_PERFORMER = 'top_performer',
+  RISING_STAR = 'rising_star',
+  RELIABLE_BACKUP = 'reliable_backup',
+  EARLY_BIRD = 'early_bird',
+  CROWD_FAVORITE = 'crowd_favorite',
+}
+
+export enum PointAction {
+  PROFILE_COMPLETE = 'profile_complete',
+  FIRST_BOOKING = 'first_booking',
+  REVIEW_LEFT = 'review_left',
+  ON_TIME_PERFORMANCE = 'on_time_performance',
+  FIVE_STAR_REVIEW = 'five_star_review',
+  GIG_APPLICATION = 'gig_application',
+  STREAK_7_DAYS = 'streak_7_days',
+}

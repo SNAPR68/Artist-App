@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
+import { I18nProvider } from '@/i18n';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -20,9 +21,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable}>
       <body>
         <ErrorBoundary>
-          <ToastProvider>
-            {children}
-          </ToastProvider>
+          <I18nProvider>
+            <ToastProvider>
+              {children}
+            </ToastProvider>
+          </I18nProvider>
         </ErrorBoundary>
       </body>
     </html>

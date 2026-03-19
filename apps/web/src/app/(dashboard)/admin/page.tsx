@@ -1,9 +1,44 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { apiClient } from '../../../lib/api-client';
 
-type Tab = 'overview' | 'users' | 'bookings' | 'payments';
+type Tab = 'overview' | 'users' | 'bookings' | 'payments' | 'disputes' | 'venues' | 'intelligence';
+
+interface DisputeRecord {
+  id: string;
+  review_id: string;
+  reason: string;
+  status: string;
+  resolution: string | null;
+  admin_notes: string | null;
+  created_at: string;
+}
+
+interface VenueRecord {
+  id: string;
+  name: string;
+  city: string;
+  venue_type: string;
+  capacity: number;
+}
+
+interface VenueIssueRecord {
+  id: string;
+  venue_id: string;
+  issue_type: string;
+  description: string;
+  is_verified: boolean;
+  created_at: string;
+}
+
+interface SeasonalCurveRecord {
+  city: string;
+  month: number;
+  demand_classification: string;
+  avg_fill_rate: number;
+  yoy_trend_pct: number | null;
+}
 
 interface PlatformStats {
   users: { total: number; artists: number; clients: number; new_this_week: number };
@@ -88,6 +123,13 @@ export default function AdminDashboardPage() {
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [paymentStats, setPaymentStats] = useState<PaymentStats | null>(null);
+  const [disputes, setDisputes] = useState<DisputeRecord[]>([]);
+  const [venues, setVenues] = useState<VenueRecord[]>([]);
+  const [venueIssues, setVenueIssues] = useState<VenueIssueRecord[]>([]);
+  const [seasonalCurves, setSeasonalCurves] = useState<SeasonalCurveRecord[]>([]);
+  const [expandedVenue, setExpandedVenue] = useState<string | null>(null);
+  const [resolvingDispute, setResolvingDispute] = useState<string | null>(null);
+  const [resolveForm, setResolveForm] = useState<{ resolution: string; admin_notes: string }>({ resolution: 'upheld', admin_notes: '' });
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [loading, setLoading] = useState(true);
@@ -116,6 +158,18 @@ export default function AdminDashboardPage() {
             setPaymentStats(res.data.stats);
           }
         })
+        .finally(() => setLoading(false));
+    } else if (tab === 'disputes') {
+      apiClient<{ disputes: DisputeRecord[]; total: number }>('/v1/admin/reputation/disputes?per_page=100')
+        .then((res) => { if (res.success) setDisputes(res.data.disputes); })
+        .finally(() => setLoading(false));
+    } else if (tab === 'venues') {
+      apiClient<VenueRecord[]>('/v1/venues')
+        .then((res) => { if (res.success) setVenues(res.data); })
+        .finally(() => setLoading(false));
+    } else if (tab === 'intelligence') {
+      apiClient<SeasonalCurveRecord[]>('/v1/seasonal/curves')
+        .then((res) => { if (res.success) setSeasonalCurves(res.data); })
         .finally(() => setLoading(false));
     }
   }, [tab, roleFilter]);
@@ -155,7 +209,7 @@ export default function AdminDashboardPage() {
 
       {/* Tab Navigation */}
       <div className="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit">
-        {(['overview', 'bookings', 'users', 'payments'] as const).map((t) => (
+        {(['overview', 'bookings', 'users', 'payments', 'disputes', 'venues', 'intelligence'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -432,6 +486,287 @@ export default function AdminDashboardPage() {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Disputes Tab */}
+      {!loading && tab === 'disputes' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">Reason</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">Created</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {disputes.length === 0 ? (
+                    <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-500">No disputes found</td></tr>
+                  ) : (
+                    disputes.map((d) => (
+                      <tr key={d.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-gray-900">
+                          {d.reason.length > 100 ? `${d.reason.slice(0, 100)}...` : d.reason}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            d.status === 'submitted' ? 'bg-yellow-100 text-yellow-700' :
+                            d.status === 'under_review' ? 'bg-blue-100 text-blue-700' :
+                            d.status === 'upheld' ? 'bg-green-100 text-green-700' :
+                            d.status === 'overturned' ? 'bg-red-100 text-red-700' :
+                            d.status === 'dismissed' ? 'bg-gray-100 text-gray-600' :
+                            'bg-gray-100 text-gray-600'
+                          }`}>
+                            {d.status.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-500">
+                          {new Date(d.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                        </td>
+                        <td className="px-4 py-3">
+                          {resolvingDispute === d.id ? (
+                            <div className="space-y-2">
+                              <select
+                                value={resolveForm.resolution}
+                                onChange={(e) => setResolveForm((f) => ({ ...f, resolution: e.target.value }))}
+                                className="block w-full text-xs border border-gray-300 rounded px-2 py-1"
+                              >
+                                <option value="upheld">Upheld</option>
+                                <option value="overturned">Overturned</option>
+                                <option value="dismissed">Dismissed</option>
+                              </select>
+                              <textarea
+                                value={resolveForm.admin_notes}
+                                onChange={(e) => setResolveForm((f) => ({ ...f, admin_notes: e.target.value }))}
+                                placeholder="Admin notes..."
+                                className="block w-full text-xs border border-gray-300 rounded px-2 py-1 h-16 resize-none"
+                              />
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={async () => {
+                                    setActionLoading(d.id);
+                                    await apiClient(`/v1/admin/reputation/disputes/${d.id}/resolve`, {
+                                      method: 'PUT',
+                                      body: JSON.stringify({ resolution: resolveForm.resolution, admin_notes: resolveForm.admin_notes }),
+                                    });
+                                    setActionLoading(null);
+                                    setResolvingDispute(null);
+                                    setResolveForm({ resolution: 'upheld', admin_notes: '' });
+                                    const res = await apiClient<{ disputes: DisputeRecord[]; total: number }>('/v1/admin/reputation/disputes?per_page=100');
+                                    if (res.success) setDisputes(res.data.disputes);
+                                  }}
+                                  disabled={actionLoading === d.id}
+                                  className="text-xs px-2 py-1 rounded border border-green-300 text-green-600 hover:bg-green-50 disabled:opacity-50"
+                                >
+                                  {actionLoading === d.id ? 'Saving...' : 'Submit'}
+                                </button>
+                                <button
+                                  onClick={() => { setResolvingDispute(null); setResolveForm({ resolution: 'upheld', admin_notes: '' }); }}
+                                  className="text-xs px-2 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setResolvingDispute(d.id)}
+                              disabled={d.status === 'upheld' || d.status === 'overturned' || d.status === 'dismissed'}
+                              className="text-xs px-2 py-1 rounded border border-primary-300 text-primary-600 hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Resolve
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Venues Tab */}
+      {!loading && tab === 'venues' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">Name</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">City</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">Type</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">Capacity</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {venues.length === 0 ? (
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-500">No venues found</td></tr>
+                  ) : (
+                    venues.map((v) => (
+                      <Fragment key={v.id}>
+                        <tr className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-gray-900 font-medium">{v.name}</td>
+                          <td className="px-4 py-3 text-gray-700">{v.city}</td>
+                          <td className="px-4 py-3">
+                            <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+                              {v.venue_type?.replace('_', ' ') ?? '-'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">{v.capacity?.toLocaleString() ?? '-'}</td>
+                          <td className="px-4 py-3">
+                            <button
+                              onClick={async () => {
+                                if (expandedVenue === v.id) {
+                                  setExpandedVenue(null);
+                                  return;
+                                }
+                                setActionLoading(v.id);
+                                const res = await apiClient<VenueIssueRecord[]>(`/v1/reputation/venues/${v.id}/issues`);
+                                if (res.success) setVenueIssues(res.data);
+                                setExpandedVenue(v.id);
+                                setActionLoading(null);
+                              }}
+                              disabled={actionLoading === v.id}
+                              className="text-xs px-2 py-1 rounded border border-primary-300 text-primary-600 hover:bg-primary-50 disabled:opacity-50"
+                            >
+                              {actionLoading === v.id ? 'Loading...' : expandedVenue === v.id ? 'Hide Issues' : 'View Issues'}
+                            </button>
+                          </td>
+                        </tr>
+                        {expandedVenue === v.id && (
+                          <tr key={`${v.id}-issues`}>
+                            <td colSpan={5} className="px-4 py-3 bg-gray-50">
+                              {venueIssues.length === 0 ? (
+                                <p className="text-sm text-gray-500">No issues reported for this venue.</p>
+                              ) : (
+                                <div className="space-y-2">
+                                  {venueIssues.map((issue) => (
+                                    <div key={issue.id} className="flex items-start justify-between bg-white border border-gray-200 rounded-lg p-3">
+                                      <div className="space-y-1">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+                                            {issue.issue_type.replace('_', ' ')}
+                                          </span>
+                                          {issue.is_verified && (
+                                            <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">Verified</span>
+                                          )}
+                                        </div>
+                                        <p className="text-sm text-gray-700">{issue.description ?? 'No description'}</p>
+                                        <p className="text-xs text-gray-400">
+                                          {new Date(issue.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                                        </p>
+                                      </div>
+                                      {!issue.is_verified && (
+                                        <button
+                                          onClick={async () => {
+                                            setActionLoading(issue.id);
+                                            await apiClient(`/v1/admin/reputation/venue-issues/${issue.id}/verify`, {
+                                              method: 'PUT',
+                                              body: JSON.stringify({ is_verified: true }),
+                                            });
+                                            setActionLoading(null);
+                                            const res = await apiClient<VenueIssueRecord[]>(`/v1/reputation/venues/${v.id}/issues`);
+                                            if (res.success) setVenueIssues(res.data);
+                                          }}
+                                          disabled={actionLoading === issue.id}
+                                          className="text-xs px-2 py-1 rounded border border-green-300 text-green-600 hover:bg-green-50 disabled:opacity-50 shrink-0"
+                                        >
+                                          {actionLoading === issue.id ? 'Verifying...' : 'Verify'}
+                                        </button>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Intelligence Tab */}
+      {!loading && tab === 'intelligence' && (
+        <div className="space-y-6">
+          <h2 className="text-lg font-semibold text-gray-900">Seasonal Demand Overview</h2>
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">City</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">Month</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">Classification</th>
+                    <th className="text-right px-4 py-3 font-medium text-gray-600">Fill Rate %</th>
+                    <th className="text-right px-4 py-3 font-medium text-gray-600">YoY Trend</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {seasonalCurves.length === 0 ? (
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-500">No seasonal data available</td></tr>
+                  ) : (
+                    seasonalCurves.map((c, i) => (
+                      <tr key={`${c.city}-${c.month}-${i}`} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-gray-900 font-medium">{c.city}</td>
+                        <td className="px-4 py-3 text-gray-700">
+                          {new Date(2024, c.month - 1).toLocaleString('en-IN', { month: 'long' })}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            c.demand_classification === 'peak' ? 'bg-red-100 text-red-700' :
+                            c.demand_classification === 'high' ? 'bg-orange-100 text-orange-700' :
+                            c.demand_classification === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
+                            c.demand_classification === 'low' ? 'bg-green-100 text-green-700' :
+                            'bg-gray-100 text-gray-600'
+                          }`}>
+                            {c.demand_classification}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right text-gray-900">
+                          {(c.avg_fill_rate * 100).toFixed(1)}%
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {c.yoy_trend_pct !== null ? (
+                            <span className={c.yoy_trend_pct >= 0 ? 'text-green-600' : 'text-red-600'}>
+                              {c.yoy_trend_pct >= 0 ? '+' : ''}{c.yoy_trend_pct.toFixed(1)}%
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <h3 className="text-sm font-medium text-gray-900">Substitution Requests</h3>
+              <p className="text-xs text-gray-400 mt-2">Coming soon</p>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <h3 className="text-sm font-medium text-gray-900">Recommendation Stats</h3>
+              <p className="text-xs text-gray-400 mt-2">Coming soon</p>
             </div>
           </div>
         </div>

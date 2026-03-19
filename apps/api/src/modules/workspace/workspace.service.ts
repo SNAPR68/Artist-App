@@ -450,6 +450,90 @@ export class WorkspaceService {
     return workspaceRepository.getPresentations(workspaceId);
   }
 
+  // ─── Commission ───────────────────────────────────────────
+
+  async getCommissionSummary(workspaceId: string, userId: string) {
+    await this.verifyMembership(workspaceId, userId);
+    return workspaceRepository.getCommissionSummary(workspaceId);
+  }
+
+  async updateWorkspaceCommission(workspaceId: string, userId: string, defaultCommissionPct: number) {
+    await this.verifyManagerAccess(workspaceId, userId);
+
+    const workspace = await workspaceRepository.findById(workspaceId);
+    if (!workspace) {
+      throw new WorkspaceError('NOT_FOUND', 'Workspace not found', 404);
+    }
+
+    return workspaceRepository.updateWorkspaceCommission(workspaceId, defaultCommissionPct);
+  }
+
+  async updateBookingCommission(workspaceId: string, userId: string, eventId: string, bookingId: string, commissionPct: number) {
+    await this.verifyManagerAccess(workspaceId, userId);
+
+    // Verify event belongs to workspace
+    const event = await workspaceRepository.getEventById(eventId);
+    if (!event || event.workspace_id !== workspaceId) {
+      throw new WorkspaceError('EVENT_NOT_FOUND', 'Event not found in this workspace', 404);
+    }
+
+    // Find the workspace_event_booking row
+    const link = await db('workspace_event_bookings')
+      .where({ workspace_event_id: eventId, booking_id: bookingId })
+      .first();
+
+    if (!link) {
+      throw new WorkspaceError('BOOKING_NOT_LINKED', 'Booking is not linked to this event', 404);
+    }
+
+    return workspaceRepository.updateBookingCommission(link.id, commissionPct);
+  }
+
+  async computeCommission(workspaceId: string, userId: string) {
+    await this.verifyManagerAccess(workspaceId, userId);
+
+    // Get workspace default
+    const workspace = await workspaceRepository.findById(workspaceId);
+    if (!workspace) {
+      throw new WorkspaceError('NOT_FOUND', 'Workspace not found', 404);
+    }
+
+    const defaultPct = Number(workspace.default_commission_pct ?? 0);
+
+    // Get all event bookings for this workspace
+    const rows = await db('workspace_event_bookings as web')
+      .join('workspace_events as we', 'we.id', 'web.workspace_event_id')
+      .join('bookings as b', 'b.id', 'web.booking_id')
+      .where({ 'we.workspace_id': workspaceId, 'we.deleted_at': null })
+      .select(
+        'web.id',
+        'web.commission_pct',
+        'b.final_amount_paise',
+        'b.quoted_amount_paise',
+      );
+
+    let totalCommissionPaise = 0;
+    let updated = 0;
+
+    for (const row of rows) {
+      const agreedAmount = Number(row.final_amount_paise ?? row.quoted_amount_paise ?? 0);
+      const pct = row.commission_pct != null ? Number(row.commission_pct) : defaultPct;
+      const commissionAmountPaise = Math.round(agreedAmount * (pct / 100));
+
+      await db('workspace_event_bookings')
+        .where({ id: row.id })
+        .update({ commission_amount_paise: commissionAmountPaise });
+
+      totalCommissionPaise += commissionAmountPaise;
+      updated++;
+    }
+
+    return {
+      bookings_updated: updated,
+      total_commission_paise: totalCommissionPaise,
+    };
+  }
+
   // ─── Analytics ─────────────────────────────────────────────
 
   async getAnalytics(workspaceId: string, userId: string, dateRange?: DateRange) {

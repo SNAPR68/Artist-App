@@ -40,6 +40,9 @@ import { financialCommandRoutes } from './modules/financial-command/financial-co
 import { seasonalDemandRoutes } from './modules/seasonal-demand/seasonal-demand.routes.js';
 import { reputationDefenseRoutes } from './modules/reputation-defense/reputation-defense.routes.js';
 import { emergencySubstitutionRoutes } from './modules/emergency-substitution/emergency-substitution.routes.js';
+import { socialAnalyzerRoutes } from './modules/social-analyzer/social-analyzer.routes.js';
+import { gigMarketplaceRoutes } from './modules/gig-marketplace/gig-marketplace.routes.js';
+import { gamificationRoutes } from './modules/gamification/gamification.routes.js';
 import { startCronJobs } from './infrastructure/cron.js';
 
 const app = Fastify({
@@ -140,6 +143,9 @@ await app.register(financialCommandRoutes);
 await app.register(seasonalDemandRoutes);
 await app.register(reputationDefenseRoutes);
 await app.register(emergencySubstitutionRoutes);
+await app.register(socialAnalyzerRoutes);
+await app.register(gigMarketplaceRoutes);
+await app.register(gamificationRoutes);
 
 // ─── Graceful Shutdown ───────────────────────────────────────
 async function shutdown(signal: string) {

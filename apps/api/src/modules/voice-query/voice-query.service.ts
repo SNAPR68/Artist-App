@@ -31,6 +31,56 @@ interface VoiceQueryResult extends VoiceExecutionResult {
   confidence: number;
 }
 
+// ─── Page-aware suggestions ──────────────────────────────────
+
+const PAGE_SUGGESTIONS: Record<string, string[]> = {
+  bookings: [
+    'Check booking status',
+    'Confirm my next booking',
+    'Show earnings from bookings',
+  ],
+  calendar: [
+    'Block dates for next week',
+    'Show my availability',
+    'Go to bookings',
+  ],
+  earnings: [
+    'How much did I earn this month?',
+    'Show my market position',
+    'Go to financial dashboard',
+  ],
+  financial: [
+    'Show my earnings breakdown',
+    'Am I underpriced?',
+    'Go to earnings',
+  ],
+  intelligence: [
+    'Show demand trends',
+    'What should I charge?',
+    'Open gig advisor',
+  ],
+  gigs: [
+    'Find artists for my event',
+    'Search by genre',
+    'Go to bookings',
+  ],
+  search: [
+    'Find a DJ in Mumbai',
+    'Show me rock bands',
+    'Go to bookings',
+  ],
+  home: [
+    'Show my bookings',
+    'Check earnings',
+    'Find artists',
+  ],
+  workspace: [
+    'Show pipeline',
+    'Check booking status',
+    'Go to gig marketplace',
+  ],
+};
+
 // ─── Role-based suggestions ─────────────────────────────────
 
 const ROLE_SUGGESTIONS: Record<string, string[]> = {
@@ -67,7 +117,7 @@ export class VoiceQueryService {
   /**
    * Process a voice query: parse intent, execute, manage conversation state.
    */
-  async processQuery(userId: string, text: string, sessionId?: string): Promise<VoiceQueryResult> {
+  async processQuery(userId: string, text: string, sessionId?: string, currentPage?: string): Promise<VoiceQueryResult> {
     // 1. Get or create conversation
     let conversation: Record<string, unknown> | undefined;
 
@@ -147,6 +197,7 @@ export class VoiceQueryService {
       session_state: {
         ...sessionState,
         user_role: user?.role,
+        current_page: currentPage,
       },
       previous_intents: sessionState.previous_intents || [],
     };
@@ -176,6 +227,7 @@ export class VoiceQueryService {
         last_intent: parsed.intent,
         previous_intents: previousIntents,
         user_role: user?.role,
+        current_page: currentPage,
       }),
     });
 
@@ -186,7 +238,15 @@ export class VoiceQueryService {
       content: result.response_text,
     });
 
-    // 9. Return result
+    // 9. Enrich suggestions with page-aware context
+    if (currentPage && PAGE_SUGGESTIONS[currentPage] && result.suggestions.length < 5) {
+      const pageSuggestions = PAGE_SUGGESTIONS[currentPage].filter(
+        (s) => !result.suggestions.includes(s),
+      );
+      result.suggestions = [...result.suggestions, ...pageSuggestions].slice(0, 5);
+    }
+
+    // 10. Return result
     return {
       session_id: conversationId,
       intent: parsed.intent,

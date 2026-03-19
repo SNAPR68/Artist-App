@@ -15,8 +15,8 @@ export async function voiceQueryRoutes(app: FastifyInstance) {
   app.post('/v1/voice/query', {
     preHandler: [authMiddleware, requirePermission('voice:query'), validateBody(voiceQuerySchema)],
   }, async (request, reply) => {
-    const { text, session_id } = request.body as { text: string; session_id?: string };
-    const result = await voiceQueryService.processQuery(request.user!.user_id, text, session_id);
+    const { text, session_id, current_page } = request.body as { text: string; session_id?: string; current_page?: string };
+    const result = await voiceQueryService.processQuery(request.user!.user_id, text, session_id, current_page);
 
     return reply.send({
       success: true,

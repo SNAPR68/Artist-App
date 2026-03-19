@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
 
 interface ClientProfile {
@@ -17,6 +18,7 @@ interface Shortlist {
 }
 
 export default function ClientDashboardPage() {
+  const router = useRouter();
   const [profile, setProfile] = useState<ClientProfile | null>(null);
   const [shortlists, setShortlists] = useState<Shortlist[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,10 +28,14 @@ export default function ClientDashboardPage() {
       apiClient<ClientProfile>('/v1/clients/profile'),
       apiClient<Shortlist[]>('/v1/shortlists'),
     ]).then(([profileRes, shortlistRes]) => {
-      if (profileRes.success) setProfile(profileRes.data);
+      if (!profileRes.success) {
+        router.push('/client/onboarding');
+        return;
+      }
+      setProfile(profileRes.data);
       if (shortlistRes.success) setShortlists(shortlistRes.data);
     }).finally(() => setLoading(false));
-  }, []);
+  }, [router]);
 
   if (loading) {
     return (

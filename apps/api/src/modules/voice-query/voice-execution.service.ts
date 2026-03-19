@@ -12,6 +12,11 @@ export interface VoiceExecutionResult {
   response_text: string;
   data?: Record<string, unknown>;
   suggestions: string[];
+  action?: {
+    type: 'navigate' | 'execute';
+    route?: string;
+    params?: Record<string, unknown>;
+  };
 }
 
 interface ConversationContext {
@@ -28,8 +33,10 @@ export class VoiceExecutionService {
   async execute(
     parsedIntent: VoiceParsedIntent,
     userId: string,
-    _conversationContext: ConversationContext,
+    conversationContext: ConversationContext,
   ): Promise<VoiceExecutionResult> {
+    const userRole = (conversationContext.session_state?.user_role as string) || 'artist';
+
     switch (parsedIntent.intent) {
       case 'DISCOVER':
         return this.handleDiscover(parsedIntent, userId);
@@ -38,13 +45,16 @@ export class VoiceExecutionService {
         return this.handleStatus(parsedIntent, userId);
 
       case 'ACTION':
-        return this.handleAction(parsedIntent);
+        return this.handleAction(parsedIntent, userRole);
 
       case 'INTELLIGENCE':
         return this.handleIntelligence(parsedIntent, userId);
 
       case 'EMERGENCY':
         return this.handleEmergency(parsedIntent, userId);
+
+      case 'NAVIGATE':
+        return this.handleNavigate(parsedIntent, userRole);
 
       default:
         return {
@@ -214,17 +224,88 @@ export class VoiceExecutionService {
 
   private async handleAction(
     parsedIntent: VoiceParsedIntent,
+    userRole: string,
   ): Promise<VoiceExecutionResult> {
     const { booking_id, action_verb } = parsedIntent.entities;
-    const action = action_verb || 'perform this action';
-    const idText = booking_id ? ` ${booking_id.slice(0, 8)}...` : '';
+    const lower = parsedIntent.raw_text.toLowerCase();
 
+    // Confirm / accept booking
+    if ((action_verb === 'confirm' || action_verb === 'accept') && booking_id) {
+      const bookingRoute = userRole === 'client'
+        ? `/client/bookings/${booking_id}`
+        : `/artist/bookings/${booking_id}`;
+      return {
+        response_text: `Opening booking details so you can confirm.`,
+        suggestions: ['Show all bookings', 'Go home'],
+        action: { type: 'navigate', route: bookingRoute },
+      };
+    }
+
+    // Cancel / reject booking
+    if ((action_verb === 'cancel' || action_verb === 'reject') && booking_id) {
+      const bookingRoute = userRole === 'client'
+        ? `/client/bookings/${booking_id}`
+        : `/artist/bookings/${booking_id}`;
+      return {
+        response_text: `Opening booking details so you can cancel.`,
+        suggestions: ['Show all bookings', 'Go home'],
+        action: { type: 'navigate', route: bookingRoute },
+      };
+    }
+
+    // Create / post gig
+    if (/create\s*gig|post\s*gig|new\s*gig|list\s*gig/.test(lower)) {
+      return {
+        response_text: `Taking you to the gig marketplace to create a post.`,
+        suggestions: ['Show my gigs', 'Go home'],
+        action: { type: 'navigate', route: '/gigs' },
+      };
+    }
+
+    // Generate / download PDF
+    if (/generate\s*pdf|download\s*pdf|export\s*pdf|pdf\s*ban/.test(lower)) {
+      return {
+        response_text: `You can generate PDFs from the presentations page in your workspace. Head there to create branded proposals and contracts.`,
+        suggestions: ['Open workspace', 'Show bookings', 'Go home'],
+        action: { type: 'navigate', route: userRole === 'client' || userRole === 'event_company' ? '/client/workspace' : '/artist/bookings' },
+      };
+    }
+
+    // Book an artist (with or without name)
+    if (action_verb === 'book') {
+      const artistName = parsedIntent.entities.artist_name;
+      if (artistName) {
+        return {
+          response_text: `Let me find ${artistName} so you can start the booking process.`,
+          suggestions: [`Search for ${artistName}`, 'Show recommendations', 'Go home'],
+          action: { type: 'navigate', route: `/search?q=${encodeURIComponent(artistName)}` },
+        };
+      }
+      return {
+        response_text: `Let's find the right artist for your event. Taking you to search.`,
+        suggestions: ['Show recommendations', 'Browse gigs', 'Go home'],
+        action: { type: 'navigate', route: '/search' },
+      };
+    }
+
+    // Schedule / block date
+    if (action_verb === 'schedule' || /block\s*date/.test(lower)) {
+      return {
+        response_text: `Opening your calendar to manage availability.`,
+        suggestions: ['Show bookings', 'Go home'],
+        action: { type: 'navigate', route: '/artist/calendar' },
+      };
+    }
+
+    // Fallback for unknown actions
+    const action = action_verb || 'perform this action';
+    const idText = booking_id ? ` for booking ${booking_id.slice(0, 8)}...` : '';
     return {
-      response_text: `To ${action} booking${idText}, please use the dashboard. Voice actions will be enabled soon.`,
+      response_text: `I can help you ${action}${idText}. Try being more specific, like "confirm booking" or "create a gig post".`,
       suggestions: [
-        'Check booking status instead',
-        'Find artists for my event',
-        'Show my upcoming bookings',
+        'Show my bookings',
+        'Go to gig marketplace',
+        'Check booking status',
       ],
     };
   }
@@ -338,6 +419,69 @@ export class VoiceExecutionService {
         'Check replacement status',
         'Call support',
       ],
+    };
+  }
+  // ─── NAVIGATE ──────────────────────────────────────────
+
+  private async handleNavigate(
+    parsedIntent: VoiceParsedIntent,
+    userRole: string,
+  ): Promise<VoiceExecutionResult> {
+    const pageTarget = parsedIntent.entities.page_target;
+
+    if (!pageTarget) {
+      return {
+        response_text: 'Where would you like to go? You can say things like "show my bookings" or "go to calendar".',
+        suggestions: ['Show bookings', 'Go to calendar', 'Open gigs marketplace', 'Show earnings'],
+      };
+    }
+
+    const ROUTE_MAP: Record<string, Record<string, string>> = {
+      bookings: { artist: '/artist/bookings', client: '/client/bookings', agent: '/agent/bookings', event_company: '/client/bookings', admin: '/admin' },
+      calendar: { artist: '/artist/calendar', client: '/search', agent: '/search' },
+      earnings: { artist: '/artist/earnings' },
+      financial: { artist: '/artist/financial' },
+      intelligence: { artist: '/artist/intelligence' },
+      'gig-advisor': { artist: '/artist/intelligence/gig-advisor' },
+      profile: { artist: '/artist/profile', client: '/client', agent: '/agent' },
+      workspace: { client: '/client/workspace', event_company: '/client/workspace' },
+      gigs: { artist: '/gigs', client: '/gigs', agent: '/gigs', event_company: '/gigs', admin: '/gigs' },
+      search: { artist: '/search', client: '/search', agent: '/search', event_company: '/search', admin: '/search' },
+      notifications: { artist: '/notifications', client: '/notifications', agent: '/notifications', event_company: '/notifications', admin: '/notifications' },
+      settings: { artist: '/settings', client: '/settings', agent: '/settings', event_company: '/settings' },
+      home: { artist: '/artist', client: '/client', agent: '/agent', event_company: '/client', admin: '/admin' },
+      seasonal: { artist: '/artist/seasonal' },
+      reputation: { artist: '/artist/intelligence/reputation' },
+      gamification: { artist: '/artist/gamification' },
+      recommendations: { client: '/client/recommendations', event_company: '/client/recommendations', agent: '/agent/recommendations' },
+      shortlists: { client: '/client/shortlists', event_company: '/client/shortlists' },
+      substitutions: { client: '/client/substitutions', event_company: '/client/substitutions' },
+    };
+
+    const routeMap = ROUTE_MAP[pageTarget];
+    const route = routeMap?.[userRole] || routeMap?.['artist'] || routeMap?.['client'];
+
+    if (!route) {
+      return {
+        response_text: `Sorry, that page isn't available for your account. Try saying "show my bookings" or "go home".`,
+        suggestions: ['Show bookings', 'Go home', 'Open gigs'],
+      };
+    }
+
+    const pageNames: Record<string, string> = {
+      bookings: 'your bookings', calendar: 'your calendar', earnings: 'your earnings',
+      financial: 'your financial dashboard', intelligence: 'your intelligence dashboard',
+      'gig-advisor': 'the gig advisor', profile: 'your profile', workspace: 'your workspace',
+      gigs: 'the gig marketplace', search: 'artist search', notifications: 'your notifications',
+      settings: 'settings', home: 'home', seasonal: 'seasonal trends',
+      reputation: 'your reputation', gamification: 'your achievements',
+      recommendations: 'recommendations', shortlists: 'your shortlists', substitutions: 'substitution requests',
+    };
+
+    return {
+      response_text: `Taking you to ${pageNames[pageTarget] || pageTarget}.`,
+      suggestions: ['Go back', 'Show bookings', 'Go home'],
+      action: { type: 'navigate', route },
     };
   }
 }

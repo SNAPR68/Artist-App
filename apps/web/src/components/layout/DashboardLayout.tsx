@@ -3,38 +3,44 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
+import { useI18n } from '@/i18n';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { VoiceAssistant } from '../voice/VoiceAssistant';
 
 interface NavItem {
   href: string;
-  label: string;
+  labelKey: string;
   icon: string;
 }
 
 const ARTIST_NAV: NavItem[] = [
-  { href: '/artist', label: 'Home', icon: '🏠' },
-  { href: '/artist/bookings', label: 'Bookings', icon: '📋' },
-  { href: '/artist/intelligence', label: 'Intelligence', icon: '🧠' },
-  { href: '/artist/financial', label: 'Finances', icon: '💰' },
-  { href: '/artist/calendar', label: 'Calendar', icon: '📅' },
+  { href: '/artist', labelKey: 'nav.home', icon: '🏠' },
+  { href: '/artist/bookings', labelKey: 'nav.bookings', icon: '📋' },
+  { href: '/gigs', labelKey: 'nav.gigs', icon: '🎯' },
+  { href: '/artist/intelligence', labelKey: 'nav.intelligence', icon: '🧠' },
+  { href: '/artist/financial', labelKey: 'nav.finances', icon: '💰' },
+  { href: '/artist/calendar', labelKey: 'nav.calendar', icon: '📅' },
 ];
 
 const CLIENT_NAV: NavItem[] = [
-  { href: '/client', label: 'Home', icon: '🏠' },
-  { href: '/client/bookings', label: 'Bookings', icon: '📋' },
-  { href: '/client/workspace', label: 'Workspace', icon: '🏢' },
-  { href: '/client/recommendations', label: 'Discover', icon: '✨' },
-  { href: '/search', label: 'Search', icon: '🔍' },
+  { href: '/client', labelKey: 'nav.home', icon: '🏠' },
+  { href: '/client/bookings', labelKey: 'nav.bookings', icon: '📋' },
+  { href: '/gigs', labelKey: 'nav.gigs', icon: '🎯' },
+  { href: '/client/workspace', labelKey: 'nav.workspace', icon: '🏢' },
+  { href: '/client/recommendations', labelKey: 'nav.discover', icon: '✨' },
+  { href: '/search', labelKey: 'nav.search', icon: '🔍' },
 ];
 
 const AGENT_NAV: NavItem[] = [
-  { href: '/agent', label: 'Home', icon: '🏠' },
-  { href: '/agent/roster', label: 'Roster', icon: '🎤' },
-  { href: '/agent/bookings', label: 'Bookings', icon: '📋' },
-  { href: '/agent/recommendations', label: 'Discover', icon: '✨' },
+  { href: '/agent', labelKey: 'nav.home', icon: '🏠' },
+  { href: '/agent/roster', labelKey: 'nav.roster', icon: '🎤' },
+  { href: '/agent/bookings', labelKey: 'nav.bookings', icon: '📋' },
+  { href: '/gigs', labelKey: 'nav.gigs', icon: '🎯' },
+  { href: '/agent/recommendations', labelKey: 'nav.discover', icon: '✨' },
 ];
 
 const ADMIN_NAV: NavItem[] = [
-  { href: '/admin', label: 'Home', icon: '🏠' },
+  { href: '/admin', labelKey: 'nav.home', icon: '🏠' },
 ];
 
 function getNavItems(role?: string): NavItem[] {
@@ -62,6 +68,7 @@ function getHomeHref(role?: string): string {
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
+  const { t } = useI18n();
   const navItems = getNavItems(user?.role);
   const homeHref = getHomeHref(user?.role);
 
@@ -87,27 +94,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/voice"
-            className="text-gray-500 hover:text-primary-500 transition-colors"
-            aria-label="Voice Assistant"
-            title="Voice Assistant"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
-            </svg>
-          </Link>
+          <LanguageSwitcher />
           <Link
             href="/notifications"
             className="relative text-gray-500 hover:text-gray-700"
-            aria-label="Notifications"
+            aria-label={t('nav.notifications')}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
@@ -118,7 +116,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             onClick={() => logout()}
             className="text-sm text-gray-500 hover:text-gray-700"
           >
-            Logout
+            {t('nav.logout')}
           </button>
         </div>
       </header>
@@ -141,11 +139,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               }`}
             >
               <span className="text-lg">{item.icon}</span>
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
             </Link>
           );
         })}
       </nav>
+
+      {/* Floating Voice Assistant */}
+      <VoiceAssistant />
     </div>
   );
 }

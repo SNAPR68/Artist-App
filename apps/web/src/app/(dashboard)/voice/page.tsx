@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
 
 interface ChatMessage {
@@ -8,13 +9,15 @@ interface ChatMessage {
   text: string;
   intent?: string;
   suggestions?: string[];
+  action?: { type: 'navigate' | 'execute'; route?: string; params?: Record<string, unknown> };
 }
 
 interface VoiceQueryResponse {
-  reply: string;
+  response_text: string;
   intent?: string;
   suggestions?: string[];
   session_id: string;
+  action?: { type: 'navigate' | 'execute'; route?: string; params?: Record<string, unknown> };
 }
 
 interface VoiceSession {
@@ -24,6 +27,7 @@ interface VoiceSession {
 }
 
 export default function VoicePage() {
+  const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [sessions, setSessions] = useState<VoiceSession[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -55,7 +59,7 @@ export default function VoicePage() {
     setSending(true);
 
     try {
-      const body: Record<string, string> = { query };
+      const body: Record<string, string> = { text: query };
       if (sessionId) body.session_id = sessionId;
 
       const res = await apiClient<VoiceQueryResponse>('/v1/voice/query', {
@@ -68,9 +72,10 @@ export default function VoicePage() {
         if (!sessionId && data.session_id) setSessionId(data.session_id);
         const assistantMsg: ChatMessage = {
           role: 'assistant',
-          text: data.reply,
+          text: data.response_text,
           intent: data.intent,
           suggestions: data.suggestions,
+          action: data.action,
         };
         setMessages((prev) => [...prev, assistantMsg]);
       } else {
@@ -153,6 +158,14 @@ export default function VoicePage() {
                   </span>
                 )}
                 <p className="whitespace-pre-wrap">{msg.text}</p>
+                {msg.action?.type === 'navigate' && msg.action.route && (
+                  <button
+                    onClick={() => router.push(msg.action!.route!)}
+                    className="mt-2 text-xs bg-primary-50 text-primary-700 border border-primary-200 rounded-lg px-3 py-1.5 hover:bg-primary-100 transition-colors"
+                  >
+                    Go to page &rarr;
+                  </button>
+                )}
               </div>
             </div>
           ))}

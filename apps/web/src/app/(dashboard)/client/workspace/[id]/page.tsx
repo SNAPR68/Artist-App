@@ -142,6 +142,26 @@ export default function WorkspaceDetailPage() {
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 mt-1">{workspace.name}</h1>
         </div>
+        <div className="flex gap-2">
+          <Link
+            href={`/client/workspace/${workspaceId}/analytics`}
+            className="text-sm bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
+            Analytics
+          </Link>
+          <Link
+            href={`/client/workspace/${workspaceId}/presentations`}
+            className="text-sm bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
+            Presentations
+          </Link>
+          <Link
+            href={`/client/workspace/${workspaceId}/settings`}
+            className="text-sm bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
+            Settings
+          </Link>
+        </div>
       </div>
 
       {/* Tabs */}

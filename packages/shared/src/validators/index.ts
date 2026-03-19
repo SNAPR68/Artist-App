@@ -64,6 +64,11 @@ export const updateArtistProfileSchema = createArtistProfileSchema.partial();
 export const createClientProfileSchema = z.object({
   client_type: z.enum(['corporate', 'wedding_planner', 'club_venue', 'individual', 'event_company']),
   company_name: z.string().max(200).optional(),
+  company_type: z.string().max(100).optional(),
+  city: z.string().max(100).optional(),
+  event_types_interested: z.array(z.string()).max(20).optional(),
+  average_budget_min: z.number().int().min(0).optional(),
+  average_budget_max: z.number().int().min(0).optional(),
 });
 
 // ─── Calendar ────────────────────────────────────────────────
@@ -498,6 +503,7 @@ export const earningsQuerySchema = z.object({
 export const voiceQuerySchema = z.object({
   text: z.string().min(1).max(1000),
   session_id: z.string().uuid().optional(),
+  current_page: z.string().max(200).optional(),
 });
 
 export const voiceSessionQuerySchema = z.object({
@@ -599,4 +605,83 @@ export const gigAdvisorV2QuerySchema = z.object({
 export const updateBackupPreferencesSchema = z.object({
   is_reliable_backup: z.boolean(),
   backup_premium_pct: z.number().int().min(0).max(100).default(25),
+});
+
+// ─── Social Media Analyzer ──────────────────────────────────
+
+export const analyzeSocialProfileSchema = z.object({
+  platform: z.enum(['instagram', 'youtube']),
+  profile_url: z.string().url().max(500),
+});
+
+// ─── Workspace Commission ────────────────────────────────────
+
+export const updateWorkspaceCommissionSchema = z.object({
+  default_commission_pct: z.number().min(0).max(50),
+});
+
+export const updateBookingCommissionSchema = z.object({
+  commission_pct: z.number().min(0).max(50),
+});
+
+// ─── Gig Marketplace ────────────────────────────────────────
+
+export const createGigPostSchema = z.object({
+  title: z.string().min(5).max(200),
+  description: z.string().min(10).max(2000),
+  event_type: z.nativeEnum(EventType),
+  event_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  event_city: z.string().min(1).max(100),
+  genres_needed: z.array(z.string()).min(1).max(10),
+  budget_min_paise: z.number().int().min(0),
+  budget_max_paise: z.number().int().min(0),
+  guest_count: z.number().int().min(1).optional(),
+  duration_hours: z.number().min(0.5).max(24).optional(),
+  requirements: z.string().max(2000).optional(),
+  expires_at: z.string().optional(),
+});
+
+export const updateGigPostSchema = createGigPostSchema.partial();
+
+export const gigPostQuerySchema = z.object({
+  city: z.string().optional(),
+  event_type: z.nativeEnum(EventType).optional(),
+  genre: z.string().optional(),
+  budget_min: z.number().int().min(0).optional(),
+  budget_max: z.number().int().min(0).optional(),
+  status: z.enum(['open', 'closed', 'filled', 'cancelled', 'expired']).optional(),
+  page: z.number().int().min(1).default(1),
+  per_page: z.number().int().min(1).max(50).default(20),
+});
+
+export const createGigApplicationSchema = z.object({
+  cover_note: z.string().max(1000).optional(),
+  proposed_amount_paise: z.number().int().min(0).optional(),
+});
+
+export const respondGigApplicationSchema = z.object({
+  status: z.enum(['shortlisted', 'accepted', 'rejected']),
+});
+
+// ─── Gamification ───────────────────────────────────────────
+
+export const gamificationClaimBadgeSchema = z.object({
+  badge_type: z.enum(['verified_artist', 'top_performer', 'rising_star', 'reliable_backup', 'early_bird', 'crowd_favorite']),
+});
+
+// ─── Artist Microsite ──────────────────────────────────────
+
+export const micrositeSettingsSchema = z.object({
+  layout_variant: z.enum(['classic', 'modern', 'minimal']).default('classic'),
+  brand_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  hero_image_url: z.string().url().optional(),
+  featured_review_ids: z.array(z.string().uuid()).max(5).optional(),
+  featured_media_ids: z.array(z.string().uuid()).max(10).optional(),
+});
+
+// ─── Public Event Dashboard ─────────────────────────────────
+
+export const publicDashboardSettingsSchema = z.object({
+  public_dashboard_enabled: z.boolean(),
+  client_visible_fields: z.array(z.string()).default(['name', 'date', 'venue', 'artists', 'status']),
 });

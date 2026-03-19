@@ -140,8 +140,8 @@ const PERMISSIONS: Record<string, UserRole[]> = {
   'financial:certificate': [UserRole.ARTIST],
 
   // Seasonal Demand Intelligence
-  'seasonal:read_artist': [UserRole.ARTIST, UserRole.AGENT],
-  'seasonal:read_client': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'seasonal:read_artist': [UserRole.ARTIST, UserRole.AGENT, UserRole.ADMIN],
+  'seasonal:read_client': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT, UserRole.ADMIN],
   'seasonal:alerts': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
 
   // Reputation Defense
@@ -154,6 +154,18 @@ const PERMISSIONS: Record<string, UserRole[]> = {
   'substitution:create': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT, UserRole.ADMIN],
   'substitution:respond': [UserRole.ARTIST],
   'substitution:read': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+
+  // Gig Marketplace
+  'gig:create': [UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'gig:browse': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'gig:apply': [UserRole.ARTIST],
+
+  // Gamification
+  'gamification:read': [UserRole.ARTIST, UserRole.CLIENT, UserRole.EVENT_COMPANY, UserRole.AGENT],
+  'gamification:claim_badge': [UserRole.ARTIST],
+
+  // Artist Microsite
+  'artist:microsite': [UserRole.ARTIST],
 };
 
 /**

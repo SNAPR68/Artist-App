@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../../lib/api-client';
 import { MediaUploader } from '../../../../components/media/MediaUploader';
@@ -55,6 +55,26 @@ export default function OnboardingPage() {
   // Step 4: Media
   const [media, setMedia] = useState<Array<{ id: string; media_type: 'image' | 'video'; original_url: string; thumbnail_url?: string; transcode_status: string; sort_order: number }>>([]);
   const [profileCreated, setProfileCreated] = useState(false);
+
+  // Pre-fill from social media analyzer
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('social_prefill');
+      if (!stored) return;
+
+      const data = JSON.parse(stored);
+      if (data.display_name) setStageName(data.display_name);
+      if (data.suggested_bio) setBio(data.suggested_bio);
+      if (data.suggested_genres && Array.isArray(data.suggested_genres)) {
+        const matched = data.suggested_genres.filter((g: string) => GENRES.includes(g));
+        if (matched.length > 0) setSelectedGenres(matched);
+      }
+
+      localStorage.removeItem('social_prefill');
+    } catch {
+      // Ignore malformed data
+    }
+  }, []);
 
   const toggleItem = (list: string[], item: string, setter: (v: string[]) => void) => {
     if (list.includes(item)) {
@@ -162,6 +182,12 @@ export default function OnboardingPage() {
       {/* Step 1: Basic Info */}
       {step === 1 && (
         <div className="space-y-4">
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
+            Want to import your profile?{' '}
+            <a href="/artist/onboarding/social" className="font-semibold underline">
+              Analyze your social media profile &rarr;
+            </a>
+          </div>
           <h2 className="text-xl font-bold text-gray-900">Tell us about yourself</h2>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Stage Name *</label>

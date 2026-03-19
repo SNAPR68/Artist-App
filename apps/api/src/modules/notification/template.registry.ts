@@ -325,6 +325,24 @@ export const NOTIFICATION_TEMPLATES: Record<string, NotificationTemplate> = {
   },
 
   // ─── Financial Command Center Templates ───────────────────
+  // ─── Gig Marketplace Templates ──────────────────────────────
+  gig_new_application: {
+    whatsapp_template_id: 'gig_new_app_v1',
+    sms_flow_id: 'flow_gig_new_app',
+    push_title: 'New Gig Application',
+    push_body: '{{artist_name}} applied to your gig "{{gig_title}}" with a proposed amount of ₹{{amount}}',
+    email_subject: 'New Application — {{gig_title}}',
+    email_body: '<strong>{{artist_name}}</strong> has applied to your gig <strong>"{{gig_title}}"</strong>. Proposed amount: <strong>₹{{amount}}</strong>. Log in to review the application.',
+  },
+  gig_application_accepted: {
+    whatsapp_template_id: 'gig_app_accepted_v1',
+    sms_flow_id: 'flow_gig_accepted',
+    push_title: 'Application Accepted!',
+    push_body: 'Your application for "{{gig_title}}" has been accepted! {{event_type}} on {{event_date}} in {{event_city}}.',
+    email_subject: 'Application Accepted — {{gig_title}}',
+    email_body: 'Great news! Your application for <strong>"{{gig_title}}"</strong> has been accepted. The <strong>{{event_type}}</strong> is on <strong>{{event_date}}</strong> in <strong>{{event_city}}</strong>. Log in to view details and next steps.',
+  },
+
   financial_light_month_alert: {
     whatsapp_template_id: 'financial_light_v1',
     sms_flow_id: 'flow_financial_light',
