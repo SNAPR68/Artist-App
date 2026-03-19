@@ -10,21 +10,35 @@ export async function adminRoutes(app: FastifyInstance) {
    * Regenerates phone_hash for all users whose phone_hash starts with 'hash_'
    */
   app.post('/v1/admin/fix-seed-hashes', async (_request, reply) => {
-    const seedUsers: any[] = await db('users').whereRaw("phone_hash LIKE 'hash_%'");
-    let fixed = 0;
-    for (const user of seedUsers) {
-      // The phone column has plain text phone numbers for seed users
-      const plainPhone = user.phone;
-      if (!plainPhone || plainPhone.startsWith('{')) continue; // skip encrypted phones
-      const correctHash = hashForSearch(plainPhone);
-      const encryptedPhone = encryptPII(plainPhone);
-      await db('users').where({ id: user.id }).update({
-        phone_hash: correctHash,
-        phone: encryptedPhone,
-      });
-      fixed++;
+    // Step 1: Delete orphan users (no profile linked)
+    const orphanIds: any[] = await db('users')
+      .where('id', 'not in', db.raw(
+        'SELECT user_id FROM artist_profiles UNION SELECT user_id FROM client_profiles UNION SELECT user_id FROM agent_profiles'
+      ))
+      .select('id');
+
+    let deleted = 0;
+    for (const row of orphanIds) {
+      try {
+        await db('refresh_tokens').where({ user_id: row.id }).del().catch(() => {});
+        await db('users').where({ id: row.id }).del();
+        deleted++;
+      } catch { /* skip FK errors */ }
     }
-    return reply.send({ success: true, data: { fixed, total: seedUsers.length }, errors: [] });
+
+    // Step 2: Fix remaining users with plain-text phones
+    const allUsers: any[] = await db('users').select('id', 'phone', 'phone_hash');
+    let fixed = 0;
+    for (const user of allUsers) {
+      if (user.phone && /^\d{10}$/.test(user.phone)) {
+        const correctHash = hashForSearch(user.phone);
+        const encrypted = encryptPII(user.phone);
+        await db('users').where({ id: user.id }).update({ phone_hash: correctHash, phone: encrypted });
+        fixed++;
+      }
+    }
+
+    return reply.send({ success: true, data: { orphans_deleted: deleted, hashes_fixed: fixed }, errors: [] });
   });
   /**
    * GET /v1/admin/users — List all users with profiles
