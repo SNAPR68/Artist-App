@@ -44,7 +44,7 @@ export default function EarningsPage() {
   const [summary, setSummary] = useState<EarningsSummary | null>(null);
   const [transactions, setTransactions] = useState<PaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState<'current' | '1m' | '3m' | '6m'>('current');
+  const [period, setPeriod] = useState<'current' | '1m' | '3m' | '6m'>('6m');
 
   useEffect(() => {
     setLoading(true);

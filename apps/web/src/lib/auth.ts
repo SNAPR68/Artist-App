@@ -4,6 +4,18 @@ import { create } from 'zustand';
 import type { UserRole } from '@artist-booking/shared';
 import { apiClient, setTokens, clearTokens } from './api-client';
 
+// Decode JWT payload without a library
+function decodeJWT(token: string): { sub: string; role: UserRole; phone?: string; is_new?: boolean } | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
 interface AuthState {
   user: {
     id: string;
@@ -13,7 +25,9 @@ interface AuthState {
   } | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  _initialized: boolean;
 
+  initialize: () => void;
   generateOTP: (phone: string) => Promise<{ expiresInSeconds: number }>;
   verifyOTP: (phone: string, otp: string, role?: UserRole) => Promise<void>;
   refreshToken: () => Promise<void>;
@@ -21,10 +35,40 @@ interface AuthState {
   setUser: (user: AuthState['user']) => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
+  _initialized: false,
+
+  initialize: () => {
+    if (get()._initialized) return;
+    if (typeof window === 'undefined') return;
+
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      set({ _initialized: true });
+      return;
+    }
+
+    const payload = decodeJWT(token);
+    if (payload?.sub && payload?.role) {
+      set({
+        user: {
+          id: payload.sub,
+          phone: payload.phone ?? '',
+          role: payload.role,
+          is_new: false,
+        },
+        isAuthenticated: true,
+        _initialized: true,
+      });
+    } else {
+      // Invalid token — clear it
+      clearTokens();
+      set({ _initialized: true });
+    }
+  },
 
   generateOTP: async (phone: string) => {
     set({ isLoading: true });

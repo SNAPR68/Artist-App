@@ -1,7 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
 import { useI18n } from '@/i18n';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -67,10 +68,31 @@ function getHomeHref(role?: string): string {
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, logout } = useAuthStore();
+  const router = useRouter();
+  const { user, isAuthenticated, _initialized, logout } = useAuthStore();
   const { t } = useI18n();
   const navItems = getNavItems(user?.role);
   const homeHref = getHomeHref(user?.role);
+
+  // Auth guard: redirect to login if not authenticated after hydration
+  useEffect(() => {
+    if (_initialized && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [_initialized, isAuthenticated, router]);
+
+  // Show loading while auth is initializing
+  if (!_initialized) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Will redirect via useEffect
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-16 sm:pb-0">

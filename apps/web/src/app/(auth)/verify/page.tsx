@@ -59,7 +59,24 @@ function VerifyContent() {
             router.push('/');
         }
       } else {
-        router.push('/');
+        // Redirect existing users to their role-specific dashboard
+        switch (currentUser?.role) {
+          case UserRole.ARTIST:
+            router.push('/artist');
+            break;
+          case UserRole.CLIENT:
+          case UserRole.EVENT_COMPANY:
+            router.push('/client');
+            break;
+          case UserRole.AGENT:
+            router.push('/agent');
+            break;
+          case UserRole.ADMIN:
+            router.push('/admin');
+            break;
+          default:
+            router.push('/');
+        }
       }
     } catch (err) {
       if (err instanceof Error && err.message.includes('Role is required')) {

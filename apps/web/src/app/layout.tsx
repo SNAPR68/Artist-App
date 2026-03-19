@@ -4,6 +4,7 @@ import '@/styles/globals.css';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
 import { I18nProvider } from '@/i18n';
+import { AuthInitializer } from '@/components/AuthInitializer';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ErrorBoundary>
           <I18nProvider>
             <ToastProvider>
+              <AuthInitializer />
               {children}
             </ToastProvider>
           </I18nProvider>

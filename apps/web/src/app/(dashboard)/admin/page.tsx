@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useState } from 'react';
 import { apiClient } from '../../../lib/api-client';
+import { useAuthStore } from '../../../lib/auth';
 
 type Tab = 'overview' | 'users' | 'bookings' | 'payments' | 'disputes' | 'venues' | 'intelligence';
 
@@ -117,6 +118,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function AdminDashboardPage() {
+  const { user } = useAuthStore();
   const [tab, setTab] = useState<Tab>('overview');
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [users, setUsers] = useState<UserRecord[]>([]);
@@ -202,6 +204,15 @@ export default function AdminDashboardPage() {
     ? bookings
     : bookings.filter((b) => b.status === statusFilter);
   const statuses = ['all', ...new Set(bookings.map((b) => b.status))];
+
+  if (user && user.role !== 'admin') {
+    return (
+      <div className="text-center py-20">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Admin Access Required</h1>
+        <p className="text-gray-500">You are logged in as <span className="font-medium">{user.role}</span>. This dashboard is only available to administrators.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

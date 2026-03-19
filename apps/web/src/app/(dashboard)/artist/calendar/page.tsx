@@ -10,6 +10,14 @@ interface CalendarEntry {
   notes?: string;
 }
 
+interface BookingRecord {
+  id: string;
+  status: string;
+  event_date: string;
+  event_type?: string;
+  client_name?: string;
+}
+
 const STATUS_COLORS: Record<string, string> = {
   available: 'bg-green-100 text-green-800 border-green-300',
   held: 'bg-yellow-100 text-yellow-800 border-yellow-300',
@@ -38,10 +46,41 @@ export default function CalendarPage() {
     const startDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
     const endDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
 
-    const res = await apiClient<CalendarEntry[]>(`/v1/calendar?start_date=${startDate}&end_date=${endDate}`);
-    if (res.success) {
-      setEntries(res.data);
+    // Fetch calendar entries AND bookings in parallel
+    const [calRes, bookingsRes] = await Promise.all([
+      apiClient<CalendarEntry[]>(`/v1/calendar?start_date=${startDate}&end_date=${endDate}`),
+      apiClient<BookingRecord[]>('/v1/bookings?role=artist&per_page=200'),
+    ]);
+
+    const calEntries = calRes.success ? calRes.data : [];
+
+    // Overlay bookings onto calendar — mark booked dates from active bookings
+    if (bookingsRes.success) {
+      const bookingDates = new Map<string, BookingRecord>();
+      const bookingsData = Array.isArray(bookingsRes.data) ? bookingsRes.data : [];
+      for (const b of bookingsData) {
+        if (b.event_date && ['confirmed', 'pre_event', 'event_day', 'completed', 'inquiry', 'quoted', 'negotiating'].includes(b.status)) {
+          const dateStr = b.event_date.split('T')[0];
+          bookingDates.set(dateStr, b);
+        }
+      }
+
+      // Add booking dates not already in calendar entries
+      const existingDates = new Set(calEntries.map((e) => e.date));
+      for (const [dateStr, booking] of bookingDates) {
+        if (!existingDates.has(dateStr)) {
+          const isConfirmed = ['confirmed', 'pre_event', 'event_day', 'completed'].includes(booking.status);
+          calEntries.push({
+            id: booking.id,
+            date: dateStr,
+            status: isConfirmed ? 'booked' : 'held',
+            notes: `${booking.event_type ?? 'Event'} - ${booking.client_name ?? 'Booking'}`,
+          });
+        }
+      }
     }
+
+    setEntries(calEntries);
     setLoading(false);
   };
 

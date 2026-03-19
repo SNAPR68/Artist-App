@@ -1,4 +1,9 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/lib/auth';
 
 const CATEGORIES = [
   { name: 'Bollywood', icon: '🎤', count: '500+' },
@@ -26,7 +31,33 @@ const STATS = [
   { value: '100%', label: 'Secure Payments' },
 ];
 
+function getDashboardHref(role?: string): string {
+  switch (role) {
+    case 'artist': return '/artist';
+    case 'client':
+    case 'event_company': return '/client';
+    case 'agent': return '/agent';
+    case 'admin': return '/admin';
+    default: return '/';
+  }
+}
+
 export default function HomePage() {
+  const { user, isAuthenticated, _initialized, logout } = useAuthStore();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
+
+  // Authenticated users: redirect to their dashboard
+  useEffect(() => {
+    if (mounted && _initialized && isAuthenticated && user) {
+      router.replace(getDashboardHref(user.role));
+    }
+  }, [mounted, _initialized, isAuthenticated, user, router]);
+
+  const showAuth = mounted && _initialized;
+
   return (
     <main className="min-h-screen bg-white">
       {/* Navigation */}
@@ -42,13 +73,36 @@ export default function HomePage() {
             <Link href="/artist/onboarding" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">
               List as Artist
             </Link>
-            <Link href="/login" className="text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 px-5 py-2.5 rounded-lg transition-colors">
-              Get Started
-            </Link>
+            {showAuth && isAuthenticated && user ? (
+              <div className="flex items-center gap-4">
+                <Link
+                  href={getDashboardHref(user.role)}
+                  className="text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 px-5 py-2.5 rounded-lg transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={() => logout()}
+                  className="text-sm text-neutral-500 hover:text-neutral-700"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" className="text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 px-5 py-2.5 rounded-lg transition-colors">
+                Get Started
+              </Link>
+            )}
           </div>
-          <Link href="/login" className="md:hidden text-sm font-medium text-primary-500">
-            Login
-          </Link>
+          {showAuth && isAuthenticated && user ? (
+            <Link href={getDashboardHref(user.role)} className="md:hidden text-sm font-medium text-primary-500">
+              Dashboard
+            </Link>
+          ) : (
+            <Link href="/login" className="md:hidden text-sm font-medium text-primary-500">
+              Login
+            </Link>
+          )}
         </div>
       </nav>
 
@@ -63,10 +117,21 @@ export default function HomePage() {
             <br />
             <span className="text-primary-500">for your event</span>
           </h1>
-          <p className="text-lg text-neutral-500 max-w-2xl mx-auto mb-10">
+          <p className="text-lg text-neutral-500 max-w-2xl mx-auto mb-4">
             Weddings, corporate events, house parties, concerts — find and book verified artists
             in under 24 hours. Secure payments, transparent pricing, zero hassle.
           </p>
+          {/* Voice-first messaging */}
+          <div className="flex items-center justify-center gap-2 mb-10">
+            <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                <line x1="12" x2="12" y1="19" y2="22" />
+              </svg>
+            </div>
+            <span className="text-sm text-neutral-500">Voice-enabled — just say what you need</span>
+          </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/search"
@@ -164,6 +229,28 @@ export default function HomePage() {
             Create Your Profile
             <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
+        </div>
+      </section>
+
+      {/* Event Company CTA */}
+      <section className="py-20 px-6 bg-neutral-50">
+        <div className="max-w-5xl mx-auto bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl p-10 md:p-16 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Manage multiple events?
+          </h2>
+          <p className="text-amber-100 text-lg max-w-xl mx-auto mb-8">
+            Run your entertainment business with our workspace — pipeline CRM, branded presentations,
+            team management, and commission tracking. Built for event companies and agencies.
+          </p>
+          <Link
+            href="/login"
+            className="inline-flex items-center px-8 py-4 bg-white hover:bg-neutral-50 text-amber-600 font-bold rounded-xl transition-colors text-base"
+          >
+            Set Up Your Workspace
+            <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </Link>
         </div>
