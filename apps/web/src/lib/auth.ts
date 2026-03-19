@@ -5,11 +5,12 @@ import type { UserRole } from '@artist-booking/shared';
 import { apiClient, setTokens, clearTokens } from './api-client';
 
 // Decode JWT payload without a library
-function decodeJWT(token: string): { sub: string; role: UserRole; phone?: string; is_new?: boolean } | null {
+function decodeJWT(token: string): { user_id: string; role: UserRole; phone?: string } | null {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
     const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (!payload.user_id || !payload.role) return null;
     return payload;
   } catch {
     return null;
@@ -45,10 +46,10 @@ function getInitialAuthState(): Pick<AuthState, 'user' | 'isAuthenticated' | '_i
     return { user: null, isAuthenticated: false, _initialized: true };
   }
   const payload = decodeJWT(token);
-  if (payload?.sub && payload?.role) {
+  if (payload?.user_id && payload?.role) {
     return {
       user: {
-        id: payload.sub,
+        id: payload.user_id,
         phone: payload.phone ?? '',
         role: payload.role as UserRole,
         is_new: false,
@@ -80,10 +81,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
 
     const payload = decodeJWT(token);
-    if (payload?.sub && payload?.role) {
+    if (payload?.user_id && payload?.role) {
       set({
         user: {
-          id: payload.sub,
+          id: payload.user_id,
           phone: payload.phone ?? '',
           role: payload.role,
           is_new: false,
