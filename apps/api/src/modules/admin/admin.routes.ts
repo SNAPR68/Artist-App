@@ -2,8 +2,30 @@ import type { FastifyInstance } from 'fastify';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { db } from '../../infrastructure/database.js';
+import { hashForSearch, encryptPII } from '../../infrastructure/encryption.js';
 
 export async function adminRoutes(app: FastifyInstance) {
+  /**
+   * POST /v1/admin/fix-seed-hashes — One-time fix for seed data phone hashes
+   * Regenerates phone_hash for all users whose phone_hash starts with 'hash_'
+   */
+  app.post('/v1/admin/fix-seed-hashes', async (_request, reply) => {
+    const seedUsers: any[] = await db('users').whereRaw("phone_hash LIKE 'hash_%'");
+    let fixed = 0;
+    for (const user of seedUsers) {
+      // The phone column has plain text phone numbers for seed users
+      const plainPhone = user.phone;
+      if (!plainPhone || plainPhone.startsWith('{')) continue; // skip encrypted phones
+      const correctHash = hashForSearch(plainPhone);
+      const encryptedPhone = encryptPII(plainPhone);
+      await db('users').where({ id: user.id }).update({
+        phone_hash: correctHash,
+        phone: encryptedPhone,
+      });
+      fixed++;
+    }
+    return reply.send({ success: true, data: { fixed, total: seedUsers.length }, errors: [] });
+  });
   /**
    * GET /v1/admin/users — List all users with profiles
    */
