@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { apiClient } from '../../../../lib/api-client';
 import { useAuthStore } from '../../../../lib/auth';
@@ -70,7 +70,7 @@ function formatPaise(paise: number): string {
 
 export default function GigDetailPage() {
   const params = useParams();
-  const router = useRouter();
+  // const router = useRouter();
   const { user } = useAuthStore();
   const gigId = params.id as string;
 

@@ -49,12 +49,6 @@ const LEVEL_COLORS: Record<string, string> = {
   platinum: 'bg-indigo-500',
 };
 
-const LEVEL_THRESHOLDS: Record<string, number> = {
-  bronze: 0,
-  silver: 200,
-  gold: 500,
-  platinum: 1000,
-};
 
 const ACTION_LABELS: Record<string, string> = {
   profile_complete: 'Profile Completed',

@@ -77,9 +77,9 @@ export default function WorkspacePresentationsPage() {
           const seen = new Set<string>();
           const unique: PipelineArtist[] = [];
           for (const booking of pipeRes.data) {
-            const aid = (booking as Record<string, unknown>).artist_id as string ??
-              (booking as Record<string, unknown>).id as string;
-            const name = (booking as Record<string, unknown>).artist_name as string ?? 'Unknown Artist';
+            const aid = (booking as unknown as Record<string, unknown>).artist_id as string ??
+              (booking as unknown as Record<string, unknown>).id as string;
+            const name = (booking as unknown as Record<string, unknown>).artist_name as string ?? 'Unknown Artist';
             if (aid && !seen.has(aid)) {
               seen.add(aid);
               unique.push({ id: aid, artist_id: aid, artist_name: name });

@@ -12,7 +12,7 @@ function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phone = searchParams.get('phone') ?? '';
-  const { verifyOTP, generateOTP, isLoading, user } = useAuthStore();
+  const { verifyOTP, generateOTP, isLoading } = useAuthStore();
   const { t } = useI18n();
 
   const [error, setError] = useState('');
