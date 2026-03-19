@@ -6,8 +6,15 @@ import { apiClient } from '../../../../lib/api-client';
 import { MediaUploader } from '../../../../components/media/MediaUploader';
 
 const EVENT_TYPES = [
-  'Wedding', 'Corporate', 'Birthday', 'College Fest', 'Concert',
-  'Private Party', 'Festival', 'Club Night', 'Restaurant', 'Other',
+  { value: 'wedding', label: 'Wedding' },
+  { value: 'corporate', label: 'Corporate' },
+  { value: 'private_party', label: 'Private Party' },
+  { value: 'concert', label: 'Concert' },
+  { value: 'club_gig', label: 'Club Night' },
+  { value: 'festival', label: 'Festival' },
+  { value: 'college_event', label: 'College Fest' },
+  { value: 'restaurant', label: 'Restaurant' },
+  { value: 'other', label: 'Other' },
 ];
 
 const GENRES = [
@@ -49,7 +56,7 @@ export default function OnboardingPage() {
 
   // Step 3: Pricing
   const [pricing, setPricing] = useState<PricingEntry[]>([
-    { event_type: 'Wedding', city_tier: 'tier_1', min_price: 50000, max_price: 200000 },
+    { event_type: 'wedding', city_tier: 'tier_1', min_price: 50000, max_price: 200000 },
   ]);
 
   // Step 4: Media
@@ -85,7 +92,7 @@ export default function OnboardingPage() {
   };
 
   const addPricingRow = () => {
-    setPricing([...pricing, { event_type: 'Wedding', city_tier: 'tier_1', min_price: 0, max_price: 0 }]);
+    setPricing([...pricing, { event_type: 'wedding', city_tier: 'tier_1', min_price: 0, max_price: 0 }]);
   };
 
   const removePricingRow = (index: number) => {
@@ -288,15 +295,15 @@ export default function OnboardingPage() {
             <div className="flex flex-wrap gap-2">
               {EVENT_TYPES.map((type) => (
                 <button
-                  key={type}
-                  onClick={() => toggleItem(selectedEventTypes, type, setSelectedEventTypes)}
+                  key={type.value}
+                  onClick={() => toggleItem(selectedEventTypes, type.value, setSelectedEventTypes)}
                   className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-                    selectedEventTypes.includes(type)
+                    selectedEventTypes.includes(type.value)
                       ? 'bg-primary-500 text-white border-primary-500'
                       : 'bg-white text-gray-700 border-gray-300 hover:border-primary-300'
                   }`}
                 >
-                  {type}
+                  {type.label}
                 </button>
               ))}
             </div>
@@ -354,7 +361,7 @@ export default function OnboardingPage() {
                     className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                   >
                     {EVENT_TYPES.map((t) => (
-                      <option key={t} value={t}>{t}</option>
+                      <option key={t.value} value={t.value}>{t.label}</option>
                     ))}
                   </select>
                 </div>
