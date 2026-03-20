@@ -14,7 +14,7 @@ India's live entertainment booking marketplace. Connects artists, clients, agent
 ## Deployment Architecture
 | Service | Platform | URL |
 |---------|----------|-----|
-| Frontend | Vercel | `artist-booking-jvbmsu14v-tscllps-projects.vercel.app` |
+| Frontend | Vercel | `artist-booking-nbluziovn-tscllps-projects.vercel.app` |
 | API | Render (free) | `https://artist-booking-api.onrender.com` |
 | Database | Supabase (Sydney, ap-southeast-2) | `wqfzlkkkcsjrwksjpxfp.supabase.co` |
 | Redis | Upstash | Set in Render env vars |
