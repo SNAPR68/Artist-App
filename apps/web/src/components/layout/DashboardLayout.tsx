@@ -81,20 +81,20 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-50 pb-16 sm:pb-0">
       {/* Top Bar */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
-        <Link href={homeHref} className="text-xl font-bold text-primary-500">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-2 sticky top-0 z-40">
+        <Link href={homeHref} className="text-xl font-bold text-primary-500 shrink-0">
           ArtistBooking
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden sm:flex items-center gap-1">
+        <nav className="hidden sm:flex items-center gap-0.5 flex-1 min-w-0 justify-center">
           {navItems.map((item) => {
             const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
                   isActive
                     ? 'bg-primary-50 text-primary-600'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -106,7 +106,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 shrink-0">
           <LanguageSwitcher />
           <Link
             href="/notifications"
@@ -117,10 +117,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
             </svg>
           </Link>
-          <span className="text-sm text-gray-600 hidden sm:inline">{user?.phone}</span>
           <button
             onClick={() => logout()}
-            className="text-sm text-gray-500 hover:text-gray-700"
+            className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap"
           >
             {t('nav.logout')}
           </button>
