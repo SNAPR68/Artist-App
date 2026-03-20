@@ -27,13 +27,16 @@ interface WorkspaceEvent {
   id: string;
   name: string;
   event_date: string;
-  city: string;
+  event_city?: string;
+  city?: string;
   venue?: string;
+  event_type?: string;
   status: string;
   guest_count?: number;
   budget_min_paise?: number;
   budget_max_paise?: number;
-  booking_count: number;
+  booking_count?: number;
+  client_name?: string;
 }
 
 interface WorkspaceMember {
@@ -92,12 +95,12 @@ export default function WorkspaceDetailPage() {
   useEffect(() => {
     setTabLoading(true);
     if (activeTab === 'pipeline') {
-      apiClient<PipelineBooking[]>(`/v1/workspaces/${workspaceId}/pipeline`)
-        .then((res) => { if (res.success) setPipeline(res.data); })
+      apiClient<{ bookings: PipelineBooking[]; state_counts: Record<string, number>; pagination: unknown }>(`/v1/workspaces/${workspaceId}/pipeline`)
+        .then((res) => { if (res.success) setPipeline(Array.isArray(res.data) ? res.data : res.data?.bookings ?? []); })
         .finally(() => setTabLoading(false));
     } else if (activeTab === 'events') {
-      apiClient<WorkspaceEvent[]>(`/v1/workspaces/${workspaceId}/events`)
-        .then((res) => { if (res.success) setEvents(res.data); })
+      apiClient<{ events: WorkspaceEvent[] }>(`/v1/workspaces/${workspaceId}/events`)
+        .then((res) => { if (res.success) setEvents(Array.isArray(res.data) ? res.data : res.data?.events ?? []); })
         .finally(() => setTabLoading(false));
     } else if (activeTab === 'team') {
       apiClient<WorkspaceMember[]>(`/v1/workspaces/${workspaceId}/members`)
@@ -243,8 +246,9 @@ export default function WorkspaceDetailPage() {
                       <div>
                         <h3 className="font-medium text-gray-900">{evt.name}</h3>
                         <p className="text-sm text-gray-500">
-                          {new Date(evt.event_date).toLocaleDateString('en-IN')} &middot; {evt.city}
-                          {evt.venue && ` &middot; ${evt.venue}`}
+                          {new Date(evt.event_date).toLocaleDateString('en-IN')} &middot; {evt.event_city || evt.city || ''}
+                          {evt.venue && ` · ${evt.venue}`}
+                          {evt.event_type && ` · ${evt.event_type}`}
                         </p>
                       </div>
                       <span
@@ -260,7 +264,8 @@ export default function WorkspaceDetailPage() {
                           Budget: ₹{(evt.budget_min_paise / 100).toLocaleString('en-IN')} &ndash; ₹{(evt.budget_max_paise / 100).toLocaleString('en-IN')}
                         </span>
                       )}
-                      <span>{evt.booking_count} booking{evt.booking_count !== 1 ? 's' : ''}</span>
+                      {evt.booking_count != null && <span>{evt.booking_count} booking{evt.booking_count !== 1 ? 's' : ''}</span>}
+                      {evt.client_name && <span>{evt.client_name}</span>}
                     </div>
                   </div>
                 ))
@@ -280,7 +285,7 @@ export default function WorkspaceDetailPage() {
                   <div key={m.id} className="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{m.name}</span>
+                        <span className="font-medium text-gray-900">{m.name || m.role || 'Team Member'}</span>
                         <span className={`text-xs px-2 py-0.5 rounded-full ${ROLE_COLORS[m.role] ?? 'bg-gray-100 text-gray-700'}`}>
                           {m.role}
                         </span>
