@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useVoiceRecognition } from './useVoiceRecognition';
 import { VoiceWaveform } from './VoiceWaveform';
+import { MiniArtistCard } from './MiniArtistCard';
 import { apiClient } from '../../lib/api-client';
 import { useAuthStore } from '../../lib/auth';
 
@@ -19,18 +20,39 @@ interface VoiceResponse {
   data?: Record<string, unknown>;
 }
 
+interface DiscoverArtist {
+  id: string;
+  stage_name: string;
+  genres?: string[];
+  trust_score?: number;
+  base_city?: string;
+  thumbnail_url?: string | null;
+  bio?: string | null;
+  total_bookings?: number;
+  is_verified?: boolean;
+  price_range_min?: number | null;
+  price_range_max?: number | null;
+  min_price?: number | null;
+  min_paise?: number | null;
+  pricing?: Array<{ min_price?: number; max_price?: number; min_paise?: number; max_paise?: number }>;
+}
+
 interface Message {
   role: 'user' | 'assistant';
   text: string;
   suggestions?: string[];
   action?: VoiceResponse['action'];
   data?: Record<string, unknown>;
+  artists?: DiscoverArtist[];
 }
 
 export function VoiceAssistant() {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
   const {
     isListening,
     transcript,
@@ -70,6 +92,10 @@ export function VoiceAssistant() {
         if (res.success && res.data) {
           const data = res.data;
           setSessionId(data.session_id);
+
+          // Extract artists from DISCOVER responses
+          const artists = (data.data?.artists as DiscoverArtist[]) ?? undefined;
+
           setMessages((prev) => [
             ...prev,
             {
@@ -78,6 +104,7 @@ export function VoiceAssistant() {
               suggestions: data.suggestions,
               action: data.action,
               data: data.data,
+              artists,
             },
           ]);
 
@@ -143,13 +170,11 @@ export function VoiceAssistant() {
   }
 
   function handleSuggestionClick(suggestion: string) {
-    // Intercept "Book X" or "Tell me more about X" — navigate to artist profile
     const bookMatch = suggestion.match(/^book\s+(.+)/i);
     const moreMatch = suggestion.match(/^tell me more about\s+(.+)/i);
     const artistName = (bookMatch?.[1] || moreMatch?.[1])?.trim();
 
     if (artistName) {
-      // Try to find the artist ID from the last assistant message's data
       const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant' && m.data);
       const artists = (lastAssistantMsg?.data?.artists as Array<Record<string, unknown>>) ?? [];
       const match = artists.find(a =>
@@ -163,7 +188,6 @@ export function VoiceAssistant() {
       setIsOpen(false);
       return;
     }
-    // Default: send as a new query
     sendQueryCb(suggestion);
   }
 
@@ -172,67 +196,79 @@ export function VoiceAssistant() {
     setIsOpen(false);
   }
 
-  // Don't render if not authenticated
-  if (!user) return null;
+  // Don't render if not authenticated or not mounted (prevents hydration mismatch)
+  if (!mounted || !user) return null;
 
   return (
     <>
-      {/* Floating Mic Button */}
+      {/* ─── FAB: ArtistBook Concierge Button ─── */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-all hover:scale-110 flex items-center justify-center"
-          aria-label="Voice Assistant"
+          className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-modal flex items-center gap-2 rounded-pill bg-gradient-accent text-white shadow-glow-md hover:shadow-glow-lg transition-all duration-300 hover:scale-105 px-4 py-3 md:px-5 md:py-3.5 animate-pulse-glow"
+          aria-label="ArtistBook Concierge"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-            <line x1="12" x2="12" y1="19" y2="22" />
+          {/* Sparkles icon */}
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+            <path d="M5 3v4" />
+            <path d="M19 17v4" />
+            <path d="M3 5h4" />
+            <path d="M17 19h4" />
           </svg>
+          <span className="text-sm font-semibold hidden sm:inline">Concierge</span>
         </button>
       )}
 
-      {/* Voice Overlay */}
+      {/* ─── Chat Panel ─── */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
-          {/* Backdrop */}
+        <>
+          {/* Mobile backdrop */}
           <div
-            className="absolute inset-0 bg-black/40"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal md:hidden"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Bottom Sheet */}
-          <div className="relative w-full max-w-lg bg-white rounded-t-2xl shadow-2xl max-h-[75vh] flex flex-col animate-slide-up">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b">
-              <h3 className="font-semibold text-gray-900">Voice Assistant</h3>
-              <div className="flex items-center gap-2">
-                {!isSupported && (
-                  <span className="text-xs text-amber-600">Mic not supported</span>
-                )}
+          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-modal md:w-[400px] md:h-[560px] md:rounded-2xl flex flex-col overflow-hidden bg-surface-base/[0.97] backdrop-blur-glass-lg border-0 md:border md:border-glass-border md:shadow-glass animate-scale-in">
+            {/* ─── Header ─── */}
+            <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-surface-card/80 backdrop-blur-glass border-b border-glass-border">
+              <div className="flex items-center gap-2.5">
+                {/* Back arrow on mobile */}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1 text-gray-400 hover:text-gray-600"
+                  className="md:hidden p-1 text-text-muted hover:text-text-primary transition-colors"
+                  aria-label="Close"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m15 18-6-6 6-6" />
+                  </svg>
+                </button>
+                {/* Sparkle icon */}
+                <div className="w-8 h-8 rounded-lg bg-gradient-accent flex items-center justify-center shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-heading font-semibold text-text-primary text-sm leading-tight">
+                    ArtistBook Concierge
+                  </h3>
+                  <p className="text-[10px] text-text-muted leading-tight">
+                    Your personal entertainment assistant
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {!isSupported && (
+                  <span className="text-[10px] text-warning px-1.5 py-0.5 rounded bg-warning/10">No mic</span>
+                )}
+                {/* Close (desktop) */}
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="hidden md:flex p-1.5 text-text-muted hover:text-text-primary hover:bg-glass-light rounded-lg transition-colors"
+                  aria-label="Close"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 6 6 18" />
                     <path d="m6 6 12 12" />
                   </svg>
@@ -240,47 +276,87 @@ export function VoiceAssistant() {
               </div>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+            {/* ─── Messages ─── */}
+            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4 scrollbar-hide">
               {messages.length === 0 && (
-                <div className="text-center text-gray-400 py-8">
-                  <p className="text-sm">Tap the mic and speak, or type below.</p>
-                  <p className="text-xs mt-1">
-                    Try: &quot;Show my bookings&quot; or &quot;Find DJ for wedding in
-                    Mumbai&quot;
-                  </p>
+                <div className="text-center py-10 space-y-4">
+                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-accent-subtle flex items-center justify-center">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent-violet">
+                      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-text-secondary">How can I help?</p>
+                    <p className="text-xs text-text-muted mt-1">
+                      Speak or type to find artists, check bookings, get insights
+                    </p>
+                  </div>
+                  {/* Quick action chips */}
+                  <div className="flex flex-wrap justify-center gap-2 pt-2">
+                    {[
+                      'Find a DJ for wedding in Mumbai',
+                      'Show my bookings',
+                      'Show my earnings',
+                    ].map((q) => (
+                      <button
+                        key={q}
+                        onClick={() => sendQueryCb(q)}
+                        className="text-xs bg-glass-light border border-glass-border text-text-secondary rounded-pill px-3 py-1.5 hover:bg-glass-medium hover:border-primary-500/30 hover:text-text-primary transition-all"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
+
               {messages.map((msg, i) => (
-                <div
-                  key={i}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2 ${
-                      msg.role === 'user'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-900'
-                    }`}
-                  >
-                    <p className="text-sm">{msg.text}</p>
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[90%] space-y-2 ${msg.role === 'user' ? '' : ''}`}>
+                    {/* Message bubble */}
+                    <div
+                      className={`rounded-2xl px-4 py-2.5 ${
+                        msg.role === 'user'
+                          ? 'bg-gradient-accent text-white'
+                          : 'bg-glass-medium border border-glass-border text-text-primary'
+                      }`}
+                    >
+                      <p className="text-sm leading-relaxed whitespace-pre-line">{msg.text}</p>
+                    </div>
+
+                    {/* ─── Artist Cards Strip ─── */}
+                    {msg.artists && msg.artists.length > 0 && (
+                      <div className="-mx-4">
+                        <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
+                          {msg.artists.map((artist) => (
+                            <MiniArtistCard key={artist.id} {...artist} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Navigation action card */}
                     {msg.action?.type === 'navigate' && msg.action.route && (
                       <button
                         onClick={() => handleNavigateAction(msg.action!.route!)}
-                        className="mt-2 w-full text-left text-xs bg-white text-blue-600 border border-blue-200 rounded-lg px-3 py-2 hover:bg-blue-50 transition"
+                        className="flex items-center gap-2 w-full text-left text-xs bg-glass-light border border-glass-border text-primary-400 rounded-lg px-3 py-2 hover:bg-glass-medium hover:border-primary-500/30 transition-all"
                       >
-                        Go to page &rarr;
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 12h14" />
+                          <path d="m12 5 7 7-7 7" />
+                        </svg>
+                        Go to page
                       </button>
                     )}
+
                     {/* Suggestion chips */}
                     {msg.suggestions && msg.suggestions.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
+                      <div className="flex flex-wrap gap-1.5">
                         {msg.suggestions.map((s, j) => (
                           <button
                             key={j}
                             onClick={() => handleSuggestionClick(s)}
-                            className="text-xs bg-white text-gray-700 border border-gray-200 rounded-full px-2.5 py-1 hover:bg-gray-50 transition"
+                            className="text-xs bg-glass-light border border-glass-border text-text-secondary rounded-pill px-2.5 py-1 hover:bg-glass-medium hover:border-primary-500/30 hover:text-text-primary transition-all"
                           >
                             {s}
                           </button>
@@ -293,93 +369,77 @@ export function VoiceAssistant() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Waveform + interim transcript */}
+            {/* ─── Status Bar ─── */}
             {state === 'listening' && (
-              <div className="px-4 py-2 text-center border-t bg-blue-50">
+              <div className="shrink-0 px-4 py-2 text-center border-t border-glass-border bg-surface-card/60">
                 <VoiceWaveform isActive={true} />
                 {interimTranscript && (
-                  <p className="text-xs text-gray-500 italic mt-1">{interimTranscript}</p>
+                  <p className="text-xs text-text-muted italic mt-1">{interimTranscript}</p>
                 )}
-                <p className="text-xs text-blue-600 mt-1">Listening...</p>
+                <p className="text-xs text-primary-400 mt-1">Listening...</p>
               </div>
             )}
             {state === 'processing' && (
-              <div className="px-4 py-2 text-center border-t bg-gray-50">
-                <p className="text-xs text-gray-500">Processing...</p>
+              <div className="shrink-0 px-4 py-2 text-center border-t border-glass-border bg-surface-card/60">
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent-violet animate-pulse [animation-delay:0.2s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent-magenta animate-pulse [animation-delay:0.4s]" />
+                </div>
+                <p className="text-xs text-text-muted mt-1">Thinking...</p>
               </div>
             )}
             {state === 'responding' && (
-              <div className="px-4 py-2 text-center border-t bg-green-50">
-                <p className="text-xs text-green-600">Speaking...</p>
+              <div className="shrink-0 px-4 py-2 text-center border-t border-glass-border bg-surface-card/60">
+                <p className="text-xs text-accent-violet animate-pulse">Speaking...</p>
               </div>
             )}
 
-            {/* Input area */}
-            <div className="px-4 py-3 border-t bg-white flex items-center gap-2">
+            {/* ─── Input Area ─── */}
+            <div className="shrink-0 px-3 py-3 border-t border-glass-border bg-surface-card/80 backdrop-blur-glass flex items-center gap-2 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
               {/* Mic button */}
               <button
                 onClick={handleMicClick}
                 disabled={!isSupported || state === 'processing' || state === 'responding'}
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shrink-0 ${
                   state === 'listening'
-                    ? 'bg-red-500 text-white animate-pulse'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    ? 'bg-red-500/90 text-white animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.4)]'
+                    : 'bg-glass-medium border border-glass-border text-text-primary hover:bg-glass-heavy'
+                } disabled:opacity-40 disabled:cursor-not-allowed`}
+                aria-label={state === 'listening' ? 'Stop listening' : 'Start voice input'}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
                   <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                   <line x1="12" x2="12" y1="19" y2="22" />
                 </svg>
               </button>
 
-              {/* Text input fallback */}
-              <form onSubmit={handleTextSubmit} className="flex-1 flex gap-2">
+              {/* Text input */}
+              <form onSubmit={handleTextSubmit} className="flex-1 flex gap-2 items-center">
                 <input
                   type="text"
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
-                  placeholder="Or type here..."
-                  className="flex-1 rounded-full border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Ask anything..."
+                  className="flex-1 bg-surface-elevated border border-glass-border rounded-pill px-4 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
                   disabled={state !== 'idle'}
                 />
                 <button
                   type="submit"
                   disabled={!textInput.trim() || state !== 'idle'}
-                  className="text-blue-600 font-medium text-sm disabled:opacity-50"
+                  className="text-primary-400 hover:text-primary-300 font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
                 >
-                  Send
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m22 2-7 20-4-9-9-4z" />
+                    <path d="m22 2-11 11" />
+                  </svg>
                 </button>
               </form>
             </div>
           </div>
-        </div>
+        </>
       )}
-
-      {/* Slide-up animation */}
-      <style jsx global>{`
-        @keyframes slide-up {
-          from {
-            transform: translateY(100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
-      `}</style>
     </>
   );
 }

@@ -100,15 +100,36 @@ export class VoiceExecutionService {
       results = searchResult.data || [];
     } catch {
       // Fallback: direct DB query if search service fails
-      const query = db('artist_profiles')
-        .where('deleted_at', null)
-        .orderBy('trust_score', 'desc')
+      const query = db('artist_profiles as ap')
+        .leftJoin('users as u', 'u.id', 'ap.user_id')
+        .where('ap.deleted_at', null)
+        .orderBy('ap.trust_score', 'desc')
         .limit(5);
 
-      if (city) query.where('base_city', 'ilike', `%${city}%`);
-      if (genre) query.whereRaw('genres @> ?', [JSON.stringify([genre])]);
+      if (city) query.where('ap.base_city', 'ilike', `%${city}%`);
+      if (genre) query.whereRaw('ap.genres @> ?', [JSON.stringify([genre])]);
 
-      results = await query.select('id', 'stage_name', 'genres', 'trust_score', 'base_city');
+      const rawResults = await query.select(
+        'ap.id', 'ap.stage_name', 'ap.genres', 'ap.trust_score', 'ap.base_city',
+        'ap.bio', 'ap.total_bookings', 'ap.pricing',
+        db.raw('COALESCE(u.is_verified, false) as is_verified'),
+      );
+
+      // Fetch thumbnails for fallback results
+      const ids = rawResults.map((a: any) => a.id);
+      const thumbs = ids.length > 0
+        ? await db('media_items')
+            .whereIn('artist_id', ids)
+            .where({ deleted_at: null })
+            .orderBy('sort_order', 'asc')
+            .select('artist_id', 'thumbnail_url', 'original_url')
+        : [];
+      const thumbMap = new Map(thumbs.map((t: any) => [t.artist_id, t.thumbnail_url ?? t.original_url]));
+
+      results = rawResults.map((a: any) => ({
+        ...a,
+        thumbnail_url: thumbMap.get(a.id) ?? null,
+      }));
     }
 
     if (results.length === 0) {
