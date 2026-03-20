@@ -1,34 +1,29 @@
 'use client';
 
-import { ShieldCheck, Clock, Wallet, Lock } from 'lucide-react';
 import { CountUp } from '@/components/shared/CountUp';
 
 const stats = [
-  { value: 5000, suffix: '+', label: 'Verified Artists', icon: ShieldCheck, color: 'text-primary-400' },
-  { value: '<24hrs', label: 'Average Booking Time', icon: Clock, color: 'text-secondary-400' },
-  { value: 0, prefix: '₹', label: 'Platform Fee for Artists', icon: Wallet, color: 'text-accent-magenta' },
-  { value: 100, suffix: '%', label: 'Secure Payments', icon: Lock, color: 'text-green-400' },
+  { value: 5000, suffix: '+', label: 'Artists', color: 'from-primary-500 to-primary-600' },
+  { value: 10000, suffix: '+', label: 'Events', color: 'from-secondary-500 to-secondary-600' },
+  { value: 50, suffix: '+', label: 'Cities', color: 'from-accent-magenta to-accent-pink' },
+  { value: 4.8, suffix: '/5', label: 'Rating', color: 'from-amber-500 to-orange-500' },
 ];
 
 export function StatsBar() {
   return (
-    <section className="relative py-16 px-6">
+    <section className="py-8 px-6">
       <div className="max-w-section mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {stats.map((stat) => (
-              <div key={stat.label} className="glass-card p-6 text-center group">
-                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-lg bg-glass-light mb-3 ${stat.color}`}>
-                  <stat.icon size={20} />
-                </div>
-                <div className="text-2xl md:text-3xl font-heading font-bold text-text-primary">
-                  {typeof stat.value === 'string' ? (
-                    <CountUp end={stat.value} className="" />
-                  ) : (
-                    <CountUp end={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
-                  )}
-                </div>
-                <p className="text-xs sm:text-sm text-text-muted mt-1">{stat.label}</p>
+        <div className="flex items-center justify-around gap-2 py-6 px-4 rounded-2xl bg-glass-medium border border-glass-border">
+          {stats.map((stat, i) => (
+            <div key={stat.label} className="text-center flex-1">
+              <div className="text-xl md:text-2xl font-heading font-bold text-text-primary">
+                <CountUp end={stat.value} suffix={stat.suffix} />
               </div>
+              <p className="text-[10px] md:text-xs text-text-muted mt-0.5">{stat.label}</p>
+              {i < stats.length - 1 && (
+                <div className="hidden" />
+              )}
+            </div>
           ))}
         </div>
       </div>

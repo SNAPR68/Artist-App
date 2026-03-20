@@ -1,9 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowRight, Music, Sparkles } from 'lucide-react';
-import { AnimatedSection } from '@/components/shared/AnimatedSection';
+import { ArrowRight } from 'lucide-react';
 
 interface CTABannerProps {
   variant: 'artist' | 'company';
@@ -12,19 +10,19 @@ interface CTABannerProps {
 const variants = {
   artist: {
     title: 'Are you an artist?',
-    subtitle: 'Join thousands of artists getting discovered and booked. No listing fees, instant payments, and a dedicated profile to showcase your talent.',
+    subtitle: 'Join 5,000+ artists getting discovered and booked. Zero listing fees.',
     cta: 'Create Your Profile',
     ctaHref: '/artist/onboarding',
-    gradient: 'from-primary-600 via-secondary-600 to-accent-violet',
-    accentColor: 'text-primary-200',
+    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80',
+    gradient: 'from-primary-900/90 via-primary-900/70 to-transparent',
   },
   company: {
-    title: 'Manage multiple events?',
-    subtitle: 'Run your entertainment business with our workspace — pipeline CRM, branded presentations, team management, and commission tracking.',
-    cta: 'Set Up Your Workspace',
+    title: 'Run events at scale?',
+    subtitle: 'Workspace CRM, team management, and commission tracking.',
+    cta: 'Set Up Workspace',
     ctaHref: '/login',
-    gradient: 'from-amber-600 via-orange-600 to-rose-600',
-    accentColor: 'text-amber-200',
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
+    gradient: 'from-surface-bg/95 via-surface-bg/70 to-transparent',
   },
 };
 
@@ -32,49 +30,36 @@ export function CTABanner({ variant }: CTABannerProps) {
   const config = variants[variant];
 
   return (
-    <section className="py-12 px-6">
-      <AnimatedSection>
-        <div className="max-w-5xl mx-auto relative overflow-hidden rounded-2xl">
-          {/* Animated gradient background */}
-          <div
-            className={`absolute inset-0 bg-gradient-to-br ${config.gradient} animate-gradient-shift`}
-            style={{ backgroundSize: '200% 200%' }}
+    <section className="py-6 px-6">
+      <div className="max-w-section mx-auto">
+        <div className="relative overflow-hidden rounded-2xl h-[200px] md:h-[220px]">
+          {/* Background image */}
+          <img
+            src={config.image}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
           />
-
-          {/* Floating decorative elements */}
-          <motion.div
-            className="absolute top-6 right-12 opacity-20"
-            animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
-            transition={{ duration: 5, repeat: Infinity }}
-          >
-            <Music size={60} className="text-white" />
-          </motion.div>
-          <motion.div
-            className="absolute bottom-6 left-12 opacity-15"
-            animate={{ y: [0, 8, 0], rotate: [0, -5, 0] }}
-            transition={{ duration: 6, repeat: Infinity }}
-          >
-            <Sparkles size={48} className="text-white" />
-          </motion.div>
+          {/* Gradient overlay */}
+          <div className={`absolute inset-0 bg-gradient-to-r ${config.gradient}`} />
 
           {/* Content */}
-          <div className="relative z-10 p-10 md:p-16 text-center">
-            <h2 className="text-h2 md:text-display font-heading font-bold text-white mb-4">
+          <div className="relative z-10 h-full flex flex-col justify-center px-8 md:px-12 max-w-md">
+            <h2 className="text-xl md:text-2xl font-heading font-bold text-white mb-2">
               {config.title}
             </h2>
-            <p className={`text-lg max-w-xl mx-auto mb-8 ${config.accentColor}`}>
+            <p className="text-sm text-white/70 mb-5 leading-relaxed">
               {config.subtitle}
             </p>
             <Link
               href={config.ctaHref}
-              className="group inline-flex items-center gap-2 px-8 py-4 bg-white hover:bg-gray-50 text-surface-bg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="group inline-flex items-center gap-2 px-6 py-2.5 bg-white hover:bg-gray-100 text-surface-bg font-semibold text-sm rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] w-fit"
             >
               {config.cta}
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
-      </AnimatedSection>
+      </div>
     </section>
   );
 }

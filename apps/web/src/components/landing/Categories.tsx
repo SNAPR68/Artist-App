@@ -1,66 +1,131 @@
 'use client';
 
 import Link from 'next/link';
-import {
-  Mic2, Disc3, Guitar, Laugh, Footprints, Camera,
-  Palette, Megaphone, Sparkles, Piano,
-} from 'lucide-react';
 import { useDragScroll } from '@/hooks/useDragScroll';
 
-const CATEGORIES = [
-  { name: 'Singers & Vocalists', icon: Mic2, count: '500+', gradient: 'from-primary-500/20 to-primary-600/5' },
-  { name: 'DJs & Electronic', icon: Disc3, count: '400+', gradient: 'from-secondary-500/20 to-secondary-600/5' },
-  { name: 'Live Bands', icon: Guitar, count: '350+', gradient: 'from-accent-magenta/20 to-accent-pink/5' },
-  { name: 'Comedians', icon: Laugh, count: '300+', gradient: 'from-amber-500/20 to-orange-600/5' },
-  { name: 'Dancers', icon: Footprints, count: '250+', gradient: 'from-green-500/20 to-emerald-600/5' },
-  { name: 'Photographers', icon: Camera, count: '250+', gradient: 'from-cyan-500/20 to-sky-600/5' },
-  { name: 'Mehendi Artists', icon: Palette, count: '200+', gradient: 'from-rose-500/20 to-pink-600/5' },
-  { name: 'Anchors/Emcees', icon: Megaphone, count: '200+', gradient: 'from-violet-500/20 to-purple-600/5' },
-  { name: 'Magicians', icon: Sparkles, count: '150+', gradient: 'from-indigo-500/20 to-blue-600/5' },
-  { name: 'Instrumentalists', icon: Piano, count: '150+', gradient: 'from-teal-500/20 to-cyan-600/5' },
+const GENRES = [
+  { name: 'All', genre: '', emoji: '🎵', active: true },
+  { name: 'Bollywood', genre: 'Bollywood', emoji: '🎤' },
+  { name: 'EDM', genre: 'EDM', emoji: '🎧' },
+  { name: 'Live Band', genre: 'Live Band', emoji: '🎸' },
+  { name: 'Classical', genre: 'Classical', emoji: '🎻' },
+  { name: 'Hip-Hop', genre: 'Hip-Hop', emoji: '🎤' },
+  { name: 'Rock', genre: 'Rock', emoji: '🤘' },
+  { name: 'Sufi', genre: 'Sufi', emoji: '💫' },
+  { name: 'Jazz', genre: 'Jazz', emoji: '🎷' },
+  { name: 'Comedy', genre: 'Comedy', emoji: '😂' },
+  { name: 'Folk', genre: 'Folk', emoji: '💃' },
+  { name: 'Wedding', genre: 'Wedding', emoji: '💍' },
+  { name: 'Acoustic', genre: 'Acoustic', emoji: '🎵' },
+  { name: 'Fusion', genre: 'Fusion', emoji: '🔥' },
+];
+
+const EVENT_TYPES = [
+  {
+    name: 'Weddings',
+    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80',
+    count: '2,500+',
+    href: '/search?event_type=wedding',
+  },
+  {
+    name: 'Corporate',
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80',
+    count: '1,800+',
+    href: '/search?event_type=corporate',
+  },
+  {
+    name: 'House Parties',
+    image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=400&q=80',
+    count: '3,200+',
+    href: '/search?event_type=house_party',
+  },
+  {
+    name: 'Concerts',
+    image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400&q=80',
+    count: '900+',
+    href: '/search?event_type=concert',
+  },
+  {
+    name: 'College Fests',
+    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&q=80',
+    count: '1,100+',
+    href: '/search?event_type=college',
+  },
 ];
 
 export function Categories() {
-  const scrollRef = useDragScroll<HTMLDivElement>();
+  const genreScrollRef = useDragScroll<HTMLDivElement>();
+  const eventScrollRef = useDragScroll<HTMLDivElement>();
 
   return (
-    <section className="py-20 px-6">
-      <div className="max-w-section mx-auto">
-        <div>
-          <h2 className="text-h2 font-heading font-bold text-text-primary text-center mb-3">
-            Browse by <span className="text-gradient">Category</span>
+    <section className="py-12 md:py-16">
+      {/* ─── Genre Chips ─── */}
+      <div className="max-w-section mx-auto px-6 mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg md:text-xl font-heading font-bold text-text-primary">
+            Genres
           </h2>
-          <p className="text-text-muted text-center mb-12">
-            Find the right entertainment for any occasion
-          </p>
+          <Link href="/search" className="text-xs font-semibold text-primary-400 hover:text-primary-300 transition-colors">
+            See All
+          </Link>
         </div>
 
-        {/* Mobile: horizontal scroll, Desktop: grid */}
-        <div>
-          <div
-            ref={scrollRef}
-            className="flex gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-3 lg:grid-cols-5 md:overflow-x-visible drag-scroll md:cursor-default"
-          >
-            {CATEGORIES.map((cat) => (
-              <Link
-                key={cat.name}
-                href={`/search?genre=${encodeURIComponent(cat.name)}`}
-                className="group flex-shrink-0 w-[160px] md:w-auto"
-              >
-                <div
-                  className={`flex flex-col items-center p-6 rounded-xl bg-gradient-to-br ${cat.gradient} border border-glass-border hover:border-primary-500/30 hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] transition-all`}
-                >
-                  <div className="w-12 h-12 rounded-xl bg-glass-medium flex items-center justify-center mb-3 group-hover:shadow-glow-sm transition-shadow">
-                    <cat.icon size={24} className="text-text-secondary group-hover:text-text-primary transition-colors" />
-                  </div>
-                  <span className="font-semibold text-text-primary text-sm text-center">
-                    {cat.name}
-                  </span>
-                  <span className="text-xs text-text-muted mt-1">{cat.count}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
+        <div
+          ref={genreScrollRef}
+          className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide drag-scroll"
+        >
+          {GENRES.map((g) => (
+            <Link
+              key={g.name}
+              href={g.genre ? `/search?genre=${encodeURIComponent(g.genre)}` : '/search'}
+              className={`flex items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-pill text-sm font-medium transition-all shrink-0 ${
+                g.active
+                  ? 'bg-gradient-accent text-white shadow-glow-sm'
+                  : 'bg-glass-medium border border-glass-border text-text-secondary hover:bg-glass-heavy hover:text-text-primary hover:border-primary-500/30'
+              }`}
+            >
+              <span className="text-base">{g.emoji}</span>
+              {g.name}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── Event Type Cards ─── */}
+      <div className="max-w-section mx-auto px-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg md:text-xl font-heading font-bold text-text-primary">
+            Browse by Event
+          </h2>
+          <Link href="/search" className="text-xs font-semibold text-primary-400 hover:text-primary-300 transition-colors">
+            See All
+          </Link>
+        </div>
+
+        <div
+          ref={eventScrollRef}
+          className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide drag-scroll"
+        >
+          {EVENT_TYPES.map((event) => (
+            <Link
+              key={event.name}
+              href={event.href}
+              className="group relative w-[160px] md:w-[200px] aspect-[3/4] rounded-2xl overflow-hidden shrink-0"
+            >
+              <img
+                src={event.image}
+                alt={event.name}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              {/* Content */}
+              <div className="absolute inset-x-0 bottom-0 p-4">
+                <h3 className="text-white font-semibold text-sm">{event.name}</h3>
+                <p className="text-white/60 text-xs mt-0.5">{event.count} bookings</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

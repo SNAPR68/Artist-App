@@ -1,111 +1,130 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Search, ArrowRight, Mic } from 'lucide-react';
-import { GradientMeshBg } from '@/components/shared/GradientMeshBg';
-import { FloatingBlob } from '@/components/shared/FloatingBlob';
+import { Search, ArrowRight, Play } from 'lucide-react';
 
-const container = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.3 },
-  },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.4, 0.25, 1] } },
-};
+// Curated artist images for the hero collage (Unsplash — free to use)
+const HERO_IMAGES = [
+  { src: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=80', alt: 'Singer performing on stage' },
+  { src: 'https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=600&q=80', alt: 'DJ mixing at a club' },
+  { src: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&q=80', alt: 'Live concert crowd' },
+  { src: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&q=80', alt: 'Music festival lights' },
+  { src: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&q=80', alt: 'DJ performing with lights' },
+  { src: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=600&q=80', alt: 'Band performing live' },
+];
 
 export function Hero() {
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      <GradientMeshBg />
+    <section className="relative min-h-[100vh] md:min-h-[90vh] flex items-end md:items-center overflow-hidden">
+      {/* ─── Background Image Collage ─── */}
+      <div className="absolute inset-0">
+        {/* Primary hero image */}
+        <img
+          src={HERO_IMAGES[0].src}
+          alt={HERO_IMAGES[0].alt}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Dark overlay with gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-surface-bg via-surface-bg/80 to-surface-bg/30" />
+        {/* Neon color overlay for vibe */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/20 via-transparent to-accent-magenta/20" />
+        {/* Bottom heavy gradient for text readability */}
+        <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-surface-bg via-surface-bg/95 to-transparent" />
+      </div>
 
-      {/* Floating blobs */}
-      <FloatingBlob color="rgba(59,130,246,0.12)" size={400} top="-5%" left="5%" delay={0} />
-      <FloatingBlob color="rgba(139,92,246,0.1)" size={350} top="30%" right="-5%" delay={2} />
-      <FloatingBlob color="rgba(236,72,153,0.08)" size={300} bottom="5%" left="25%" delay={4} />
+      {/* ─── Floating Thumbnails (Desktop) ─── */}
+      <div className="hidden lg:block absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Top-right cluster */}
+        <div className="absolute top-24 right-[8%] w-48 h-64 rounded-2xl overflow-hidden rotate-6 opacity-60 shadow-2xl animate-float-slow">
+          <img src={HERO_IMAGES[1].src} alt={HERO_IMAGES[1].alt} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
+        </div>
+        <div className="absolute top-40 right-[22%] w-36 h-48 rounded-2xl overflow-hidden -rotate-3 opacity-50 shadow-2xl animate-float-slow-reverse">
+          <img src={HERO_IMAGES[2].src} alt={HERO_IMAGES[2].alt} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
+        </div>
+        {/* Left accent */}
+        <div className="absolute top-32 left-[5%] w-40 h-56 rounded-2xl overflow-hidden -rotate-6 opacity-40 shadow-2xl animate-float-slow" style={{ animationDelay: '2s' }}>
+          <img src={HERO_IMAGES[3].src} alt={HERO_IMAGES[3].alt} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
+        </div>
+      </div>
 
-      <motion.div
-        className="relative z-10 max-w-4xl mx-auto px-6 text-center"
-        variants={container}
-        initial="hidden"
-        animate="show"
-      >
-        {/* Badge */}
-        <motion.div variants={item}>
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-pill bg-glass-medium border border-glass-border text-xs font-semibold text-text-secondary shimmer-overlay">
-            India&apos;s #1 Artist Booking Platform
-          </span>
-        </motion.div>
-
-        {/* Heading */}
-        <motion.h1
-          className="mt-8 text-4xl sm:text-5xl md:text-hero font-heading font-extrabold text-text-primary leading-[1.05] tracking-tighter"
-          variants={item}
-        >
-          Book the perfect artist
-          <br />
-          <span className="text-gradient">for your event</span>
-        </motion.h1>
-
-        {/* Subtext */}
-        <motion.p
-          className="mt-6 text-base sm:text-lg text-text-muted max-w-2xl mx-auto leading-relaxed"
-          variants={item}
-        >
-          Weddings, corporate events, house parties, concerts — find and book verified artists
-          in under 24 hours. Secure payments, transparent pricing, zero hassle.
-        </motion.p>
-
-        {/* Voice indicator */}
-        <motion.div className="flex items-center justify-center gap-2 mt-6" variants={item}>
-          <div className="w-8 h-8 bg-primary-500/20 rounded-full flex items-center justify-center">
-            <Mic size={14} className="text-primary-400" />
+      {/* ─── Content ─── */}
+      <div className="relative z-10 w-full max-w-section mx-auto px-6 pb-12 md:pb-20 pt-32 md:pt-0">
+        <div className="max-w-2xl">
+          {/* Badge */}
+          <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-pill bg-white/10 backdrop-blur-sm border border-white/20 text-xs font-semibold text-white/90">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+              </span>
+              India&apos;s #1 Artist Booking Platform
+            </span>
           </div>
-          <span className="text-sm text-text-muted">Voice-enabled — just say what you need</span>
-        </motion.div>
 
-        {/* CTAs */}
-        <motion.div className="flex flex-col sm:flex-row gap-4 justify-center mt-10" variants={item}>
-          <Link
-            href="/search"
-            className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-accent hover:bg-gradient-accent-hover text-white font-semibold rounded-xl transition-all hover-glow hover:scale-[1.02] active:scale-[0.98]"
+          {/* Heading */}
+          <h1
+            className="mt-6 text-4xl sm:text-5xl md:text-6xl lg:text-hero font-heading font-extrabold text-white leading-[1.05] tracking-tighter animate-fade-in-up"
+            style={{ animationDelay: '0.25s' }}
           >
-            <Search size={18} />
-            Find Artists
-          </Link>
-          <Link
-            href="/artist/onboarding"
-            className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent border border-glass-border hover:border-primary-500/40 text-text-primary font-semibold rounded-xl transition-all hover:bg-glass-light"
-          >
-            Join as Artist
-            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </motion.div>
+            Book the perfect
+            <br />
+            <span className="text-gradient">artist for your event</span>
+          </h1>
 
-        {/* Avatar Stack */}
-        <motion.div className="flex items-center justify-center gap-3 mt-10" variants={item}>
-          <div className="flex -space-x-2">
-            {[
-              'bg-primary-500', 'bg-secondary-500', 'bg-accent-magenta',
-              'bg-accent-indigo', 'bg-primary-600',
-            ].map((bg, i) => (
-              <div
-                key={i}
-                className={`w-8 h-8 rounded-full ${bg} border-2 border-surface-bg flex items-center justify-center text-[10px] text-white font-bold`}
-              >
-                {String.fromCharCode(65 + i)}
-              </div>
-            ))}
+          {/* Subtext */}
+          <p
+            className="mt-5 text-base sm:text-lg text-white/70 max-w-lg leading-relaxed animate-fade-in-up"
+            style={{ animationDelay: '0.4s' }}
+          >
+            DJs, singers, bands, comedians — find and book verified artists for any occasion. Instant quotes, secure payments.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3 mt-8 animate-fade-in-up" style={{ animationDelay: '0.55s' }}>
+            <Link
+              href="/search"
+              className="group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-gradient-accent hover:bg-gradient-accent-hover text-white font-semibold rounded-xl transition-all hover-glow hover:scale-[1.02] active:scale-[0.98] text-sm"
+            >
+              <Search size={17} />
+              Find Artists
+            </Link>
+            <Link
+              href="/artist/onboarding"
+              className="group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/30 text-white font-semibold rounded-xl transition-all text-sm"
+            >
+              <Play size={17} />
+              Join as Artist
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
-          <span className="text-sm text-text-muted">
-            <span className="text-text-secondary font-semibold">5,000+</span> verified artists
-          </span>
-        </motion.div>
-      </motion.div>
+
+          {/* Social proof row */}
+          <div className="flex items-center gap-4 mt-8 animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
+            {/* Avatar stack */}
+            <div className="flex -space-x-2.5">
+              {HERO_IMAGES.slice(0, 4).map((img, i) => (
+                <div key={i} className="w-9 h-9 rounded-full border-2 border-surface-bg overflow-hidden">
+                  <img src={img.src} alt="" className="w-full h-full object-cover" />
+                </div>
+              ))}
+            </div>
+            <div className="text-sm">
+              <span className="text-white font-semibold">5,000+</span>
+              <span className="text-white/50 ml-1">verified artists</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Scroll indicator ─── */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 animate-float hidden md:block">
+        <div className="w-6 h-10 rounded-pill border-2 border-white/20 flex items-start justify-center p-1.5">
+          <div className="w-1 h-2.5 rounded-full bg-white/50 animate-pulse" />
+        </div>
+      </div>
     </section>
   );
 }

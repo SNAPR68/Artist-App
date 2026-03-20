@@ -47,10 +47,10 @@ export default function HomePage() {
       <Hero />
       <StatsBar />
       <Categories />
-      <HowItWorks />
       <FeaturedArtists />
-      <Testimonials />
       <CTABanner variant="artist" />
+      <HowItWorks />
+      <Testimonials />
       <CTABanner variant="company" />
       <TrustSignals />
       <Footer />
