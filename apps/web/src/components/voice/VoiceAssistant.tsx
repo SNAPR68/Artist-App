@@ -400,13 +400,31 @@ export function VoiceAssistant() {
               </span>
             </div>
 
-            {/* Widget body — greeting + quick chips + input */}
+            {/* Widget body — voice CTA + quick chips + input */}
             <div className="px-4 py-3 space-y-3">
-              <p className="text-xs text-text-secondary">
-                {user
-                  ? 'Ask me anything — find artists, check bookings, get insights.'
-                  : 'Find the perfect artist for your event. Ask me anything!'}
-              </p>
+              {/* Voice-first CTA */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => { setIsOpen(true); setTimeout(() => handleMicClick(), 150); }}
+                  disabled={!isSupported}
+                  className="w-12 h-12 rounded-full bg-gradient-accent flex items-center justify-center text-white shrink-0 shadow-glow-md hover:shadow-glow-lg hover:scale-105 transition-all animate-pulse-glow disabled:opacity-40 disabled:animate-none"
+                  aria-label="Tap to speak"
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" x2="12" y1="19" y2="22" />
+                  </svg>
+                </button>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-text-primary">Tap to speak</p>
+                  <p className="text-[11px] text-text-muted">
+                    {user
+                      ? 'Ask about bookings, earnings, or find artists'
+                      : 'Find the perfect artist for your event'}
+                  </p>
+                </div>
+              </div>
 
               {/* Quick action chips */}
               <div className="flex flex-wrap gap-1.5">
@@ -421,7 +439,7 @@ export function VoiceAssistant() {
                 ))}
               </div>
 
-              {/* Input bar */}
+              {/* Text input bar */}
               <form
                 onSubmit={(e) => { e.preventDefault(); if (textInput.trim()) { setIsOpen(true); setTimeout(() => { sendQueryCb(textInput.trim()); setTextInput(''); }, 100); } }}
                 className="flex gap-2 items-center"
@@ -431,12 +449,12 @@ export function VoiceAssistant() {
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
                   onFocus={() => setIsOpen(true)}
-                  placeholder="Ask about artists, pricing, events..."
+                  placeholder="Or type your question..."
                   className="flex-1 bg-surface-elevated border border-glass-border rounded-pill px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
                 />
                 <button
                   type="submit"
-                  className="w-8 h-8 rounded-full bg-gradient-accent flex items-center justify-center text-white shrink-0 hover:opacity-90 transition-opacity"
+                  className="w-8 h-8 rounded-full bg-glass-medium border border-glass-border flex items-center justify-center text-text-primary shrink-0 hover:bg-glass-heavy transition-all"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m22 2-7 20-4-9-9-4z" />
