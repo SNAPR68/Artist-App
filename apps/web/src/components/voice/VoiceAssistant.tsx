@@ -24,6 +24,7 @@ interface Message {
   text: string;
   suggestions?: string[];
   action?: VoiceResponse['action'];
+  data?: Record<string, unknown>;
 }
 
 export function VoiceAssistant() {
@@ -76,6 +77,7 @@ export function VoiceAssistant() {
               text: data.response_text,
               suggestions: data.suggestions,
               action: data.action,
+              data: data.data,
             },
           ]);
 
@@ -141,6 +143,27 @@ export function VoiceAssistant() {
   }
 
   function handleSuggestionClick(suggestion: string) {
+    // Intercept "Book X" or "Tell me more about X" — navigate to artist profile
+    const bookMatch = suggestion.match(/^book\s+(.+)/i);
+    const moreMatch = suggestion.match(/^tell me more about\s+(.+)/i);
+    const artistName = (bookMatch?.[1] || moreMatch?.[1])?.trim();
+
+    if (artistName) {
+      // Try to find the artist ID from the last assistant message's data
+      const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant' && m.data);
+      const artists = (lastAssistantMsg?.data?.artists as Array<Record<string, unknown>>) ?? [];
+      const match = artists.find(a =>
+        (a.stage_name as string)?.toLowerCase() === artistName.toLowerCase()
+      );
+      if (match?.id) {
+        router.push(`/artists/${match.id}`);
+      } else {
+        router.push(`/search?q=${encodeURIComponent(artistName)}`);
+      }
+      setIsOpen(false);
+      return;
+    }
+    // Default: send as a new query
     sendQueryCb(suggestion);
   }
 
