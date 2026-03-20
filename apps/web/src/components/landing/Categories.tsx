@@ -1,12 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import {
   Mic2, Disc3, Guitar, Laugh, Footprints, Camera,
   Palette, Megaphone, Sparkles, Piano,
 } from 'lucide-react';
-import { AnimatedSection } from '@/components/shared/AnimatedSection';
 import { useDragScroll } from '@/hooks/useDragScroll';
 
 const CATEGORIES = [
@@ -28,30 +26,29 @@ export function Categories() {
   return (
     <section className="py-20 px-6">
       <div className="max-w-section mx-auto">
-        <AnimatedSection>
+        <div>
           <h2 className="text-h2 font-heading font-bold text-text-primary text-center mb-3">
             Browse by <span className="text-gradient">Category</span>
           </h2>
           <p className="text-text-muted text-center mb-12">
             Find the right entertainment for any occasion
           </p>
-        </AnimatedSection>
+        </div>
 
         {/* Mobile: horizontal scroll, Desktop: grid */}
-        <div
-          ref={scrollRef}
-          className="flex gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-3 lg:grid-cols-5 md:overflow-x-visible drag-scroll md:cursor-default"
-        >
-          {CATEGORIES.map((cat, i) => (
-            <AnimatedSection key={cat.name} delay={i * 0.05}>
+        <div>
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-3 lg:grid-cols-5 md:overflow-x-visible drag-scroll md:cursor-default"
+          >
+            {CATEGORIES.map((cat) => (
               <Link
+                key={cat.name}
                 href={`/search?genre=${encodeURIComponent(cat.name)}`}
                 className="group flex-shrink-0 w-[160px] md:w-auto"
               >
-                <motion.div
-                  className={`flex flex-col items-center p-6 rounded-xl bg-gradient-to-br ${cat.gradient} border border-glass-border hover:border-primary-500/30 transition-all`}
-                  whileHover={{ y: -4, scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <div
+                  className={`flex flex-col items-center p-6 rounded-xl bg-gradient-to-br ${cat.gradient} border border-glass-border hover:border-primary-500/30 hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] transition-all`}
                 >
                   <div className="w-12 h-12 rounded-xl bg-glass-medium flex items-center justify-center mb-3 group-hover:shadow-glow-sm transition-shadow">
                     <cat.icon size={24} className="text-text-secondary group-hover:text-text-primary transition-colors" />
@@ -60,10 +57,10 @@ export function Categories() {
                     {cat.name}
                   </span>
                   <span className="text-xs text-text-muted mt-1">{cat.count}</span>
-                </motion.div>
+                </div>
               </Link>
-            </AnimatedSection>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

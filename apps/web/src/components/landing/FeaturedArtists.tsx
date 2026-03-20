@@ -1,9 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Star, MapPin, BadgeCheck, Heart, ArrowRight } from 'lucide-react';
-import { AnimatedSection } from '@/components/shared/AnimatedSection';
 
 // Static featured artists data (avoids API dependency for landing page)
 const FEATURED_ARTISTS = [
@@ -79,22 +77,21 @@ export function FeaturedArtists() {
   return (
     <section className="py-20 px-6">
       <div className="max-w-section mx-auto">
-        <AnimatedSection>
+        <div>
           <h2 className="text-h2 font-heading font-bold text-text-primary text-center mb-3">
             Top Artists <span className="text-gradient">This Month</span>
           </h2>
           <p className="text-text-muted text-center mb-12">
             Handpicked talent trusted by thousands of event planners
           </p>
-        </AnimatedSection>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {FEATURED_ARTISTS.map((artist, i) => (
-            <AnimatedSection key={artist.id} delay={i * 0.08}>
-              <motion.div
-                className="group glass-card overflow-hidden"
-                whileHover={{ y: -4 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {FEATURED_ARTISTS.map((artist) => (
+              <div
+                key={artist.id}
+                className="group glass-card overflow-hidden hover:-translate-y-1 transition-transform"
               >
                 {/* Image Placeholder */}
                 <div className={`relative aspect-[4/3] bg-gradient-to-br ${artist.gradient} overflow-hidden`}>
@@ -115,18 +112,14 @@ export function FeaturedArtists() {
                   </button>
 
                   {/* Book Now - appears on hover */}
-                  <motion.div
-                    className="absolute inset-x-3 bottom-3"
-                    initial={{ opacity: 0, y: 10 }}
-                    whileHover={{ opacity: 1, y: 0 }}
-                  >
+                  <div className="absolute inset-x-3 bottom-3">
                     <Link
                       href={`/artists/${artist.id}`}
-                      className="block w-full text-center py-2.5 bg-gradient-accent text-white text-sm font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="block w-full text-center py-2.5 bg-gradient-accent text-white text-sm font-semibold rounded-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all"
                     >
                       Book Now
                     </Link>
-                  </motion.div>
+                  </div>
                 </div>
 
                 {/* Content */}
@@ -152,12 +145,12 @@ export function FeaturedArtists() {
                     </span>
                   </div>
                 </Link>
-              </motion.div>
-            </AnimatedSection>
+              </div>
           ))}
+          </div>
         </div>
 
-        <AnimatedSection delay={0.4}>
+        <div>
           <div className="text-center mt-10">
             <Link
               href="/search"
@@ -167,7 +160,7 @@ export function FeaturedArtists() {
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-        </AnimatedSection>
+        </div>
       </div>
     </section>
   );

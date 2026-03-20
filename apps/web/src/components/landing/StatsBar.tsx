@@ -1,7 +1,6 @@
 'use client';
 
 import { ShieldCheck, Clock, Wallet, Lock } from 'lucide-react';
-import { AnimatedSection } from '@/components/shared/AnimatedSection';
 import { CountUp } from '@/components/shared/CountUp';
 
 const stats = [
@@ -16,9 +15,8 @@ export function StatsBar() {
     <section className="relative py-16 px-6">
       <div className="max-w-section mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {stats.map((stat, i) => (
-            <AnimatedSection key={stat.label} delay={i * 0.1}>
-              <div className="glass-card p-6 text-center group">
+          {stats.map((stat) => (
+              <div key={stat.label} className="glass-card p-6 text-center group">
                 <div className={`inline-flex items-center justify-center w-10 h-10 rounded-lg bg-glass-light mb-3 ${stat.color}`}>
                   <stat.icon size={20} />
                 </div>
@@ -31,7 +29,6 @@ export function StatsBar() {
                 </div>
                 <p className="text-xs sm:text-sm text-text-muted mt-1">{stat.label}</p>
               </div>
-            </AnimatedSection>
           ))}
         </div>
       </div>

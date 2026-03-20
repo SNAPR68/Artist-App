@@ -48,6 +48,31 @@ interface WorkspaceMember {
   joined_at: string;
 }
 
+interface CreateEventForm {
+  name: string;
+  event_date: string;
+  event_city: string;
+  event_type: string;
+  venue: string;
+  guest_count: string;
+  budget_min: string;
+  budget_max: string;
+  notes: string;
+  client_name: string;
+  client_phone: string;
+}
+
+const EMPTY_EVENT_FORM: CreateEventForm = {
+  name: '', event_date: '', event_city: '', event_type: 'wedding',
+  venue: '', guest_count: '', budget_min: '', budget_max: '',
+  notes: '', client_name: '', client_phone: '',
+};
+
+const EVENT_TYPES = [
+  'wedding', 'corporate', 'concert', 'house_party', 'college_fest',
+  'birthday', 'reception', 'sangeet', 'mehendi', 'engagement', 'other',
+];
+
 type TabKey = 'pipeline' | 'events' | 'team';
 
 const PIPELINE_COLUMNS: { key: string; label: string; color: string }[] = [
@@ -83,6 +108,10 @@ export default function WorkspaceDetailPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('pipeline');
   const [loading, setLoading] = useState(true);
   const [tabLoading, setTabLoading] = useState(false);
+  const [showCreateEvent, setShowCreateEvent] = useState(false);
+  const [eventForm, setEventForm] = useState<CreateEventForm>(EMPTY_EVENT_FORM);
+  const [creatingEvent, setCreatingEvent] = useState(false);
+  const [createError, setCreateError] = useState('');
 
   useEffect(() => {
     apiClient<WorkspaceDetail>(`/v1/workspaces/${workspaceId}`)
@@ -126,6 +155,45 @@ export default function WorkspaceDetailPage() {
     { key: 'events', label: 'Events' },
     { key: 'team', label: 'Team' },
   ];
+
+  const handleCreateEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreatingEvent(true);
+    setCreateError('');
+    try {
+      const body: Record<string, unknown> = {
+        name: eventForm.name,
+        event_date: eventForm.event_date,
+        event_city: eventForm.event_city,
+        event_type: eventForm.event_type,
+      };
+      if (eventForm.venue) body.venue = eventForm.venue;
+      if (eventForm.guest_count) body.guest_count = parseInt(eventForm.guest_count, 10);
+      if (eventForm.budget_min) body.budget_min_paise = Math.round(parseFloat(eventForm.budget_min) * 100);
+      if (eventForm.budget_max) body.budget_max_paise = Math.round(parseFloat(eventForm.budget_max) * 100);
+      if (eventForm.notes) body.notes = eventForm.notes;
+      if (eventForm.client_name) body.client_name = eventForm.client_name;
+      if (eventForm.client_phone) body.client_phone = eventForm.client_phone;
+
+      const res = await apiClient(`/v1/workspaces/${workspaceId}/events`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+      });
+      if (res.success) {
+        setShowCreateEvent(false);
+        setEventForm(EMPTY_EVENT_FORM);
+        // Reload events
+        const eventsRes = await apiClient<{ events: WorkspaceEvent[] }>(`/v1/workspaces/${workspaceId}/events`);
+        if (eventsRes.success) setEvents(Array.isArray(eventsRes.data) ? eventsRes.data : eventsRes.data?.events ?? []);
+      } else {
+        setCreateError((res as { errors?: { message?: string }[] }).errors?.[0]?.message || 'Failed to create event');
+      }
+    } catch {
+      setCreateError('Something went wrong. Please try again.');
+    } finally {
+      setCreatingEvent(false);
+    }
+  };
 
   const groupedPipeline: Record<string, PipelineBooking[]> = {};
   PIPELINE_COLUMNS.forEach((col) => { groupedPipeline[col.key] = []; });
@@ -235,9 +303,164 @@ export default function WorkspaceDetailPage() {
           {/* Events Tab */}
           {activeTab === 'events' && (
             <div className="space-y-3">
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowCreateEvent(true)}
+                  className="bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+                >
+                  + Add Event
+                </button>
+              </div>
+
+              {/* Create Event Modal */}
+              {showCreateEvent && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                  <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+                      <h2 className="text-lg font-semibold text-gray-900">Create New Event</h2>
+                      <button onClick={() => setShowCreateEvent(false)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+                    </div>
+                    <form onSubmit={handleCreateEvent} className="p-5 space-y-4">
+                      {createError && (
+                        <div className="bg-red-50 text-red-700 text-sm p-3 rounded-lg">{createError}</div>
+                      )}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Event Name *</label>
+                        <input
+                          required
+                          value={eventForm.name}
+                          onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                          placeholder="e.g., Sharma Wedding Reception"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Event Date *</label>
+                          <input
+                            required
+                            type="date"
+                            value={eventForm.event_date}
+                            onChange={(e) => setEventForm({ ...eventForm, event_date: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Event Type *</label>
+                          <select
+                            required
+                            value={eventForm.event_type}
+                            onChange={(e) => setEventForm({ ...eventForm, event_type: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none capitalize"
+                          >
+                            {EVENT_TYPES.map((t) => (
+                              <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                          <input
+                            required
+                            value={eventForm.event_city}
+                            onChange={(e) => setEventForm({ ...eventForm, event_city: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            placeholder="Mumbai"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Venue</label>
+                          <input
+                            value={eventForm.venue}
+                            onChange={(e) => setEventForm({ ...eventForm, venue: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            placeholder="Taj Palace"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Guest Count</label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={eventForm.guest_count}
+                            onChange={(e) => setEventForm({ ...eventForm, guest_count: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            placeholder="200"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Client Name</label>
+                          <input
+                            value={eventForm.client_name}
+                            onChange={(e) => setEventForm({ ...eventForm, client_name: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            placeholder="Mr. Sharma"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Budget Min (₹)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={eventForm.budget_min}
+                            onChange={(e) => setEventForm({ ...eventForm, budget_min: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            placeholder="50000"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Budget Max (₹)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={eventForm.budget_max}
+                            onChange={(e) => setEventForm({ ...eventForm, budget_max: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            placeholder="200000"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <textarea
+                          rows={2}
+                          value={eventForm.notes}
+                          onChange={(e) => setEventForm({ ...eventForm, notes: e.target.value })}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none resize-none"
+                          placeholder="Any special requirements..."
+                        />
+                      </div>
+                      <div className="flex justify-end gap-3 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowCreateEvent(false)}
+                          className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={creatingEvent}
+                          className="px-4 py-2 text-sm text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
+                        >
+                          {creatingEvent ? 'Creating...' : 'Create Event'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
               {events.length === 0 ? (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
                   <p className="text-gray-500">No events in this workspace yet.</p>
+                  <p className="text-sm text-gray-400 mt-1">Click &quot;Add Event&quot; to create your first event.</p>
                 </div>
               ) : (
                 events.map((evt) => (
