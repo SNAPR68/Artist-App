@@ -14,7 +14,7 @@ export class ShortlistService {
     if (!shortlist) {
       throw new ShortlistError('NOT_FOUND', 'Shortlist not found', 404);
     }
-    if (shortlist.user_id !== userId) {
+    if (shortlist.client_id !== userId) {
       throw new ShortlistError('FORBIDDEN', 'Not your shortlist', 403);
     }
 
@@ -27,7 +27,7 @@ export class ShortlistService {
     if (!shortlist) {
       throw new ShortlistError('NOT_FOUND', 'Shortlist not found', 404);
     }
-    if (shortlist.user_id !== userId) {
+    if (shortlist.client_id !== userId) {
       throw new ShortlistError('FORBIDDEN', 'Not your shortlist', 403);
     }
 
@@ -39,7 +39,7 @@ export class ShortlistService {
     if (!shortlist) {
       throw new ShortlistError('NOT_FOUND', 'Shortlist not found', 404);
     }
-    if (shortlist.user_id !== userId) {
+    if (shortlist.client_id !== userId) {
       throw new ShortlistError('FORBIDDEN', 'Not your shortlist', 403);
     }
 
@@ -51,7 +51,7 @@ export class ShortlistService {
     if (!shortlist) {
       throw new ShortlistError('NOT_FOUND', 'Shortlist not found', 404);
     }
-    if (shortlist.user_id !== userId) {
+    if (shortlist.client_id !== userId) {
       throw new ShortlistError('FORBIDDEN', 'Not your shortlist', 403);
     }
 

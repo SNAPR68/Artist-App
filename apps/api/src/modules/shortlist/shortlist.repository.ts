@@ -4,7 +4,7 @@ export class ShortlistRepository {
   async create(userId: string, name: string) {
     const [shortlist] = await db('shortlists')
       .insert({
-        user_id: userId,
+        client_id: userId,
         name,
       })
       .returning('*');
@@ -13,13 +13,13 @@ export class ShortlistRepository {
 
   async findByUser(userId: string) {
     return db('shortlists')
-      .where({ user_id: userId, deleted_at: null })
+      .where({ client_id: userId })
       .orderBy('created_at', 'desc');
   }
 
   async findById(id: string) {
     return db('shortlists')
-      .where({ id, deleted_at: null })
+      .where({ id })
       .first();
   }
 
@@ -68,11 +68,9 @@ export class ShortlistRepository {
   }
 
   async deleteShortlist(id: string) {
-    const [deleted] = await db('shortlists')
+    return db('shortlists')
       .where({ id })
-      .update({ deleted_at: new Date() })
-      .returning('*');
-    return deleted;
+      .delete();
   }
 }
 
