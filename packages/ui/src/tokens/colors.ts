@@ -1,34 +1,72 @@
+// ArtistBook Design System v2 — Color Tokens
+// Premium dark theme with electric blue → purple → magenta gradient accents
+
 export const colors = {
+  // Primary — Electric Blue
   primary: {
-    50: '#EBF0FB',
-    100: '#D6E0F7',
-    200: '#ADC1EF',
-    300: '#85A2E7',
-    400: '#5C83DF',
-    500: '#1A56DB', // Primary
-    600: '#1548B8',
-    700: '#103A95',
-    800: '#0B2C72',
-    900: '#061E4F',
+    50: '#EFF6FF',
+    100: '#DBEAFE',
+    200: '#BFDBFE',
+    300: '#93C5FD',
+    400: '#60A5FA',
+    500: '#3B82F6', // Primary anchor
+    600: '#2563EB',
+    700: '#1D4ED8',
+    800: '#1E40AF',
+    900: '#1E3A8A',
   },
+  // Secondary — Violet/Purple
   secondary: {
-    50: '#FFF7ED',
-    100: '#FFEDD5',
-    200: '#FED7AA',
-    300: '#FDBA74',
-    400: '#FB923C',
-    500: '#F97316', // Secondary (CTAs & badges)
-    600: '#EA580C',
-    700: '#C2410C',
-    800: '#9A3412',
-    900: '#7C2D12',
+    50: '#F5F3FF',
+    100: '#EDE9FE',
+    200: '#DDD6FE',
+    300: '#C4B5FD',
+    400: '#A78BFA',
+    500: '#8B5CF6', // Secondary anchor
+    600: '#7C3AED',
+    700: '#6D28D9',
+    800: '#5B21B6',
+    900: '#4C1D95',
   },
+  // Accent gradient stops
+  accent: {
+    blue: '#3B82F6',
+    indigo: '#6366F1',
+    violet: '#8B5CF6',
+    purple: '#7C3AED',
+    magenta: '#EC4899',
+    pink: '#F472B6',
+  },
+  // Surface layers — dark background hierarchy
+  surface: {
+    bg: '#030712',       // Page background — near-black with blue undertone
+    base: '#0A0F1A',     // Section backgrounds
+    card: '#111827',     // Cards, modals, dropdowns
+    elevated: '#1E293B', // Hover states, active items
+    overlay: '#334155',  // Tooltips, popovers
+  },
+  // Glass morphism
+  glass: {
+    light: 'rgba(255, 255, 255, 0.05)',
+    medium: 'rgba(255, 255, 255, 0.08)',
+    heavy: 'rgba(255, 255, 255, 0.12)',
+    border: 'rgba(255, 255, 255, 0.10)',
+  },
+  // Text colors for dark theme
+  text: {
+    primary: '#F9FAFB',
+    secondary: '#D1D5DB',
+    muted: '#9CA3AF',
+    inverse: '#030712',
+  },
+  // Semantic — unchanged (works on dark)
   semantic: {
     success: '#059669',
     warning: '#D97706',
     error: '#DC2626',
     info: '#2563EB',
   },
+  // Neutral grays
   neutral: {
     50: '#F9FAFB',
     100: '#F3F4F6',
@@ -43,6 +81,7 @@ export const colors = {
   },
   white: '#FFFFFF',
   black: '#000000',
+  // Booking state colors — business logic, do not change
   bookingStates: {
     inquiry: '#3B82F6',
     shortlisted: '#8B5CF6',

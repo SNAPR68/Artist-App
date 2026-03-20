@@ -1,5 +1,8 @@
+// ArtistBook Design System v2 — Typography Tokens
+
 export const typography = {
   fontFamily: {
+    heading: 'Plus Jakarta Sans, Inter, system-ui, sans-serif',
     primary: 'Inter, system-ui, -apple-system, sans-serif',
     mono: 'JetBrains Mono, Menlo, Monaco, monospace',
   },
@@ -14,12 +17,15 @@ export const typography = {
     h2: '28px',
     h1: '32px',
     display: '40px',
+    display2: '48px',
+    display3: '56px',
   },
   fontWeight: {
     regular: 400,
     medium: 500,
     semibold: 600,
     bold: 700,
+    extrabold: 800,
   },
   lineHeight: {
     tight: 1.2,
