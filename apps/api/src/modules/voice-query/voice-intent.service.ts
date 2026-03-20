@@ -35,15 +35,17 @@ const INTENT_KEYWORDS: Record<string, string[]> = {
   ],
   STATUS: [
     'status', 'kahan tak', 'kya hua', 'booking ka', 'payment ka',
-    'update', 'track', 'where is', 'how is',
+    'update', 'track', 'where is', 'how is', 'check booking',
+    'booking status', 'my bookings', 'recent bookings',
   ],
   ACTION: [
     'book', 'confirm', 'cancel', 'hold', 'accept', 'reject',
     'schedule', 'karo', 'kar do', 'block date',
   ],
   INTELLIGENCE: [
-    'demand', 'price', 'earnings', 'forecast', 'season', 'trend',
-    'kitna kamaaya', 'market', 'analytics', 'revenue', 'income',
+    'demand', 'price', 'earnings', 'earn', 'forecast', 'season', 'trend',
+    'kitna kamaaya', 'how much', 'market', 'analytics', 'revenue', 'income',
+    'charge', 'underpriced', 'overpriced', 'positioning', 'percentile',
   ],
   EMERGENCY: [
     'cancel ho gaya', 'replacement', 'substitute', 'urgent',
