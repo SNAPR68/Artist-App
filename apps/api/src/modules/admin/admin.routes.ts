@@ -5,6 +5,150 @@ import { db } from '../../infrastructure/database.js';
 import { hashForSearch, encryptPII } from '../../infrastructure/encryption.js';
 
 export async function adminRoutes(app: FastifyInstance) {
+
+  /**
+   * POST /v1/admin/setup-demo-users — Create demo users with proper HMAC hashes
+   * Creates client, event_company, agent, admin users with known phone numbers.
+   * Idempotent: skips users that already exist with the correct role.
+   */
+  app.post('/v1/admin/setup-demo-users', async (_request, reply) => {
+    const demoUsers = [
+      { phone: '9876543211', role: 'client', profileType: 'client', companyName: 'Kapoor Wedding Studio', clientType: 'wedding_planner' },
+      { phone: '9876543212', role: 'event_company', profileType: 'client', companyName: 'StarLight Events Pvt Ltd', clientType: 'event_company' },
+      { phone: '9876543213', role: 'agent', profileType: 'agent', companyName: 'Prime Talent Agency' },
+      { phone: '9876543214', role: 'admin', profileType: null },
+    ];
+
+    const results: Record<string, string> = {};
+
+    for (const demo of demoUsers) {
+      const phoneHash = hashForSearch(demo.phone);
+      const encrypted = encryptPII(demo.phone);
+
+      // Check if user already exists with correct role
+      const existing = await db('users').where({ phone_hash: phoneHash }).first();
+      if (existing && existing.role === demo.role) {
+        results[demo.phone] = `already exists as ${demo.role} (${existing.id})`;
+        continue;
+      }
+
+      // If user exists but with wrong role (seed collision), update role
+      if (existing && existing.role !== demo.role) {
+        await db('users').where({ id: existing.id }).update({ role: demo.role });
+
+        // Clean up old profile and create correct one
+        await db('artist_profiles').where({ user_id: existing.id }).del().catch(() => {});
+        await db('client_profiles').where({ user_id: existing.id }).del().catch(() => {});
+        await db('agent_profiles').where({ user_id: existing.id }).del().catch(() => {});
+
+        if (demo.profileType === 'client') {
+          await db('client_profiles').insert({
+            user_id: existing.id,
+            client_type: demo.clientType,
+            company_name: demo.companyName,
+          });
+        } else if (demo.profileType === 'agent') {
+          await db('agent_profiles').insert({
+            user_id: existing.id,
+            company_name: demo.companyName,
+            commission_rate: 10,
+            total_artists: 15,
+          });
+        }
+
+        results[demo.phone] = `updated role to ${demo.role} (${existing.id})`;
+        continue;
+      }
+
+      // Also check for users with hash_ prefix (from migration)
+      const hashPrefixed = await db('users').where({ phone_hash: `hash_${demo.phone}` }).first();
+      if (hashPrefixed) {
+        await db('users').where({ id: hashPrefixed.id }).update({
+          phone: encrypted,
+          phone_hash: phoneHash,
+          role: demo.role,
+        });
+        results[demo.phone] = `fixed hash and role for ${demo.role} (${hashPrefixed.id})`;
+        continue;
+      }
+
+      // Create new user
+      const [user] = await db('users').insert({
+        phone: encrypted,
+        phone_hash: phoneHash,
+        role: demo.role,
+        is_active: true,
+      }).returning(['id']);
+
+      if (demo.profileType === 'client') {
+        await db('client_profiles').insert({
+          user_id: user.id,
+          client_type: demo.clientType,
+          company_name: demo.companyName,
+        });
+      } else if (demo.profileType === 'agent') {
+        await db('agent_profiles').insert({
+          user_id: user.id,
+          company_name: demo.companyName,
+          commission_rate: 10,
+          total_artists: 15,
+        });
+      }
+
+      results[demo.phone] = `created as ${demo.role} (${user.id})`;
+    }
+
+    // Set up workspace for event_company user if missing
+    const ecHash = hashForSearch('9876543212');
+    const ecUser = await db('users').where({ phone_hash: ecHash }).first();
+    if (ecUser) {
+      const existingWs = await db('workspaces').where({ owner_user_id: ecUser.id }).first();
+      if (!existingWs) {
+        const [ws] = await db('workspaces').insert({
+          name: 'StarLight Events',
+          slug: `starlight-events-${Date.now()}`,
+          owner_user_id: ecUser.id,
+          brand_color: '#E67E22',
+          description: 'Premium event management for weddings, corporate, and private events',
+          city: 'Mumbai',
+          company_type: 'event_management',
+          is_active: true,
+        }).returning(['id']);
+
+        await db('workspace_members').insert({
+          workspace_id: ws.id,
+          user_id: ecUser.id,
+          role: 'owner',
+          is_active: true,
+        });
+
+        const events = [
+          { name: 'Sharma-Patel Wedding', event_type: 'wedding', event_city: 'Mumbai', guest_count: 300, status: 'planning', client_name: 'Mrs. Sharma' },
+          { name: 'TechCorp Annual Gala', event_type: 'corporate', event_city: 'Delhi', guest_count: 200, status: 'confirmed', client_name: 'Rajesh Mehta' },
+          { name: 'Mehra Birthday Bash', event_type: 'private_party', event_city: 'Jaipur', guest_count: 100, status: 'planning', client_name: 'Arun Mehra' },
+        ];
+
+        for (let i = 0; i < events.length; i++) {
+          const eventDate = new Date(Date.now() + (30 + i * 15) * 86400000);
+          await db('workspace_events').insert({
+            workspace_id: ws.id,
+            ...events[i],
+            event_date: eventDate.toISOString().split('T')[0],
+            budget_min_paise: [300000000, 200000000, 100000000][i],
+            budget_max_paise: [500000000, 300000000, 150000000][i],
+            created_by: ecUser.id,
+          });
+        }
+
+        results['workspace'] = `created StarLight Events workspace with 3 events`;
+      } else {
+        results['workspace'] = `already exists (${existingWs.id})`;
+      }
+    }
+
+    return reply.send({ success: true, data: results, errors: [] });
+  });
+
   /**
    * POST /v1/admin/fix-seed-hashes — One-time fix for seed data phone hashes
    * Regenerates phone_hash for all users whose phone_hash starts with 'hash_'
