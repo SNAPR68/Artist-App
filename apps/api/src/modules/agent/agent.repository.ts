@@ -35,7 +35,7 @@ export class AgentRepository {
     return db('artist_agent_links as aal')
       .join('artist_profiles as ap', 'ap.id', 'aal.artist_id')
       .where('aal.agent_id', agentId)
-      .where('aal.status', 'active')
+      .where('aal.is_active', true)
       .select(
         'aal.id as link_id',
         'ap.id as artist_id',
@@ -48,7 +48,7 @@ export class AgentRepository {
 
   async addToRoster(agentId: string, artistId: string) {
     const [link] = await db('artist_agent_links')
-      .insert({ agent_id: agentId, artist_id: artistId, status: 'active' })
+      .insert({ agent_id: agentId, artist_id: artistId, is_active: true })
       .returning('*');
     return link;
   }
@@ -70,7 +70,7 @@ export class AgentRepository {
       .join('artist_agent_links as aal', function () {
         this.on('aal.artist_id', '=', 'b.artist_id').andOn('aal.agent_id', '=', db.raw('?', [agentId]));
       })
-      .where('aal.status', 'active')
+      .where('aal.is_active', true)
       .whereIn('b.state', ['completed', 'settled', 'confirmed', 'pre_event', 'event_day'])
       .select(
         db.raw(`COUNT(*) FILTER (WHERE b.state IN ('completed', 'settled')) as completed_bookings`),
@@ -101,7 +101,7 @@ export class AgentRepository {
         this.on('aal.artist_id', '=', 'b.artist_id').andOn('aal.agent_id', '=', db.raw('?', [agentId]));
       })
       .join('artist_profiles as ap', 'ap.id', 'b.artist_id')
-      .where('aal.status', 'active')
+      .where('aal.is_active', true)
       .whereIn('b.state', ['completed', 'settled'])
       .orderBy('b.event_date', 'desc')
       .select(
@@ -132,7 +132,7 @@ export class AgentRepository {
           .andOnIn('b.state', ['completed', 'settled', 'confirmed', 'pre_event', 'event_day']);
       })
       .where('aal.agent_id', agentId)
-      .where('aal.status', 'active')
+      .where('aal.is_active', true)
       .groupBy('aal.artist_id', 'ap.id', 'ap.stage_name', 'ap.trust_score', 'ap.base_city', 'ap.genres')
       .select(
         'ap.id as artist_id',
