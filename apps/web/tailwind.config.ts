@@ -83,9 +83,23 @@ const config: Config = {
 
       // ─── Typography ───────────────────────────────────
       fontFamily: {
-        heading: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        heading: ['var(--font-heading)', 'Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'monospace'],
+      },
+      fontSize: {
+        'hero': ['4.5rem', { lineHeight: '1.05', letterSpacing: '-0.02em' }],
+        'display': ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'h1': ['3rem', { lineHeight: '1.15', letterSpacing: '-0.02em' }],
+        'h2': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
+        'h3': ['1.5rem', { lineHeight: '1.3' }],
+        'h4': ['1.25rem', { lineHeight: '1.4' }],
+      },
+      letterSpacing: {
+        tighter: '-0.02em',
+        tight: '-0.01em',
+        wide: '0.05em',
+        wider: '0.1em',
       },
 
       // ─── Spacing (8px grid) ───────────────────────────
@@ -141,6 +155,22 @@ const config: Config = {
         'gradient-glow': 'radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.15), transparent 70%)',
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      },
+
+      // ─── Z-Index ───────────────────────────────────────
+      zIndex: {
+        navbar: '50',
+        dropdown: '55',
+        modal: '60',
+        toast: '70',
+        tooltip: '80',
+      },
+
+      // ─── Max Width ──────────────────────────────────────
+      maxWidth: {
+        'prose': '65ch',
+        'section': '1200px',
+        'wide': '1400px',
       },
 
       // ─── Animations ───────────────────────────────────

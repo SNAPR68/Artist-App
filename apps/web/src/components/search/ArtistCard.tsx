@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Star, MapPin, BadgeCheck, Heart } from 'lucide-react';
 
 interface ArtistCardProps {
   id: string;
@@ -34,65 +36,97 @@ export function ArtistCard({
     : null;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+    <motion.div
+      className="group glass-card overflow-hidden"
+      whileHover={{ y: -4 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+    >
       {/* Thumbnail */}
-      <div className="aspect-video bg-gray-100 relative">
+      <div className="aspect-[4/3] bg-surface-elevated relative overflow-hidden">
         {thumbnail_url ? (
-          <img src={thumbnail_url} alt={stage_name} className="w-full h-full object-cover" />
+          <img
+            src={thumbnail_url}
+            alt={stage_name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-300 text-4xl">
-            ♪
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500/10 to-secondary-500/10">
+            <span className="text-4xl opacity-30">♪</span>
           </div>
         )}
+
+        {/* Gradient overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-surface-bg/80 to-transparent" />
+
+        {/* Verified badge */}
         {is_verified && (
-          <span className="absolute top-2 left-2 bg-primary-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+          <span className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 rounded-pill bg-primary-500/80 backdrop-blur-sm text-white text-[10px] font-bold">
+            <BadgeCheck size={10} />
             VERIFIED
           </span>
         )}
-        {onShortlist && (
-          <button
-            onClick={(e) => { e.preventDefault(); onShortlist(id); }}
-            className="absolute top-2 right-2 bg-white/80 hover:bg-white text-gray-600 hover:text-secondary-500 w-7 h-7 rounded-full flex items-center justify-center text-sm transition-colors"
-            title="Add to shortlist"
+
+        {/* Heart / Shortlist */}
+        <button
+          onClick={(e) => { e.preventDefault(); onShortlist?.(id); }}
+          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface-bg/40 backdrop-blur-sm border border-glass-border flex items-center justify-center text-text-muted hover:text-accent-magenta hover:scale-110 transition-all"
+          title="Add to shortlist"
+        >
+          <Heart size={14} />
+        </button>
+
+        {/* Book Now overlay on hover */}
+        <div className="absolute inset-x-3 bottom-3 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+          <Link
+            href={`/artists/${id}`}
+            className="block w-full text-center py-2.5 bg-gradient-accent text-white text-sm font-semibold rounded-lg hover-glow"
           >
-            +
-          </button>
-        )}
+            View Profile
+          </Link>
+        </div>
       </div>
 
       {/* Content */}
-      <Link href={`/artists/${id}`} className="block p-3">
+      <Link href={`/artists/${id}`} className="block p-4">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="font-semibold text-gray-900 truncate">{stage_name}</h3>
-          <span className="text-sm font-bold text-primary-500">{trust_score}</span>
+          <h3 className="font-semibold text-text-primary truncate">{stage_name}</h3>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <Star size={13} className="text-amber-400 fill-amber-400" />
+            <span className="text-sm font-medium text-text-primary">{trust_score}</span>
+          </div>
         </div>
 
-        <p className="text-xs text-gray-500 mb-2">{base_city} · {total_bookings} bookings</p>
+        <div className="flex items-center gap-1 text-xs text-text-muted mb-2">
+          <MapPin size={11} />
+          <span>{base_city}</span>
+          <span className="text-glass-border mx-1">·</span>
+          <span>{total_bookings} bookings</span>
+        </div>
 
         {/* Genres */}
         <div className="flex flex-wrap gap-1 mb-2">
           {genres.slice(0, 3).map((g) => (
-            <span key={g} className="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded">
+            <span key={g} className="bg-glass-light border border-glass-border text-text-muted text-[10px] px-2 py-0.5 rounded-pill">
               {g}
             </span>
           ))}
           {genres.length > 3 && (
-            <span className="text-[10px] text-gray-400">+{genres.length - 3}</span>
+            <span className="text-[10px] text-text-muted">+{genres.length - 3}</span>
           )}
         </div>
 
         {/* Bio preview */}
         {bio && (
-          <p className="text-xs text-gray-500 line-clamp-2 mb-2">{bio}</p>
+          <p className="text-xs text-text-muted line-clamp-2 mb-2">{bio}</p>
         )}
 
         {/* Price */}
         {minPrice !== null && (
-          <p className="text-sm font-medium text-gray-900">
+          <p className="text-sm font-semibold text-text-primary">
             From ₹{(minPrice / 100).toLocaleString('en-IN')}
           </p>
         )}
       </Link>
-    </div>
+    </motion.div>
   );
 }

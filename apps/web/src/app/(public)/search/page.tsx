@@ -2,9 +2,14 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { SlidersHorizontal } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 import { ArtistCard } from '../../../components/search/ArtistCard';
-import Link from 'next/link';
+import { SearchBar } from '../../../components/search/SearchBar';
+import { FilterSidebar } from '../../../components/search/FilterSidebar';
+import { FilterDrawer } from '../../../components/search/FilterDrawer';
+import { SkeletonCard } from '../../../components/shared/SkeletonCard';
 
 interface ArtistResult {
   id: string;
@@ -37,7 +42,11 @@ interface SearchResponse {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" /></div>}>
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+      </div>
+    }>
       <SearchPageContent />
     </Suspense>
   );
@@ -58,6 +67,7 @@ function SearchPageContent() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
   const doSearch = useCallback(async () => {
     setLoading(true);
@@ -100,121 +110,66 @@ function SearchPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-primary-500">ArtistBooking</Link>
-          <Link href="/login" className="text-sm text-primary-500 hover:text-primary-600">Login</Link>
-        </div>
-      </header>
-
-      <div className="max-w-6xl mx-auto px-4 py-6">
+    <div className="min-h-screen">
+      <div className="max-w-section mx-auto px-4 sm:px-6 py-8">
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="mb-6">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search artists, bands, DJs..."
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
-            />
+        <SearchBar value={query} onChange={setQuery} onSubmit={handleSearch} />
+
+        {/* Active filters + mobile filter button */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Mobile filter button */}
             <button
-              type="submit"
-              className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium"
+              onClick={() => setFilterDrawerOpen(true)}
+              className="desktop:hidden flex items-center gap-1.5 px-3 py-2 bg-glass-light border border-glass-border rounded-lg text-sm text-text-secondary"
             >
-              Search
+              <SlidersHorizontal size={14} />
+              Filters
+              {(genre || city || eventType) && (
+                <span className="w-5 h-5 rounded-full bg-primary-500 text-white text-[10px] flex items-center justify-center font-bold">
+                  {[genre, city, eventType].filter(Boolean).length}
+                </span>
+              )}
             </button>
+
+            {/* Active filter pills */}
+            {[
+              { label: genre, onClear: () => { setGenre(''); setPage(1); } },
+              { label: city, onClear: () => { setCity(''); setPage(1); } },
+              { label: eventType, onClear: () => { setEventType(''); setPage(1); } },
+            ].filter(f => f.label).map((f) => (
+              <span key={f.label} className="flex items-center gap-1 px-2.5 py-1 rounded-pill bg-primary-500/10 border border-primary-500/20 text-xs text-primary-300">
+                {f.label}
+                <button onClick={f.onClear} className="hover:text-primary-100 ml-0.5">&times;</button>
+              </span>
+            ))}
           </div>
-        </form>
+        </div>
 
         <div className="flex gap-6">
-          {/* Sidebar Filters */}
-          <aside className="w-56 shrink-0 hidden desktop:block">
-            <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4 sticky top-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-gray-900 text-sm">Filters</h3>
-                {(genre || city || eventType) && (
-                  <button onClick={clearFilters} className="text-xs text-primary-500 hover:text-primary-600">
-                    Clear all
-                  </button>
-                )}
-              </div>
-
-              {/* Genre */}
-              {facets?.genres && facets.genres.length > 0 && (
-                <div>
-                  <h4 className="text-xs font-medium text-gray-500 uppercase mb-2">Genre</h4>
-                  <div className="space-y-1 max-h-40 overflow-y-auto">
-                    {facets.genres.map((f) => (
-                      <button
-                        key={f.value}
-                        onClick={() => { setGenre(genre === f.value ? '' : f.value); setPage(1); }}
-                        className={`block w-full text-left text-sm px-2 py-1 rounded ${
-                          genre === f.value ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {f.value} <span className="text-gray-400">({f.count})</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* City */}
-              {facets?.cities && facets.cities.length > 0 && (
-                <div>
-                  <h4 className="text-xs font-medium text-gray-500 uppercase mb-2">City</h4>
-                  <div className="space-y-1 max-h-40 overflow-y-auto">
-                    {facets.cities.map((f) => (
-                      <button
-                        key={f.value}
-                        onClick={() => { setCity(city === f.value ? '' : f.value); setPage(1); }}
-                        className={`block w-full text-left text-sm px-2 py-1 rounded ${
-                          city === f.value ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {f.value} <span className="text-gray-400">({f.count})</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Event Type */}
-              {facets?.event_types && facets.event_types.length > 0 && (
-                <div>
-                  <h4 className="text-xs font-medium text-gray-500 uppercase mb-2">Event Type</h4>
-                  <div className="space-y-1 max-h-40 overflow-y-auto">
-                    {facets.event_types.map((f) => (
-                      <button
-                        key={f.value}
-                        onClick={() => { setEventType(eventType === f.value ? '' : f.value); setPage(1); }}
-                        className={`block w-full text-left text-sm px-2 py-1 rounded ${
-                          eventType === f.value ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {f.value} <span className="text-gray-400">({f.count})</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </aside>
+          {/* Desktop Sidebar */}
+          <FilterSidebar
+            facets={facets}
+            genre={genre}
+            city={city}
+            eventType={eventType}
+            onGenreChange={(v) => { setGenre(v); setPage(1); }}
+            onCityChange={(v) => { setCity(v); setPage(1); }}
+            onEventTypeChange={(v) => { setEventType(v); setPage(1); }}
+            onClearAll={clearFilters}
+          />
 
           {/* Results */}
           <main className="flex-1">
             {/* Results header */}
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-text-muted">
                 {loading ? 'Searching...' : `${total} artist${total !== 1 ? 's' : ''} found`}
               </p>
               <select
                 value={sortBy}
                 onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
-                className="text-sm border border-gray-300 rounded-lg px-3 py-1.5"
+                className="text-sm bg-glass-light border border-glass-border rounded-lg px-3 py-1.5 text-text-secondary focus:outline-none focus:border-primary-500/30"
               >
                 <option value="relevance">Most Relevant</option>
                 <option value="trust_score">Highest Rated</option>
@@ -226,21 +181,39 @@ function SearchPageContent() {
 
             {/* Grid */}
             {loading ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+              <div className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <SkeletonCard key={i} />
+                ))}
               </div>
             ) : results.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-xl text-gray-400 mb-2">No artists found</p>
-                <p className="text-sm text-gray-400">Try adjusting your search or filters</p>
+                <p className="text-xl text-text-muted mb-2">No artists found</p>
+                <p className="text-sm text-text-muted">Try adjusting your search or filters</p>
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-4">
+                <motion.div
+                  className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-4"
+                  initial="hidden"
+                  animate="show"
+                  variants={{
+                    hidden: {},
+                    show: { transition: { staggerChildren: 0.05 } },
+                  }}
+                >
                   {results.map((artist) => (
-                    <ArtistCard key={artist.id} {...artist} />
+                    <motion.div
+                      key={artist.id}
+                      variants={{
+                        hidden: { opacity: 0, y: 20 },
+                        show: { opacity: 1, y: 0 },
+                      }}
+                    >
+                      <ArtistCard {...artist} />
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
 
                 {/* Pagination */}
                 {totalPages > 1 && (
@@ -248,17 +221,17 @@ function SearchPageContent() {
                     <button
                       onClick={() => setPage(Math.max(1, page - 1))}
                       disabled={page === 1}
-                      className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-50"
+                      className="px-4 py-2 text-sm bg-glass-light border border-glass-border rounded-lg text-text-secondary disabled:opacity-30 hover:border-primary-500/20 transition-colors"
                     >
                       Previous
                     </button>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-text-muted px-3">
                       Page {page} of {totalPages}
                     </span>
                     <button
                       onClick={() => setPage(Math.min(totalPages, page + 1))}
                       disabled={page === totalPages}
-                      className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-50"
+                      className="px-4 py-2 text-sm bg-glass-light border border-glass-border rounded-lg text-text-secondary disabled:opacity-30 hover:border-primary-500/20 transition-colors"
                     >
                       Next
                     </button>
@@ -269,6 +242,20 @@ function SearchPageContent() {
           </main>
         </div>
       </div>
+
+      {/* Mobile Filter Drawer */}
+      <FilterDrawer
+        isOpen={filterDrawerOpen}
+        onClose={() => setFilterDrawerOpen(false)}
+        facets={facets}
+        genre={genre}
+        city={city}
+        eventType={eventType}
+        onGenreChange={(v) => { setGenre(v); setPage(1); }}
+        onCityChange={(v) => { setCity(v); setPage(1); }}
+        onEventTypeChange={(v) => { setEventType(v); setPage(1); }}
+        onClearAll={clearFilters}
+      />
     </div>
   );
 }

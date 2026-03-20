@@ -176,6 +176,70 @@
   .hover-glow:hover {
     box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.3);
   }
+
+  /* Glass card — pre-composed */
+  .glass-card {
+    background: var(--glass-bg-medium);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+  }
+  .glass-card:hover {
+    box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.2);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+
+  /* Gradient mesh background */
+  .gradient-mesh-bg {
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 40%, rgba(59, 130, 246, 0.15), transparent),
+      radial-gradient(ellipse 60% 60% at 80% 20%, rgba(139, 92, 246, 0.12), transparent),
+      radial-gradient(ellipse 50% 80% at 60% 80%, rgba(236, 72, 153, 0.1), transparent),
+      radial-gradient(ellipse 70% 40% at 10% 90%, rgba(99, 102, 241, 0.08), transparent),
+      var(--surface-bg);
+  }
+
+  /* Drag-scrollable containers */
+  .drag-scroll {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    cursor: grab;
+  }
+  .drag-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  .drag-scroll:active {
+    cursor: grabbing;
+  }
+  .drag-scroll > * {
+    scroll-snap-align: start;
+  }
+
+  /* Skeleton variants */
+  .skeleton-text {
+    @apply skeleton;
+    height: 1em;
+    width: 80%;
+  }
+  .skeleton-heading {
+    @apply skeleton;
+    height: 1.5em;
+    width: 60%;
+  }
+  .skeleton-avatar {
+    @apply skeleton;
+    border-radius: 50%;
+  }
+  .skeleton-image {
+    @apply skeleton;
+    aspect-ratio: 16/9;
+    width: 100%;
+  }
 }
 
 /* ============================================

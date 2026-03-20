@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, ArrowRight, ArrowLeft } from 'lucide-react';
 import { apiClient } from '../../lib/api-client';
+import { BookingStepIndicator } from './BookingStepIndicator';
 
 interface BookingInquiryFormProps {
   artistId: string;
@@ -17,11 +20,16 @@ interface BookingResponse {
   event_city: string;
 }
 
+const STEP_LABELS = ['Event Details', 'Requirements', 'Review'];
+
 export default function BookingInquiryForm({ artistId, artistName, eventTypes }: BookingInquiryFormProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     if (typeof window === 'undefined') return false;
     return !!localStorage.getItem('refresh_token');
   });
+
+  const [currentStep, setCurrentStep] = useState(1);
+  const [direction, setDirection] = useState(1);
 
   const [formData, setFormData] = useState({
     event_type: eventTypes[0] ?? '',
@@ -45,19 +53,27 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
     }));
   }
 
+  function nextStep() {
+    setDirection(1);
+    setCurrentStep((s) => Math.min(s + 1, 3));
+  }
+
+  function prevStep() {
+    setDirection(-1);
+    setCurrentStep((s) => Math.max(s - 1, 1));
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
     setSubmitting(true);
 
-    // Re-check auth before submitting
     if (typeof window !== 'undefined' && !localStorage.getItem('refresh_token')) {
       setIsAuthenticated(false);
       setSubmitting(false);
       return;
     }
 
-    // Build requirements string including budget and message
     const parts: string[] = [];
     if (formData.budget) {
       parts.push(`Budget: INR ${Number(formData.budget).toLocaleString('en-IN')}`);
@@ -96,37 +112,42 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
     }
   }
 
+  const today = new Date().toISOString().split('T')[0];
+
   // --- Success state ---
   if (successBookingId) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <div className="text-center">
-          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+      <div className="glass-card p-6">
+        <motion.div
+          className="text-center"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+        >
+          <div className="w-14 h-14 bg-green-500/15 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Check size={28} className="text-green-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">Inquiry Sent!</h3>
-          <p className="text-gray-600 text-sm mb-3">
-            Your booking inquiry for <strong>{artistName}</strong> has been submitted successfully.
+          <h3 className="text-lg font-heading font-semibold text-text-primary mb-1">Inquiry Sent!</h3>
+          <p className="text-sm text-text-muted mb-3">
+            Your booking inquiry for <strong className="text-text-secondary">{artistName}</strong> has been submitted.
           </p>
-          <p className="text-xs text-gray-500 mb-4">
-            Booking ID: <code className="bg-gray-100 px-2 py-0.5 rounded">{successBookingId}</code>
+          <p className="text-xs text-text-muted mb-4">
+            Booking ID: <code className="bg-glass-light border border-glass-border px-2 py-0.5 rounded text-text-secondary">{successBookingId}</code>
           </p>
-          <p className="text-sm text-gray-500">
-            The artist will review your request and respond soon. You can track this booking in your dashboard.
+          <p className="text-sm text-text-muted mb-4">
+            The artist will review your request and respond soon.
           </p>
           <button
             type="button"
             onClick={() => {
               setSuccessBookingId('');
+              setCurrentStep(1);
               setFormData((prev) => ({ ...prev, event_date: '', event_city: '', event_venue: '', budget: '', message: '' }));
             }}
-            className="mt-4 text-sm text-primary-600 hover:text-primary-700 font-medium"
+            className="text-sm text-primary-400 hover:text-primary-300 font-medium transition-colors"
           >
             Send another inquiry
           </button>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -134,14 +155,14 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
   // --- Login prompt ---
   if (!isAuthenticated) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Book This Artist</h3>
-        <p className="text-gray-600 text-sm mb-4">
+      <div className="glass-card p-6">
+        <h3 className="text-lg font-heading font-semibold text-text-primary mb-2">Book This Artist</h3>
+        <p className="text-sm text-text-muted mb-4">
           Sign in to send a booking inquiry to {artistName}.
         </p>
         <a
           href={`/login?redirect=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '')}`}
-          className="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-medium py-2.5 px-4 rounded-lg transition-colors"
+          className="block w-full text-center bg-gradient-accent hover:bg-gradient-accent-hover text-white font-medium py-3 px-4 rounded-xl transition-all hover-glow"
         >
           Sign in to Book
         </a>
@@ -149,157 +170,185 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
     );
   }
 
-  // --- Inquiry form ---
-  const today = new Date().toISOString().split('T')[0];
+  // --- Multi-step Inquiry form ---
+  const slideVariants = {
+    enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir > 0 ? -80 : 80, opacity: 0 }),
+  };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Book This Artist</h3>
+    <div className="glass-card p-6">
+      <h3 className="text-lg font-heading font-semibold text-text-primary mb-4">Book This Artist</h3>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Event Type */}
-        <div>
-          <label htmlFor="bk-event-type" className="block text-sm font-medium text-gray-700 mb-1">
-            Event Type <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="bk-event-type"
-            name="event_type"
-            value={formData.event_type}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          >
-            {eventTypes.map((t) => (
-              <option key={t} value={t}>
-                {t.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
-              </option>
-            ))}
-          </select>
-        </div>
+      <BookingStepIndicator currentStep={currentStep} totalSteps={3} labels={STEP_LABELS} />
 
-        {/* Event Date */}
-        <div>
-          <label htmlFor="bk-event-date" className="block text-sm font-medium text-gray-700 mb-1">
-            Event Date <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="bk-event-date"
-            type="date"
-            name="event_date"
-            value={formData.event_date}
-            onChange={handleChange}
-            min={today}
-            required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          />
-        </div>
+      <form onSubmit={handleSubmit}>
+        <AnimatePresence mode="wait" custom={direction}>
+          {currentStep === 1 && (
+            <motion.div
+              key="step1"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.25 }}
+              className="space-y-4"
+            >
+              <FormField label="Event Type" required>
+                <select name="event_type" value={formData.event_type} onChange={handleChange} required className="form-input">
+                  {eventTypes.map((t) => (
+                    <option key={t} value={t}>
+                      {t.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
 
-        {/* City */}
-        <div>
-          <label htmlFor="bk-city" className="block text-sm font-medium text-gray-700 mb-1">
-            City <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="bk-city"
-            type="text"
-            name="event_city"
-            value={formData.event_city}
-            onChange={handleChange}
-            placeholder="e.g. Mumbai"
-            required
-            minLength={2}
-            maxLength={100}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          />
-        </div>
+              <FormField label="Event Date" required>
+                <input type="date" name="event_date" value={formData.event_date} onChange={handleChange} min={today} required className="form-input" />
+              </FormField>
 
-        {/* Venue */}
-        <div>
-          <label htmlFor="bk-venue" className="block text-sm font-medium text-gray-700 mb-1">
-            Venue
-          </label>
-          <input
-            id="bk-venue"
-            type="text"
-            name="event_venue"
-            value={formData.event_venue}
-            onChange={handleChange}
-            placeholder="e.g. Grand Ballroom, Taj Hotel"
-            maxLength={500}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          />
-        </div>
+              <FormField label="City" required>
+                <input type="text" name="event_city" value={formData.event_city} onChange={handleChange} placeholder="e.g. Mumbai" required minLength={2} maxLength={100} className="form-input" />
+              </FormField>
 
-        {/* Duration */}
-        <div>
-          <label htmlFor="bk-duration" className="block text-sm font-medium text-gray-700 mb-1">
-            Duration (hours) <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="bk-duration"
-            type="number"
-            name="duration_hours"
-            value={formData.duration_hours}
-            onChange={handleChange}
-            min={0.5}
-            max={24}
-            step={0.5}
-            required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          />
-        </div>
+              <FormField label="Venue">
+                <input type="text" name="event_venue" value={formData.event_venue} onChange={handleChange} placeholder="e.g. Grand Ballroom, Taj Hotel" maxLength={500} className="form-input" />
+              </FormField>
+            </motion.div>
+          )}
 
-        {/* Budget */}
-        <div>
-          <label htmlFor="bk-budget" className="block text-sm font-medium text-gray-700 mb-1">
-            Budget (INR)
-          </label>
-          <input
-            id="bk-budget"
-            type="number"
-            name="budget"
-            value={formData.budget}
-            onChange={handleChange}
-            placeholder="e.g. 50000"
-            min={0}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          />
-        </div>
+          {currentStep === 2 && (
+            <motion.div
+              key="step2"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.25 }}
+              className="space-y-4"
+            >
+              <FormField label="Duration (hours)" required>
+                <input type="number" name="duration_hours" value={formData.duration_hours} onChange={handleChange} min={0.5} max={24} step={0.5} required className="form-input" />
+              </FormField>
 
-        {/* Message */}
-        <div>
-          <label htmlFor="bk-message" className="block text-sm font-medium text-gray-700 mb-1">
-            Message
-          </label>
-          <textarea
-            id="bk-message"
-            name="message"
-            value={formData.message}
-            onChange={handleChange}
-            rows={3}
-            placeholder="Tell the artist about your event, any special requirements..."
-            maxLength={5000}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
-          />
-        </div>
+              <FormField label="Budget (INR)">
+                <input type="number" name="budget" value={formData.budget} onChange={handleChange} placeholder="e.g. 50000" min={0} className="form-input" />
+              </FormField>
+
+              <FormField label="Message">
+                <textarea name="message" value={formData.message} onChange={handleChange} rows={3} placeholder="Tell the artist about your event..." maxLength={5000} className="form-input resize-none" />
+              </FormField>
+            </motion.div>
+          )}
+
+          {currentStep === 3 && (
+            <motion.div
+              key="step3"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.25 }}
+              className="space-y-3"
+            >
+              <h4 className="text-sm font-medium text-text-primary mb-2">Review Your Inquiry</h4>
+              <ReviewRow label="Event Type" value={formData.event_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} />
+              <ReviewRow label="Date" value={formData.event_date} />
+              <ReviewRow label="City" value={formData.event_city} />
+              {formData.event_venue && <ReviewRow label="Venue" value={formData.event_venue} />}
+              <ReviewRow label="Duration" value={`${formData.duration_hours} hours`} />
+              {formData.budget && <ReviewRow label="Budget" value={`₹${Number(formData.budget).toLocaleString('en-IN')}`} />}
+              {formData.message && <ReviewRow label="Message" value={formData.message} />}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-red-700">
+          <div className="mt-4 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-sm text-red-400">
             {error}
           </div>
         )}
 
-        {/* Submit */}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white font-medium py-2.5 px-4 rounded-lg transition-colors"
-        >
-          {submitting ? 'Sending...' : 'Send Inquiry'}
-        </button>
+        {/* Navigation */}
+        <div className="flex gap-2 mt-6">
+          {currentStep > 1 && (
+            <button
+              type="button"
+              onClick={prevStep}
+              className="flex items-center gap-1 px-4 py-2.5 bg-glass-light border border-glass-border rounded-xl text-sm text-text-secondary hover:bg-glass-medium transition-colors"
+            >
+              <ArrowLeft size={14} />
+              Back
+            </button>
+          )}
+
+          {currentStep < 3 ? (
+            <button
+              type="button"
+              onClick={nextStep}
+              className="flex-1 flex items-center justify-center gap-1 py-2.5 bg-gradient-accent hover:bg-gradient-accent-hover text-white font-semibold rounded-xl transition-all hover-glow"
+            >
+              Next
+              <ArrowRight size={14} />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex-1 py-2.5 bg-gradient-accent hover:bg-gradient-accent-hover disabled:opacity-50 text-white font-semibold rounded-xl transition-all hover-glow"
+            >
+              {submitting ? 'Sending...' : 'Send Inquiry'}
+            </button>
+          )}
+        </div>
       </form>
+
+      <style jsx>{`
+        .form-input {
+          width: 100%;
+          padding: 0.625rem 0.75rem;
+          font-size: 0.875rem;
+          color: var(--tw-text-opacity, 1) #F9FAFB;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          border-radius: 0.75rem;
+          outline: none;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus {
+          border-color: rgba(59, 130, 246, 0.5);
+          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        .form-input::placeholder {
+          color: #9CA3AF;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function FormField({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-xs font-medium text-text-muted mb-1.5">
+        {label} {required && <span className="text-red-400">*</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function ReviewRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between py-2 border-b border-glass-border last:border-0">
+      <span className="text-xs text-text-muted">{label}</span>
+      <span className="text-sm text-text-primary font-medium text-right max-w-[60%]">{value}</span>
     </div>
   );
 }

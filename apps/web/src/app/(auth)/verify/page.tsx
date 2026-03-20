@@ -2,11 +2,23 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Button, Card, OTPInput } from '@artist-booking/ui';
+import { motion } from 'framer-motion';
+import { OTPInput } from '@artist-booking/ui';
 import { UserRole } from '@artist-booking/shared';
 import { useAuthStore } from '@/lib/auth';
 import { useI18n } from '@/i18n';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Mic2, Users, Briefcase, Building2 } from 'lucide-react';
+
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.2 } },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 15 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 function VerifyContent() {
   const router = useRouter();
@@ -21,12 +33,10 @@ function VerifyContent() {
   const [countdown, setCountdown] = useState(30);
   const [canResend, setCanResend] = useState(false);
 
-  // Redirect if no phone
   useEffect(() => {
     if (!phone) router.replace('/login');
   }, [phone, router]);
 
-  // Countdown timer for resend
   useEffect(() => {
     if (countdown <= 0) {
       setCanResend(true);
@@ -41,41 +51,23 @@ function VerifyContent() {
     try {
       await verifyOTP(phone, otp, selectedRole);
 
-      // After verifyOTP succeeds, user state is set in the store
       const currentUser = useAuthStore.getState().user;
       if (currentUser?.is_new) {
         switch (currentUser.role) {
-          case UserRole.ARTIST:
-            router.push('/artist/onboarding');
-            break;
+          case UserRole.ARTIST: router.push('/artist/onboarding'); break;
           case UserRole.CLIENT:
-          case UserRole.EVENT_COMPANY:
-            router.push('/client/onboarding');
-            break;
-          case UserRole.AGENT:
-            router.push('/agent/onboarding');
-            break;
-          default:
-            router.push('/');
+          case UserRole.EVENT_COMPANY: router.push('/client/onboarding'); break;
+          case UserRole.AGENT: router.push('/agent/onboarding'); break;
+          default: router.push('/');
         }
       } else {
-        // Redirect existing users to their role-specific dashboard
         switch (currentUser?.role) {
-          case UserRole.ARTIST:
-            router.push('/artist');
-            break;
+          case UserRole.ARTIST: router.push('/artist'); break;
           case UserRole.CLIENT:
-          case UserRole.EVENT_COMPANY:
-            router.push('/client');
-            break;
-          case UserRole.AGENT:
-            router.push('/agent');
-            break;
-          case UserRole.ADMIN:
-            router.push('/admin');
-            break;
-          default:
-            router.push('/');
+          case UserRole.EVENT_COMPANY: router.push('/client'); break;
+          case UserRole.AGENT: router.push('/agent'); break;
+          case UserRole.ADMIN: router.push('/admin'); break;
+          default: router.push('/');
         }
       }
     } catch (err) {
@@ -102,50 +94,52 @@ function VerifyContent() {
   const maskedPhone = phone ? `${phone.slice(0, 3)}****${phone.slice(7)}` : '';
 
   const roles = [
-    { value: UserRole.ARTIST, labelKey: 'role.artist', descKey: 'role.artist.desc' },
-    { value: UserRole.CLIENT, labelKey: 'role.client', descKey: 'role.client.desc' },
-    { value: UserRole.AGENT, labelKey: 'role.agent', descKey: 'role.agent.desc' },
-    { value: UserRole.EVENT_COMPANY, labelKey: 'role.eventCompany', descKey: 'role.eventCompany.desc' },
+    { value: UserRole.ARTIST, labelKey: 'role.artist', descKey: 'role.artist.desc', icon: Mic2 },
+    { value: UserRole.CLIENT, labelKey: 'role.client', descKey: 'role.client.desc', icon: Users },
+    { value: UserRole.AGENT, labelKey: 'role.agent', descKey: 'role.agent.desc', icon: Briefcase },
+    { value: UserRole.EVENT_COMPANY, labelKey: 'role.eventCompany', descKey: 'role.eventCompany.desc', icon: Building2 },
   ];
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-neutral-50 p-4">
-      <Card variant="elevated" padding="lg" className="w-full max-w-md">
-        <div className="flex justify-end mb-2">
+    <div className="glass-card p-8">
+      <motion.div variants={container} initial="hidden" animate="show">
+        <motion.div variants={item} className="flex justify-end mb-2">
           <LanguageSwitcher />
-        </div>
+        </motion.div>
 
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-neutral-900 mb-2">{t('auth.verifyOtp')}</h1>
-          <p className="text-neutral-500">
+        <motion.div variants={item} className="text-center mb-8">
+          <h1 className="text-h3 font-heading font-bold text-text-primary mb-2">{t('auth.verifyOtp')}</h1>
+          <p className="text-sm text-text-muted">
             {t('auth.enterOtp')}{' '}
-            <span className="font-medium text-neutral-700">+91 {maskedPhone}</span>
+            <span className="font-medium text-text-secondary">+91 {maskedPhone}</span>
           </p>
-        </div>
+        </motion.div>
 
         {isNewUser && (
-          <div className="mb-6">
-            <p className="text-sm font-medium text-neutral-700 mb-3">{t('auth.selectRole')}</p>
+          <motion.div variants={item} className="mb-6">
+            <p className="text-sm font-medium text-text-secondary mb-3">{t('auth.selectRole')}</p>
             <div className="grid grid-cols-2 gap-2">
               {roles.map((role) => (
-                <button
+                <motion.button
                   key={role.value}
                   onClick={() => { setSelectedRole(role.value); setError(''); }}
-                  className={`p-3 rounded-lg border-2 text-left transition-colors ${
+                  className={`p-3 rounded-xl border-2 text-left transition-all ${
                     selectedRole === role.value
-                      ? 'border-primary-500 bg-primary-50'
-                      : 'border-neutral-200 hover:border-neutral-300'
+                      ? 'border-primary-500 bg-primary-500/10 shadow-glow-sm'
+                      : 'border-glass-border hover:border-primary-500/30 bg-glass-light'
                   }`}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <p className="text-sm font-medium text-neutral-900">{t(role.labelKey)}</p>
-                  <p className="text-xs text-neutral-500">{t(role.descKey)}</p>
-                </button>
+                  <role.icon size={18} className={selectedRole === role.value ? 'text-primary-400 mb-1' : 'text-text-muted mb-1'} />
+                  <p className="text-sm font-medium text-text-primary">{t(role.labelKey)}</p>
+                  <p className="text-[10px] text-text-muted">{t(role.descKey)}</p>
+                </motion.button>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
-        <div className="flex flex-col items-center space-y-4">
+        <motion.div variants={item} className="flex flex-col items-center space-y-4">
           <OTPInput
             onComplete={handleOTPComplete}
             error={error}
@@ -154,26 +148,29 @@ function VerifyContent() {
 
           <div className="text-center">
             {canResend ? (
-              <Button variant="tertiary" size="sm" onClick={handleResend} loading={isLoading}>
+              <button
+                onClick={handleResend}
+                disabled={isLoading}
+                className="text-sm text-primary-400 hover:text-primary-300 font-medium transition-colors disabled:opacity-50"
+              >
                 {t('auth.resendOtp')}
-              </Button>
+              </button>
             ) : (
-              <p className="text-sm text-neutral-400">
-                {t('auth.resendIn')} {countdown}s
+              <p className="text-sm text-text-muted">
+                {t('auth.resendIn')} <span className="text-text-secondary font-medium">{countdown}s</span>
               </p>
             )}
           </div>
 
-          <Button
-            variant="tertiary"
-            size="sm"
+          <button
             onClick={() => router.push('/login')}
+            className="text-sm text-text-muted hover:text-text-secondary transition-colors"
           >
             {t('auth.changePhone')}
-          </Button>
-        </div>
-      </Card>
-    </main>
+          </button>
+        </motion.div>
+      </motion.div>
+    </div>
   );
 }
 
