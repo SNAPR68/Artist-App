@@ -55,7 +55,7 @@ export default function ClientDashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <Link
           href="/search"
           className="bg-primary-500 text-white rounded-lg p-5 hover:bg-primary-600 transition-colors"
@@ -65,12 +65,44 @@ export default function ClientDashboardPage() {
           <p className="text-primary-100 text-xs mt-1">Search by genre, city, budget</p>
         </Link>
         <Link
+          href="/client/bookings"
+          className="bg-white rounded-lg p-5 border border-gray-200 hover:border-primary-300 transition-colors"
+        >
+          <span className="block text-lg mb-1">📋</span>
+          <span className="font-medium text-gray-900">My Bookings</span>
+          <p className="text-gray-500 text-xs mt-1">Track & manage</p>
+        </Link>
+        <Link
           href="/client/shortlists"
           className="bg-white rounded-lg p-5 border border-gray-200 hover:border-primary-300 transition-colors"
         >
           <span className="block text-lg mb-1">⭐</span>
           <span className="font-medium text-gray-900">My Shortlists</span>
           <p className="text-gray-500 text-xs mt-1">{shortlists.length} shortlist{shortlists.length !== 1 ? 's' : ''}</p>
+        </Link>
+        <Link
+          href="/client/workspace"
+          className="bg-white rounded-lg p-5 border border-gray-200 hover:border-primary-300 transition-colors"
+        >
+          <span className="block text-lg mb-1">🏢</span>
+          <span className="font-medium text-gray-900">Workspace</span>
+          <p className="text-gray-500 text-xs mt-1">Events & pipeline</p>
+        </Link>
+        <Link
+          href="/client/recommendations"
+          className="bg-white rounded-lg p-5 border border-gray-200 hover:border-primary-300 transition-colors"
+        >
+          <span className="block text-lg mb-1">✨</span>
+          <span className="font-medium text-gray-900">Discover</span>
+          <p className="text-gray-500 text-xs mt-1">AI recommendations</p>
+        </Link>
+        <Link
+          href="/client/substitutions"
+          className="bg-white rounded-lg p-5 border border-gray-200 hover:border-primary-300 transition-colors"
+        >
+          <span className="block text-lg mb-1">🔄</span>
+          <span className="font-medium text-gray-900">Substitutions</span>
+          <p className="text-gray-500 text-xs mt-1">Emergency replacements</p>
         </Link>
       </div>
 

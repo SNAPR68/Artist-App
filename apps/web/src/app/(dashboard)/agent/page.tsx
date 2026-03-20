@@ -77,7 +77,7 @@ export default function AgentDashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
           <p className="text-2xl font-bold text-gray-900">{roster.length}</p>
           <p className="text-sm text-gray-500">Artists in Roster</p>
@@ -86,10 +86,16 @@ export default function AgentDashboard() {
           <p className="text-2xl font-bold text-gray-900">{profile.commission_pct}%</p>
           <p className="text-sm text-gray-500">Commission Rate</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-          <p className="text-2xl font-bold text-primary-500">{profile.email}</p>
-          <p className="text-sm text-gray-500">Contact Email</p>
-        </div>
+        <Link href="/agent/bookings" className="bg-white border border-gray-200 rounded-lg p-4 text-center hover:border-primary-300 transition-colors">
+          <p className="text-2xl mb-0.5">📋</p>
+          <p className="text-sm font-medium text-gray-700">Bookings</p>
+          <p className="text-xs text-gray-400">Manage pipeline</p>
+        </Link>
+        <Link href="/agent/recommendations" className="bg-white border border-gray-200 rounded-lg p-4 text-center hover:border-primary-300 transition-colors">
+          <p className="text-2xl mb-0.5">✨</p>
+          <p className="text-sm font-medium text-gray-700">Recommendations</p>
+          <p className="text-xs text-gray-400">AI suggestions</p>
+        </Link>
       </div>
 
       {/* Roster Preview */}

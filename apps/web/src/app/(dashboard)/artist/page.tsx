@@ -101,13 +101,14 @@ export default function ArtistHomePage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <Link
           href="/artist/calendar"
           className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors text-center"
         >
           <span className="block text-lg mb-1">📅</span>
-          <span className="text-sm font-medium text-gray-700">Manage Calendar</span>
+          <span className="text-sm font-medium text-gray-700">Calendar</span>
+          <p className="text-xs text-gray-400 mt-0.5">Availability</p>
         </Link>
         <Link
           href="/artist/bookings"
@@ -115,6 +116,7 @@ export default function ArtistHomePage() {
         >
           <span className="block text-lg mb-1">📋</span>
           <span className="text-sm font-medium text-gray-700">Bookings</span>
+          <p className="text-xs text-gray-400 mt-0.5">Manage gigs</p>
         </Link>
         <Link
           href="/artist/earnings"
@@ -122,6 +124,47 @@ export default function ArtistHomePage() {
         >
           <span className="block text-lg mb-1">💰</span>
           <span className="text-sm font-medium text-gray-700">Earnings</span>
+          <p className="text-xs text-gray-400 mt-0.5">Payment history</p>
+        </Link>
+        <Link
+          href="/artist/financial"
+          className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors text-center"
+        >
+          <span className="block text-lg mb-1">🏦</span>
+          <span className="text-sm font-medium text-gray-700">Financial Center</span>
+          <p className="text-xs text-gray-400 mt-0.5">Escrow, tax, forecast</p>
+        </Link>
+        <Link
+          href="/artist/intelligence"
+          className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors text-center"
+        >
+          <span className="block text-lg mb-1">🧠</span>
+          <span className="text-sm font-medium text-gray-700">Career Intelligence</span>
+          <p className="text-xs text-gray-400 mt-0.5">Insights & trends</p>
+        </Link>
+        <Link
+          href="/artist/seasonal"
+          className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors text-center"
+        >
+          <span className="block text-lg mb-1">📊</span>
+          <span className="text-sm font-medium text-gray-700">Seasonal Demand</span>
+          <p className="text-xs text-gray-400 mt-0.5">Peak & valley alerts</p>
+        </Link>
+        <Link
+          href="/gigs"
+          className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors text-center"
+        >
+          <span className="block text-lg mb-1">🎯</span>
+          <span className="text-sm font-medium text-gray-700">Gig Marketplace</span>
+          <p className="text-xs text-gray-400 mt-0.5">Browse opportunities</p>
+        </Link>
+        <Link
+          href="/artist/gamification"
+          className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors text-center"
+        >
+          <span className="block text-lg mb-1">🏆</span>
+          <span className="text-sm font-medium text-gray-700">Achievements</span>
+          <p className="text-xs text-gray-400 mt-0.5">Badges & streaks</p>
         </Link>
         <Link
           href="/artist/profile"
@@ -129,6 +172,7 @@ export default function ArtistHomePage() {
         >
           <span className="block text-lg mb-1">👤</span>
           <span className="text-sm font-medium text-gray-700">Edit Profile</span>
+          <p className="text-xs text-gray-400 mt-0.5">Photos, bio, pricing</p>
         </Link>
       </div>
     </div>
