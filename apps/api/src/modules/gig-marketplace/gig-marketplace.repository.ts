@@ -88,7 +88,6 @@ export class GigMarketplaceRepository {
       .where({ 'gp.id': id })
       .select(
         'gp.*',
-        'u.full_name as poster_name',
         'u.phone as poster_phone',
       )
       .first();
@@ -133,7 +132,6 @@ export class GigMarketplaceRepository {
     const posts = await query.clone()
       .select(
         'gp.*',
-        'u.full_name as poster_name',
       )
       .orderBy('gp.created_at', 'desc')
       .limit(perPage)
@@ -240,7 +238,6 @@ export class GigMarketplaceRepository {
         'gp.budget_min_paise as gig_budget_min_paise',
         'gp.budget_max_paise as gig_budget_max_paise',
         'gp.status as gig_status',
-        'u.full_name as poster_name',
       )
       .orderBy('ga.created_at', 'desc');
   }
@@ -300,7 +297,6 @@ export class GigMarketplaceRepository {
     const posts = await query.clone()
       .select(
         'gp.*',
-        'u.full_name as poster_name',
         db.raw(`(
           SELECT COUNT(*)::int FROM jsonb_array_elements_text(gp.genres_needed) g
           WHERE g = ANY(?)

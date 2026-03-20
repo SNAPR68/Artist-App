@@ -60,15 +60,20 @@ export class VoiceQueryRepository {
     parsed_entities?: Record<string, unknown>;
     confidence?: number;
   }) {
+    const insertData: Record<string, unknown> = {
+      conversation_id: data.conversation_id,
+      direction: data.direction,
+      raw_text: data.content,
+      parsed_intent: data.parsed_intent || null,
+      parsed_entities: data.parsed_entities ? JSON.stringify(data.parsed_entities) : '{}',
+      confidence: data.confidence ?? null,
+    };
+    // For outbound messages, also set response_text
+    if (data.direction === 'outbound') {
+      insertData.response_text = data.content;
+    }
     const [row] = await db('voice_messages')
-      .insert({
-        conversation_id: data.conversation_id,
-        direction: data.direction,
-        content: data.content,
-        parsed_intent: data.parsed_intent || null,
-        parsed_entities: data.parsed_entities ? JSON.stringify(data.parsed_entities) : null,
-        confidence: data.confidence ?? null,
-      })
+      .insert(insertData)
       .returning('*');
     return row;
   }

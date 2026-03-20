@@ -212,7 +212,6 @@ export class WorkspaceRepository {
         'wm.updated_at',
         'u.phone',
         'u.email',
-        'u.full_name',
       )
       .orderBy('wm.created_at', 'asc');
   }

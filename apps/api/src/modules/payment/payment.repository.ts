@@ -114,10 +114,10 @@ export class PaymentRepository {
       .where({ 'ap.user_id': userId, 'p.status': 'settled' })
       .whereBetween('p.created_at', [startDate, endDate])
       .select(
-        db.raw('SUM(p.amount_paise) as gross_total'),
-        db.raw('SUM(p.tds_paise) as total_tds'),
-        db.raw('SUM(p.platform_fee_paise) as total_platform_fee'),
-        db.raw('SUM(p.artist_payout_paise) as net_total'),
+        db.raw('SUM(p.amount) as gross_total'),
+        db.raw('SUM(p.tds_amount) as total_tds'),
+        db.raw('SUM(p.platform_fee) as total_platform_fee'),
+        db.raw('SUM(p.artist_share) as net_total'),
         db.raw('COUNT(p.id) as transaction_count'),
       )
       .first();

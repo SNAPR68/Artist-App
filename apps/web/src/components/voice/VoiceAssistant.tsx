@@ -59,13 +59,11 @@ export function VoiceAssistant() {
       setMessages((prev) => [...prev, { role: 'user', text }]);
 
       try {
+        const body: Record<string, string> = { text, current_page: pathname ?? 'home' };
+        if (sessionId) body.session_id = sessionId;
         const res = await apiClient<VoiceResponse>('/v1/voice/query', {
           method: 'POST',
-          body: JSON.stringify({
-            text,
-            session_id: sessionId,
-            current_page: pathname,
-          }),
+          body: JSON.stringify(body),
         });
 
         if (res.success && res.data) {
