@@ -381,88 +381,40 @@ export function VoiceAssistant() {
 
   return (
     <>
-      {/* ─── Collapsed: Visible Chat Widget (not just a button) ─── */}
+      {/* ─── Collapsed: Compact chat bar (doesn't overlap content) ─── */}
       {!isOpen && (
-        <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-modal w-[320px] md:w-[360px] animate-scale-in">
-          <div className="rounded-2xl overflow-hidden border border-glass-border bg-surface-base/[0.97] backdrop-blur-glass-lg shadow-glass">
-            {/* Widget header — gradient bar */}
-            <div className="flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-primary-600 to-accent-violet cursor-pointer" onClick={() => setIsOpen(true)}>
-              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                {sparkleIcon(16, 'white')}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-heading font-semibold text-white text-sm leading-tight">ArtistChat</h3>
-                <p className="text-[10px] text-white/70 leading-tight">AI-powered artist discovery</p>
-              </div>
-              <span className="relative flex h-2.5 w-2.5 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-400" />
-              </span>
+        <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-modal animate-scale-in">
+          <div className="flex items-center gap-2 rounded-full border border-glass-border bg-surface-base/[0.97] backdrop-blur-glass-lg shadow-glass pl-1.5 pr-3 py-1.5 cursor-pointer hover:shadow-glow-md transition-all" onClick={() => setIsOpen(true)}>
+            {/* Mic button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                // Start listening IMMEDIATELY in the click handler (user gesture required by Web Speech API)
+                setState('listening');
+                startListening();
+                // Then open the panel
+                setIsOpen(true);
+              }}
+              disabled={!isSupported}
+              className="w-10 h-10 rounded-full bg-gradient-accent flex items-center justify-center text-white shrink-0 shadow-glow-sm hover:shadow-glow-md hover:scale-105 transition-all disabled:opacity-40"
+              aria-label="Tap to speak"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                <line x1="12" x2="12" y1="19" y2="22" />
+              </svg>
+            </button>
+            {/* Label */}
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-semibold text-text-primary leading-tight">ArtistChat</span>
+              <span className="text-[10px] text-text-muted leading-tight">Ask or speak to find artists</span>
             </div>
-
-            {/* Widget body — voice CTA + quick chips + input */}
-            <div className="px-4 py-3 space-y-3">
-              {/* Voice-first CTA */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => { setIsOpen(true); setTimeout(() => handleMicClick(), 150); }}
-                  disabled={!isSupported}
-                  className="w-12 h-12 rounded-full bg-gradient-accent flex items-center justify-center text-white shrink-0 shadow-glow-md hover:shadow-glow-lg hover:scale-105 transition-all animate-pulse-glow disabled:opacity-40 disabled:animate-none"
-                  aria-label="Tap to speak"
-                >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                    <line x1="12" x2="12" y1="19" y2="22" />
-                  </svg>
-                </button>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-text-primary">Tap to speak</p>
-                  <p className="text-[11px] text-text-muted">
-                    {user
-                      ? 'Ask about bookings, earnings, or find artists'
-                      : 'Find the perfect artist for your event'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Quick action chips */}
-              <div className="flex flex-wrap gap-1.5">
-                {(user ? authChips : guestChips).slice(0, 2).map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => { setIsOpen(true); setTimeout(() => sendQueryCb(q), 100); }}
-                    className="text-[11px] bg-glass-light border border-glass-border text-text-secondary rounded-pill px-2.5 py-1 hover:bg-glass-medium hover:border-primary-500/30 hover:text-text-primary transition-all"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-
-              {/* Text input bar */}
-              <form
-                onSubmit={(e) => { e.preventDefault(); if (textInput.trim()) { setIsOpen(true); setTimeout(() => { sendQueryCb(textInput.trim()); setTextInput(''); }, 100); } }}
-                className="flex gap-2 items-center"
-              >
-                <input
-                  type="text"
-                  value={textInput}
-                  onChange={(e) => setTextInput(e.target.value)}
-                  onFocus={() => setIsOpen(true)}
-                  placeholder="Or type your question..."
-                  className="flex-1 bg-surface-elevated border border-glass-border rounded-pill px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
-                />
-                <button
-                  type="submit"
-                  className="w-8 h-8 rounded-full bg-glass-medium border border-glass-border flex items-center justify-center text-text-primary shrink-0 hover:bg-glass-heavy transition-all"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m22 2-7 20-4-9-9-4z" />
-                    <path d="m22 2-11 11" />
-                  </svg>
-                </button>
-              </form>
-            </div>
+            {/* Online dot */}
+            <span className="relative flex h-2 w-2 shrink-0 ml-1">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+            </span>
           </div>
         </div>
       )}
