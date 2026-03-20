@@ -86,21 +86,32 @@ export function VoiceAssistant() {
       if (lower.includes(city)) { params.city = city.charAt(0).toUpperCase() + city.slice(1); break; }
     }
 
-    // Detect genre/category
+    // Detect genre/category — values must match API facet values
     const genres: Record<string, string> = {
-      'dj': 'DJs & Electronic', 'singer': 'Singers & Vocalists', 'band': 'Live Bands',
-      'comedian': 'Comedians', 'comedy': 'Comedians', 'dancer': 'Dancers', 'dance': 'Dancers',
-      'photographer': 'Photographers', 'mehendi': 'Mehendi Artists', 'anchor': 'Anchors/Emcees',
-      'emcee': 'Anchors/Emcees', 'magician': 'Magicians', 'magic': 'Magicians',
-      'instrumentalist': 'Instrumentalists', 'pianist': 'Instrumentalists', 'guitarist': 'Instrumentalists',
-      'vocalist': 'Singers & Vocalists', 'bollywood': 'Singers & Vocalists',
+      'dj': 'EDM', 'edm': 'EDM', 'electronic': 'Electronic',
+      'singer': 'Bollywood', 'vocalist': 'Bollywood', 'bollywood': 'Bollywood',
+      'band': 'Live Band', 'live band': 'Live Band',
+      'comedian': 'Comedy', 'comedy': 'Comedy', 'standup': 'Comedy',
+      'dancer': 'Folk', 'dance': 'Folk',
+      'classical': 'Classical', 'ghazal': 'Ghazal', 'sufi': 'Sufi',
+      'jazz': 'Jazz', 'rock': 'Rock', 'pop': 'Pop', 'folk': 'Folk',
+      'hip-hop': 'Hip-Hop', 'hiphop': 'Hip-Hop', 'rap': 'Hip-Hop',
+      'fusion': 'Fusion', 'qawwali': 'Qawwali', 'acoustic': 'Acoustic',
+      'techno': 'Techno', 'house': 'House', 'wedding': 'Wedding',
+      'brass': 'Brass Band', 'rajasthani': 'Rajasthani',
     };
     for (const [keyword, genre] of Object.entries(genres)) {
       if (lower.includes(keyword)) { params.genre = genre; break; }
     }
 
-    // Use the full text as a search query
-    params.q = text;
+    // Only use q when no genre was detected — extract keywords, not full sentence
+    if (!params.genre) {
+      const stopWords = ['find', 'show', 'me', 'a', 'an', 'the', 'for', 'in', 'near', 'around', 'i', 'want', 'need', 'looking', 'get', 'book', 'hire', 'best', 'top', 'good'];
+      const words = lower.split(/\s+/).filter(w => !stopWords.includes(w) && w.length > 1);
+      const cityLower = params.city?.toLowerCase();
+      const searchWords = cityLower ? words.filter(w => w !== cityLower) : words;
+      if (searchWords.length > 0) params.q = searchWords.slice(0, 2).join(' ');
+    }
     return params;
   }
 
