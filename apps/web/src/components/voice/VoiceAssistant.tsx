@@ -75,12 +75,159 @@ export function VoiceAssistant() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // ─── Helper: extract search params from natural language (for unauthenticated visitors) ───
+  function extractSearchParams(text: string): { q?: string; genre?: string; city?: string } {
+    const lower = text.toLowerCase();
+    const params: { q?: string; genre?: string; city?: string } = {};
+
+    // Detect city names
+    const cities = ['mumbai', 'delhi', 'bangalore', 'bengaluru', 'chennai', 'hyderabad', 'pune', 'kolkata', 'jaipur', 'ahmedabad', 'goa', 'lucknow', 'chandigarh', 'noida', 'gurgaon'];
+    for (const city of cities) {
+      if (lower.includes(city)) { params.city = city.charAt(0).toUpperCase() + city.slice(1); break; }
+    }
+
+    // Detect genre/category
+    const genres: Record<string, string> = {
+      'dj': 'DJs & Electronic', 'singer': 'Singers & Vocalists', 'band': 'Live Bands',
+      'comedian': 'Comedians', 'comedy': 'Comedians', 'dancer': 'Dancers', 'dance': 'Dancers',
+      'photographer': 'Photographers', 'mehendi': 'Mehendi Artists', 'anchor': 'Anchors/Emcees',
+      'emcee': 'Anchors/Emcees', 'magician': 'Magicians', 'magic': 'Magicians',
+      'instrumentalist': 'Instrumentalists', 'pianist': 'Instrumentalists', 'guitarist': 'Instrumentalists',
+      'vocalist': 'Singers & Vocalists', 'bollywood': 'Singers & Vocalists',
+    };
+    for (const [keyword, genre] of Object.entries(genres)) {
+      if (lower.includes(keyword)) { params.genre = genre; break; }
+    }
+
+    // Use the full text as a search query
+    params.q = text;
+    return params;
+  }
+
+  // ─── Helper: check if query needs authentication ───
+  function isAuthRequiredQuery(text: string): boolean {
+    const lower = text.toLowerCase();
+    const authKeywords = ['my booking', 'my earning', 'my payment', 'my profile', 'my calendar', 'my wallet', 'my payout', 'my review'];
+    return authKeywords.some(kw => lower.includes(kw));
+  }
+
+  // ─── Helper: speak response text via TTS ───
+  function speakResponse(text: string) {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-IN';
+      utterance.rate = 1.0;
+      utterance.onend = () => setState('idle');
+      speechSynthesis.speak(utterance);
+      setState('responding');
+    } else {
+      setState('idle');
+    }
+  }
+
+  // ─── Unauthenticated discovery via public search API ───
+  const handleGuestQuery = useCallback(
+    async (text: string) => {
+      // Check if query requires auth → redirect to login
+      if (isAuthRequiredQuery(text)) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            text: 'You need to sign in to access your bookings, earnings, and profile. Would you like to log in?',
+            suggestions: ['Log in now', 'Find a DJ in Mumbai', 'Show me singers'],
+            action: { type: 'navigate', route: '/login' },
+          },
+        ]);
+        speakResponse('You need to sign in to access that feature. Would you like to log in?');
+        return;
+      }
+
+      // Check for category browsing intent
+      const lower = text.toLowerCase();
+      if (lower.includes('categor') || lower.includes('what do you have') || lower.includes('what kind')) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            text: 'We have 10+ categories of artists! Here are the most popular ones:\n\n🎤 Singers & Vocalists (500+)\n🎧 DJs & Electronic (400+)\n🎸 Live Bands (350+)\n😂 Comedians (300+)\n💃 Dancers (250+)\n📸 Photographers (250+)\n\nWhat type of artist are you looking for?',
+            suggestions: ['Find a singer', 'Find a DJ', 'Find a band', 'Find a comedian'],
+          },
+        ]);
+        speakResponse('We have singers, DJs, bands, comedians, dancers, photographers, and more. What type of artist are you looking for?');
+        return;
+      }
+
+      // Search via public API
+      const searchParams = extractSearchParams(text);
+      const queryParts: string[] = [];
+      if (searchParams.q) queryParts.push(`q=${encodeURIComponent(searchParams.q)}`);
+      if (searchParams.genre) queryParts.push(`genre=${encodeURIComponent(searchParams.genre)}`);
+      if (searchParams.city) queryParts.push(`city=${encodeURIComponent(searchParams.city)}`);
+      queryParts.push('per_page=5');
+
+      try {
+        const res = await apiClient<{ artists: DiscoverArtist[]; total: number }>(
+          `/v1/search/artists?${queryParts.join('&')}`
+        );
+
+        if (res.success && res.data) {
+          const artists = res.data.artists ?? [];
+          const total = res.data.total ?? 0;
+
+          if (artists.length > 0) {
+            const cityInfo = searchParams.city ? ` in ${searchParams.city}` : '';
+            const genreInfo = searchParams.genre ? ` ${searchParams.genre}` : ' artists';
+            const responseText = `Found ${total}${genreInfo}${cityInfo}! Here are the top picks:`;
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                text: responseText,
+                suggestions: ['Show me more', 'Find in another city', 'Sign in to book'],
+                artists,
+                data: { artists } as unknown as Record<string, unknown>,
+              },
+            ]);
+            speakResponse(`Found ${total}${genreInfo}${cityInfo}. Showing you the top picks.`);
+          } else {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                text: 'I couldn\'t find artists matching that query. Try a different city or category!',
+                suggestions: ['Find a DJ in Mumbai', 'Show me singers in Delhi', 'What categories do you have?'],
+              },
+            ]);
+            speakResponse('I couldn\'t find artists matching that. Try a different city or category.');
+          }
+        } else {
+          throw new Error('Search failed');
+        }
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', text: 'Sorry, something went wrong. Please try again.' },
+        ]);
+        setState('idle');
+      }
+    },
+    [router]
+  );
+
   // When transcript is finalized, send query
   const sendQueryCb = useCallback(
     async (text: string) => {
       setState('processing');
       setMessages((prev) => [...prev, { role: 'user', text }]);
 
+      // If user is NOT logged in, use guest discovery mode
+      if (!user) {
+        await handleGuestQuery(text);
+        return;
+      }
+
+      // Authenticated user — full voice query API
       try {
         const body: Record<string, string> = { text, current_page: pathname ?? 'home' };
         if (sessionId) body.session_id = sessionId;
@@ -109,16 +256,7 @@ export function VoiceAssistant() {
           ]);
 
           // Voice output
-          if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(data.response_text);
-            utterance.lang = 'en-IN';
-            utterance.rate = 1.0;
-            utterance.onend = () => setState('idle');
-            speechSynthesis.speak(utterance);
-            setState('responding');
-          } else {
-            setState('idle');
-          }
+          speakResponse(data.response_text);
 
           // Handle navigation action
           if (data.action?.type === 'navigate' && data.action.route) {
@@ -143,7 +281,7 @@ export function VoiceAssistant() {
         setState('idle');
       }
     },
-    [sessionId, pathname, router]
+    [sessionId, pathname, router, user, handleGuestQuery]
   );
 
   useEffect(() => {
@@ -170,6 +308,15 @@ export function VoiceAssistant() {
   }
 
   function handleSuggestionClick(suggestion: string) {
+    const lower = suggestion.toLowerCase();
+
+    // Handle login/sign-in suggestions for unauthenticated users
+    if (lower === 'log in now' || lower === 'sign in to book') {
+      router.push('/login');
+      setIsOpen(false);
+      return;
+    }
+
     const bookMatch = suggestion.match(/^book\s+(.+)/i);
     const moreMatch = suggestion.match(/^tell me more about\s+(.+)/i);
     const artistName = (bookMatch?.[1] || moreMatch?.[1])?.trim();
@@ -196,8 +343,9 @@ export function VoiceAssistant() {
     setIsOpen(false);
   }
 
-  // Don't render if not authenticated or not mounted (prevents hydration mismatch)
-  if (!mounted || !user) return null;
+  // Don't render until mounted (prevents hydration mismatch)
+  // Concierge is available for ALL visitors — logged in or not
+  if (!mounted) return null;
 
   return (
     <>
@@ -288,16 +436,25 @@ export function VoiceAssistant() {
                   <div>
                     <p className="text-sm font-medium text-text-secondary">How can I help?</p>
                     <p className="text-xs text-text-muted mt-1">
-                      Speak or type to find artists, check bookings, get insights
+                      {user
+                        ? 'Speak or type to find artists, check bookings, get insights'
+                        : 'Discover artists, ask about pricing, or explore categories'}
                     </p>
                   </div>
-                  {/* Quick action chips */}
+                  {/* Quick action chips — different for logged-in vs visitors */}
                   <div className="flex flex-wrap justify-center gap-2 pt-2">
-                    {[
-                      'Find a DJ for wedding in Mumbai',
-                      'Show my bookings',
-                      'Show my earnings',
-                    ].map((q) => (
+                    {(user
+                      ? [
+                          'Find a DJ for wedding in Mumbai',
+                          'Show my bookings',
+                          'Show my earnings',
+                        ]
+                      : [
+                          'Find a DJ for wedding in Mumbai',
+                          'Show me singers in Delhi',
+                          'What categories do you have?',
+                        ]
+                    ).map((q) => (
                       <button
                         key={q}
                         onClick={() => sendQueryCb(q)}
