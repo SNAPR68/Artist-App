@@ -5,22 +5,21 @@ import { db } from '../../infrastructure/database.js';
 export interface CreateRequestData {
   original_booking_id: string;
   requested_by: string;
-  original_artist_id: string;
+  cancelled_artist_id: string;
   event_date: string;
   event_city: string;
   event_type: string;
-  original_genres: string[];
+  genres: string[];
   urgency_level: string;
   status: string;
   expires_at: Date;
-  original_agreed_amount_paise: number;
-  venue_id?: string | null;
+  budget_paise: number;
 }
 
 export interface CreateCandidateData {
-  substitution_request_id: string;
+  request_id: string;
   artist_id: string;
-  match_score: number;
+  similarity_score: number;
   score_breakdown: Record<string, number>;
   response: string;
 }
@@ -63,7 +62,7 @@ export class EmergencySubstitutionRepository {
     return db('substitution_requests')
       .where('accepted_artist_id', artistId)
       .orWhereIn('id', function () {
-        this.select('substitution_request_id')
+        this.select('request_id')
           .from('substitution_candidates')
           .where('artist_id', artistId);
       })
@@ -86,11 +85,11 @@ export class EmergencySubstitutionRepository {
 
   // ─── Substitution Candidates ────────────────────────────────
 
-  async createCandidates(requestId: string, candidates: Omit<CreateCandidateData, 'substitution_request_id'>[]) {
+  async createCandidates(requestId: string, candidates: Omit<CreateCandidateData, 'request_id'>[]) {
     const rows = candidates.map((c) => ({
-      substitution_request_id: requestId,
+      request_id: requestId,
       artist_id: c.artist_id,
-      match_score: c.match_score,
+      similarity_score: c.similarity_score,
       score_breakdown: JSON.stringify(c.score_breakdown),
       response: c.response,
     }));
@@ -100,14 +99,14 @@ export class EmergencySubstitutionRepository {
   async getCandidates(requestId: string) {
     return db('substitution_candidates as sc')
       .join('artist_profiles as ap', 'ap.id', 'sc.artist_id')
-      .where('sc.substitution_request_id', requestId)
+      .where('sc.request_id', requestId)
       .select(
         'sc.*',
         'ap.stage_name',
         'ap.genres',
         'ap.trust_score',
       )
-      .orderBy('sc.match_score', 'desc');
+      .orderBy('sc.similarity_score', 'desc');
   }
 
   async getCandidate(candidateId: string) {
@@ -117,20 +116,20 @@ export class EmergencySubstitutionRepository {
   async updateCandidate(candidateId: string, data: Record<string, unknown>) {
     const [row] = await db('substitution_candidates')
       .where({ id: candidateId })
-      .update({ ...data, updated_at: db.fn.now() })
+      .update(data)
       .returning('*');
     return row;
   }
 
   async getUnrespondedCandidates(requestId: string) {
     return db('substitution_candidates')
-      .where({ substitution_request_id: requestId, response: 'pending' });
+      .where({ request_id: requestId, response: 'pending' });
   }
 
   async expireUnrespondedForRequest(requestId: string) {
     return db('substitution_candidates')
-      .where({ substitution_request_id: requestId, response: 'pending' })
-      .update({ response: 'expired', updated_at: db.fn.now() });
+      .where({ request_id: requestId, response: 'pending' })
+      .update({ response: 'expired' });
   }
 
   // ─── Artist Availability ────────────────────────────────────

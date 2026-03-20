@@ -6,9 +6,9 @@ export interface UpsertScoreData {
   target_artist_id: string;
   recommendation_type: string;
   score: number;
+  score_breakdown?: Record<string, unknown>;
   context?: Record<string, unknown>;
   expires_at: Date;
-  rising_star?: boolean;
 }
 
 export interface UpsertCollaborativeSignalData {
@@ -58,9 +58,9 @@ export class RecommendationRepository {
         target_artist_id: data.target_artist_id,
         recommendation_type: data.recommendation_type,
         score: data.score,
+        score_breakdown: JSON.stringify(data.score_breakdown ?? {}),
         context: data.context ? JSON.stringify(data.context) : '{}',
         expires_at: data.expires_at,
-        rising_star: data.rising_star ?? false,
       })
       .returning('*');
 

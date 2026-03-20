@@ -164,16 +164,15 @@ export class EmergencySubstitutionService {
     const request = await emergencySubstitutionRepository.createRequest({
       original_booking_id: originalBookingId,
       requested_by: userId,
-      original_artist_id: cancelledArtistId,
+      cancelled_artist_id: cancelledArtistId,
       event_date,
       event_city,
       event_type,
-      original_genres: originalGenres,
+      genres: originalGenres,
       urgency_level: resolvedUrgency,
       status: 'matching',
       expires_at: expiryDate,
-      original_agreed_amount_paise: booking.agreed_amount_paise ?? 0,
-      venue_id: booking.venue_id,
+      budget_paise: booking.agreed_amount_paise ?? 0,
     });
 
     // 7. Run matching algorithm
@@ -197,7 +196,7 @@ export class EmergencySubstitutionService {
         request.id,
         candidates.map((c) => ({
           artist_id: c.artist_id,
-          match_score: c.match_score,
+          similarity_score: c.match_score,
           score_breakdown: c.score_breakdown,
           response: 'pending',
         })),
@@ -364,7 +363,7 @@ export class EmergencySubstitutionService {
       throw new EmergencySubstitutionError('UNAUTHORIZED', 'Not your candidate entry', 403);
     }
 
-    const request = await emergencySubstitutionRepository.getRequest(candidate.substitution_request_id);
+    const request = await emergencySubstitutionRepository.getRequest(candidate.request_id);
     if (!request) {
       throw new EmergencySubstitutionError('REQUEST_NOT_FOUND', 'Substitution request not found', 404);
     }
@@ -397,21 +396,18 @@ export class EmergencySubstitutionService {
       // 4. Update candidate response
       await trx('substitution_candidates')
         .where({ id: candidateId })
-        .update({ response: 'accepted', responded_at: trx.fn.now(), updated_at: trx.fn.now() });
+        .update({ response: 'accepted', responded_at: trx.fn.now() });
 
       // 5. Expire other candidates
       await trx('substitution_candidates')
-        .where({ substitution_request_id: request.id })
+        .where({ request_id: request.id })
         .whereNot({ id: candidateId })
         .where({ response: 'pending' })
-        .update({ response: 'expired', updated_at: trx.fn.now() });
+        .update({ response: 'expired' });
 
-      // 6. Calculate premium amount
+      // 6. Calculate premium multiplier
       const premiumPct = artistProfile.backup_premium_pct ?? 25;
       const premiumMultiplier = 1 + premiumPct / 100;
-      const premiumAmountPaise = Math.round(
-        (lockedRequest.original_agreed_amount_paise ?? 0) * premiumMultiplier,
-      );
 
       // 7. Update request
       const [updatedRequest] = await trx('substitution_requests')
@@ -420,7 +416,7 @@ export class EmergencySubstitutionService {
           status: 'accepted',
           accepted_artist_id: candidate.artist_id,
           matched_at: trx.fn.now(),
-          premium_amount_paise: premiumAmountPaise,
+          premium_multiplier: premiumMultiplier,
           updated_at: trx.fn.now(),
         })
         .returning('*');
@@ -457,18 +453,18 @@ export class EmergencySubstitutionService {
 
     // 3. Check if all candidates have responded
     const pending = await emergencySubstitutionRepository.getUnrespondedCandidates(
-      candidate.substitution_request_id,
+      candidate.request_id,
     );
 
     if (pending.length === 0) {
       // All responded, none accepted — check if any accepted
       const allCandidates = await emergencySubstitutionRepository.getCandidates(
-        candidate.substitution_request_id,
+        candidate.request_id,
       );
       const hasAccepted = allCandidates.some((c: Record<string, unknown>) => c.response === 'accepted');
       if (!hasAccepted) {
         await emergencySubstitutionRepository.updateRequest(
-          candidate.substitution_request_id,
+          candidate.request_id,
           { status: 'expired' },
         );
         // TODO: send expiry notification to requester
