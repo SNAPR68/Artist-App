@@ -167,13 +167,16 @@ export function VoiceAssistant() {
       queryParts.push('per_page=5');
 
       try {
-        const res = await apiClient<{ artists: DiscoverArtist[]; total: number }>(
+        // Search API returns { success, data: [artists], meta: { total } }
+        const res = await apiClient<DiscoverArtist[]>(
           `/v1/search/artists?${queryParts.join('&')}`
         );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const raw = res as any;
 
         if (res.success && res.data) {
-          const artists = res.data.artists ?? [];
-          const total = res.data.total ?? 0;
+          const artists: DiscoverArtist[] = Array.isArray(res.data) ? res.data : [];
+          const total: number = raw.meta?.total ?? artists.length;
 
           if (artists.length > 0) {
             const cityInfo = searchParams.city ? ` in ${searchParams.city}` : '';
