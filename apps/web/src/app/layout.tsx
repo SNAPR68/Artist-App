@@ -5,6 +5,7 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
 import { I18nProvider } from '@/i18n';
 import { AuthInitializer } from '@/components/AuthInitializer';
+import { VoiceAssistant } from '@/components/voice/VoiceAssistant';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ToastProvider>
               <AuthInitializer />
               {children}
+              <VoiceAssistant />
             </ToastProvider>
           </I18nProvider>
         </ErrorBoundary>

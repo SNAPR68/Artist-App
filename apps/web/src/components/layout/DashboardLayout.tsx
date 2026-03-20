@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
 import { useI18n } from '@/i18n';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { VoiceAssistant } from '../voice/VoiceAssistant';
+
 
 interface NavItem {
   href: string;
@@ -153,8 +153,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         })}
       </nav>
 
-      {/* Floating Voice Assistant */}
-      <VoiceAssistant />
     </div>
   );
 }
