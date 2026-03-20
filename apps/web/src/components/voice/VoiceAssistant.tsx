@@ -361,28 +361,95 @@ export function VoiceAssistant() {
   // Concierge is available for ALL visitors — logged in or not
   if (!mounted) return null;
 
+  // Sparkle SVG reused in header and collapsed widget
+  const sparkleIcon = (size: number, color = 'currentColor') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+    </svg>
+  );
+
+  const guestChips = [
+    'Find a DJ for wedding in Mumbai',
+    'Show me singers in Delhi',
+    'What categories do you have?',
+  ];
+  const authChips = [
+    'Find a DJ for wedding in Mumbai',
+    'Show my bookings',
+    'Show my earnings',
+  ];
+
   return (
     <>
-      {/* ─── FAB: ArtistBook Concierge Button ─── */}
+      {/* ─── Collapsed: Visible Chat Widget (not just a button) ─── */}
       {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-modal flex items-center gap-2 rounded-pill bg-gradient-accent text-white shadow-glow-md hover:shadow-glow-lg transition-all duration-300 hover:scale-105 px-4 py-3 md:px-5 md:py-3.5 animate-pulse-glow"
-          aria-label="ArtistBook Concierge"
-        >
-          {/* Sparkles icon */}
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-            <path d="M5 3v4" />
-            <path d="M19 17v4" />
-            <path d="M3 5h4" />
-            <path d="M17 19h4" />
-          </svg>
-          <span className="text-sm font-semibold hidden sm:inline">Concierge</span>
-        </button>
+        <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-modal w-[320px] md:w-[360px] animate-scale-in">
+          <div className="rounded-2xl overflow-hidden border border-glass-border bg-surface-base/[0.97] backdrop-blur-glass-lg shadow-glass">
+            {/* Widget header — gradient bar */}
+            <div className="flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-primary-600 to-accent-violet cursor-pointer" onClick={() => setIsOpen(true)}>
+              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                {sparkleIcon(16, 'white')}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-heading font-semibold text-white text-sm leading-tight">ArtistChat</h3>
+                <p className="text-[10px] text-white/70 leading-tight">AI-powered artist discovery</p>
+              </div>
+              <span className="relative flex h-2.5 w-2.5 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-400" />
+              </span>
+            </div>
+
+            {/* Widget body — greeting + quick chips + input */}
+            <div className="px-4 py-3 space-y-3">
+              <p className="text-xs text-text-secondary">
+                {user
+                  ? 'Ask me anything — find artists, check bookings, get insights.'
+                  : 'Find the perfect artist for your event. Ask me anything!'}
+              </p>
+
+              {/* Quick action chips */}
+              <div className="flex flex-wrap gap-1.5">
+                {(user ? authChips : guestChips).slice(0, 2).map((q) => (
+                  <button
+                    key={q}
+                    onClick={() => { setIsOpen(true); setTimeout(() => sendQueryCb(q), 100); }}
+                    className="text-[11px] bg-glass-light border border-glass-border text-text-secondary rounded-pill px-2.5 py-1 hover:bg-glass-medium hover:border-primary-500/30 hover:text-text-primary transition-all"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+
+              {/* Input bar */}
+              <form
+                onSubmit={(e) => { e.preventDefault(); if (textInput.trim()) { setIsOpen(true); setTimeout(() => { sendQueryCb(textInput.trim()); setTextInput(''); }, 100); } }}
+                className="flex gap-2 items-center"
+              >
+                <input
+                  type="text"
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  onFocus={() => setIsOpen(true)}
+                  placeholder="Ask about artists, pricing, events..."
+                  className="flex-1 bg-surface-elevated border border-glass-border rounded-pill px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
+                />
+                <button
+                  type="submit"
+                  className="w-8 h-8 rounded-full bg-gradient-accent flex items-center justify-center text-white shrink-0 hover:opacity-90 transition-opacity"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m22 2-7 20-4-9-9-4z" />
+                    <path d="m22 2-11 11" />
+                  </svg>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* ─── Chat Panel ─── */}
+      {/* ─── Expanded Chat Panel ─── */}
       {isOpen && (
         <>
           {/* Mobile backdrop */}
@@ -391,48 +458,43 @@ export function VoiceAssistant() {
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-modal md:w-[400px] md:h-[560px] md:rounded-2xl flex flex-col overflow-hidden bg-surface-base/[0.97] backdrop-blur-glass-lg border-0 md:border md:border-glass-border md:shadow-glass animate-scale-in">
+          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-modal md:w-[400px] md:h-[600px] md:rounded-2xl flex flex-col overflow-hidden bg-surface-base/[0.97] backdrop-blur-glass-lg border-0 md:border md:border-glass-border md:shadow-glass animate-scale-in">
             {/* ─── Header ─── */}
-            <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-surface-card/80 backdrop-blur-glass border-b border-glass-border">
+            <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-gradient-to-r from-primary-600 to-accent-violet">
               <div className="flex items-center gap-2.5">
                 {/* Back arrow on mobile */}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="md:hidden p-1 text-text-muted hover:text-text-primary transition-colors"
+                  className="md:hidden p-1 text-white/80 hover:text-white transition-colors"
                   aria-label="Close"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m15 18-6-6 6-6" />
                   </svg>
                 </button>
-                {/* Sparkle icon */}
-                <div className="w-8 h-8 rounded-lg bg-gradient-accent flex items-center justify-center shrink-0">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-                  </svg>
+                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                  {sparkleIcon(16, 'white')}
                 </div>
                 <div>
-                  <h3 className="font-heading font-semibold text-text-primary text-sm leading-tight">
-                    ArtistBook Concierge
+                  <h3 className="font-heading font-semibold text-white text-sm leading-tight">
+                    ArtistChat
                   </h3>
-                  <p className="text-[10px] text-text-muted leading-tight">
-                    Your personal entertainment assistant
+                  <p className="text-[10px] text-white/70 leading-tight">
+                    AI-powered artist discovery
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 {!isSupported && (
-                  <span className="text-[10px] text-warning px-1.5 py-0.5 rounded bg-warning/10">No mic</span>
+                  <span className="text-[10px] text-yellow-200 px-1.5 py-0.5 rounded bg-white/10">No mic</span>
                 )}
-                {/* Close (desktop) */}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="hidden md:flex p-1.5 text-text-muted hover:text-text-primary hover:bg-glass-light rounded-lg transition-colors"
-                  aria-label="Close"
+                  className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                  aria-label="Minimize"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 6 6 18" />
-                    <path d="m6 6 12 12" />
+                    <path d="M6 12h12" />
                   </svg>
                 </button>
               </div>
@@ -441,42 +503,30 @@ export function VoiceAssistant() {
             {/* ─── Messages ─── */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4 scrollbar-hide">
               {messages.length === 0 && (
-                <div className="text-center py-10 space-y-4">
-                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-accent-subtle flex items-center justify-center">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent-violet">
-                      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-text-secondary">How can I help?</p>
-                    <p className="text-xs text-text-muted mt-1">
-                      {user
-                        ? 'Speak or type to find artists, check bookings, get insights'
-                        : 'Discover artists, ask about pricing, or explore categories'}
-                    </p>
-                  </div>
-                  {/* Quick action chips — different for logged-in vs visitors */}
-                  <div className="flex flex-wrap justify-center gap-2 pt-2">
-                    {(user
-                      ? [
-                          'Find a DJ for wedding in Mumbai',
-                          'Show my bookings',
-                          'Show my earnings',
-                        ]
-                      : [
-                          'Find a DJ for wedding in Mumbai',
-                          'Show me singers in Delhi',
-                          'What categories do you have?',
-                        ]
-                    ).map((q) => (
-                      <button
-                        key={q}
-                        onClick={() => sendQueryCb(q)}
-                        className="text-xs bg-glass-light border border-glass-border text-text-secondary rounded-pill px-3 py-1.5 hover:bg-glass-medium hover:border-primary-500/30 hover:text-text-primary transition-all"
-                      >
-                        {q}
-                      </button>
-                    ))}
+                <div className="space-y-4 pt-4">
+                  {/* Welcome message as chat bubble */}
+                  <div className="flex justify-start">
+                    <div className="max-w-[90%] space-y-3">
+                      <div className="rounded-2xl px-4 py-3 bg-glass-medium border border-glass-border text-text-primary">
+                        <p className="text-sm leading-relaxed">
+                          {user
+                            ? 'Hey! I can help you find artists, check bookings, manage your calendar, and more. What do you need?'
+                            : 'Hey! I\'m your AI assistant for finding the perfect artist. Tell me about your event and I\'ll find the best match — DJs, singers, bands, comedians, and more across India.'}
+                        </p>
+                      </div>
+                      {/* Quick action chips */}
+                      <div className="flex flex-wrap gap-1.5">
+                        {(user ? authChips : guestChips).map((q) => (
+                          <button
+                            key={q}
+                            onClick={() => sendQueryCb(q)}
+                            className="text-xs bg-glass-light border border-glass-border text-text-secondary rounded-pill px-3 py-1.5 hover:bg-glass-medium hover:border-primary-500/30 hover:text-text-primary transition-all"
+                          >
+                            {q}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -495,7 +545,7 @@ export function VoiceAssistant() {
                       <p className="text-sm leading-relaxed whitespace-pre-line">{msg.text}</p>
                     </div>
 
-                    {/* ─── Artist Cards Strip ─── */}
+                    {/* ─── Artist Cards ─── */}
                     {msg.artists && msg.artists.length > 0 && (
                       <div className="-mx-4">
                         <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
@@ -592,7 +642,7 @@ export function VoiceAssistant() {
                   type="text"
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
-                  placeholder="Ask anything..."
+                  placeholder="Ask about artists, pricing, events..."
                   className="flex-1 bg-surface-elevated border border-glass-border rounded-pill px-4 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
                   disabled={state !== 'idle'}
                 />
