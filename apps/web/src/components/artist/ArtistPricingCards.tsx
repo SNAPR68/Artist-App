@@ -5,9 +5,11 @@ import { AnimatedSection } from '@/components/shared/AnimatedSection';
 
 interface PricingEntry {
   event_type: string;
-  city_tier: string;
-  min_price: number;
-  max_price: number;
+  city_tier?: string;
+  min_price?: number;
+  max_price?: number;
+  min_paise?: number;
+  max_paise?: number;
 }
 
 interface ArtistPricingCardsProps {
@@ -39,8 +41,8 @@ export function ArtistPricingCards({ pricing }: ArtistPricingCardsProps) {
                 {p.city_tier?.replace('_', ' ')}
               </p>
               <p className="text-lg font-heading font-bold text-text-primary">
-                ₹{(p.min_price / 100).toLocaleString('en-IN')}
-                <span className="text-text-muted font-normal text-sm"> – ₹{(p.max_price / 100).toLocaleString('en-IN')}</span>
+                ₹{((p.min_price ?? p.min_paise ?? 0) / 100).toLocaleString('en-IN')}
+                <span className="text-text-muted font-normal text-sm"> – ₹{((p.max_price ?? p.max_paise ?? 0) / 100).toLocaleString('en-IN')}</span>
               </p>
             </motion.div>
           </AnimatedSection>

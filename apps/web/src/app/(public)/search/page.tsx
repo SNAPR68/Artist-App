@@ -21,7 +21,7 @@ interface ArtistResult {
   total_bookings: number;
   is_verified: boolean;
   thumbnail_url?: string;
-  pricing?: Array<{ min_price: number; max_price: number }>;
+  pricing?: Array<{ min_price?: number; max_price?: number; min_paise?: number; max_paise?: number }>;
 }
 
 interface Facet {

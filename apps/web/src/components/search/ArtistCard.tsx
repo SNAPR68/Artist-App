@@ -14,7 +14,7 @@ interface ArtistCardProps {
   total_bookings: number;
   is_verified: boolean;
   thumbnail_url?: string;
-  pricing?: Array<{ min_price: number; max_price: number }>;
+  pricing?: Array<{ min_price?: number; max_price?: number; min_paise?: number; max_paise?: number }>;
   onShortlist?: (id: string) => void;
 }
 
@@ -31,9 +31,10 @@ export function ArtistCard({
   pricing,
   onShortlist,
 }: ArtistCardProps) {
-  const minPrice = pricing?.length
-    ? Math.min(...pricing.map((p) => p.min_price))
-    : null;
+  const prices = pricing
+    ?.map((p) => p.min_price ?? p.min_paise)
+    .filter((v): v is number => typeof v === 'number' && !isNaN(v));
+  const minPrice = prices?.length ? Math.min(...prices) : null;
 
   return (
     <motion.div
