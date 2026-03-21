@@ -187,14 +187,32 @@ export function VoiceAssistant() {
 
       try {
         // Search API returns { success, data: [artists], meta: { total } }
-        // Add timeout for Render cold starts (~30-60s)
+        // Timeout set to 90s to handle Render free-tier cold starts (~30-60s)
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 20000);
+        const timeout = setTimeout(() => controller.abort(), 90000);
+
+        // Show a "waking up" message if it takes more than 5s
+        const wakeUpTimer = setTimeout(() => {
+          setMessages((prev) => {
+            // Only add if last message isn't already a wake-up notice
+            const last = prev[prev.length - 1];
+            if (last?.text?.includes('waking up')) return prev;
+            return [
+              ...prev,
+              {
+                role: 'assistant' as const,
+                text: 'Our server is waking up (free tier) — this can take up to 60 seconds on first request. Hang tight!',
+              },
+            ];
+          });
+        }, 5000);
+
         const res = await apiClient<DiscoverArtist[]>(
           `/v1/search/artists?${queryParts.join('&')}`,
           { signal: controller.signal }
         );
         clearTimeout(timeout);
+        clearTimeout(wakeUpTimer);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const raw = res as any;
 
@@ -238,9 +256,9 @@ export function VoiceAssistant() {
           {
             role: 'assistant',
             text: isTimeout
-              ? 'Our server is waking up (free tier). Please try again in a few seconds!'
+              ? 'The server took too long to respond. It may still be waking up — please try again.'
               : 'Sorry, something went wrong. Please try again.',
-            suggestions: ['Find a DJ in Mumbai', 'Show me singers in Delhi', 'What categories do you have?'],
+            suggestions: ['Try again', 'Find a DJ in Mumbai', 'Show me singers in Delhi'],
           },
         ]);
         setState('idle');

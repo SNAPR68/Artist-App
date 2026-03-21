@@ -3,6 +3,16 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  Search,
+  Calendar,
+  Heart,
+  Building2,
+  Sparkles,
+  AlertTriangle,
+  ArrowRight,
+  Clock,
+} from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 
 interface ClientProfile {
@@ -16,6 +26,31 @@ interface Shortlist {
   name: string;
   created_at: string;
 }
+
+const StatsSkeleton = () => (
+  <div className="animate-pulse grid grid-cols-3 gap-4 mb-8">
+    {[...Array(3)].map((_, i) => (
+      <div key={i} className="glass-card p-6 rounded-xl">
+        <div className="h-4 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded w-3/4 mb-3" />
+        <div className="h-8 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded w-1/2" />
+      </div>
+    ))}
+  </div>
+);
+
+const QuickActionsSkeleton = () => (
+  <div className="animate-pulse">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="glass-card p-6 rounded-xl">
+          <div className="w-12 h-12 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded-lg mb-3" />
+          <div className="h-4 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded w-4/5 mb-2" />
+          <div className="h-3 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded w-3/4" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 export default function ClientDashboardPage() {
   const router = useRouter();
@@ -39,89 +74,149 @@ export default function ClientDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+      <div className="space-y-8">
+        <div className="h-10 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded-lg w-1/2 animate-pulse" />
+        <StatsSkeleton />
+        <QuickActionsSkeleton />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in">
+      {/* Welcome Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-4xl font-heading font-bold text-text-primary mb-2">
           {profile?.company_name ? `Welcome, ${profile.company_name}` : 'Client Dashboard'}
         </h1>
-        <p className="text-gray-500">Find and book artists for your events</p>
+        <p className="text-text-muted text-lg">
+          Find and book premium artists for your events
+        </p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="glass-card rounded-xl p-6 border glass-border hover:border-primary-500/50 transition-all group">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm text-text-muted font-medium">Active Bookings</p>
+            <Calendar className="w-5 h-5 text-primary-400 group-hover:scale-110 transition-transform" />
+          </div>
+          <p className="text-3xl font-bold text-text-primary">0</p>
+          <p className="text-xs text-text-muted mt-2">Coming up soon</p>
+        </div>
+
+        <div className="glass-card rounded-xl p-6 border glass-border hover:border-primary-500/50 transition-all group">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm text-text-muted font-medium">Shortlisted Artists</p>
+            <Heart className="w-5 h-5 text-accent-magenta group-hover:scale-110 transition-transform" />
+          </div>
+          <p className="text-3xl font-bold text-text-primary">{shortlists.length}</p>
+          <p className="text-xs text-text-muted mt-2">Ready to contact</p>
+        </div>
+
+        <div className="glass-card rounded-xl p-6 border glass-border hover:border-primary-500/50 transition-all group">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm text-text-muted font-medium">Total Events</p>
+            <Sparkles className="w-5 h-5 text-success group-hover:scale-110 transition-transform" />
+          </div>
+          <p className="text-3xl font-bold text-text-primary">0</p>
+          <p className="text-xs text-text-muted mt-2">Planned this year</p>
+        </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <Link
-          href="/search"
-          className="bg-primary-500 text-white rounded-lg p-5 hover:bg-primary-600 transition-colors"
-        >
-          <span className="block text-lg mb-1">🔍</span>
-          <span className="font-medium">Find Artists</span>
-          <p className="text-primary-100 text-xs mt-1">Search by genre, city, budget</p>
-        </Link>
-        <Link
-          href="/client/bookings"
-          className="bg-white rounded-lg p-5 border border-gray-200 hover:border-primary-300 transition-colors"
-        >
-          <span className="block text-lg mb-1">📋</span>
-          <span className="font-medium text-gray-900">My Bookings</span>
-          <p className="text-gray-500 text-xs mt-1">Track & manage</p>
-        </Link>
-        <Link
-          href="/client/shortlists"
-          className="bg-white rounded-lg p-5 border border-gray-200 hover:border-primary-300 transition-colors"
-        >
-          <span className="block text-lg mb-1">⭐</span>
-          <span className="font-medium text-gray-900">My Shortlists</span>
-          <p className="text-gray-500 text-xs mt-1">{shortlists.length} shortlist{shortlists.length !== 1 ? 's' : ''}</p>
-        </Link>
-        <Link
-          href="/client/workspace"
-          className="bg-white rounded-lg p-5 border border-gray-200 hover:border-primary-300 transition-colors"
-        >
-          <span className="block text-lg mb-1">🏢</span>
-          <span className="font-medium text-gray-900">Workspace</span>
-          <p className="text-gray-500 text-xs mt-1">Events & pipeline</p>
-        </Link>
-        <Link
-          href="/client/recommendations"
-          className="bg-white rounded-lg p-5 border border-gray-200 hover:border-primary-300 transition-colors"
-        >
-          <span className="block text-lg mb-1">✨</span>
-          <span className="font-medium text-gray-900">Discover</span>
-          <p className="text-gray-500 text-xs mt-1">AI recommendations</p>
-        </Link>
-        <Link
-          href="/client/substitutions"
-          className="bg-white rounded-lg p-5 border border-gray-200 hover:border-primary-300 transition-colors"
-        >
-          <span className="block text-lg mb-1">🔄</span>
-          <span className="font-medium text-gray-900">Substitutions</span>
-          <p className="text-gray-500 text-xs mt-1">Emergency replacements</p>
-        </Link>
+      <div>
+        <h2 className="text-xl font-heading font-bold text-text-primary mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <QuickActionCard
+            href="/search"
+            icon={Search}
+            title="Find Artists"
+            description="Search by genre, city, budget"
+            gradientFrom="from-primary-500"
+            gradientTo="to-primary-600"
+            isPrimary
+          />
+          <QuickActionCard
+            href="/client/bookings"
+            icon={Calendar}
+            title="My Bookings"
+            description="Track & manage"
+            gradientFrom="from-accent-magenta"
+            gradientTo="to-pink-600"
+          />
+          <QuickActionCard
+            href="/client/shortlists"
+            icon={Heart}
+            title="My Shortlists"
+            description={`${shortlists.length} shortlist${shortlists.length !== 1 ? 's' : ''}`}
+            gradientFrom="from-rose-500"
+            gradientTo="to-red-600"
+          />
+          <QuickActionCard
+            href="/client/workspace"
+            icon={Building2}
+            title="Workspace"
+            description="Events & pipeline"
+            gradientFrom="from-blue-500"
+            gradientTo="to-cyan-600"
+          />
+          <QuickActionCard
+            href="/client/recommendations"
+            icon={Sparkles}
+            title="Discover Artists"
+            description="AI recommendations"
+            gradientFrom="from-purple-500"
+            gradientTo="to-indigo-600"
+          />
+          <QuickActionCard
+            href="/client/substitutions"
+            icon={AlertTriangle}
+            title="Emergency Sub"
+            description="Last-minute replacements"
+            gradientFrom="from-orange-500"
+            gradientTo="to-red-600"
+          />
+        </div>
       </div>
 
       {/* Recent Shortlists */}
       {shortlists.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Recent Shortlists</h2>
-          <div className="space-y-2">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-heading font-bold text-text-primary">Recent Shortlists</h2>
+            <Link
+              href="/client/shortlists"
+              className="text-sm font-medium text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1"
+            >
+              View all <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="space-y-3">
             {shortlists.slice(0, 5).map((sl) => (
               <Link
                 key={sl.id}
                 href={`/client/shortlists/${sl.id}`}
-                className="block bg-white rounded-lg border border-gray-200 p-3 hover:border-primary-300 transition-colors"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-900">{sl.name}</span>
-                  <span className="text-xs text-gray-400">
-                    {new Date(sl.created_at).toLocaleDateString('en-IN')}
-                  </span>
+                <div className="glass-card rounded-xl p-4 border glass-border hover:border-primary-500/50 hover:shadow-glow-sm transition-all group cursor-pointer">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-text-primary group-hover:text-primary-300 transition-colors">
+                        {sl.name}
+                      </h3>
+                      <div className="flex items-center gap-1 text-xs text-text-muted mt-1">
+                        <Clock className="w-3 h-3" />
+                        <span>
+                          {new Date(sl.created_at).toLocaleDateString('en-IN', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-text-muted group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
+                  </div>
                 </div>
               </Link>
             ))}
@@ -129,5 +224,66 @@ export default function ClientDashboardPage() {
         </div>
       )}
     </div>
+  );
+}
+
+interface QuickActionCardProps {
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  gradientFrom: string;
+  gradientTo: string;
+  isPrimary?: boolean;
+}
+
+function QuickActionCard({
+  href,
+  icon: Icon,
+  title,
+  description,
+  gradientFrom,
+  gradientTo,
+  isPrimary = false,
+}: QuickActionCardProps) {
+  return (
+    <Link href={href}>
+      <div
+        className={`rounded-xl p-6 border transition-all duration-300 h-full group cursor-pointer ${
+          isPrimary
+            ? `bg-gradient-to-br ${gradientFrom} ${gradientTo} border-primary-500/30 hover:border-primary-400 hover:shadow-glow-sm`
+            : `glass-card glass-border hover:border-primary-500/50 hover:shadow-glow-sm`
+        }`}
+      >
+        <div
+          className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${
+            isPrimary
+              ? 'bg-white/20'
+              : `bg-gradient-to-br ${gradientFrom} ${gradientTo}`
+          }`}
+        >
+          <Icon className={`w-6 h-6 ${isPrimary ? 'text-white' : 'text-white'}`} />
+        </div>
+        <h3
+          className={`font-semibold mb-1 group-hover:translate-y-0 transition-all ${
+            isPrimary
+              ? 'text-white'
+              : 'text-text-primary group-hover:text-primary-300'
+          }`}
+        >
+          {title}
+        </h3>
+        <p className={`text-sm mb-3 ${isPrimary ? 'text-white/80' : 'text-text-muted'}`}>
+          {description}
+        </p>
+        <div
+          className={`flex items-center text-xs font-medium group-hover:translate-x-1 transition-transform ${
+            isPrimary ? 'text-white/70' : 'text-primary-400'
+          }`}
+        >
+          Explore <ArrowRight className="ml-1 w-3 h-3" />
+        </div>
+      </div>
+    </Link>
   );
 }
