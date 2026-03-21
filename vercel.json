@@ -8,12 +8,6 @@
     "silent": false
   },
   "regions": ["sfo1", "iad1"],
-  "functions": {
-    "apps/web/src/app/**/*.{js,ts,jsx,tsx}": {
-      "memory": 1024,
-      "maxDuration": 60
-    }
-  },
   "env": {
     "NODE_ENV": "production"
   }
