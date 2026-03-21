@@ -160,9 +160,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: async () => {
     try {
       await apiClient('/v1/auth/logout', { method: 'POST' });
+    } catch {
+      // Best-effort — token may already be expired
     } finally {
       clearTokens();
       set({ user: null, isAuthenticated: false });
+      // Redirect to homepage after logout
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
     }
   },
 

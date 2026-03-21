@@ -5,6 +5,7 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
 import { I18nProvider } from '@/i18n';
 import { AuthInitializer } from '@/components/AuthInitializer';
+import { SessionExpiredModal } from '@/components/SessionExpiredModal';
 import { VoiceAssistant } from '@/components/voice/VoiceAssistant';
 
 const inter = Inter({
@@ -28,11 +29,56 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${plusJakarta.variable}`}>
+      {/* Inline auth loading skeleton — prevents white flash while JS boots.
+          The AuthInitializer component removes this class once auth state resolves. */}
+      <head>
+        <style dangerouslySetInnerHTML={{ __html: `
+          .auth-loading body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #0A0F1A 0%, #111827 100%);
+            transition: opacity 0.3s ease;
+          }
+          .auth-loading body::after {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            z-index: 10000;
+            width: 2rem;
+            height: 2rem;
+            margin: -1rem 0 0 -1rem;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-top-color: #8B5CF6;
+            border-radius: 50%;
+            animation: auth-spin 0.6s linear infinite;
+          }
+          @keyframes auth-spin {
+            to { transform: rotate(360deg); }
+          }
+          .auth-ready body::before,
+          .auth-ready body::after {
+            opacity: 0;
+            pointer-events: none;
+          }
+        `}} />
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(){
+            try {
+              var t = localStorage.getItem('access_token');
+              if (t) document.documentElement.classList.add('auth-loading');
+            } catch(e) {}
+          })();
+        `}} />
+      </head>
       <body>
         <ErrorBoundary>
           <I18nProvider>
             <ToastProvider>
               <AuthInitializer />
+              <SessionExpiredModal />
               {children}
               <VoiceAssistant />
             </ToastProvider>

@@ -45,29 +45,61 @@ export function clearTokens() {
   }
 }
 
+// ─── Session expiry event ───
+// Fires when refresh fails and session is truly dead. Components can listen
+// to show a modal instead of silently redirecting.
+type SessionExpiredListener = () => void;
+const sessionExpiredListeners: Set<SessionExpiredListener> = new Set();
+
+export function onSessionExpired(listener: SessionExpiredListener): () => void {
+  sessionExpiredListeners.add(listener);
+  return () => { sessionExpiredListeners.delete(listener); };
+}
+
+function emitSessionExpired() {
+  sessionExpiredListeners.forEach((fn) => fn());
+}
+
+// ─── Retry queue for concurrent 401s ───
+// When multiple requests hit 401 at the same time, only ONE refresh call
+// should fire. The rest queue up and replay once the single refresh resolves.
+let refreshPromise: Promise<boolean> | null = null;
+
 async function refreshAccessToken(): Promise<boolean> {
+  // If a refresh is already in flight, piggy-back on it
+  if (refreshPromise) return refreshPromise;
+
   const stored = getRefreshToken();
   if (!stored) return false;
 
-  try {
-    const res = await fetch(`${API_BASE_URL}/v1/auth/token/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token: stored }),
-    });
+  refreshPromise = (async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/v1/auth/token/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: stored }),
+      });
 
-    if (!res.ok) {
+      if (!res.ok) {
+        clearTokens();
+        emitSessionExpired();
+        return false;
+      }
+
+      const data = await res.json();
+      setTokens(data.data.access_token, data.data.refresh_token);
+      return true;
+    } catch {
       clearTokens();
+      emitSessionExpired();
       return false;
+    } finally {
+      // Clear the singleton so future 401s can trigger a fresh refresh
+      refreshPromise = null;
     }
+  })();
 
-    const data = await res.json();
-    setTokens(data.data.access_token, data.data.refresh_token);
-    return true;
-  } catch {
-    clearTokens();
-    return false;
-  }
+  return refreshPromise;
 }
 
 export async function apiClient<T>(
@@ -95,8 +127,7 @@ export async function apiClient<T>(
       headers['Authorization'] = `Bearer ${getAccessToken()}`;
       response = await fetch(url, { ...options, headers });
     } else {
-      // Don't hard-redirect — let callers handle auth failures gracefully.
-      // Return error response instead of nuking the session.
+      // Don't hard-redirect — the SessionExpiredModal handles UX.
       return { success: false, data: {} as T, errors: [{ code: 'UNAUTHORIZED', message: 'Session expired. Please log in again.' }] } as ApiResponse<T>;
     }
   }
