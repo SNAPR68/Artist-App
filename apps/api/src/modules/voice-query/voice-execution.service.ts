@@ -477,6 +477,12 @@ export class VoiceExecutionService {
       recommendations: { client: '/client/recommendations', event_company: '/client/recommendations', agent: '/agent/recommendations' },
       shortlists: { client: '/client/shortlists', event_company: '/client/shortlists' },
       substitutions: { client: '/client/substitutions', event_company: '/client/substitutions' },
+      payments: { client: '/client/payments', event_company: '/client/payments' },
+      team: { client: '/client/workspace', event_company: '/client/workspace' },
+      roster: { agent: '/agent/roster' },
+      commissions: { agent: '/agent/commissions' },
+      backup: { artist: '/artist/settings/backup' },
+      voice: { artist: '/voice', client: '/voice', agent: '/voice', event_company: '/voice', admin: '/voice' },
     };
 
     const routeMap = ROUTE_MAP[pageTarget];
@@ -497,6 +503,8 @@ export class VoiceExecutionService {
       settings: 'settings', home: 'home', seasonal: 'seasonal trends',
       reputation: 'your reputation', gamification: 'your achievements',
       recommendations: 'recommendations', shortlists: 'your shortlists', substitutions: 'substitution requests',
+      payments: 'your payments', team: 'team management', roster: 'your artist roster',
+      commissions: 'your commissions', backup: 'backup settings', voice: 'voice assistant',
     };
 
     return {

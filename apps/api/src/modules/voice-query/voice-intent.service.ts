@@ -52,9 +52,10 @@ const INTENT_KEYWORDS: Record<string, string[]> = {
     'emergency', 'backup', 'last minute', 'who can replace',
   ],
   NAVIGATE: [
-    'go to', 'show me', 'open', 'navigate', 'take me to',
-    'jao', 'dikhao', 'kholo', 'dekho',
-    'page', 'dashboard', 'screen',
+    'go to', 'go to my', 'show me', 'show my', 'open', 'open my', 'navigate',
+    'take me to', 'take me to my', 'switch to', 'go back to',
+    'jao', 'dikhao', 'kholo', 'dekho', 'mera', 'mere', 'meri',
+    'page', 'dashboard', 'screen', 'section',
   ],
 };
 
@@ -130,6 +131,13 @@ const PAGE_TARGETS: Record<string, string> = {
   'recommendations': 'recommendations', 'suggested': 'recommendations',
   'shortlist': 'shortlists', 'shortlists': 'shortlists', 'saved': 'shortlists',
   'substitution': 'substitutions', 'replacement': 'substitutions',
+  'payments': 'payments', 'payment': 'payments', 'invoices': 'payments', 'billing': 'payments',
+  'team': 'team', 'members': 'team', 'team members': 'team',
+  'roster': 'roster', 'my artists': 'roster', 'artist roster': 'roster',
+  'commissions': 'commissions', 'commission': 'commissions',
+  'backup': 'backup', 'data backup': 'backup',
+  'voice': 'voice', 'voice assistant': 'voice',
+  'achievements': 'gamification', 'rewards': 'gamification', 'streaks': 'gamification',
 };
 
 // Sorted page target keys: longest first for multi-word matching

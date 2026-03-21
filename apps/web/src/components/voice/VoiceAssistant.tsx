@@ -455,8 +455,8 @@ export function VoiceAssistant() {
             </button>
             {/* Label */}
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-semibold text-text-primary leading-tight">ArtistChat</span>
-              <span className="text-[10px] text-text-muted leading-tight">Ask or speak to find artists</span>
+              <span className="text-sm font-semibold text-text-primary leading-tight">{user ? 'Voice Assistant' : 'ArtistChat'}</span>
+              <span className="text-[10px] text-text-muted leading-tight">{user ? 'Ask or speak for anything' : 'Ask or speak to find artists'}</span>
             </div>
             {/* Online dot */}
             <span className="relative flex h-2 w-2 shrink-0 ml-1">
@@ -495,10 +495,10 @@ export function VoiceAssistant() {
                 </div>
                 <div>
                   <h3 className="font-heading font-semibold text-white text-sm leading-tight">
-                    ArtistChat
+                    {user ? 'Voice Assistant' : 'ArtistChat'}
                   </h3>
                   <p className="text-[10px] text-white/70 leading-tight">
-                    AI-powered artist discovery
+                    {user ? 'Voice commands for everything' : 'AI-powered artist discovery'}
                   </p>
                 </div>
               </div>
