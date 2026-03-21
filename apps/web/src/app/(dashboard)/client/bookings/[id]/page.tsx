@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { apiClient } from '../../../../../lib/api-client';
 import { StateTimeline } from '../../../../../components/booking/StateTimeline';
 import { QuoteBreakdown } from '../../../../../components/booking/QuoteBreakdown';
+import { ReviewForm } from '../../../../../components/booking/ReviewForm';
+import CancellationModal from '../../../../../components/payment/CancellationModal';
 
 interface BookingDetail {
   id: string;
@@ -55,9 +57,10 @@ export default function ClientBookingDetailPage() {
   const [submitting, setSubmitting] = useState(false);
 
   // Review state
-  const [reviewRating, setReviewRating] = useState(5);
-  const [reviewComment, setReviewComment] = useState('');
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  // Cancellation modal state
+  const [showCancellationModal, setShowCancellationModal] = useState(false);
 
   useEffect(() => {
     loadBooking();
@@ -93,36 +96,8 @@ export default function ClientBookingDetailPage() {
     loadBooking();
   };
 
-  const handleCancel = async () => {
-    if (!confirm('Cancel this booking?')) return;
-    setSubmitting(true);
-    await apiClient(`/v1/bookings/${id}/transition`, {
-      method: 'POST',
-      body: JSON.stringify({ state: 'cancelled' }),
-    });
-    setSubmitting(false);
-    loadBooking();
-  };
-
-  const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    const res = await apiClient('/v1/reviews', {
-      method: 'POST',
-      body: JSON.stringify({
-        booking_id: id,
-        overall_rating: reviewRating,
-        dimensions: {
-          professionalism: reviewRating,
-          punctuality: reviewRating,
-          performance_quality: reviewRating,
-          value_for_money: reviewRating,
-        },
-        comment: reviewComment || undefined,
-      }),
-    });
-    setSubmitting(false);
-    if (res.success) setReviewSubmitted(true);
+  const handleCancelClick = () => {
+    setShowCancellationModal(true);
   };
 
   const handleDownloadContract = async () => {
@@ -263,7 +238,7 @@ export default function ClientBookingDetailPage() {
             </button>
           )}
           {canCancel && (
-            <button onClick={handleCancel} disabled={submitting} className="py-2 px-4 border border-red-300 text-red-600 rounded-lg text-sm hover:bg-red-50 disabled:opacity-50">
+            <button onClick={handleCancelClick} disabled={submitting} className="py-2 px-4 border border-red-300 text-red-600 rounded-lg text-sm hover:bg-red-50 disabled:opacity-50">
               Cancel
             </button>
           )}
@@ -274,40 +249,10 @@ export default function ClientBookingDetailPage() {
       {canReview && !reviewSubmitted && (
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <h2 className="text-sm font-semibold text-gray-500 uppercase mb-4">Leave a Review</h2>
-          <form onSubmit={handleSubmitReview} className="space-y-4">
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">Rating</label>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setReviewRating(star)}
-                    className={`text-2xl ${star <= reviewRating ? 'text-yellow-400' : 'text-gray-300'}`}
-                  >
-                    ★
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">Comment (optional)</label>
-              <textarea
-                value={reviewComment}
-                onChange={(e) => setReviewComment(e.target.value)}
-                rows={3}
-                placeholder="How was the performance?"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full py-2 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 disabled:opacity-50"
-            >
-              {submitting ? 'Submitting...' : 'Submit Review'}
-            </button>
-          </form>
+          <ReviewForm
+            bookingId={id}
+            onSubmitSuccess={() => setReviewSubmitted(true)}
+          />
         </div>
       )}
 
@@ -315,6 +260,20 @@ export default function ClientBookingDetailPage() {
         <div className="bg-green-50 border border-green-200 rounded-lg p-5 text-center">
           <p className="text-green-700 font-medium">Thank you! Your review has been submitted.</p>
         </div>
+      )}
+
+      {/* Cancellation Modal */}
+      {showCancellationModal && booking && (
+        <CancellationModal
+          bookingId={id}
+          eventDate={booking.event_date}
+          onClose={() => setShowCancellationModal(false)}
+          onCancelled={() => {
+            setShowCancellationModal(false);
+            loadBooking();
+          }}
+          cancellationType="BY_CLIENT"
+        />
       )}
     </div>
   );

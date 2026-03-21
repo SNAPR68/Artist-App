@@ -3,6 +3,7 @@ import { conciergeService } from './concierge.service.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
+import { conciergeSearchSchema, conciergeCreateBookingSchema } from '@artist-booking/shared';
 
 export async function conciergeRoutes(app: FastifyInstance) {
   /**
@@ -11,7 +12,7 @@ export async function conciergeRoutes(app: FastifyInstance) {
   app.post('/v1/concierge/search', {
     preHandler: [authMiddleware, requirePermission('concierge:manage'), rateLimit('SEARCH')],
   }, async (request, reply) => {
-    const params = request.body as Record<string, unknown>;
+    const params = conciergeSearchSchema.parse(request.body);
     const artists = await conciergeService.searchOnBehalf(params);
 
     return reply.send({
@@ -27,12 +28,12 @@ export async function conciergeRoutes(app: FastifyInstance) {
   app.post('/v1/concierge/bookings', {
     preHandler: [authMiddleware, requirePermission('concierge:manage'), rateLimit('WRITE')],
   }, async (request, reply) => {
-    const { client_user_id, ...bookingData } = request.body as { client_user_id: string } & Record<string, unknown>;
+    const body = conciergeCreateBookingSchema.parse(request.body);
 
     const booking = await conciergeService.createBookingOnBehalf(
       request.user!.user_id,
-      client_user_id,
-      bookingData as never,
+      body.client_user_id,
+      body as never,
     );
 
     return reply.status(201).send({
@@ -63,7 +64,7 @@ export async function conciergeRoutes(app: FastifyInstance) {
    */
   app.get('/v1/concierge/stats', {
     preHandler: [authMiddleware, requirePermission('concierge:manage')],
-  }, async (request, reply) => {
+  }, async (_request, reply) => {
     const stats = await conciergeService.getStats();
 
     return reply.send({

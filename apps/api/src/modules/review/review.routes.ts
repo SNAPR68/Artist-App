@@ -2,18 +2,14 @@ import type { FastifyInstance } from 'fastify';
 import { reviewService } from './review.service.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
+import { createReviewSchema } from '@artist-booking/shared';
 
 export async function reviewRoutes(app: FastifyInstance) {
   /** POST /v1/reviews — Submit a review for a booking */
   app.post('/v1/reviews', {
     preHandler: [authMiddleware, rateLimit('WRITE')],
   }, async (request, reply) => {
-    const body = request.body as {
-      booking_id: string;
-      overall_rating: number;
-      dimensions: Record<string, number>;
-      comment?: string;
-    };
+    const body = createReviewSchema.parse(request.body);
 
     const review = await reviewService.submitReview(request.user!.user_id, body);
 

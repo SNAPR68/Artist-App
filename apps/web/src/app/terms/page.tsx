@@ -74,8 +74,85 @@ export default function TermsOfServicePage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-gray-900">11. Contact</h2>
-          <p className="text-gray-700">For questions about these Terms, email us at <strong>legal@artistbooking.in</strong>.</p>
+          <h2 className="text-lg font-semibold text-gray-900">11. Intellectual Property</h2>
+          <p className="text-gray-700">All content on the Platform, including logos, designs, and software, is owned by or licensed to Artist Booking Platform. Artists retain ownership of their performance videos and audio recordings. Clients may not download, reproduce, or distribute artist content without explicit permission.</p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">12. Rating & Review System</h2>
+          <p className="text-gray-700">Both Artists and Clients can leave ratings and reviews after a booking is completed. Reviews must be truthful and relate to the actual performance or booking experience. We reserve the right to remove reviews that are defamatory, offensive, or unrelated to the service. Artists and Clients may dispute reviews through our support system.</p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">13. Booking Modifications</h2>
+          <ul className="list-disc pl-5 text-gray-700 space-y-1">
+            <li>Artist can request modifications (date, time, scope) before acceptance with Client approval</li>
+            <li>Client can request modifications within 24 hours of booking confirmation</li>
+            <li>Modifications may result in price adjustments, agreed upon by both parties</li>
+            <li>After 24 hours, modifications require both parties' written consent</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">14. Performance Standards for Artists</h2>
+          <p className="text-gray-700">Artists agree to:</p>
+          <ul className="list-disc pl-5 text-gray-700 space-y-1">
+            <li>Arrive 15 minutes before the scheduled event time</li>
+            <li>Perform for the agreed duration with professionalism</li>
+            <li>Bring necessary equipment unless specified otherwise</li>
+            <li>Maintain appropriate conduct and language at all times</li>
+            <li>Comply with Client's reasonable requests regarding performance type</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">15. Client Responsibilities</h2>
+          <p className="text-gray-700">Clients agree to:</p>
+          <ul className="list-disc pl-5 text-gray-700 space-y-1">
+            <li>Provide accurate event details and venue information</li>
+            <li>Arrange safe, appropriate venue for the performance</li>
+            <li>Ensure timely payment and no payment disputes after satisfaction</li>
+            <li>Treat Artists with respect and professionalism</li>
+            <li>Not record performances without written consent (exceptions for personal use)</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">16. Account Suspension & Termination</h2>
+          <p className="text-gray-700">We reserve the right to suspend or terminate accounts that:</p>
+          <ul className="list-disc pl-5 text-gray-700 space-y-1">
+            <li>Violate these Terms or our conduct guidelines</li>
+            <li>Have multiple payment defaults or chargebacks</li>
+            <li>Have ratings consistently below 2.5 stars due to performance issues</li>
+            <li>Engage in fraudulent or abusive behavior</li>
+            <li>Breach confidentiality or use the Platform to solicit off-platform bookings</li>
+          </ul>
+          <p className="text-gray-700 mt-2">Suspended accounts will be notified with reason and may appeal within 30 days.</p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">17. Amendments to Terms</h2>
+          <p className="text-gray-700">We may update these Terms at any time. Changes take effect 30 days after posting. Continued use of the Platform after 30 days constitutes acceptance of updated Terms. For material changes, we will provide additional notice via email.</p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">18. Severability</h2>
+          <p className="text-gray-700">If any provision of these Terms is found invalid or unenforceable by a court of law, that provision will be severed and the remaining provisions will continue in full force and effect.</p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">19. Entire Agreement</h2>
+          <p className="text-gray-700">These Terms, together with our Privacy Policy, constitute the entire agreement between you and Artist Booking Platform regarding your use of the Platform and supersede all prior or contemporaneous agreements.</p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">20. Contact & Support</h2>
+          <p className="text-gray-700">For questions or disputes regarding these Terms, contact us at:</p>
+          <ul className="list-disc pl-5 text-gray-700 space-y-1">
+            <li>Email: <strong>legal@artistbooking.in</strong></li>
+            <li>Support Portal: Available 24/7 in the Platform</li>
+            <li>Postal Address: Artist Booking Platform, 123 Tech Street, Mumbai, Maharashtra 400001, India</li>
+          </ul>
         </section>
       </div>
     </div>

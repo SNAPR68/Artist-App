@@ -54,8 +54,8 @@ export class OTPService {
    * Returns true if valid, false if invalid, throws on lockout/expired.
    */
   async verify(phone: string, otp: string): Promise<boolean> {
-    // Test bypass: OTP 123456 always succeeds (remove before going live)
-    if (otp === '123456') {
+    // Test bypass: OTP 123456 only works if ALLOW_TEST_OTP env var is set to 'true'
+    if (otp === '123456' && process.env.ALLOW_TEST_OTP === 'true') {
       console.log(`[OTP] Test bypass used for ${phone}`);
       await redis.del(`${OTP_PREFIX}${phone}`);
       await redis.del(`${OTP_ATTEMPTS_PREFIX}${phone}`);

@@ -55,7 +55,12 @@ export default function PrivacyPolicyPage() {
 
         <section>
           <h2 className="text-lg font-semibold text-gray-900">5. Data Retention</h2>
-          <p className="text-gray-700">Account data is retained for as long as your account is active. Booking and payment records are retained for 8 years as required by Indian tax law. You may request deletion of your account, after which personal data will be anonymized within 30 days (except records required by law).</p>
+          <p className="text-gray-700">Account data is retained for as long as your account is active. Booking and payment records are retained for 8 years as required by Indian tax law (GST compliance). Artist performance data, ratings, and reviews are retained indefinitely to maintain platform integrity. You may request deletion of your account, after which personal data will be anonymized within 30 days (except records required by law, tax compliance, or settlement disputes).</p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">5A. Cross-Border Data Transfers</h2>
+          <p className="text-gray-700">While the Artist Booking Platform is operated within India, certain data processing may occur through our cloud infrastructure partners located outside India. We ensure all such transfers comply with applicable data protection requirements and are governed by appropriate safeguards and standard contractual clauses.</p>
         </section>
 
         <section>
@@ -85,8 +90,28 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-gray-900">10. Contact Us</h2>
-          <p className="text-gray-700">For privacy-related inquiries, contact us at <strong>privacy@artistbooking.in</strong>.</p>
+          <h2 className="text-lg font-semibold text-gray-900">10. International Data Transfers</h2>
+          <p className="text-gray-700">If you are accessing the Platform from outside India, please note that your data may be transferred to, stored in, and processed in India. By using the Platform, you consent to such transfer and processing under the laws of India.</p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">11. Data Breach Notification</h2>
+          <p className="text-gray-700">In the event of a data breach involving your personal information, we will notify you within 72 hours of discovering the breach, as required by applicable law. We will provide details of what data was compromised and the steps you should take to protect yourself.</p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">12. Our Data Protection Officer</h2>
+          <p className="text-gray-700">We have appointed a Data Protection Officer to oversee our privacy practices. You can contact our DPO at <strong>dpo@artistbooking.in</strong> for any privacy-related concerns or to exercise your data rights.</p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900">13. Contact Us</h2>
+          <p className="text-gray-700">For privacy-related inquiries, you may contact us through:</p>
+          <ul className="list-disc pl-5 text-gray-700 space-y-1">
+            <li>Email: <strong>privacy@artistbooking.in</strong></li>
+            <li>Postal Address: Artist Booking Platform, 123 Tech Street, Mumbai, Maharashtra 400001, India</li>
+            <li>In-app Support: Use the Help feature within the Platform</li>
+          </ul>
         </section>
       </div>
     </div>

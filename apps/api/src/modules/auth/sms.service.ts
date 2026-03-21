@@ -12,14 +12,14 @@ export class SMSService {
    * Send OTP via MSG91
    */
   async sendOTP(phone: string, otp: string): Promise<SMSResult> {
-    // In development, just log the OTP
+    // In development, just log that OTP was sent (don't log the actual OTP)
     if (config.NODE_ENV === 'development') {
-      console.log(`[DEV] OTP for +91${phone}: ${otp}`);
+      console.log(`[DEV] OTP sent for +91${phone}`);
       return { success: true, provider: 'dev-console' };
     }
 
     if (!config.MSG91_AUTH_KEY || !config.MSG91_OTP_TEMPLATE_ID) {
-      console.log(`[SMS BYPASS] OTP for +91${phone}: ${otp} (MSG91 not configured, use 123456 to bypass)`);
+      console.log(`[SMS BYPASS] OTP sent for +91${phone} (MSG91 not configured, use 123456 to bypass)`);
       return { success: true, provider: 'bypass-console' };
     }
 

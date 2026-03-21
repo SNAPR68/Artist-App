@@ -215,6 +215,12 @@ export default function WorkspaceDetailPage() {
         </div>
         <div className="flex gap-2">
           <Link
+            href={`/client/workspace/${workspaceId}/team`}
+            className="text-sm bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
+            Team
+          </Link>
+          <Link
             href={`/client/workspace/${workspaceId}/analytics`}
             className="text-sm bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors font-medium"
           >

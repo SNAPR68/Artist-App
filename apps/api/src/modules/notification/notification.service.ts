@@ -1,5 +1,13 @@
 import { NotificationChannel } from '@artist-booking/shared';
 
+/**
+ * Mask a phone number for safe logging: 98****3210
+ */
+function maskPhoneNumber(phone: string): string {
+  if (!phone || phone.length < 4) return '****';
+  return phone.slice(0, 2) + '****' + phone.slice(-4);
+}
+
 interface NotificationPayload {
   userId: string;
   channel: NotificationChannel;
@@ -88,13 +96,13 @@ export class NotificationService {
     // Gupshup WhatsApp Business API integration
     // In development, log to console
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[WhatsApp] To: ${phone}, Template: ${template}`, variables);
+      console.log(`[WhatsApp] To: ${maskPhoneNumber(phone)}, Template: ${template}`, variables);
       return { status: 'sent', channel: 'whatsapp' };
     }
 
     const apiKey = process.env.GUPSHUP_API_KEY;
     if (!apiKey) {
-      console.log(`[WHATSAPP BYPASS] To: ${phone}, Template: ${template}`, variables);
+      console.log(`[WHATSAPP BYPASS] To: ${maskPhoneNumber(phone)}, Template: ${template}`, variables);
       return { status: 'bypassed', channel: 'whatsapp' };
     }
 
@@ -119,13 +127,13 @@ export class NotificationService {
   private async sendSMS(phone: string, template: string, variables: Record<string, string>) {
     // MSG91 SMS integration
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[SMS] To: ${phone}, Template: ${template}`, variables);
+      console.log(`[SMS] To: ${maskPhoneNumber(phone)}, Template: ${template}`, variables);
       return { status: 'sent', channel: 'sms' };
     }
 
     const authKey = process.env.MSG91_AUTH_KEY;
     if (!authKey) {
-      console.log(`[SMS BYPASS] To: ${phone}, Template: ${template}`, variables);
+      console.log(`[SMS BYPASS] To: ${maskPhoneNumber(phone)}, Template: ${template}`, variables);
       return { status: 'bypassed', channel: 'sms' };
     }
 

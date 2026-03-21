@@ -4,7 +4,7 @@ import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { validateBody } from '../../middleware/validation.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
-import { createClientProfileSchema } from '@artist-booking/shared';
+import { createClientProfileSchema, updateClientProfileSchema } from '@artist-booking/shared';
 
 export async function clientRoutes(app: FastifyInstance) {
   /**
@@ -50,6 +50,7 @@ export async function clientRoutes(app: FastifyInstance) {
       authMiddleware,
       requirePermission('client:update_own'),
       rateLimit('WRITE'),
+      validateBody(updateClientProfileSchema),
     ],
   }, async (request, reply) => {
     const profile = await clientService.updateProfile(request.user!.user_id, request.body as never);

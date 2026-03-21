@@ -70,6 +70,11 @@ await app.register(cors, {
 
 await app.register(helmet, {
   contentSecurityPolicy: false, // API-only, no HTML
+  strictTransportSecurity: {
+    maxAge: 31536000, // 1 year in seconds
+    includeSubDomains: true,
+    preload: true,
+  },
 });
 
 await app.register(compress, { global: true });
@@ -101,6 +106,32 @@ app.get('/v1', async () => {
       environment: config.NODE_ENV,
     },
     errors: [],
+  };
+});
+
+// ─── V1 Health Check ─────────────────────────────────────────
+app.get('/v1/health', async () => {
+  const startTime = process.uptime();
+  const [dbResult, redisOk] = await Promise.all([checkDatabaseHealth(), checkRedisHealth()]);
+
+  const status = dbResult.ok && redisOk ? 'ok' : 'degraded';
+
+  return {
+    success: status === 'ok',
+    data: {
+      status,
+      uptime: startTime,
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+      services: {
+        database: dbResult.ok ? 'ok' : 'error',
+        redis: redisOk ? 'ok' : 'error',
+      },
+    },
+    errors: [
+      ...(dbResult.error ? [{ code: 'DATABASE_ERROR', message: dbResult.error }] : []),
+      ...(!redisOk ? [{ code: 'REDIS_ERROR', message: 'Redis connection failed' }] : []),
+    ],
   };
 });
 

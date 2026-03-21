@@ -168,6 +168,17 @@ export const verifyPaymentSchema = z.object({
   razorpay_signature: z.string(),
 });
 
+export const paymentWebhookSchema = z.object({
+  event: z.string().min(1),
+  payload: z.record(z.unknown()),
+});
+
+export const settlePaymentSchema = z.object({
+  paymentId: z.string().uuid(),
+});
+
+export const settleEligibleSchema = z.object({}).strict();
+
 // ─── Dispute ────────────────────────────────────────────────────
 export const submitDisputeSchema = z.object({
   booking_id: z.string().uuid(),
@@ -685,3 +696,49 @@ export const publicDashboardSettingsSchema = z.object({
   public_dashboard_enabled: z.boolean(),
   client_visible_fields: z.array(z.string()).default(['name', 'date', 'venue', 'artists', 'status']),
 });
+
+// ─── Notification Preferences ──────────────────────────────────
+export const updateNotificationPrefsSchema = z.object({
+  whatsapp: z.boolean().optional(),
+  sms: z.boolean().optional(),
+  push: z.boolean().optional(),
+  email: z.boolean().optional(),
+});
+
+// ─── Shortlist ─────────────────────────────────────────────────
+export const createShortlistSchema = z.object({
+  name: z.string().min(1).max(200),
+});
+
+export const addArtistToShortlistSchema = z.object({
+  artist_id: z.string().uuid(),
+  notes: z.string().max(2000).optional(),
+});
+
+// ─── Concierge ─────────────────────────────────────────────────
+export const conciergeSearchSchema = z.object({
+  q: z.string().max(200).optional(),
+  genre: z.array(z.string()).optional(),
+  city: z.string().optional(),
+  event_type: z.nativeEnum(EventType).optional(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  budget_min: z.number().int().min(0).optional(),
+  budget_max: z.number().int().min(0).optional(),
+  distance_km: z.number().min(0).max(5000).optional(),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+});
+
+export const conciergeCreateBookingSchema = z.object({
+  client_user_id: z.string().uuid(),
+  artist_id: z.string().uuid(),
+  event_type: z.nativeEnum(EventType),
+  event_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  event_city: z.string().min(2).max(100),
+  event_venue: z.string().max(500).optional(),
+  duration_hours: z.number().min(0.5).max(24),
+  requirements: z.string().max(5000).optional(),
+});
+
+// ─── Client Profile Update ─────────────────────────────────────
+export const updateClientProfileSchema = createClientProfileSchema.partial();

@@ -3,7 +3,8 @@ services:
     name: artist-booking-api
     runtime: node
     region: singapore
-    plan: free
+    plan: starter
+    numInstances: 1
     buildCommand: HUSKY=0 NODE_ENV=development pnpm install && pnpm --filter @artist-booking/shared build && cd apps/api && npx tsc -p tsconfig.build.json && npx tsc-alias -p tsconfig.build.json
     startCommand: cd apps/api && node dist/app.js
     envVars:

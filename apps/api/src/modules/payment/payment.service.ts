@@ -5,6 +5,7 @@ import { bookingRepository } from '../booking/booking.repository.js';
 import { bookingService } from '../booking/booking.service.js';
 import { calculatePaymentSplit, calculateRefund } from './split-calculator.js';
 import { BookingState, PaymentStatus, FINANCIAL } from '@artist-booking/shared';
+import { db } from '../../infrastructure/database.js';
 export class PaymentService {
   /**
    * Create a Razorpay order for a confirmed booking.
@@ -156,6 +157,7 @@ export class PaymentService {
 
   /**
    * Process a partial refund (used by dispute resolution).
+   * Uses idempotency key to prevent duplicate refunds.
    */
   async processPartialRefund(bookingId: string, refundAmountPaise: number) {
     const payment = await paymentRepository.findByBookingId(bookingId);
@@ -164,9 +166,19 @@ export class PaymentService {
     }
 
     if (refundAmountPaise > 0) {
+      // Generate idempotency key for this refund
+      const idempotencyKey = `refund:${payment.id}:${refundAmountPaise}`;
+
+      // Check if this refund has already been processed
+      const existingRefund = await paymentRepository.findByIdempotencyKey(idempotencyKey);
+      if (existingRefund) {
+        return { refund_amount_paise: refundAmountPaise };
+      }
+
       await razorpayClient.initiateRefund(payment.razorpay_payment_id, refundAmountPaise, {
         booking_id: bookingId,
         reason: 'dispute_resolution',
+        idempotency_key: idempotencyKey,
       });
       await paymentRepository.updateStatus(payment.id, PaymentStatus.PARTIALLY_REFUNDED);
     }
@@ -225,6 +237,7 @@ export class PaymentService {
   /**
    * Settle a payment: release funds from escrow to artist.
    * Called by cron (auto-settle 3 days after event) or admin (manual).
+   * Uses database transaction to ensure atomic booking state + payment updates.
    */
   async settlePayment(paymentId: string) {
     const payment = await paymentRepository.findById(paymentId);
@@ -236,32 +249,69 @@ export class PaymentService {
       throw new PaymentError('INVALID_STATE', `Cannot settle payment in ${payment.status} status`, 400);
     }
 
-    // Update payment to settled
-    await paymentRepository.updateStatus(payment.id, PaymentStatus.SETTLED);
-    const settlement = await paymentRepository.recordSettlement(payment.id, {
-      artist_payout_paise: payment.artist_payout_paise,
-      platform_fee_paise: payment.platform_fee_paise,
-      tds_paise: payment.tds_paise,
-      settled_at: new Date(),
+    // Atomic transaction: update payment + booking state together
+    const result = await db.transaction(async (trx) => {
+      // Lock the payment row to prevent concurrent settlement attempts
+      const lockedPayment = await trx('payments')
+        .where({ id: payment.id })
+        .forUpdate()
+        .first();
+
+      if (!lockedPayment || lockedPayment.status !== PaymentStatus.IN_ESCROW) {
+        throw new PaymentError('CONFLICT', 'Payment status changed during settlement', 409);
+      }
+
+      // Update payment to settled
+      await trx('payments')
+        .where({ id: payment.id })
+        .update({
+          status: PaymentStatus.SETTLED,
+          updated_at: new Date(),
+        });
+
+      const settlement = await trx('payment_settlements')
+        .insert({
+          payment_id: payment.id,
+          artist_payout_paise: payment.artist_payout_paise,
+          platform_fee_paise: payment.platform_fee_paise,
+          tds_paise: payment.tds_paise,
+          settled_at: new Date(),
+        })
+        .returning('*')
+        .then((rows: any[]) => rows[0]);
+
+      // Get booking and transition to settled if completed
+      const booking = await trx('bookings')
+        .where({ id: payment.booking_id })
+        .first();
+
+      if (booking && booking.state === BookingState.COMPLETED) {
+        await trx('bookings')
+          .where({ id: payment.booking_id })
+          .update({
+            state: BookingState.SETTLED,
+            updated_at: new Date(),
+          });
+
+        await trx('booking_events')
+          .insert({
+            booking_id: payment.booking_id,
+            from_state: BookingState.COMPLETED,
+            to_state: BookingState.SETTLED,
+            triggered_by: 'system:settlement',
+            metadata: JSON.stringify({ payment_id: paymentId, artist_payout_paise: payment.artist_payout_paise }),
+            created_at: new Date(),
+          });
+      }
+
+      return settlement;
     });
 
-    // Auto-create payout transfer record
+    // Auto-create payout transfer record (outside transaction)
     try {
-      await payoutService.createPayout(settlement.id);
+      await payoutService.createPayout(result.id);
     } catch (err) {
-      console.error(`[SETTLEMENT] Failed to create payout for settlement ${settlement.id}:`, err);
-    }
-
-    // Transition booking to settled if completed
-    const booking = await bookingRepository.findById(payment.booking_id);
-    if (booking && booking.state === BookingState.COMPLETED) {
-      await bookingRepository.updateStatus(payment.booking_id, BookingState.SETTLED);
-      await bookingRepository.addEvent(payment.booking_id, {
-        from_state: BookingState.COMPLETED,
-        to_state: BookingState.SETTLED,
-        triggered_by: 'system:settlement',
-        metadata: { payment_id: paymentId, artist_payout_paise: payment.artist_payout_paise },
-      });
+      console.error(`[SETTLEMENT] Failed to create payout for settlement ${result.id}:`, err);
     }
 
     return {

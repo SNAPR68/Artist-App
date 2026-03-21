@@ -3,11 +3,14 @@
 import { useState } from 'react';
 import { apiClient } from '../../lib/api-client';
 
+type CancellationSubType = 'BY_CLIENT' | 'BY_ARTIST' | 'FORCE_MAJEURE' | 'PLATFORM';
+
 interface CancellationModalProps {
   bookingId: string;
   eventDate: string;
   onClose: () => void;
   onCancelled: () => void;
+  cancellationType?: CancellationSubType;
 }
 
 const CANCELLATION_SCHEDULE = [
@@ -30,10 +33,24 @@ function getRefundTier(days: number): string {
   return '0%';
 }
 
-export default function CancellationModal({ bookingId, eventDate, onClose, onCancelled }: CancellationModalProps) {
+const CANCELLATION_SUBTYPES: { value: CancellationSubType; label: string; description: string }[] = [
+  { value: 'BY_CLIENT', label: 'Client Initiated', description: 'I am cancelling this booking' },
+  { value: 'BY_ARTIST', label: 'Artist Cancelled', description: 'The artist has cancelled' },
+  { value: 'FORCE_MAJEURE', label: 'Force Majeure', description: 'Unforeseen circumstances (emergency, natural disaster)' },
+  { value: 'PLATFORM', label: 'Platform Issue', description: 'Technical or administrative issue' },
+];
+
+export default function CancellationModal({
+  bookingId,
+  eventDate,
+  onClose,
+  onCancelled,
+  cancellationType = 'BY_CLIENT'
+}: CancellationModalProps) {
   const [reason, setReason] = useState('');
+  const [subType, setSubType] = useState<CancellationSubType>(cancellationType);
   const [confirming, setConfirming] = useState(false);
-  const [step, setStep] = useState<'info' | 'confirm'>('info');
+  const [step, setStep] = useState<'info' | 'type' | 'confirm'>('info');
 
   const daysUntil = getDaysUntilEvent(eventDate);
   const refundPercent = getRefundTier(daysUntil);
@@ -41,9 +58,12 @@ export default function CancellationModal({ bookingId, eventDate, onClose, onCan
   async function handleCancel() {
     setConfirming(true);
     try {
-      const res = await apiClient(`/v1/bookings/${bookingId}/transition`, {
+      const res = await apiClient(`/v1/bookings/${bookingId}/cancel`, {
         method: 'POST',
-        body: JSON.stringify({ to_status: 'cancelled', reason }),
+        body: JSON.stringify({
+          sub_type: subType,
+          reason,
+        }),
       });
       if (res.success) {
         onCancelled();
@@ -103,6 +123,52 @@ export default function CancellationModal({ bookingId, eventDate, onClose, onCan
                 Keep Booking
               </button>
               <button
+                onClick={() => setStep('type')}
+                className="flex-1 bg-red-500 text-white py-2.5 rounded-lg font-medium hover:bg-red-600 transition-colors"
+              >
+                Continue
+              </button>
+            </div>
+          </>
+        )}
+
+        {step === 'type' && (
+          <>
+            <div className="space-y-3">
+              <h3 className="font-medium text-gray-900">Cancellation Type</h3>
+              {CANCELLATION_SUBTYPES.map((type) => (
+                <label
+                  key={type.value}
+                  className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                    subType === type.value
+                      ? 'border-primary-500 bg-primary-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="cancellation-type"
+                    value={type.value}
+                    checked={subType === type.value}
+                    onChange={(e) => setSubType(e.target.value as CancellationSubType)}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900 text-sm">{type.label}</p>
+                    <p className="text-xs text-gray-600 mt-0.5">{type.description}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep('info')}
+                className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+              >
+                Back
+              </button>
+              <button
                 onClick={() => setStep('confirm')}
                 className="flex-1 bg-red-500 text-white py-2.5 rounded-lg font-medium hover:bg-red-600 transition-colors"
               >
@@ -114,18 +180,24 @@ export default function CancellationModal({ bookingId, eventDate, onClose, onCan
 
         {step === 'confirm' && (
           <>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-              <p className="text-sm text-red-700">
-                Are you sure? This action cannot be undone.
-              </p>
-              <p className="text-lg font-bold text-red-800 mt-2">
-                Refund: {refundPercent}
-              </p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="text-center mb-4">
+                <p className="text-sm text-red-700 font-medium">
+                  Are you sure? This action cannot be undone.
+                </p>
+                <p className="text-lg font-bold text-red-800 mt-2">
+                  Refund: {refundPercent}
+                </p>
+              </div>
+              <div className="bg-red-100 rounded p-3 text-xs text-red-700">
+                <p className="font-medium mb-1">Cancellation Type: {CANCELLATION_SUBTYPES.find(t => t.value === subType)?.label}</p>
+                {reason && <p>{reason}</p>}
+              </div>
             </div>
 
             <div className="flex gap-3">
               <button
-                onClick={() => setStep('info')}
+                onClick={() => setStep('type')}
                 className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors"
               >
                 Go Back

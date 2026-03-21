@@ -1,8 +1,9 @@
 import type { FastifyInstance } from 'fastify';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
-import { requirePermission } from '../../middleware/rbac.middleware.js';
+import { requirePermission, requireRole } from '../../middleware/rbac.middleware.js';
 import { db } from '../../infrastructure/database.js';
 import { hashForSearch, encryptPII } from '../../infrastructure/encryption.js';
+import { UserRole } from '@artist-booking/shared';
 
 export async function adminRoutes(app: FastifyInstance) {
 
@@ -11,7 +12,9 @@ export async function adminRoutes(app: FastifyInstance) {
    * Creates client, event_company, agent, admin users with known phone numbers.
    * Idempotent: skips users that already exist with the correct role.
    */
-  app.post('/v1/admin/setup-demo-users', async (_request, reply) => {
+  app.post('/v1/admin/setup-demo-users', {
+    preHandler: [authMiddleware, requireRole(UserRole.ADMIN)],
+  }, async (_request, reply) => {
     const demoUsers = [
       { phone: '9876543211', role: 'client', profileType: 'client', companyName: 'Kapoor Wedding Studio', clientType: 'wedding_planner' },
       { phone: '9876543212', role: 'event_company', profileType: 'client', companyName: 'StarLight Events Pvt Ltd', clientType: 'event_company' },
@@ -153,7 +156,9 @@ export async function adminRoutes(app: FastifyInstance) {
    * POST /v1/admin/fix-seed-hashes — One-time fix for seed data phone hashes
    * Regenerates phone_hash for all users whose phone_hash starts with 'hash_'
    */
-  app.post('/v1/admin/fix-seed-hashes', async (_request, reply) => {
+  app.post('/v1/admin/fix-seed-hashes', {
+    preHandler: [authMiddleware, requireRole(UserRole.ADMIN)],
+  }, async (_request, reply) => {
     // Step 1: Delete orphan users (no profile linked)
     const orphanIds: any[] = await db('users')
       .where('id', 'not in', db.raw(

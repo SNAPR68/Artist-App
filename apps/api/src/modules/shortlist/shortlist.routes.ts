@@ -3,6 +3,7 @@ import { shortlistService } from './shortlist.service.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
+import { createShortlistSchema, addArtistToShortlistSchema } from '@artist-booking/shared';
 
 export async function shortlistRoutes(app: FastifyInstance) {
   /**
@@ -11,8 +12,8 @@ export async function shortlistRoutes(app: FastifyInstance) {
   app.post('/v1/shortlists', {
     preHandler: [authMiddleware, requirePermission('shortlist:manage'), rateLimit('WRITE')],
   }, async (request, reply) => {
-    const { name } = request.body as { name: string };
-    const shortlist = await shortlistService.createShortlist(request.user!.user_id, name);
+    const body = createShortlistSchema.parse(request.body);
+    const shortlist = await shortlistService.createShortlist(request.user!.user_id, body.name);
 
     return reply.status(201).send({
       success: true,
@@ -59,8 +60,8 @@ export async function shortlistRoutes(app: FastifyInstance) {
     preHandler: [authMiddleware, requirePermission('shortlist:manage'), rateLimit('WRITE')],
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const { artist_id, notes } = request.body as { artist_id: string; notes?: string };
-    const entry = await shortlistService.addArtist(request.user!.user_id, id, artist_id, notes);
+    const body = addArtistToShortlistSchema.parse(request.body);
+    const entry = await shortlistService.addArtist(request.user!.user_id, id, body.artist_id, body.notes);
 
     return reply.status(201).send({
       success: true,

@@ -112,7 +112,7 @@ export default function PaymentPage() {
       });
       if (res.success) {
         setStatus('success');
-        setTimeout(() => router.push(`/client/bookings/${bookingId}`), 2000);
+        setTimeout(() => router.push(`/client/bookings/${bookingId}/confirmation`), 2000);
       } else {
         setError('Payment verification failed. Contact support if amount was deducted.');
         setStatus('failed');

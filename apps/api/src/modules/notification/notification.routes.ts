@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { db } from '../../infrastructure/database.js';
+import { updateNotificationPrefsSchema } from '@artist-booking/shared';
 
 export async function notificationRoutes(app: FastifyInstance) {
   /** GET /v1/notifications — List user notifications */
@@ -77,7 +78,7 @@ export async function notificationRoutes(app: FastifyInstance) {
   app.put('/v1/notifications/preferences', {
     preHandler: [authMiddleware],
   }, async (request, reply) => {
-    const body = request.body as { whatsapp?: boolean; sms?: boolean; push?: boolean; email?: boolean };
+    const body = updateNotificationPrefsSchema.parse(request.body);
 
     await db('notification_preferences')
       .insert({

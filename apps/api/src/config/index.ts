@@ -55,6 +55,8 @@ const envSchema = z.object({
 
   // Gupshup (WhatsApp)
   GUPSHUP_API_KEY: z.string().optional(),
+  GUPSHUP_USERID: z.string().optional(),
+  GUPSHUP_PASSWORD: z.string().optional(),
   GUPSHUP_APP_NAME: z.string().optional(),
   GUPSHUP_SOURCE_NUMBER: z.string().optional(),
 
@@ -65,8 +67,32 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default('Artist Booking <noreply@artistbooking.in>'),
 
+  // Sentry
+  SENTRY_DSN: z.string().optional(),
+  SENTRY_RELEASE: z.string().optional(),
+
   // Logging
   LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
+
+  // Monitoring & Observability
+  DATADOG_API_KEY: z.string().optional(),
+  DATADOG_SITE: z.string().default('datadoghq.com'),
+  PROMETHEUS_METRICS_PORT: z.coerce.number().default(9090),
+  PROMETHEUS_SCRAPE_INTERVAL: z.string().default('15s'),
+
+  // Monitoring Dashboards (read-only URLs)
+  DATADOG_DASHBOARD_URL: z.string().optional(),
+  PROMETHEUS_DASHBOARD_URL: z.string().optional(),
+  GRAFANA_DASHBOARD_URL: z.string().optional(),
+  APM_DASHBOARD_URL: z.string().optional(),
+  STATUS_PAGE_URL: z.string().optional(),
+
+  // Performance Monitoring
+  NEWRELIC_LICENSE_KEY: z.string().optional(),
+  NEWRELIC_APP_ID: z.string().optional(),
+
+  // Error Tracking (already have SENTRY_DSN)
+  ERROR_TRACKING_ENABLED: z.string().default('true'),
 });
 
 function loadConfig() {

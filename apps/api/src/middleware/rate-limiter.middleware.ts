@@ -30,7 +30,15 @@ export function rateLimit(tier: RateLimitTier) {
 
     const results = await pipeline.exec();
     if (!results) {
-      return; // Redis error, fail open
+      // Redis unreachable: return 429 (fail closed for security)
+      return reply.status(429).send({
+        success: false,
+        data: null,
+        errors: [{
+          code: 'SERVICE_UNAVAILABLE',
+          message: 'Rate limiting service temporarily unavailable',
+        }],
+      });
     }
 
     const requestCount = results[2]?.[1] as number;

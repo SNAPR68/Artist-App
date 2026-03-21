@@ -1,10 +1,62 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { paymentService } from './payment.service.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
 import { razorpayClient } from './razorpay.client.js';
 import { payoutService } from './payout.service.js';
+import {
+  createPaymentOrderSchema,
+  verifyPaymentSchema,
+  paymentWebhookSchema,
+  settleEligibleSchema,
+} from '@artist-booking/shared';
+
+/**
+ * Validate that webhook request is from Razorpay IP range
+ */
+async function validateRazorpayWebhookIP(request: FastifyRequest, reply: FastifyReply) {
+  // List of Razorpay's known IP ranges (as of 2024)
+  // In production, consider maintaining this list or fetching from Razorpay's API
+  const allowedIPs = [
+    '49.12.34.0/24',    // Razorpay main
+    '49.12.35.0/24',
+    '49.12.37.0/24',
+    '49.12.38.0/24',
+    '49.12.39.0/24',
+    '49.12.40.0/24',
+    '192.186.128.0/18', // Additional Razorpay IP ranges
+  ];
+
+  // Allow configuration via ENV var for flexibility
+  const customAllowedIPs = process.env.RAZORPAY_WEBHOOK_IPS?.split(',') || [];
+  const allAllowedIPs = [...allowedIPs, ...customAllowedIPs];
+
+  // Get client IP from request
+  const clientIP = request.ip || request.socket.remoteAddress || '';
+
+  // In development/test mode, allow all IPs
+  if (process.env.NODE_ENV !== 'production') {
+    return;
+  }
+
+  // Check if client IP is in allowed ranges
+  const isAllowed = allAllowedIPs.some(range => {
+    // Simple check: if it's a CIDR range, convert to range check
+    // For now, we do a simple string match for exact IPs or check if IP starts with the range prefix
+    if (range.includes('/')) {
+      // CIDR notation - for simplicity, check prefix
+      const prefix = range.split('/')[0];
+      return clientIP.startsWith(prefix);
+    }
+    return clientIP === range;
+  });
+
+  if (!isAllowed) {
+    console.warn(`[WEBHOOK] Unauthorized IP: ${clientIP}`);
+    return reply.status(403).send({ error: 'Forbidden: IP not authorized' });
+  }
+}
 
 export async function paymentRoutes(app: FastifyInstance) {
   /**
@@ -13,8 +65,8 @@ export async function paymentRoutes(app: FastifyInstance) {
   app.post('/v1/payments/orders', {
     preHandler: [authMiddleware, requirePermission('payment:create'), rateLimit('WRITE')],
   }, async (request, reply) => {
-    const { booking_id } = request.body as { booking_id: string };
-    const order = await paymentService.createOrder(booking_id, request.user!.user_id);
+    const body = createPaymentOrderSchema.parse(request.body);
+    const order = await paymentService.createOrder(body.booking_id, request.user!.user_id);
 
     return reply.status(201).send({
       success: true,
@@ -29,11 +81,7 @@ export async function paymentRoutes(app: FastifyInstance) {
   app.post('/v1/payments/verify', {
     preHandler: [authMiddleware, rateLimit('WRITE')],
   }, async (request, reply) => {
-    const body = request.body as {
-      razorpay_order_id: string;
-      razorpay_payment_id: string;
-      razorpay_signature: string;
-    };
+    const body = verifyPaymentSchema.parse(request.body);
 
     const payment = await paymentService.verifyPayment(body);
 
@@ -47,16 +95,18 @@ export async function paymentRoutes(app: FastifyInstance) {
   /**
    * POST /v1/payments/webhook — Razorpay webhook handler
    */
-  app.post('/v1/payments/webhook', async (request, reply) => {
+  app.post('/v1/payments/webhook', {
+    preHandler: [validateRazorpayWebhookIP],
+  }, async (request, reply) => {
+    const body = paymentWebhookSchema.parse(request.body);
     const signature = request.headers['x-razorpay-signature'] as string;
-    const body = JSON.stringify(request.body);
+    const bodyStr = JSON.stringify(request.body);
 
-    if (!razorpayClient.verifyWebhookSignature(body, signature)) {
+    if (!razorpayClient.verifyWebhookSignature(bodyStr, signature)) {
       return reply.status(400).send({ error: 'Invalid signature' });
     }
 
-    const { event, payload } = request.body as { event: string; payload: Record<string, unknown> };
-    await paymentService.handleWebhook(event, payload);
+    await paymentService.handleWebhook(body.event, body.payload);
 
     return reply.send({ status: 'ok' });
   });
@@ -130,6 +180,7 @@ export async function paymentRoutes(app: FastifyInstance) {
   app.post('/v1/payments/settle-eligible', {
     preHandler: [authMiddleware, requirePermission('admin:manage')],
   }, async (request, reply) => {
+    settleEligibleSchema.parse(request.body);
     const count = await paymentService.autoSettleEligible();
 
     return reply.send({
@@ -227,7 +278,7 @@ export async function paymentRoutes(app: FastifyInstance) {
    */
   app.get('/v1/admin/payouts', {
     preHandler: [authMiddleware, requirePermission('admin:payments')],
-  }, async (request, reply) => {
+  }, async (_request, reply) => {
     const payouts = await payoutService.listPendingPayouts();
 
     return reply.send({

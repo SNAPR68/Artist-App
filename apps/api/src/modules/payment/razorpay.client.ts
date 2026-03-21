@@ -2,6 +2,14 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import { config } from '../../config/index.js';
 
+/**
+ * Mask a phone number for safe logging: 98****3210
+ */
+function maskPhoneNumber(phone: string): string {
+  if (!phone || phone.length < 4) return '****';
+  return phone.slice(0, 2) + '****' + phone.slice(-4);
+}
+
 const isMockMode = !config.RAZORPAY_KEY_ID || config.RAZORPAY_KEY_ID === 'rzp_test_placeholder';
 
 const razorpay = isMockMode
@@ -27,7 +35,12 @@ export interface VerifySignatureParams {
 export class RazorpayClient {
   async createOrder(params: CreateOrderParams) {
     if (isMockMode) {
-      console.log(`[RAZORPAY MOCK] Creating order: ₹${params.amount_paise / 100} (${params.receipt})`);
+      // Log masked notes to avoid logging PII
+      const maskedNotes = params.notes ? Object.entries(params.notes).reduce((acc, [key, value]) => {
+        acc[key] = /phone|mobile|customer_phone/.test(key) ? maskPhoneNumber(value) : value;
+        return acc;
+      }, {} as Record<string, string>) : {};
+      console.log(`[RAZORPAY MOCK] Creating order: ₹${params.amount_paise / 100} (${params.receipt})`, { notes: maskedNotes });
       return {
         id: `order_mock_${Date.now()}`,
         entity: 'order',
