@@ -7,10 +7,6 @@
   "git": {
     "silent": false
   },
-  "preview": {
-    "branches": ["develop", "staging"],
-    "enabled": true
-  },
   "regions": ["sfo1", "iad1"],
   "functions": {
     "apps/web/src/app/**/*.{js,ts,jsx,tsx}": {
