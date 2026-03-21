@@ -13,6 +13,7 @@ function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phone = searchParams.get('phone') ?? '';
+  const redirectTo = searchParams.get('redirect') || '';
   const { verifyOTP, generateOTP, isLoading } = useAuthStore();
   const { t } = useI18n();
 
@@ -42,6 +43,7 @@ function VerifyContent() {
 
       const currentUser = useAuthStore.getState().user;
       if (currentUser?.is_new) {
+        // New users always go to onboarding regardless of redirect param
         switch (currentUser.role) {
           case UserRole.ARTIST: router.push('/artist/onboarding'); break;
           case UserRole.CLIENT:
@@ -49,7 +51,11 @@ function VerifyContent() {
           case UserRole.AGENT: router.push('/agent/onboarding'); break;
           default: router.push('/');
         }
+      } else if (redirectTo) {
+        // Returning user with a redirect param — go back to where they were
+        router.push(redirectTo);
       } else {
+        // Returning user — go to role dashboard
         switch (currentUser?.role) {
           case UserRole.ARTIST: router.push('/artist'); break;
           case UserRole.CLIENT:

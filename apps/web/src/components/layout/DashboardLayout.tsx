@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
 import { useI18n } from '@/i18n';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -68,7 +68,8 @@ function getHomeHref(role?: string): string {
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, initialize, logout } = useAuthStore();
+  const router = useRouter();
+  const { user, isAuthenticated, _initialized, initialize, logout } = useAuthStore();
   const { t } = useI18n();
   const navItems = getNavItems(user?.role);
   const homeHref = getHomeHref(user?.role);
@@ -77,6 +78,25 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  // Client-side auth guard — redirect if not authenticated after initialization
+  useEffect(() => {
+    if (_initialized && !isAuthenticated) {
+      router.replace(`/login?redirect=${encodeURIComponent(pathname ?? '/')}`);
+    }
+  }, [_initialized, isAuthenticated, pathname, router]);
+
+  // Show loading skeleton while auth initializes or if not authenticated
+  if (!_initialized || !isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-16 sm:pb-0">

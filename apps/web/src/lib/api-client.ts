@@ -27,6 +27,10 @@ export function setTokens(access: string, refresh: string) {
   if (typeof window !== 'undefined') {
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
+    // Mirror token into a cookie so Next.js middleware can read it for route protection.
+    // This is NOT httpOnly — it's a signal cookie. The actual auth is still Bearer token.
+    // SameSite=Lax prevents CSRF. Path=/ makes it available to middleware on all routes.
+    document.cookie = `auth_token=${access}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
   }
 }
 
@@ -36,6 +40,8 @@ export function clearTokens() {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    // Clear the signal cookie
+    document.cookie = 'auth_token=; path=/; max-age=0; SameSite=Lax';
   }
 }
 

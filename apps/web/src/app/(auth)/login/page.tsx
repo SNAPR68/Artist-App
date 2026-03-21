@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Phone } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 import { useI18n } from '@/i18n';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '';
   const { generateOTP, isLoading } = useAuthStore();
   const { t } = useI18n();
   const [phone, setPhone] = useState('');
@@ -25,7 +27,8 @@ export default function LoginPage() {
 
     try {
       await generateOTP(phone);
-      router.push(`/verify?phone=${encodeURIComponent(phone)}`);
+      const verifyUrl = `/verify?phone=${encodeURIComponent(phone)}${redirectTo ? `&redirect=${encodeURIComponent(redirectTo)}` : ''}`;
+      router.push(verifyUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('auth.otpFailed'));
     }
@@ -87,5 +90,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   );
 }
