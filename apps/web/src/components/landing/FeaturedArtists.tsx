@@ -26,7 +26,7 @@ const FEATURED_ARTISTS = [
     reviews: 95,
     price: '15,000',
     verified: true,
-    image: 'https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&q=80',
   },
   {
     id: 'featured-3',
