@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { Calendar, MapPin, Clock, FileText, CheckCircle, XCircle, Download, Send } from 'lucide-react';
 import { apiClient } from '../../../../../lib/api-client';
 import { StateTimeline } from '../../../../../components/booking/StateTimeline';
 import { QuoteBreakdown } from '../../../../../components/booking/QuoteBreakdown';
@@ -120,7 +121,7 @@ export default function ClientBookingDetailPage() {
   if (loading) {
     return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" /></div>;
   }
-  if (!booking) return <p className="text-center py-10 text-gray-500">Booking not found</p>;
+  if (!booking) return <p className="text-center py-10 text-text-muted">Booking not found</p>;
 
   const latestQuote = booking.quotes[booking.quotes.length - 1];
   const canNegotiate = ['inquiry', 'quoted', 'negotiating'].includes(booking.status);
@@ -131,40 +132,86 @@ export default function ClientBookingDetailPage() {
   const canDownloadContract = ['confirmed', 'pre_event', 'event_day', 'completed', 'settled'].includes(booking.status);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Booking with {booking.artist_name}</h1>
+    <div className="max-w-3xl mx-auto space-y-6 animate-fade-in-up">
+      <div>
+        <h1 className="text-3xl font-bold text-gradient font-heading">Booking with {booking.artist_name}</h1>
+        <p className="text-text-muted text-sm mt-1">Track your performance booking and negotiate details</p>
+      </div>
 
       {/* Event Details */}
-      <div className="bg-white rounded-lg border border-gray-200 p-5 space-y-3">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase">Event Details</h2>
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div><span className="text-gray-500">Type:</span> <span className="font-medium">{booking.event_type}</span></div>
-          <div><span className="text-gray-500">Date:</span> <span className="font-medium">{new Date(booking.event_date).toLocaleDateString('en-IN')}</span></div>
-          <div><span className="text-gray-500">City:</span> <span className="font-medium">{booking.event_city}</span></div>
-          <div><span className="text-gray-500">Duration:</span> <span className="font-medium">{booking.event_duration_hours}h</span></div>
-          {booking.event_venue && <div className="col-span-2"><span className="text-gray-500">Venue:</span> <span className="font-medium">{booking.event_venue}</span></div>}
-          {booking.special_requirements && <div className="col-span-2"><span className="text-gray-500">Notes:</span> <span className="font-medium">{booking.special_requirements}</span></div>}
+      <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-xl border glass-border">
+        <h2 className="text-sm font-semibold text-gradient uppercase tracking-wide font-heading">Event Details</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-start gap-3">
+            <FileText className="w-5 h-5 text-primary-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-text-muted text-xs uppercase tracking-wide">Type</p>
+              <p className="text-text-primary font-medium">{booking.event_type}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <Calendar className="w-5 h-5 text-primary-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-text-muted text-xs uppercase tracking-wide">Date</p>
+              <p className="text-text-primary font-medium">{new Date(booking.event_date).toLocaleDateString('en-IN')}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <MapPin className="w-5 h-5 text-primary-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-text-muted text-xs uppercase tracking-wide">City</p>
+              <p className="text-text-primary font-medium">{booking.event_city}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <Clock className="w-5 h-5 text-primary-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-text-muted text-xs uppercase tracking-wide">Duration</p>
+              <p className="text-text-primary font-medium">{booking.event_duration_hours}h</p>
+            </div>
+          </div>
+          {booking.event_venue && <div className="col-span-2 flex items-start gap-3">
+            <MapPin className="w-5 h-5 text-primary-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-text-muted text-xs uppercase tracking-wide">Venue</p>
+              <p className="text-text-primary font-medium">{booking.event_venue}</p>
+            </div>
+          </div>}
+          {booking.special_requirements && <div className="col-span-2 flex items-start gap-3">
+            <FileText className="w-5 h-5 text-primary-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-text-muted text-xs uppercase tracking-wide">Special Requirements</p>
+              <p className="text-text-primary font-medium">{booking.special_requirements}</p>
+            </div>
+          </div>}
         </div>
       </div>
 
       {/* Timeline */}
-      <div className="bg-white rounded-lg border border-gray-200 p-5">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase mb-3">Status</h2>
+      <div className="glass-card rounded-xl p-6 backdrop-blur-xl border glass-border">
+        <h2 className="text-sm font-semibold text-gradient uppercase tracking-wide mb-4 font-heading">Status Timeline</h2>
         <StateTimeline currentStatus={booking.status} events={booking.events} />
       </div>
 
       {/* Quotes / Negotiation */}
       {booking.quotes.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 p-5 space-y-4">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase">Quotes</h2>
-          {booking.quotes.map((q) => (
-            <div key={q.round} className="border border-gray-100 rounded-lg p-3">
-              <div className="flex justify-between mb-2">
-                <span className="text-sm font-medium">Round {q.round} {q.is_final ? '(Final)' : ''}</span>
-                <span className="text-xs text-gray-400">{new Date(q.created_at).toLocaleString('en-IN')}</span>
+        <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-xl border glass-border">
+          <h2 className="text-sm font-semibold text-gradient uppercase tracking-wide font-heading">Quote History</h2>
+          {booking.quotes.map((q, idx) => (
+            <div key={q.round} className={`glass-medium rounded-lg p-4 border glass-border backdrop-blur-md ${
+              idx % 2 === 0 ? 'ml-0 mr-auto' : 'ml-auto mr-0'
+            } w-full md:w-5/6`}>
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <span className="text-sm font-semibold text-text-primary">Round {q.round} {q.is_final ? '• Final' : ''}</span>
+                  <p className="text-xs text-text-muted mt-1">{new Date(q.created_at).toLocaleString('en-IN')}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold text-accent-magenta">₹{(q.amount_paise / 100).toLocaleString('en-IN')}</p>
+                </div>
               </div>
               <QuoteBreakdown breakdown={q.breakdown} />
-              {q.notes && <p className="text-sm text-gray-600 mt-2">{q.notes}</p>}
+              {q.notes && <p className="text-sm text-text-secondary mt-3 italic">{q.notes}</p>}
             </div>
           ))}
         </div>
@@ -172,16 +219,21 @@ export default function ClientBookingDetailPage() {
 
       {/* Payment CTA for confirmed bookings */}
       {canPay && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-5 text-center">
-          <h3 className="text-lg font-semibold text-green-800 mb-2">Booking Confirmed!</h3>
-          <p className="text-sm text-green-700 mb-4">
-            Complete your payment of {booking.final_amount_paise
-              ? `₹${(booking.final_amount_paise / 100).toLocaleString('en-IN')}`
-              : 'the agreed amount'} to secure the booking.
-          </p>
+        <div className="glass-card rounded-xl p-6 backdrop-blur-xl border border-green-500/30 bg-gradient-to-r from-green-500/10 to-emerald-500/10">
+          <div className="flex items-start gap-4">
+            <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-green-300 mb-1">Booking Confirmed!</h3>
+              <p className="text-sm text-text-secondary mb-4">
+                Complete your payment of {booking.final_amount_paise
+                  ? `₹${(booking.final_amount_paise / 100).toLocaleString('en-IN')}`
+                  : 'the agreed amount'} to secure the booking.
+              </p>
+            </div>
+          </div>
           <button
             onClick={() => router.push(`/client/bookings/${id}/pay`)}
-            className="px-6 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700"
+            className="w-full px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg text-sm font-semibold hover-glow shadow-glow-sm transition-all"
           >
             Proceed to Payment
           </button>
@@ -190,55 +242,62 @@ export default function ClientBookingDetailPage() {
 
       {/* Contract Download */}
       {canDownloadContract && (
-        <div className="bg-white rounded-lg border border-gray-200 p-5 flex items-center justify-between">
+        <div className="glass-card rounded-xl p-6 flex items-center justify-between backdrop-blur-xl border glass-border hover:glass-medium transition-all">
           <div>
-            <h3 className="text-sm font-semibold text-gray-700">Booking Contract</h3>
-            <p className="text-xs text-gray-500">Download the terms and financial details for this booking.</p>
+            <h3 className="text-sm font-semibold text-text-primary">Booking Contract</h3>
+            <p className="text-xs text-text-muted mt-1">Download the terms and financial details for this booking.</p>
           </div>
           <button
             onClick={handleDownloadContract}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50"
+            className="px-4 py-2.5 bg-primary-500/20 text-primary-300 rounded-lg text-sm font-medium hover:bg-primary-500/30 transition-colors flex items-center gap-2"
           >
+            <Download className="w-4 h-4" />
             Download
           </button>
         </div>
       )}
 
       {/* Actions */}
-      <div className="bg-white rounded-lg border border-gray-200 p-5 space-y-4">
+      <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-xl border glass-border">
         {canNegotiate && (
-          <form onSubmit={handleCounterOffer} className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-700">Submit Counter-Offer</h3>
+          <form onSubmit={handleCounterOffer} className="space-y-3 pb-4 border-b border-white/10">
+            <h3 className="text-sm font-semibold text-text-primary">Submit Counter-Offer</h3>
             <div className="flex gap-2">
-              <input
-                type="number"
-                value={counterAmount}
-                onChange={(e) => setCounterAmount(e.target.value)}
-                placeholder="Amount (INR)"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                required
-              />
-              <button type="submit" disabled={submitting} className="px-4 py-2 bg-primary-500 text-white rounded-lg text-sm hover:bg-primary-600 disabled:opacity-50">
+              <div className="flex-1 relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">₹</span>
+                <input
+                  type="number"
+                  value={counterAmount}
+                  onChange={(e) => setCounterAmount(e.target.value)}
+                  placeholder="0"
+                  className="w-full pl-6 pr-3 py-2.5 bg-white/5 border glass-border rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary-400 transition-all"
+                  required
+                />
+              </div>
+              <button type="submit" disabled={submitting} className="px-4 py-2.5 bg-gradient-to-r from-primary-500 to-accent-magenta text-white rounded-lg text-sm font-semibold hover-glow shadow-glow-sm disabled:opacity-50 transition-all flex items-center gap-2">
+                <Send className="w-4 h-4" />
                 {submitting ? 'Sending...' : 'Send Offer'}
               </button>
             </div>
             <input
               value={counterNotes}
               onChange={(e) => setCounterNotes(e.target.value)}
-              placeholder="Notes (optional)"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              placeholder="Add any notes (optional)"
+              className="w-full px-3 py-2.5 bg-white/5 border glass-border rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary-400 transition-all"
             />
           </form>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-col sm:flex-row">
           {canConfirm && (
-            <button onClick={handleConfirm} disabled={submitting} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50">
+            <button onClick={handleConfirm} disabled={submitting} className="flex-1 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg text-sm font-semibold hover-glow shadow-glow-sm disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+              <CheckCircle className="w-4 h-4" />
               Confirm Booking
             </button>
           )}
           {canCancel && (
-            <button onClick={handleCancelClick} disabled={submitting} className="py-2 px-4 border border-red-300 text-red-600 rounded-lg text-sm hover:bg-red-50 disabled:opacity-50">
+            <button onClick={handleCancelClick} disabled={submitting} className="py-2.5 px-4 bg-red-500/20 border border-red-500/30 text-red-300 rounded-lg text-sm font-semibold hover:bg-red-500/30 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+              <XCircle className="w-4 h-4" />
               Cancel
             </button>
           )}
@@ -247,8 +306,8 @@ export default function ClientBookingDetailPage() {
 
       {/* Review Form for completed bookings */}
       {canReview && !reviewSubmitted && (
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase mb-4">Leave a Review</h2>
+        <div className="glass-card rounded-xl p-6 backdrop-blur-xl border glass-border">
+          <h2 className="text-sm font-semibold text-gradient uppercase tracking-wide mb-4 font-heading">Leave a Review</h2>
           <ReviewForm
             bookingId={id}
             onSubmitSuccess={() => setReviewSubmitted(true)}
@@ -257,8 +316,9 @@ export default function ClientBookingDetailPage() {
       )}
 
       {reviewSubmitted && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-5 text-center">
-          <p className="text-green-700 font-medium">Thank you! Your review has been submitted.</p>
+        <div className="glass-card rounded-xl p-6 text-center backdrop-blur-xl border border-green-500/30 bg-gradient-to-r from-green-500/10 to-emerald-500/10">
+          <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
+          <p className="text-green-300 font-medium">Thank you! Your review has been submitted.</p>
         </div>
       )}
 

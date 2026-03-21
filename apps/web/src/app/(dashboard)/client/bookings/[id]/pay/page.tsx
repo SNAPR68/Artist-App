@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { CreditCard, Smartphone, Building2, Wallet, Check, X } from 'lucide-react';
 import { apiClient } from '../../../../../../lib/api-client';
 
 interface OrderData {
@@ -124,73 +125,115 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto py-10 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 text-center">Complete Payment</h1>
-
-      {status === 'success' && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-          <div className="text-4xl mb-3">✓</div>
-          <h2 className="text-lg font-semibold text-green-800">Payment Successful!</h2>
-          <p className="text-sm text-green-600 mt-1">Your booking has been confirmed. Redirecting...</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-6 animate-fade-in">
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-heading font-bold text-gradient">Complete Payment</h1>
+          <p className="text-text-muted">Secure transaction powered by Razorpay</p>
         </div>
-      )}
 
-      {status === 'failed' && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <h2 className="text-lg font-semibold text-red-800">Payment Failed</h2>
-          <p className="text-sm text-red-600 mt-1">{error}</p>
-          <button
-            onClick={createOrder}
-            className="mt-4 bg-primary-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-primary-600 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      )}
-
-      {(status === 'idle' || status === 'loading') && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-          {order && (
-            <div className="text-center">
-              <p className="text-sm text-gray-500">Amount to Pay</p>
-              <p className="text-3xl font-bold text-gray-900">₹{formatINR(order.amount_paise)}</p>
+        {status === 'success' && (
+          <div className="glass-card border glass-border p-8 text-center space-y-4 animate-fade-in-up">
+            <div className="flex justify-center">
+              <div className="relative w-16 h-16 bg-gradient-accent rounded-full flex items-center justify-center shadow-glow-sm">
+                <Check className="w-8 h-8 text-white" />
+              </div>
             </div>
-          )}
-
-          <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600 space-y-2">
-            <p>Secure payment powered by Razorpay</p>
-            <p>Supports UPI, cards, net banking, and wallets</p>
+            <div>
+              <h2 className="text-2xl font-heading font-bold text-gradient mb-2">Payment Successful!</h2>
+              <p className="text-text-muted">Your booking has been confirmed. Redirecting...</p>
+            </div>
           </div>
+        )}
 
-          <button
-            onClick={createOrder}
-            disabled={status === 'loading'}
-            className="w-full bg-primary-500 text-white py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {status === 'loading' ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                Creating Order...
-              </span>
-            ) : (
-              'Pay Now'
+        {status === 'failed' && (
+          <div className="glass-card border glass-border p-8 text-center space-y-4 animate-fade-in-up">
+            <div className="flex justify-center">
+              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center border border-red-500/30">
+                <X className="w-8 h-8 text-red-400" />
+              </div>
+            </div>
+            <div>
+              <h2 className="text-xl font-heading font-bold text-red-300 mb-2">Payment Failed</h2>
+              <p className="text-sm text-red-200 mb-4">{error}</p>
+            </div>
+            <button
+              onClick={createOrder}
+              className="w-full bg-gradient-accent hover-glow text-white px-6 py-3 rounded-pill font-semibold transition-all duration-300 transform hover:scale-105"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {(status === 'idle' || status === 'loading') && (
+          <div className="glass-card border glass-border p-8 space-y-6 animate-fade-in-up">
+            {order && (
+              <div className="text-center space-y-2 py-4">
+                <p className="text-text-muted text-sm uppercase tracking-wide">Amount to Pay</p>
+                <p className="text-5xl font-heading font-bold text-gradient">₹{formatINR(order.amount_paise)}</p>
+              </div>
             )}
-          </button>
-        </div>
-      )}
 
-      {status === 'verifying' && (
-        <div className="text-center py-10">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto mb-4" />
-          <p className="text-gray-600">Verifying your payment...</p>
-        </div>
-      )}
+            <div className="bg-surface-elevated/50 backdrop-blur-md rounded-lg p-4 border border-glass-border space-y-3">
+              <h3 className="text-sm font-semibold text-text-primary">Payment Methods Accepted</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center gap-2 text-text-secondary">
+                  <CreditCard className="w-4 h-4" />
+                  <span className="text-xs">Credit/Debit Cards</span>
+                </div>
+                <div className="flex items-center gap-2 text-text-secondary">
+                  <Smartphone className="w-4 h-4" />
+                  <span className="text-xs">UPI & Mobile Wallets</span>
+                </div>
+                <div className="flex items-center gap-2 text-text-secondary">
+                  <Building2 className="w-4 h-4" />
+                  <span className="text-xs">Net Banking</span>
+                </div>
+                <div className="flex items-center gap-2 text-text-secondary">
+                  <Wallet className="w-4 h-4" />
+                  <span className="text-xs">Digital Wallets</span>
+                </div>
+              </div>
+            </div>
 
-      {status === 'checkout' && (
-        <div className="text-center py-10">
-          <p className="text-gray-600">Complete the payment in the Razorpay window...</p>
-        </div>
-      )}
+            <button
+              onClick={createOrder}
+              disabled={status === 'loading'}
+              className="w-full bg-gradient-accent hover-glow text-white py-4 rounded-pill font-heading font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center gap-2"
+            >
+              {status === 'loading' ? (
+                <>
+                  <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  <span>Creating Order...</span>
+                </>
+              ) : (
+                'Pay Now'
+              )}
+            </button>
+
+            <p className="text-center text-xs text-text-muted">Secure payment powered by Razorpay. Your data is encrypted.</p>
+          </div>
+        )}
+
+        {status === 'verifying' && (
+          <div className="glass-card border glass-border p-8 text-center space-y-4 animate-fade-in-up">
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary-500/20 border-t-primary-500" />
+            </div>
+            <p className="text-text-primary font-medium">Verifying your payment...</p>
+          </div>
+        )}
+
+        {status === 'checkout' && (
+          <div className="glass-card border glass-border p-8 text-center space-y-4 animate-fade-in-up">
+            <div className="flex justify-center">
+              <div className="shimmer-overlay w-12 h-12 rounded-full" />
+            </div>
+            <p className="text-text-primary font-medium">Complete the payment in the Razorpay window...</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

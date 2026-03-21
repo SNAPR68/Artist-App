@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { MessageSquare, Bell, Check } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 
 interface NotificationPreferences {
@@ -52,15 +53,17 @@ function Toggle({
       role="switch"
       aria-checked={enabled}
       onClick={() => onChange(!enabled)}
-      className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
-        enabled ? 'bg-primary-500' : 'bg-gray-200'
+      className={`relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border border-glass-border transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-slate-900 ${
+        enabled ? 'bg-gradient-accent shadow-glow-sm' : 'bg-surface-elevated/50 backdrop-blur-sm'
       }`}
     >
       <span
-        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-          enabled ? 'translate-x-5' : 'translate-x-0'
+        className={`pointer-events-none inline-flex items-center justify-center h-6 w-6 transform rounded-full bg-white text-white shadow transition duration-300 ease-in-out ${
+          enabled ? 'translate-x-7' : 'translate-x-0.5'
         }`}
-      />
+      >
+        {enabled && <Check className="w-4 h-4 text-gradient-accent" />}
+      </span>
     </button>
   );
 }
@@ -120,19 +123,19 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-500">Manage your notification preferences</p>
+    <div className="space-y-8 animate-fade-in">
+      <div className="space-y-2">
+        <h1 className="text-4xl font-heading font-bold text-gradient">Settings</h1>
+        <p className="text-text-muted">Manage your notification preferences</p>
       </div>
 
       {/* Feedback Banner */}
       {feedback && (
         <div
-          className={`rounded-lg p-4 text-sm font-medium ${
+          className={`rounded-lg p-4 text-sm font-medium border transition-all duration-300 ${
             feedback.type === 'success'
-              ? 'bg-success/10 text-success border border-success/20'
-              : 'bg-red-50 text-red-700 border border-red-200'
+              ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30'
+              : 'bg-red-500/20 text-red-200 border border-red-500/30'
           }`}
         >
           {feedback.message}
@@ -140,15 +143,22 @@ export default function SettingsPage() {
       )}
 
       {/* Notification Channels */}
-      <div className="bg-white rounded-lg border border-gray-200 p-5">
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">Notification Channels</h2>
-        <p className="text-sm text-gray-500 mb-4">Choose how you want to receive notifications</p>
-        <div className="divide-y divide-gray-100">
+      <div className="glass-card border glass-border p-8 space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-lg bg-primary-500/20 border border-primary-500/30">
+            <MessageSquare className="w-5 h-5 text-primary-300" />
+          </div>
+          <div>
+            <h2 className="text-xl font-heading font-bold text-text-primary">Notification Channels</h2>
+            <p className="text-sm text-text-muted mt-0.5">Choose how you want to receive notifications</p>
+          </div>
+        </div>
+        <div className="space-y-4 border-t border-glass-border pt-6">
           {CHANNEL_OPTIONS.map((option) => (
-            <div key={option.key} className="flex items-center justify-between py-3">
-              <div>
-                <p className="text-sm font-medium text-gray-900">{option.label}</p>
-                <p className="text-xs text-gray-500">{option.description}</p>
+            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-surface-elevated/50 border border-glass-border hover:border-primary-500/30 transition-all">
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-text-primary">{option.label}</p>
+                <p className="text-xs text-text-muted mt-1">{option.description}</p>
               </div>
               <Toggle
                 enabled={prefs[option.key]}
@@ -160,15 +170,22 @@ export default function SettingsPage() {
       </div>
 
       {/* Notification Categories */}
-      <div className="bg-white rounded-lg border border-gray-200 p-5">
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">Notification Categories</h2>
-        <p className="text-sm text-gray-500 mb-4">Choose what you want to be notified about</p>
-        <div className="divide-y divide-gray-100">
+      <div className="glass-card border glass-border p-8 space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-lg bg-gradient-accent/20 border border-gradient-accent/30">
+            <Bell className="w-5 h-5 text-gradient-accent" />
+          </div>
+          <div>
+            <h2 className="text-xl font-heading font-bold text-text-primary">Notification Categories</h2>
+            <p className="text-sm text-text-muted mt-0.5">Choose what you want to be notified about</p>
+          </div>
+        </div>
+        <div className="space-y-4 border-t border-glass-border pt-6">
           {CATEGORY_OPTIONS.map((option) => (
-            <div key={option.key} className="flex items-center justify-between py-3">
-              <div>
-                <p className="text-sm font-medium text-gray-900">{option.label}</p>
-                <p className="text-xs text-gray-500">{option.description}</p>
+            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-surface-elevated/50 border border-glass-border hover:border-primary-500/30 transition-all">
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-text-primary">{option.label}</p>
+                <p className="text-xs text-text-muted mt-1">{option.description}</p>
               </div>
               <Toggle
                 enabled={prefs[option.key]}
@@ -180,13 +197,14 @@ export default function SettingsPage() {
       </div>
 
       {/* Save Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-4">
         <button
           onClick={handleSave}
           disabled={saving}
-          className="bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-gradient-accent hover-glow text-white px-8 py-4 rounded-pill font-heading font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 flex items-center gap-2"
         >
-          {saving ? 'Saving...' : 'Save Preferences'}
+          {saving && <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />}
+          <span>{saving ? 'Saving...' : 'Save Preferences'}</span>
         </button>
       </div>
     </div>

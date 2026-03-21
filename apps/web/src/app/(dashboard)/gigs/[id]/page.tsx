@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { ChevronLeft, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 import { useAuthStore } from '../../../../lib/auth';
 
@@ -46,20 +47,20 @@ interface GigApplication {
 
 // ─── Helpers ────────────────────────────────────────────────
 
-const STATUS_COLORS: Record<string, string> = {
-  open: 'bg-green-100 text-green-700',
-  closed: 'bg-gray-100 text-gray-600',
-  filled: 'bg-blue-100 text-blue-700',
-  expired: 'bg-gray-100 text-gray-500',
-  cancelled: 'bg-red-100 text-red-600',
+const STATUS_COLORS: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
+  open: { bg: 'bg-emerald-500/20 border border-emerald-500/30', text: 'text-emerald-300', icon: <CheckCircle2 className="w-4 h-4" /> },
+  closed: { bg: 'bg-slate-500/20 border border-slate-500/30', text: 'text-slate-300', icon: <XCircle className="w-4 h-4" /> },
+  filled: { bg: 'bg-blue-500/20 border border-blue-500/30', text: 'text-blue-300', icon: <CheckCircle2 className="w-4 h-4" /> },
+  expired: { bg: 'bg-orange-500/20 border border-orange-500/30', text: 'text-orange-300', icon: <Clock className="w-4 h-4" /> },
+  cancelled: { bg: 'bg-red-500/20 border border-red-500/30', text: 'text-red-300', icon: <XCircle className="w-4 h-4" /> },
 };
 
-const APP_STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-700',
-  shortlisted: 'bg-blue-100 text-blue-700',
-  accepted: 'bg-green-100 text-green-700',
-  rejected: 'bg-red-100 text-red-600',
-  withdrawn: 'bg-gray-100 text-gray-500',
+const APP_STATUS_COLORS: Record<string, { bg: string; text: string }> = {
+  pending: { bg: 'bg-amber-500/20 border border-amber-500/30', text: 'text-amber-300' },
+  shortlisted: { bg: 'bg-blue-500/20 border border-blue-500/30', text: 'text-blue-300' },
+  accepted: { bg: 'bg-emerald-500/20 border border-emerald-500/30', text: 'text-emerald-300' },
+  rejected: { bg: 'bg-red-500/20 border border-red-500/30', text: 'text-red-300' },
+  withdrawn: { bg: 'bg-slate-500/20 border border-slate-500/30', text: 'text-slate-300' },
 };
 
 function formatPaise(paise: number): string {
@@ -176,94 +177,100 @@ export default function GigDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Back link */}
-      <Link href="/gigs" className="text-sm text-primary-500 hover:underline">Back to Gigs</Link>
+      <Link href="/gigs" className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 transition-colors group">
+        <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+        <span className="text-sm font-medium">Back to Gigs</span>
+      </Link>
 
       {/* Header */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">{gig.title}</h1>
-            <p className="text-sm text-gray-500">Posted by {gig.poster_name ?? 'Unknown'}</p>
+      <div className="glass-card border glass-border p-8 space-y-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-4xl font-heading font-bold text-gradient mb-2">{gig.title}</h1>
+            <p className="text-text-muted">Posted by {gig.poster_name ?? 'Unknown'}</p>
           </div>
-          <span className={`text-sm px-3 py-1 rounded-full font-medium ${STATUS_COLORS[gig.status] ?? 'bg-gray-100 text-gray-600'}`}>
-            {gig.status}
-          </span>
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm ${STATUS_COLORS[gig.status]?.bg} ${STATUS_COLORS[gig.status]?.text}`}>
+            {STATUS_COLORS[gig.status]?.icon}
+            <span className="capitalize">{gig.status}</span>
+          </div>
         </div>
 
         {/* Details grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-4">
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wider">Event Type</p>
-            <p className="text-sm font-medium text-gray-700">{gig.event_type.replace(/_/g, ' ')}</p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="bg-surface-elevated/50 backdrop-blur-sm rounded-lg p-4 border border-glass-border">
+            <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Event Type</p>
+            <p className="text-sm font-semibold text-text-primary">{gig.event_type.replace(/_/g, ' ')}</p>
           </div>
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wider">Date</p>
-            <p className="text-sm font-medium text-gray-700">{new Date(gig.event_date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <div className="bg-surface-elevated/50 backdrop-blur-sm rounded-lg p-4 border border-glass-border">
+            <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Date</p>
+            <p className="text-sm font-semibold text-text-primary">{new Date(gig.event_date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
           </div>
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wider">City</p>
-            <p className="text-sm font-medium text-gray-700">{gig.event_city}</p>
+          <div className="bg-surface-elevated/50 backdrop-blur-sm rounded-lg p-4 border border-glass-border">
+            <p className="text-xs text-text-muted uppercase tracking-wider mb-1">City</p>
+            <p className="text-sm font-semibold text-text-primary">{gig.event_city}</p>
           </div>
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wider">Budget Range</p>
-            <p className="text-sm font-medium text-gray-700">{formatPaise(gig.budget_min_paise)} - {formatPaise(gig.budget_max_paise)}</p>
+          <div className="bg-surface-elevated/50 backdrop-blur-sm rounded-lg p-4 border border-glass-border">
+            <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Budget Range</p>
+            <p className="text-sm font-semibold text-gradient">{formatPaise(gig.budget_min_paise)} - {formatPaise(gig.budget_max_paise)}</p>
           </div>
           {gig.guest_count && (
-            <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider">Guest Count</p>
-              <p className="text-sm font-medium text-gray-700">{gig.guest_count.toLocaleString()}</p>
+            <div className="bg-surface-elevated/50 backdrop-blur-sm rounded-lg p-4 border border-glass-border">
+              <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Guest Count</p>
+              <p className="text-sm font-semibold text-text-primary">{gig.guest_count.toLocaleString()}</p>
             </div>
           )}
           {gig.duration_hours && (
-            <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider">Duration</p>
-              <p className="text-sm font-medium text-gray-700">{gig.duration_hours} hours</p>
+            <div className="bg-surface-elevated/50 backdrop-blur-sm rounded-lg p-4 border border-glass-border">
+              <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Duration</p>
+              <p className="text-sm font-semibold text-text-primary">{gig.duration_hours} hours</p>
             </div>
           )}
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wider">Applications</p>
-            <p className="text-sm font-medium text-gray-700">{gig.application_count}</p>
-          </div>
+          {!gig.guest_count && !gig.duration_hours && (
+            <div className="bg-surface-elevated/50 backdrop-blur-sm rounded-lg p-4 border border-glass-border">
+              <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Applications</p>
+              <p className="text-sm font-semibold text-gradient">{gig.application_count}</p>
+            </div>
+          )}
         </div>
 
         {/* Genres */}
-        <div className="mb-4">
-          <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Genres Needed</p>
-          <div className="flex gap-1.5 flex-wrap">
+        <div>
+          <p className="text-xs text-text-muted uppercase tracking-wider mb-3 font-semibold">Genres Needed</p>
+          <div className="flex gap-2 flex-wrap">
             {gig.genres_needed.map((g) => (
-              <span key={g} className="text-xs bg-purple-50 text-purple-600 px-2.5 py-1 rounded-full">{g}</span>
+              <span key={g} className="text-xs bg-gradient-accent/20 text-gradient px-4 py-2 rounded-pill border border-gradient-accent/30 font-medium">{g}</span>
             ))}
           </div>
         </div>
 
         {/* Description */}
-        <div className="mb-4">
-          <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Description</p>
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{gig.description}</p>
+        <div>
+          <p className="text-xs text-text-muted uppercase tracking-wider mb-2 font-semibold">Description</p>
+          <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-wrap">{gig.description}</p>
         </div>
 
         {/* Requirements */}
         {gig.requirements && (
-          <div className="mb-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Requirements</p>
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">{gig.requirements}</p>
+          <div>
+            <p className="text-xs text-text-muted uppercase tracking-wider mb-2 font-semibold">Requirements</p>
+            <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-wrap">{gig.requirements}</p>
           </div>
         )}
 
         {/* Poster actions */}
         {isPoster && gig.status === 'open' && (
-          <div className="flex gap-3 pt-4 border-t border-gray-100">
+          <div className="flex gap-3 pt-4 border-t border-glass-border">
             <Link
               href={`/gigs/${gig.id}`}
-              className="text-sm text-primary-500 hover:underline"
+              className="px-4 py-2 rounded-pill text-sm font-medium bg-primary-500/20 text-primary-300 hover:bg-primary-500/30 transition-all border border-primary-500/30"
             >
               Edit
             </Link>
             <button
               onClick={handleClose}
-              className="text-sm text-red-500 hover:underline"
+              className="px-4 py-2 rounded-pill text-sm font-medium bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all border border-red-500/30"
             >
               Close Post
             </button>
@@ -272,9 +279,9 @@ export default function GigDetailPage() {
 
         {/* Artist apply */}
         {isArtist && gig.status === 'open' && !isPoster && (
-          <div className="pt-4 border-t border-gray-100">
+          <div className="pt-4 border-t border-glass-border">
             {applyResult && (
-              <p className={`text-sm mb-3 ${applyResult.includes('success') ? 'text-green-600' : 'text-yellow-600'}`}>
+              <p className={`text-sm mb-4 px-4 py-3 rounded-lg ${applyResult.includes('success') ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-200 border border-amber-500/30'}`}>
                 {applyResult}
               </p>
             )}
@@ -282,44 +289,44 @@ export default function GigDetailPage() {
             {!showApplyForm ? (
               <button
                 onClick={() => setShowApplyForm(true)}
-                className="bg-primary-500 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-600"
+                className="w-full bg-gradient-accent hover-glow text-white px-6 py-3 rounded-pill text-sm font-semibold transition-all duration-300 transform hover:scale-105"
               >
                 Apply to this Gig
               </button>
             ) : (
-              <form onSubmit={handleApply} className="space-y-3">
+              <form onSubmit={handleApply} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Cover Note (optional)</label>
+                  <label className="block text-sm font-semibold text-text-primary mb-2">Cover Note (optional)</label>
                   <textarea
                     rows={3}
                     value={coverNote}
                     onChange={(e) => setCoverNote(e.target.value)}
                     placeholder="Tell the client why you're a great fit..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full px-4 py-3 bg-surface-elevated/50 border border-glass-border rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Proposed Amount in ₹ (optional)</label>
+                  <label className="block text-sm font-semibold text-text-primary mb-2">Proposed Amount in ₹ (optional)</label>
                   <input
                     type="number"
                     value={proposedAmount}
                     onChange={(e) => setProposedAmount(e.target.value)}
                     placeholder="e.g., 150000"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full px-4 py-3 bg-surface-elevated/50 border border-glass-border rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   />
                 </div>
                 <div className="flex gap-3">
                   <button
                     type="submit"
                     disabled={applying}
-                    className="bg-primary-500 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 disabled:opacity-50"
+                    className="flex-1 bg-gradient-accent hover-glow text-white px-6 py-3 rounded-pill text-sm font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {applying ? 'Submitting...' : 'Submit Application'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowApplyForm(false)}
-                    className="text-sm text-gray-500 hover:text-gray-700"
+                    className="px-6 py-3 rounded-pill text-sm font-semibold text-text-muted hover:text-text-primary transition-colors bg-surface-elevated/50 border border-glass-border"
                   >
                     Cancel
                   </button>
@@ -332,42 +339,44 @@ export default function GigDetailPage() {
 
       {/* Applications (poster view) */}
       {isPoster && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Applications ({applications.length})
+        <div className="glass-card border glass-border p-8 space-y-6">
+          <h2 className="text-2xl font-heading font-bold text-gradient">
+            Applications <span className="text-base font-normal text-text-muted">({applications.length})</span>
           </h2>
 
           {applications.length === 0 ? (
-            <p className="text-sm text-gray-400">No applications yet.</p>
+            <div className="py-8 text-center">
+              <p className="text-text-muted text-sm">No applications yet.</p>
+            </div>
           ) : (
             <div className="space-y-4">
               {applications.map((app) => (
-                <div key={app.id} className="border border-gray-100 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-3">
+                <div key={app.id} className="glass-medium border glass-border p-5 space-y-4 hover:border-primary-500/50 transition-all duration-300">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
                       {app.profile_image_url ? (
-                        <img src={app.profile_image_url} alt="" className="w-10 h-10 rounded-full object-cover" />
+                        <img src={app.profile_image_url} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary-500/30" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm font-medium">
+                        <div className="w-12 h-12 rounded-full bg-gradient-accent/20 flex items-center justify-center text-text-primary text-sm font-semibold border border-gradient-accent/30">
                           {app.stage_name?.[0] ?? '?'}
                         </div>
                       )}
                       <div>
-                        <h3 className="font-medium text-gray-900">{app.stage_name}</h3>
-                        {app.base_city && <p className="text-xs text-gray-500">{app.base_city}</p>}
+                        <h3 className="font-semibold text-text-primary">{app.stage_name}</h3>
+                        {app.base_city && <p className="text-xs text-text-muted">{app.base_city}</p>}
                       </div>
                     </div>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${APP_STATUS_COLORS[app.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                    <div className={`text-xs px-3 py-1.5 rounded-pill font-semibold ${APP_STATUS_COLORS[app.status]?.bg} ${APP_STATUS_COLORS[app.status]?.text}`}>
                       {app.status}
-                    </span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-3 text-sm text-gray-500 mb-2">
+                  <div className="flex items-center gap-4 text-sm text-text-secondary flex-wrap">
                     {app.trust_score !== undefined && app.trust_score !== null && (
                       <span>Trust: {app.trust_score}</span>
                     )}
                     {app.proposed_amount_paise && (
-                      <span className="font-medium text-gray-700">Bid: {formatPaise(app.proposed_amount_paise)}</span>
+                      <span className="font-semibold text-gradient">Bid: {formatPaise(app.proposed_amount_paise)}</span>
                     )}
                     {app.base_price_paise && (
                       <span>Base rate: {formatPaise(app.base_price_paise)}</span>
@@ -375,23 +384,23 @@ export default function GigDetailPage() {
                   </div>
 
                   {app.genres && (
-                    <div className="flex gap-1 flex-wrap mb-2">
+                    <div className="flex gap-1.5 flex-wrap">
                       {(Array.isArray(app.genres) ? app.genres : []).map((g: string) => (
-                        <span key={g} className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full">{g}</span>
+                        <span key={g} className="text-xs bg-gradient-accent/20 text-gradient px-2.5 py-1 rounded-pill font-medium">{g}</span>
                       ))}
                     </div>
                   )}
 
                   {app.cover_note && (
-                    <p className="text-sm text-gray-600 mb-3 italic">&ldquo;{app.cover_note}&rdquo;</p>
+                    <p className="text-sm text-text-secondary italic border-l-2 border-primary-500/30 pl-3 py-1">&ldquo;{app.cover_note}&rdquo;</p>
                   )}
 
                   {(app.status === 'pending' || app.status === 'shortlisted') && gig.status === 'open' && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 pt-2">
                       <button
                         onClick={() => handleRespond(app.id, 'accepted')}
                         disabled={responding === app.id}
-                        className="text-xs bg-green-500 text-white px-3 py-1.5 rounded-md hover:bg-green-600 disabled:opacity-50"
+                        className="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-2 rounded-lg hover:bg-emerald-500/30 transition-all disabled:opacity-50 font-medium"
                       >
                         Accept
                       </button>
@@ -399,7 +408,7 @@ export default function GigDetailPage() {
                         <button
                           onClick={() => handleRespond(app.id, 'shortlisted')}
                           disabled={responding === app.id}
-                          className="text-xs bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-600 disabled:opacity-50"
+                          className="text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-2 rounded-lg hover:bg-blue-500/30 transition-all disabled:opacity-50 font-medium"
                         >
                           Shortlist
                         </button>
@@ -407,7 +416,7 @@ export default function GigDetailPage() {
                       <button
                         onClick={() => handleRespond(app.id, 'rejected')}
                         disabled={responding === app.id}
-                        className="text-xs bg-red-100 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-200 disabled:opacity-50"
+                        className="text-xs bg-red-500/20 text-red-300 border border-red-500/30 px-3 py-2 rounded-lg hover:bg-red-500/30 transition-all disabled:opacity-50 font-medium"
                       >
                         Reject
                       </button>

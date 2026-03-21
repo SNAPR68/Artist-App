@@ -3,7 +3,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { apiClient } from '../../../../../../lib/api-client';
-import { Download, Check, AlertCircle } from 'lucide-react';
+import { Download, Check, AlertCircle, Home, FileText } from 'lucide-react';
+
+interface BookingDetails {
+  id: string;
+  artist_id: string;
+  artist_name?: string;
+  event_date: string;
+  event_type?: string;
+}
 
 interface PaymentConfirmation {
   payment_id: string;
@@ -25,30 +33,51 @@ function formatINR(paise: number): string {
   }).format(paise / 100);
 }
 
+function formatDate(dateStr: string): string {
+  try {
+    return new Date(dateStr).toLocaleDateString('en-IN', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
 export default function PaymentConfirmationPage() {
   const { id: bookingId } = useParams<{ id: string }>();
   const router = useRouter();
   const [confirmation, setConfirmation] = useState<PaymentConfirmation | null>(null);
+  const [booking, setBooking] = useState<BookingDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloadingInvoice, setDownloadingInvoice] = useState(false);
   const [downloadingContract, setDownloadingContract] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadConfirmation();
+    loadData();
   }, [bookingId]);
 
-  const loadConfirmation = async () => {
+  const loadData = async () => {
     try {
-      // Try to load the most recent payment for this booking
-      const res = await apiClient<PaymentConfirmation>(`/v1/payments/booking/${bookingId}`);
-      if (res.success) {
-        setConfirmation(res.data);
+      const [paymentRes, bookingRes] = await Promise.all([
+        apiClient<PaymentConfirmation>(`/v1/payments/booking/${bookingId}`),
+        apiClient<BookingDetails>(`/v1/bookings/${bookingId}`),
+      ]);
+
+      if (paymentRes.success) {
+        setConfirmation(paymentRes.data);
       } else {
         setError('Payment details not found');
       }
+
+      if (bookingRes.success) {
+        setBooking(bookingRes.data);
+      }
     } catch (err) {
-      setError('Failed to load payment confirmation');
+      setError('Failed to load confirmation details');
     } finally {
       setLoading(false);
     }
@@ -106,7 +135,7 @@ export default function PaymentConfirmationPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
+      <div className="flex justify-center items-center py-20">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
       </div>
     );
@@ -115,13 +144,17 @@ export default function PaymentConfirmationPage() {
   if (error || !confirmation) {
     return (
       <div className="max-w-md mx-auto py-10">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center space-y-2">
-          <AlertCircle className="mx-auto text-red-500" size={32} />
-          <h2 className="text-lg font-semibold text-red-800">Error</h2>
-          <p className="text-sm text-red-600">{error}</p>
+        <div className="glass-card bg-gradient-to-br from-red-500/10 to-transparent p-8 text-center space-y-3">
+          <div className="flex justify-center">
+            <div className="rounded-full p-3 bg-red-500/20">
+              <AlertCircle className="text-red-400" size={32} />
+            </div>
+          </div>
+          <h2 className="text-lg font-semibold text-text-primary">Error</h2>
+          <p className="text-sm text-text-muted">{error}</p>
           <button
             onClick={() => router.push(`/client/bookings/${bookingId}`)}
-            className="mt-4 w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700"
+            className="mt-4 w-full px-4 py-2 bg-gradient-accent hover:opacity-90 text-white rounded-lg font-medium transition-all duration-300 hover-glow"
           >
             Back to Booking
           </button>
@@ -131,121 +164,184 @@ export default function PaymentConfirmationPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-10 space-y-6">
-      {/* Success Banner */}
-      <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center space-y-3">
-        <div className="flex justify-center">
-          <div className="bg-green-100 rounded-full p-3">
-            <Check className="text-green-600" size={24} />
-          </div>
-        </div>
-        <h1 className="text-2xl font-bold text-green-800">Payment Successful!</h1>
-        <p className="text-sm text-green-700">Your booking has been confirmed and payment received.</p>
+    <div className="min-h-screen py-8 px-4 relative overflow-hidden">
+      {/* Animated background dots */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-primary-400/20 rounded-full animate-fade-in"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${i * 0.1}s`,
+              animationDuration: '3s',
+            }}
+          />
+        ))}
       </div>
 
-      {/* Payment Details Card */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900">Payment Details</h2>
+      <div className="max-w-2xl mx-auto space-y-6 relative z-10">
+        {/* Success Checkmark Animation */}
+        <div className="flex justify-center mb-2">
+          <div className="relative w-20 h-20 flex items-center justify-center">
+            <div className="absolute inset-0 bg-gradient-accent rounded-full opacity-20 animate-pulse-scale" />
+            <div className="relative w-16 h-16 rounded-full bg-gradient-accent flex items-center justify-center shadow-glow-sm">
+              <Check className="text-white" size={32} strokeWidth={3} />
+            </div>
+          </div>
+        </div>
 
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-gray-500">Payment ID</p>
-            <p className="font-medium text-gray-900 break-all">{confirmation.payment_id}</p>
+        {/* Success Header */}
+        <div className="text-center space-y-2 animate-fade-in-up">
+          <h1 className="text-4xl font-heading font-bold text-gradient">Payment Successful!</h1>
+          <p className="text-text-secondary text-lg">Your booking has been confirmed and payment received</p>
+        </div>
+
+        {/* Booking Summary Card */}
+        {booking && (
+          <div className="glass-card p-6 space-y-4 animate-fade-in-up">
+            <h2 className="text-lg font-heading font-semibold text-text-primary">Booking Details</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <p className="text-text-muted text-sm font-medium">Booking ID</p>
+                <p className="text-text-primary font-heading font-semibold truncate">{booking.id.slice(0, 12)}...</p>
+              </div>
+              {booking.artist_name && (
+                <div className="space-y-1">
+                  <p className="text-text-muted text-sm font-medium">Artist</p>
+                  <p className="text-text-primary font-heading font-semibold">{booking.artist_name}</p>
+                </div>
+              )}
+              <div className="space-y-1">
+                <p className="text-text-muted text-sm font-medium">Event Date</p>
+                <p className="text-text-primary font-heading font-semibold">{formatDate(booking.event_date)}</p>
+              </div>
+              {booking.event_type && (
+                <div className="space-y-1">
+                  <p className="text-text-muted text-sm font-medium">Event Type</p>
+                  <p className="text-text-primary font-heading font-semibold capitalize">{booking.event_type}</p>
+                </div>
+              )}
+            </div>
           </div>
-          <div>
-            <p className="text-gray-500">Razorpay Payment ID</p>
-            <p className="font-medium text-gray-900">{confirmation.razorpay_payment_id.slice(0, 12)}...</p>
-          </div>
-          <div>
-            <p className="text-gray-500">Amount Paid</p>
-            <p className="text-xl font-bold text-green-600">₹{formatINR(confirmation.amount_paise)}</p>
-          </div>
-          <div>
-            <p className="text-gray-500">Payment Method</p>
-            <p className="font-medium text-gray-900 capitalize">{confirmation.payment_method || 'Not specified'}</p>
-          </div>
-          <div>
-            <p className="text-gray-500">Status</p>
-            <p className="font-medium">
-              <span className="inline-block px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+        )}
+
+        {/* Payment Details Card */}
+        <div className="glass-card p-6 space-y-4 animate-fade-in-up">
+          <h2 className="text-lg font-heading font-semibold text-text-primary">Payment Details</h2>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <p className="text-text-muted text-sm font-medium">Amount Paid</p>
+              <p className="text-2xl font-heading font-bold text-gradient">₹{formatINR(confirmation.amount_paise)}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-text-muted text-sm font-medium">Payment Method</p>
+              <p className="text-text-primary font-heading font-semibold capitalize">
+                {confirmation.payment_method || 'Card'}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-text-muted text-sm font-medium">Payment Status</p>
+              <span className="inline-block px-3 py-1 rounded-pill bg-gradient-accent/20 border border-primary-400/30 text-primary-300 text-xs font-semibold">
                 {confirmation.status.toUpperCase()}
               </span>
-            </p>
-          </div>
-          <div>
-            <p className="text-gray-500">Date & Time</p>
-            <p className="font-medium text-gray-900">
-              {new Date(confirmation.confirmed_at).toLocaleString('en-IN')}
-            </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-text-muted text-sm font-medium">Date & Time</p>
+              <p className="text-text-secondary text-sm">{new Date(confirmation.confirmed_at).toLocaleString('en-IN')}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Downloads Card */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-3">
-        <h2 className="text-lg font-semibold text-gray-900">Documents</h2>
+        {/* Documents Download Section */}
+        <div className="glass-card p-6 space-y-3 animate-fade-in-up">
+          <h2 className="text-lg font-heading font-semibold text-text-primary flex items-center gap-2">
+            <FileText size={20} className="text-primary-400" />
+            Download Documents
+          </h2>
 
-        <button
-          onClick={handleDownloadInvoice}
-          disabled={downloadingInvoice}
-          className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <div className="flex items-center gap-3">
-            <Download size={20} className="text-primary-500" />
-            <div className="text-left">
-              <p className="font-medium text-gray-900">Invoice</p>
-              <p className="text-xs text-gray-500">PDF receipt and tax invoice</p>
+          <button
+            onClick={handleDownloadInvoice}
+            disabled={downloadingInvoice}
+            className="w-full flex items-center justify-between p-4 glass-medium rounded-lg border border-glass-border hover:bg-glass-heavy transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="flex items-center gap-3">
+              <Download size={20} className="text-primary-400" />
+              <div className="text-left">
+                <p className="font-heading font-semibold text-text-primary">Invoice</p>
+                <p className="text-xs text-text-muted">PDF receipt and tax invoice</p>
+              </div>
             </div>
-          </div>
-          {downloadingInvoice && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-500" />}
-        </button>
+            {downloadingInvoice ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-400" />
+            ) : (
+              <div className="text-text-muted text-xs font-medium">Download</div>
+            )}
+          </button>
 
-        <button
-          onClick={handleDownloadContract}
-          disabled={downloadingContract}
-          className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <div className="flex items-center gap-3">
-            <Download size={20} className="text-primary-500" />
-            <div className="text-left">
-              <p className="font-medium text-gray-900">Contract</p>
-              <p className="text-xs text-gray-500">Booking terms and conditions</p>
+          <button
+            onClick={handleDownloadContract}
+            disabled={downloadingContract}
+            className="w-full flex items-center justify-between p-4 glass-medium rounded-lg border border-glass-border hover:bg-glass-heavy transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="flex items-center gap-3">
+              <Download size={20} className="text-primary-400" />
+              <div className="text-left">
+                <p className="font-heading font-semibold text-text-primary">Contract</p>
+                <p className="text-xs text-text-muted">Booking terms and conditions</p>
+              </div>
             </div>
-          </div>
-          {downloadingContract && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-500" />}
-        </button>
-      </div>
+            {downloadingContract ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-400" />
+            ) : (
+              <div className="text-text-muted text-xs font-medium">Download</div>
+            )}
+          </button>
+        </div>
 
-      {/* Next Steps */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-3">
-        <h2 className="text-lg font-semibold text-blue-900">What's Next?</h2>
-        <ul className="space-y-2 text-sm text-blue-800">
-          <li className="flex gap-2">
-            <span className="font-bold">•</span>
-            <span>Check your email for payment confirmation and invoice</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="font-bold">•</span>
-            <span>Review the booking contract for event details and terms</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="font-bold">•</span>
-            <span>The artist will contact you closer to the event date</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="font-bold">•</span>
-            <span>Save your payment receipt and contract for records</span>
-          </li>
-        </ul>
-      </div>
+        {/* Next Steps */}
+        <div className="glass-card bg-gradient-to-br from-primary-500/10 to-transparent p-6 space-y-3 animate-fade-in-up">
+          <h2 className="text-lg font-heading font-semibold text-text-primary">What's Next?</h2>
+          <ul className="space-y-2 text-sm text-text-secondary">
+            <li className="flex gap-3">
+              <span className="text-primary-400 font-bold">1</span>
+              <span>Check your email for payment confirmation and invoice</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-primary-400 font-bold">2</span>
+              <span>Review the booking contract for event details and terms</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-primary-400 font-bold">3</span>
+              <span>The artist will contact you closer to the event date</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-primary-400 font-bold">4</span>
+              <span>Save your payment receipt and contract for records</span>
+            </li>
+          </ul>
+        </div>
 
-      {/* Action Button */}
-      <button
-        onClick={() => router.push(`/client/bookings/${bookingId}`)}
-        className="w-full py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors"
-      >
-        Back to Booking
-      </button>
+        {/* Action Buttons */}
+        <div className="grid grid-cols-2 gap-4 animate-fade-in-up">
+          <button
+            onClick={() => router.push(`/client/bookings/${bookingId}`)}
+            className="flex items-center justify-center gap-2 py-3 bg-gradient-accent hover:opacity-90 text-white rounded-lg font-heading font-semibold transition-all duration-300 shadow-glow-sm hover-glow"
+          >
+            <FileText size={18} />
+            View Booking
+          </button>
+          <button
+            onClick={() => router.push('/client')}
+            className="flex items-center justify-center gap-2 py-3 glass-medium border border-glass-border text-text-primary rounded-lg font-heading font-semibold transition-all duration-300 hover:bg-glass-heavy hover-glow"
+          >
+            <Home size={18} />
+            Dashboard
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

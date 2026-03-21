@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Calendar, MapPin, IndianRupee, Sparkles, Music } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
 interface Booking {
@@ -15,18 +16,36 @@ interface Booking {
   created_at: string;
 }
 
-const STATUS_LABELS: Record<string, { label: string; className: string }> = {
-  inquiry: { label: 'New Inquiry', className: 'bg-blue-100 text-blue-700' },
-  quoted: { label: 'Quoted', className: 'bg-yellow-100 text-yellow-700' },
-  negotiating: { label: 'Negotiating', className: 'bg-yellow-100 text-yellow-800' },
-  confirmed: { label: 'Confirmed', className: 'bg-green-100 text-green-700' },
-  pre_event: { label: 'Pre-Event', className: 'bg-green-100 text-green-800' },
-  event_day: { label: 'Event Day', className: 'bg-purple-100 text-purple-700' },
-  completed: { label: 'Completed', className: 'bg-purple-100 text-purple-800' },
-  settled: { label: 'Settled', className: 'bg-green-100 text-green-700' },
-  cancelled: { label: 'Cancelled', className: 'bg-red-100 text-red-700' },
-  expired: { label: 'Expired', className: 'bg-gray-100 text-gray-600' },
+const STATUS_COLORS: Record<string, { badge: string; text: string }> = {
+  inquiry: { badge: 'bg-blue-500/20 text-blue-300', text: 'New Inquiry' },
+  quoted: { badge: 'bg-yellow-500/20 text-yellow-300', text: 'Quoted' },
+  negotiating: { badge: 'bg-yellow-500/20 text-yellow-300', text: 'Negotiating' },
+  confirmed: { badge: 'bg-green-500/20 text-green-300', text: 'Confirmed' },
+  pre_event: { badge: 'bg-green-500/20 text-green-300', text: 'Pre-Event' },
+  event_day: { badge: 'bg-purple-500/20 text-purple-300', text: 'Event Day' },
+  completed: { badge: 'bg-purple-500/20 text-purple-300', text: 'Completed' },
+  settled: { badge: 'bg-green-500/20 text-green-300', text: 'Settled' },
+  cancelled: { badge: 'bg-red-500/20 text-red-300', text: 'Cancelled' },
+  expired: { badge: 'bg-gray-500/20 text-gray-400', text: 'Expired' },
 };
+
+function SkeletonCard() {
+  return (
+    <div className="glass-card p-5 space-y-3 animate-fade-in">
+      <div className="flex items-start justify-between">
+        <div className="space-y-2 flex-1">
+          <div className="h-5 bg-white/10 rounded-lg w-32 shimmer-overlay" />
+          <div className="h-3 bg-white/5 rounded w-24" />
+        </div>
+        <div className="h-6 bg-white/10 rounded-full w-20 shimmer-overlay" />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="h-3 bg-white/5 rounded w-20" />
+        <div className="h-3 bg-white/5 rounded w-24" />
+      </div>
+    </div>
+  );
+}
 
 export default function ArtistBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -44,59 +63,83 @@ export default function ArtistBookingsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Bookings</h1>
+      <div className="animate-fade-in-up">
+        <h1 className="text-3xl font-bold text-gradient font-heading">Bookings</h1>
+        <p className="text-text-muted text-sm mt-1">Manage inquiries and confirmed performances</p>
+      </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 overflow-x-auto">
+      {/* Filter Pills */}
+      <div className="flex gap-2 overflow-x-auto pb-2 animate-fade-in-up" style={{ animationDelay: '50ms' }}>
         {['', 'inquiry', 'confirmed', 'completed', 'cancelled'].map((s) => (
           <button
             key={s}
             onClick={() => { setFilter(s); setLoading(true); }}
-            className={`px-3 py-1.5 text-sm rounded-full whitespace-nowrap ${
-              filter === s ? 'bg-primary-500 text-white' : 'bg-white text-gray-600 border border-gray-300'
+            className={`px-4 py-2 text-sm rounded-pill whitespace-nowrap transition-all font-medium ${
+              filter === s
+                ? 'glass-medium bg-gradient-accent text-white shadow-glow-sm'
+                : 'glass-card text-text-secondary hover:glass-medium'
             }`}
           >
-            {s ? STATUS_LABELS[s]?.label ?? s : 'All'}
+            {s ? STATUS_COLORS[s]?.text ?? s : 'All'}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+        <div className="grid gap-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
         </div>
       ) : bookings.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-lg mb-1">No bookings</p>
-          <p className="text-sm">New inquiries will appear here</p>
+        <div className="text-center py-16 glass-card rounded-2xl animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          <Music className="w-12 h-12 text-text-muted mx-auto mb-3 opacity-50" />
+          <p className="text-lg font-medium text-text-primary mb-1">No bookings</p>
+          <p className="text-text-muted text-sm">New inquiries will appear here</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {bookings.map((b) => {
-            const statusInfo = STATUS_LABELS[b.status] ?? { label: b.status, className: 'bg-gray-100 text-gray-600' };
+        <div className="space-y-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
+          {bookings.map((b, idx) => {
+            const statusInfo = STATUS_COLORS[b.status] ?? { badge: 'bg-gray-500/20 text-gray-400', text: b.status };
             const isNew = b.status === 'inquiry';
             return (
               <Link
                 key={b.id}
                 href={`/artist/bookings/${b.id}`}
-                className={`block bg-white rounded-lg border p-4 hover:border-primary-300 transition-colors ${
-                  isNew ? 'border-blue-300 ring-1 ring-blue-100' : 'border-gray-200'
+                className={`glass-card group hover:glass-medium backdrop-blur-xl rounded-xl p-5 transition-all duration-300 hover-glow shadow-glow-sm cursor-pointer block animate-fade-in-up ${
+                  isNew
+                    ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-2 border-gradient-accent shadow-lg shadow-blue-500/20'
+                    : 'bg-white/5 border glass-border hover:border-white/20'
                 }`}
+                style={{ animationDelay: `${50 + idx * 25}ms` }}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-gray-900">{b.client_name ?? 'Client'}</h3>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusInfo.className}`}>
-                    {statusInfo.label}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-semibold text-text-primary group-hover:text-white transition-colors">{b.client_name ?? 'Client'}</h3>
+                      {isNew && <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />}
+                    </div>
+                    <p className="text-text-muted text-sm">{b.event_type}</p>
+                  </div>
+                  <span className={`text-xs px-3 py-1 rounded-full font-semibold ${statusInfo.badge} whitespace-nowrap ml-2`}>
+                    {statusInfo.text}
                   </span>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <span>{b.event_type}</span>
-                  <span>{new Date(b.event_date).toLocaleDateString('en-IN')}</span>
-                  <span>{b.event_city}</span>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-text-secondary">
+                    <Calendar className="w-4 h-4 text-primary-400" />
+                    <span>{new Date(b.event_date).toLocaleDateString('en-IN')}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-text-secondary">
+                    <MapPin className="w-4 h-4 text-primary-400" />
+                    <span>{b.event_city}</span>
+                  </div>
                   {b.quoted_amount_paise && (
-                    <span className="font-medium text-gray-700">
-                      ₹{(b.quoted_amount_paise / 100).toLocaleString('en-IN')}
-                    </span>
+                    <div className="flex items-center gap-2 text-text-primary font-semibold pt-1">
+                      <IndianRupee className="w-4 h-4 text-accent-magenta" />
+                      <span>₹{(b.quoted_amount_paise / 100).toLocaleString('en-IN')}</span>
+                    </div>
                   )}
                 </div>
               </Link>

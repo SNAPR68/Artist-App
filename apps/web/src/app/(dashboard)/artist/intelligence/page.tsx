@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { Brain, Shield, BarChart3, MapPin, Target, Zap, ArrowRight } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
 interface IntelligenceSummary {
@@ -31,10 +32,9 @@ interface CareerData {
 }
 
 function trendArrow(trend: 'up' | 'down' | 'stable') {
-  if (trend === 'up') return <span className="text-green-500 ml-1">&#9650;</span>;
-  if (trend === 'stable') return <span className="text-gray-400 ml-1">&#9644;</span>;
-  // Never show decline — frame as opportunity
-  return <span className="text-yellow-500 ml-1">&#9654;</span>;
+  if (trend === 'up') return <span className="text-green-400 ml-1">↑</span>;
+  if (trend === 'stable') return <span className="text-text-muted ml-1">—</span>;
+  return <span className="text-yellow-400 ml-1">↗</span>;
 }
 
 export default function IntelligenceHubPage() {
@@ -78,54 +78,102 @@ export default function IntelligenceHubPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Career Intelligence</h1>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-heading font-bold text-text-primary">Career Intelligence</h1>
+          <p className="text-text-muted text-sm mt-1">Data-driven insights about your performance</p>
+        </div>
+        <Brain className="text-primary-400 opacity-50" size={32} />
+      </div>
 
-      {/* Stat Cards */}
+      {/* Core Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">Trust Score</p>
-          <p className="text-xl font-bold text-gray-900">
+        {/* Trust Score */}
+        <div className="glass-card bg-gradient-to-br from-purple-500/10 to-transparent p-5 border-purple-400/30 hover-glow">
+          <div className="flex items-start justify-between mb-2">
+            <p className="text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">Trust Score</p>
+            <Shield size={16} className="text-purple-400 opacity-60" />
+          </div>
+          <p className="text-2xl font-heading font-bold text-purple-300">
             {data.trust_score ?? 0}
             {trendArrow(data.trust_score_trend ?? 'stable')}
           </p>
+          <p className="text-xs text-text-secondary mt-2">Community rating</p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">Booking Velocity</p>
-          <p className="text-xl font-bold text-gray-900">{data.booking_velocity_30d ?? 0}</p>
-          <p className="text-xs text-gray-400">30d / {data.booking_velocity_90d ?? 0} over 90d</p>
+
+        {/* Booking Velocity */}
+        <div className="glass-card bg-gradient-to-br from-primary-500/10 to-transparent p-5 border-primary-400/30 hover-glow">
+          <div className="flex items-start justify-between mb-2">
+            <p className="text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">Booking Velocity</p>
+            <Zap size={16} className="text-primary-400 opacity-60" />
+          </div>
+          <p className="text-2xl font-heading font-bold text-primary-300">{data.booking_velocity_30d ?? 0}</p>
+          <p className="text-xs text-text-secondary mt-2">30 days / {data.booking_velocity_90d ?? 0} over 90d</p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">Rebook Rate</p>
-          <p className="text-xl font-bold text-gray-900">{data.rebook_rate ?? 0}%</p>
+
+        {/* Rebook Rate */}
+        <div className="glass-card bg-gradient-to-br from-green-500/10 to-transparent p-5 border-green-400/30 hover-glow">
+          <div className="flex items-start justify-between mb-2">
+            <p className="text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">Rebook Rate</p>
+            <BarChart3 size={16} className="text-green-400 opacity-60" />
+          </div>
+          <p className="text-2xl font-heading font-bold text-green-300">{data.rebook_rate ?? 0}%</p>
+          <p className="text-xs text-text-secondary mt-2">Client loyalty</p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">Demand Alignment</p>
-          <p className="text-xl font-bold text-gray-900">{data.demand_alignment ?? 0}%</p>
+
+        {/* Demand Alignment */}
+        <div className="glass-card bg-gradient-to-br from-blue-500/10 to-transparent p-5 border-blue-400/30 hover-glow">
+          <div className="flex items-start justify-between mb-2">
+            <p className="text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">Demand Alignment</p>
+            <Target size={16} className="text-blue-400 opacity-60" />
+          </div>
+          <p className="text-2xl font-heading font-bold text-blue-300">{data.demand_alignment ?? 0}%</p>
+          <p className="text-xs text-text-secondary mt-2">Market fit</p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">Total Bookings (This Year)</p>
-          <p className="text-xl font-bold text-gray-900">{data.total_bookings_this_year ?? 0}</p>
+
+        {/* Total Bookings */}
+        <div className="glass-card bg-gradient-to-br from-pink-500/10 to-transparent p-5 border-pink-400/30 hover-glow">
+          <div className="flex items-start justify-between mb-2">
+            <p className="text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">Total Bookings</p>
+            <BarChart3 size={16} className="text-pink-400 opacity-60" />
+          </div>
+          <p className="text-2xl font-heading font-bold text-pink-300">{data.total_bookings_this_year ?? 0}</p>
+          <p className="text-xs text-text-secondary mt-2">This year</p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">Avg Crowd Energy</p>
-          <p className="text-xl font-bold text-gray-900">{data.avg_crowd_energy ?? 0}</p>
+
+        {/* Crowd Energy */}
+        <div className="glass-card bg-gradient-to-br from-orange-500/10 to-transparent p-5 border-orange-400/30 hover-glow">
+          <div className="flex items-start justify-between mb-2">
+            <p className="text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">Crowd Energy</p>
+            <Zap size={16} className="text-orange-400 opacity-60" />
+          </div>
+          <p className="text-2xl font-heading font-bold text-orange-300">{data.avg_crowd_energy ?? 0}/5</p>
+          <p className="text-xs text-text-secondary mt-2">Audience feedback</p>
         </div>
       </div>
 
       {/* Top Cities */}
-      <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Top Cities</h2>
+      <section className="space-y-4">
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-heading font-semibold text-text-primary">Top Cities</h2>
+          <MapPin size={20} className="text-primary-400 opacity-60" />
+        </div>
         <div className="flex flex-wrap gap-2">
           {(data.top_cities ?? []).length === 0 ? (
-            <p className="text-sm text-gray-500">No city data yet. Keep performing to build your city presence!</p>
+            <div className="glass-card w-full p-6 text-center">
+              <p className="text-text-muted text-sm">No city data yet. Keep performing to build your city presence!</p>
+            </div>
           ) : (
             data.top_cities.map((c) => (
               <span
                 key={c.city}
-                className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-sm font-medium px-3 py-1.5 rounded-full"
+                className="inline-flex items-center gap-2 glass-medium border border-glass-border px-4 py-2 rounded-pill text-text-secondary text-sm font-heading font-semibold hover:bg-glass-heavy transition-colors duration-300"
               >
+                <MapPin size={14} className="text-primary-400" />
                 {c.city}
-                <span className="bg-blue-200 text-blue-800 text-xs px-1.5 py-0.5 rounded-full">{c.count}</span>
+                <span className="bg-gradient-accent/20 border border-primary-400/30 text-primary-300 text-xs px-2 py-0.5 rounded-pill font-bold">
+                  {c.count}
+                </span>
               </span>
             ))
           )}
@@ -133,19 +181,27 @@ export default function IntelligenceHubPage() {
       </section>
 
       {/* Top Event Types */}
-      <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Top Event Types</h2>
+      <section className="space-y-4">
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-heading font-semibold text-text-primary">Top Event Types</h2>
+          <Target size={20} className="text-primary-400 opacity-60" />
+        </div>
         <div className="flex flex-wrap gap-2">
           {(data.top_event_types ?? []).length === 0 ? (
-            <p className="text-sm text-gray-500">No event type data yet. Your specialties will appear here.</p>
+            <div className="glass-card w-full p-6 text-center">
+              <p className="text-text-muted text-sm">No event type data yet. Your specialties will appear here.</p>
+            </div>
           ) : (
             data.top_event_types.map((e) => (
               <span
                 key={e.event_type}
-                className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-sm font-medium px-3 py-1.5 rounded-full"
+                className="inline-flex items-center gap-2 glass-medium border border-glass-border px-4 py-2 rounded-pill text-text-secondary text-sm font-heading font-semibold hover:bg-glass-heavy transition-colors duration-300"
               >
+                <Target size={14} className="text-secondary-400" />
                 {e.event_type}
-                <span className="bg-purple-200 text-purple-800 text-xs px-1.5 py-0.5 rounded-full">{e.count}</span>
+                <span className="bg-gradient-accent/20 border border-secondary-400/30 text-secondary-300 text-xs px-2 py-0.5 rounded-pill font-bold">
+                  {e.count}
+                </span>
               </span>
             ))
           )}
@@ -156,31 +212,58 @@ export default function IntelligenceHubPage() {
       <div className="grid grid-cols-2 gap-4">
         <Link
           href="/artist/intelligence/gig-advisor"
-          className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors text-center"
+          className="glass-card p-5 hover-glow group transition-all duration-300 flex flex-col justify-between"
         >
-          <span className="block text-sm font-medium text-gray-700">Gig Advisor</span>
-          <span className="text-xs text-gray-400">Smart gig recommendations</span>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Zap size={18} className="text-primary-400 opacity-60 group-hover:opacity-100 transition-opacity" />
+              <h3 className="font-heading font-semibold text-text-primary">Gig Advisor</h3>
+            </div>
+            <p className="text-xs text-text-secondary">Smart recommendations</p>
+          </div>
+          <ArrowRight size={14} className="text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity mt-3" />
         </Link>
+
         <Link
           href="/artist/intelligence/reputation"
-          className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors text-center"
+          className="glass-card p-5 hover-glow group transition-all duration-300 flex flex-col justify-between"
         >
-          <span className="block text-sm font-medium text-gray-700">Reputation Insights</span>
-          <span className="text-xs text-gray-400">Reviews & ratings</span>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Shield size={18} className="text-secondary-400 opacity-60 group-hover:opacity-100 transition-opacity" />
+              <h3 className="font-heading font-semibold text-text-primary">Reputation</h3>
+            </div>
+            <p className="text-xs text-text-secondary">Reviews & insights</p>
+          </div>
+          <ArrowRight size={14} className="text-secondary-400 opacity-0 group-hover:opacity-100 transition-opacity mt-3" />
         </Link>
+
         <Link
           href="/artist/seasonal"
-          className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors text-center"
+          className="glass-card p-5 hover-glow group transition-all duration-300 flex flex-col justify-between"
         >
-          <span className="block text-sm font-medium text-gray-700">Seasonal Trends</span>
-          <span className="text-xs text-gray-400">Demand & timing</span>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <BarChart3 size={18} className="text-blue-400 opacity-60 group-hover:opacity-100 transition-opacity" />
+              <h3 className="font-heading font-semibold text-text-primary">Seasonal</h3>
+            </div>
+            <p className="text-xs text-text-secondary">Trends & timing</p>
+          </div>
+          <ArrowRight size={14} className="text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity mt-3" />
         </Link>
+
         <Link
           href="/artist/financial"
-          className="bg-white rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors text-center"
+          className="glass-card p-5 hover-glow group transition-all duration-300 flex flex-col justify-between"
         >
-          <span className="block text-sm font-medium text-gray-700">Financial Center</span>
-          <span className="text-xs text-gray-400">Cash flow & taxes</span>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <BarChart3 size={18} className="text-green-400 opacity-60 group-hover:opacity-100 transition-opacity" />
+              <h3 className="font-heading font-semibold text-text-primary">Financial</h3>
+            </div>
+            <p className="text-xs text-text-secondary">Cash flow & taxes</p>
+          </div>
+          <ArrowRight size={14} className="text-green-400 opacity-0 group-hover:opacity-100 transition-opacity mt-3" />
         </Link>
       </div>
     </div>
