@@ -7,7 +7,8 @@ interface UseVoiceRecognitionReturn {
   transcript: string;
   interimTranscript: string;
   isSupported: boolean;
-  startListening: () => void;
+  permissionDenied: boolean;
+  startListening: () => Promise<void>;
   stopListening: () => void;
   resetTranscript: () => void;
 }
@@ -41,6 +42,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
+  const [permissionDenied, setPermissionDenied] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   const isSupported = typeof window !== 'undefined' && getSpeechRecognitionConstructor() !== null;
@@ -83,10 +85,23 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
     recognitionRef.current = recognition;
   }, []);
 
-  const startListening = useCallback(() => {
+  const startListening = useCallback(async () => {
     if (!recognitionRef.current) return;
     setTranscript('');
     setInterimTranscript('');
+
+    // Request microphone permission explicitly before starting recognition
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Got permission — stop the stream immediately (recognition handles its own audio)
+      stream.getTracks().forEach(t => t.stop());
+    } catch (permErr) {
+      console.error('Microphone permission denied:', permErr);
+      setPermissionDenied(true);
+      setIsListening(false);
+      return;
+    }
+
     try {
       recognitionRef.current.start();
       setIsListening(true);
@@ -110,6 +125,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
     transcript,
     interimTranscript,
     isSupported,
+    permissionDenied,
     startListening,
     stopListening,
     resetTranscript,

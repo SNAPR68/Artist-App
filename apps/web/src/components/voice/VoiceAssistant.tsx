@@ -58,6 +58,7 @@ export function VoiceAssistant() {
     transcript,
     interimTranscript,
     isSupported,
+    permissionDenied,
     startListening,
     stopListening,
     resetTranscript,
@@ -124,15 +125,22 @@ export function VoiceAssistant() {
 
   // ─── Helper: speak response text via TTS ───
   function speakResponse(text: string) {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-IN';
-      utterance.rate = 1.0;
-      utterance.onend = () => setState('idle');
-      speechSynthesis.speak(utterance);
-      setState('responding');
-    } else {
-      setState('idle');
+    // Always reset to idle first — TTS is optional enhancement
+    setState('idle');
+    try {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis) {
+        // Cancel any pending speech
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-IN';
+        utterance.rate = 1.0;
+        utterance.onerror = () => setState('idle');
+        utterance.onend = () => setState('idle');
+        window.speechSynthesis.speak(utterance);
+        setState('responding');
+      }
+    } catch {
+      // TTS failed — state already set to idle above
     }
   }
 
@@ -322,9 +330,19 @@ export function VoiceAssistant() {
       stopListening();
     } else if (state === 'idle') {
       setState('listening');
-      startListening();
+      startListening().then(() => {
+        // If permission was denied, startListening sets permissionDenied and resets isListening
+        // Reset our local state too
+      });
     }
   }
+
+  // If voice recognition stops due to permission denial, reset our state
+  useEffect(() => {
+    if (permissionDenied && state === 'listening') {
+      setState('idle');
+    }
+  }, [permissionDenied, state]);
 
   function handleTextSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -403,7 +421,7 @@ export function VoiceAssistant() {
                 e.stopPropagation();
                 // Start listening IMMEDIATELY in the click handler (user gesture required by Web Speech API)
                 setState('listening');
-                startListening();
+                startListening(); // async but we don't need to await — permissionDenied effect handles state reset
                 // Then open the panel
                 setIsOpen(true);
               }}
@@ -469,6 +487,9 @@ export function VoiceAssistant() {
               <div className="flex items-center gap-2">
                 {!isSupported && (
                   <span className="text-[10px] text-yellow-200 px-1.5 py-0.5 rounded bg-white/10">No mic</span>
+                )}
+                {permissionDenied && isSupported && (
+                  <span className="text-[10px] text-yellow-200 px-1.5 py-0.5 rounded bg-white/10">Mic blocked</span>
                 )}
                 <button
                   onClick={() => setIsOpen(false)}

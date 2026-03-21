@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { Search, ArrowRight, Play, Building2 } from 'lucide-react';
 
 // Curated artist images for the hero collage (Unsplash — free to use)
+// Using direct Unsplash image URLs with auto=format for best browser compatibility
 const HERO_IMAGES = [
-  { src: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80', alt: 'Singer performing on stage' },
-  { src: 'https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=600&q=80', alt: 'DJ mixing at a club' },
-  { src: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&q=80', alt: 'Live concert crowd' },
-  { src: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&q=80', alt: 'Music festival lights' },
-  { src: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&q=80', alt: 'DJ performing with lights' },
-  { src: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=600&q=80', alt: 'Band performing live' },
+  { src: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80', alt: 'Singer performing on stage' },
+  { src: 'https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?auto=format&fit=crop&w=600&q=80', alt: 'DJ mixing at a club' },
+  { src: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80', alt: 'Live concert crowd' },
+  { src: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=600&q=80', alt: 'Music festival lights' },
+  { src: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80', alt: 'DJ performing with lights' },
+  { src: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=600&q=80', alt: 'Band performing live' },
 ];
 
 export function Hero() {
@@ -18,14 +19,14 @@ export function Hero() {
     <section className="relative min-h-[100vh] md:min-h-[90vh] flex items-end md:items-center overflow-hidden">
       {/* ─── Background Image ─── */}
       <div className="absolute inset-0">
-        {/* Primary hero image with crossOrigin for CORS */}
+        {/* Primary hero image — no crossOrigin to avoid CORS issues with Unsplash */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={HERO_IMAGES[0].src}
           alt={HERO_IMAGES[0].alt}
           className="absolute inset-0 w-full h-full object-cover"
           loading="eager"
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
+          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
         {/* Fallback solid gradient if image fails */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e]" style={{ zIndex: -1 }} />
@@ -41,16 +42,16 @@ export function Hero() {
       <div className="hidden lg:block absolute inset-0 overflow-hidden pointer-events-none">
         {/* Top-right cluster */}
         <div className="absolute top-24 right-[8%] w-48 h-64 rounded-2xl overflow-hidden rotate-6 opacity-60 shadow-2xl animate-float-slow">
-          <img src={HERO_IMAGES[1].src} alt={HERO_IMAGES[1].alt} className="w-full h-full object-cover" loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
+          <img src={HERO_IMAGES[1].src} alt={HERO_IMAGES[1].alt} className="w-full h-full object-cover" loading="lazy" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
         </div>
         <div className="absolute top-40 right-[22%] w-36 h-48 rounded-2xl overflow-hidden -rotate-3 opacity-50 shadow-2xl animate-float-slow-reverse">
-          <img src={HERO_IMAGES[2].src} alt={HERO_IMAGES[2].alt} className="w-full h-full object-cover" loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
+          <img src={HERO_IMAGES[2].src} alt={HERO_IMAGES[2].alt} className="w-full h-full object-cover" loading="lazy" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
         </div>
         {/* Left accent */}
         <div className="absolute top-32 left-[5%] w-40 h-56 rounded-2xl overflow-hidden -rotate-6 opacity-40 shadow-2xl animate-float-slow" style={{ animationDelay: '2s' }}>
-          <img src={HERO_IMAGES[3].src} alt={HERO_IMAGES[3].alt} className="w-full h-full object-cover" loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
+          <img src={HERO_IMAGES[3].src} alt={HERO_IMAGES[3].alt} className="w-full h-full object-cover" loading="lazy" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
         </div>
       </div>
@@ -119,7 +120,7 @@ export function Hero() {
             <div className="flex -space-x-2.5">
               {HERO_IMAGES.slice(0, 4).map((img, i) => (
                 <div key={i} className="w-9 h-9 rounded-full border-2 border-surface-bg overflow-hidden bg-surface-elevated">
-                  <img src={img.src} alt="" className="w-full h-full object-cover" loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                  <img src={img.src} alt="" className="w-full h-full object-cover" loading="lazy" />
                 </div>
               ))}
             </div>
