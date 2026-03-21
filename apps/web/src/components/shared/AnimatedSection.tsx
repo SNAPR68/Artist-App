@@ -1,7 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
 
 interface AnimatedSectionProps {
   children: React.ReactNode;
@@ -12,10 +11,10 @@ interface AnimatedSectionProps {
 }
 
 const directionMap = {
-  up: { y: 40, x: 0 },
-  down: { y: -40, x: 0 },
-  left: { x: 40, y: 0 },
-  right: { x: -40, y: 0 },
+  up: 'translate-y-10',
+  down: '-translate-y-10',
+  left: 'translate-x-10',
+  right: '-translate-x-10',
 };
 
 export function AnimatedSection({
@@ -25,23 +24,40 @@ export function AnimatedSection({
   direction = 'up',
   once = true,
 }: AnimatedSectionProps) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once, margin: '-80px' });
-  const offset = directionMap[direction];
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          if (once) observer.unobserve(el);
+        } else if (!once) {
+          setIsVisible(false);
+        }
+      },
+      { rootMargin: '-60px', threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [once]);
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, x: offset.x, y: offset.y }}
-      animate={isInView ? { opacity: 1, x: 0, y: 0 } : undefined}
-      transition={{
-        duration: 0.6,
-        delay,
-        ease: [0.25, 0.4, 0.25, 1],
-      }}
-      className={className}
+      className={`transition-all duration-700 ease-out ${
+        isVisible
+          ? 'opacity-100 translate-x-0 translate-y-0'
+          : `opacity-0 ${directionMap[direction]}`
+      } ${className}`}
+      style={{ transitionDelay: `${delay}s` }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

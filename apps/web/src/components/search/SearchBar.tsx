@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
 
 interface SearchBarProps {
@@ -12,11 +11,7 @@ interface SearchBarProps {
 export function SearchBar({ value, onChange, onSubmit }: SearchBarProps) {
   return (
     <form onSubmit={onSubmit} className="mb-6">
-      <motion.div
-        className="flex gap-2"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
+      <div className="flex gap-2 animate-fade-in-up">
         <div className="flex-1 relative group">
           <Search
             size={18}
@@ -36,7 +31,7 @@ export function SearchBar({ value, onChange, onSubmit }: SearchBarProps) {
         >
           Search
         </button>
-      </motion.div>
+      </div>
     </form>
   );
 }

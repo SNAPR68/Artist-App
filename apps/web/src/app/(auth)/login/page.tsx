@@ -2,21 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { Phone } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 import { useI18n } from '@/i18n';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.2 } },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 15 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -44,17 +33,17 @@ export default function LoginPage() {
 
   return (
     <div className="glass-card p-8">
-      <motion.div variants={container} initial="hidden" animate="show">
-        <motion.div variants={item} className="flex justify-end mb-2">
+      <div>
+        <div className="flex justify-end mb-2 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <LanguageSwitcher />
-        </motion.div>
+        </div>
 
-        <motion.div variants={item} className="text-center mb-8">
+        <div className="text-center mb-8 animate-fade-in-up" style={{ animationDelay: '0.28s' }}>
           <h1 className="text-h3 font-heading font-bold text-text-primary mb-2">{t('auth.welcome')}</h1>
           <p className="text-sm text-text-muted">{t('auth.enterPhone')}</p>
-        </motion.div>
+        </div>
 
-        <motion.form variants={item} onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in-up" style={{ animationDelay: '0.36s' }}>
           <div className="flex items-center gap-2">
             <div className="flex items-center h-12 px-3 rounded-xl bg-glass-light border border-glass-border text-text-muted text-sm">
               +91
@@ -79,13 +68,9 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <motion.p
-              className="text-xs text-red-400 px-1"
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
+            <p className="text-xs text-red-400 px-1 animate-fade-in-up">
               {error}
-            </motion.p>
+            </p>
           )}
 
           <button
@@ -95,12 +80,12 @@ export default function LoginPage() {
           >
             {isLoading ? 'Sending...' : t('auth.sendOtp')}
           </button>
-        </motion.form>
+        </form>
 
-        <motion.p variants={item} className="text-[10px] text-text-muted text-center mt-6 leading-relaxed">
+        <p className="text-[10px] text-text-muted text-center mt-6 leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.44s' }}>
           {t('auth.termsNotice')}
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
     </div>
   );
 }

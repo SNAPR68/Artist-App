@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Star, MapPin, BadgeCheck, Heart } from 'lucide-react';
 
 interface ArtistCardProps {
@@ -37,10 +36,8 @@ export function ArtistCard({
   const minPrice = prices?.length ? Math.min(...prices) : null;
 
   return (
-    <motion.div
-      className="group glass-card overflow-hidden"
-      whileHover={{ y: -4 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+    <div
+      className="group glass-card overflow-hidden hover:-translate-y-1 transition-all duration-300"
     >
       {/* Thumbnail */}
       <div className="aspect-[4/3] bg-surface-elevated relative overflow-hidden">
@@ -52,7 +49,7 @@ export function ArtistCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500/10 to-secondary-500/10">
-            <span className="text-4xl opacity-30">♪</span>
+            <span className="text-4xl opacity-30">&#9834;</span>
           </div>
         )}
 
@@ -100,7 +97,7 @@ export function ArtistCard({
         <div className="flex items-center gap-1 text-xs text-text-muted mb-2">
           <MapPin size={11} />
           <span>{base_city}</span>
-          <span className="text-glass-border mx-1">·</span>
+          <span className="text-glass-border mx-1">&middot;</span>
           <span>{total_bookings} bookings</span>
         </div>
 
@@ -124,10 +121,10 @@ export function ArtistCard({
         {/* Price */}
         {minPrice !== null && (
           <p className="text-sm font-semibold text-text-primary">
-            From ₹{(minPrice / 100).toLocaleString('en-IN')}
+            From &#8377;{(minPrice / 100).toLocaleString('en-IN')}
           </p>
         )}
       </Link>
-    </motion.div>
+    </div>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ArrowRight, ArrowLeft } from 'lucide-react';
 import { apiClient } from '../../lib/api-client';
 import { BookingStepIndicator } from './BookingStepIndicator';
@@ -29,7 +28,6 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
   });
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [direction, setDirection] = useState(1);
 
   const [formData, setFormData] = useState({
     event_type: eventTypes[0] ?? '',
@@ -54,12 +52,10 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
   }
 
   function nextStep() {
-    setDirection(1);
     setCurrentStep((s) => Math.min(s + 1, 3));
   }
 
   function prevStep() {
-    setDirection(-1);
     setCurrentStep((s) => Math.max(s - 1, 1));
   }
 
@@ -118,11 +114,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
   if (successBookingId) {
     return (
       <div className="glass-card p-6">
-        <motion.div
-          className="text-center"
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-        >
+        <div className="text-center animate-fade-in-up">
           <div className="w-14 h-14 bg-green-500/15 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check size={28} className="text-green-400" />
           </div>
@@ -147,7 +139,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
           >
             Send another inquiry
           </button>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -171,12 +163,6 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
   }
 
   // --- Multi-step Inquiry form ---
-  const slideVariants = {
-    enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (dir: number) => ({ x: dir > 0 ? -80 : 80, opacity: 0 }),
-  };
-
   return (
     <div className="glass-card p-6">
       <h3 className="text-lg font-heading font-semibold text-text-primary mb-4">Book This Artist</h3>
@@ -184,89 +170,79 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
       <BookingStepIndicator currentStep={currentStep} totalSteps={3} labels={STEP_LABELS} />
 
       <form onSubmit={handleSubmit}>
-        <AnimatePresence mode="wait" custom={direction}>
-          {currentStep === 1 && (
-            <motion.div
-              key="step1"
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.25 }}
-              className="space-y-4"
-            >
-              <FormField label="Event Type" required>
-                <select name="event_type" value={formData.event_type} onChange={handleChange} required className="form-input">
-                  {eventTypes.map((t) => (
-                    <option key={t} value={t}>
-                      {t.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
+        <div className="relative overflow-hidden">
+          {/* Step 1 */}
+          <div
+            className={`space-y-4 transition-all duration-300 ${
+              currentStep === 1
+                ? 'opacity-100 translate-x-0'
+                : 'opacity-0 absolute inset-0 pointer-events-none translate-x-full'
+            }`}
+          >
+            <FormField label="Event Type" required>
+              <select name="event_type" value={formData.event_type} onChange={handleChange} required className="form-input">
+                {eventTypes.map((t) => (
+                  <option key={t} value={t}>
+                    {t.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </option>
+                ))}
+              </select>
+            </FormField>
 
-              <FormField label="Event Date" required>
-                <input type="date" name="event_date" value={formData.event_date} onChange={handleChange} min={today} required className="form-input" />
-              </FormField>
+            <FormField label="Event Date" required>
+              <input type="date" name="event_date" value={formData.event_date} onChange={handleChange} min={today} required className="form-input" />
+            </FormField>
 
-              <FormField label="City" required>
-                <input type="text" name="event_city" value={formData.event_city} onChange={handleChange} placeholder="e.g. Mumbai" required minLength={2} maxLength={100} className="form-input" />
-              </FormField>
+            <FormField label="City" required>
+              <input type="text" name="event_city" value={formData.event_city} onChange={handleChange} placeholder="e.g. Mumbai" required minLength={2} maxLength={100} className="form-input" />
+            </FormField>
 
-              <FormField label="Venue">
-                <input type="text" name="event_venue" value={formData.event_venue} onChange={handleChange} placeholder="e.g. Grand Ballroom, Taj Hotel" maxLength={500} className="form-input" />
-              </FormField>
-            </motion.div>
-          )}
+            <FormField label="Venue">
+              <input type="text" name="event_venue" value={formData.event_venue} onChange={handleChange} placeholder="e.g. Grand Ballroom, Taj Hotel" maxLength={500} className="form-input" />
+            </FormField>
+          </div>
 
-          {currentStep === 2 && (
-            <motion.div
-              key="step2"
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.25 }}
-              className="space-y-4"
-            >
-              <FormField label="Duration (hours)" required>
-                <input type="number" name="duration_hours" value={formData.duration_hours} onChange={handleChange} min={0.5} max={24} step={0.5} required className="form-input" />
-              </FormField>
+          {/* Step 2 */}
+          <div
+            className={`space-y-4 transition-all duration-300 ${
+              currentStep === 2
+                ? 'opacity-100 translate-x-0'
+                : currentStep < 2
+                  ? 'opacity-0 absolute inset-0 pointer-events-none translate-x-full'
+                  : 'opacity-0 absolute inset-0 pointer-events-none -translate-x-full'
+            }`}
+          >
+            <FormField label="Duration (hours)" required>
+              <input type="number" name="duration_hours" value={formData.duration_hours} onChange={handleChange} min={0.5} max={24} step={0.5} required className="form-input" />
+            </FormField>
 
-              <FormField label="Budget (INR)">
-                <input type="number" name="budget" value={formData.budget} onChange={handleChange} placeholder="e.g. 50000" min={0} className="form-input" />
-              </FormField>
+            <FormField label="Budget (INR)">
+              <input type="number" name="budget" value={formData.budget} onChange={handleChange} placeholder="e.g. 50000" min={0} className="form-input" />
+            </FormField>
 
-              <FormField label="Message">
-                <textarea name="message" value={formData.message} onChange={handleChange} rows={3} placeholder="Tell the artist about your event..." maxLength={5000} className="form-input resize-none" />
-              </FormField>
-            </motion.div>
-          )}
+            <FormField label="Message">
+              <textarea name="message" value={formData.message} onChange={handleChange} rows={3} placeholder="Tell the artist about your event..." maxLength={5000} className="form-input resize-none" />
+            </FormField>
+          </div>
 
-          {currentStep === 3 && (
-            <motion.div
-              key="step3"
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.25 }}
-              className="space-y-3"
-            >
-              <h4 className="text-sm font-medium text-text-primary mb-2">Review Your Inquiry</h4>
-              <ReviewRow label="Event Type" value={formData.event_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} />
-              <ReviewRow label="Date" value={formData.event_date} />
-              <ReviewRow label="City" value={formData.event_city} />
-              {formData.event_venue && <ReviewRow label="Venue" value={formData.event_venue} />}
-              <ReviewRow label="Duration" value={`${formData.duration_hours} hours`} />
-              {formData.budget && <ReviewRow label="Budget" value={`₹${Number(formData.budget).toLocaleString('en-IN')}`} />}
-              {formData.message && <ReviewRow label="Message" value={formData.message} />}
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* Step 3 */}
+          <div
+            className={`space-y-3 transition-all duration-300 ${
+              currentStep === 3
+                ? 'opacity-100 translate-x-0'
+                : 'opacity-0 absolute inset-0 pointer-events-none -translate-x-full'
+            }`}
+          >
+            <h4 className="text-sm font-medium text-text-primary mb-2">Review Your Inquiry</h4>
+            <ReviewRow label="Event Type" value={formData.event_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} />
+            <ReviewRow label="Date" value={formData.event_date} />
+            <ReviewRow label="City" value={formData.event_city} />
+            {formData.event_venue && <ReviewRow label="Venue" value={formData.event_venue} />}
+            <ReviewRow label="Duration" value={`${formData.duration_hours} hours`} />
+            {formData.budget && <ReviewRow label="Budget" value={`₹${Number(formData.budget).toLocaleString('en-IN')}`} />}
+            {formData.message && <ReviewRow label="Message" value={formData.message} />}
+          </div>
+        </div>
 
         {/* Error */}
         {error && (

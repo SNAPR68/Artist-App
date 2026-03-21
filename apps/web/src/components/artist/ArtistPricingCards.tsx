@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/shared/AnimatedSection';
 
 interface PricingEntry {
@@ -25,9 +24,8 @@ export function ArtistPricingCards({ pricing }: ArtistPricingCardsProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {pricing.map((p, i) => (
           <AnimatedSection key={i} delay={i * 0.05}>
-            <motion.div
-              className="glass-card p-4 relative overflow-hidden"
-              whileHover={{ y: -2 }}
+            <div
+              className="glass-card p-4 relative overflow-hidden transition-transform duration-200 hover:-translate-y-0.5"
             >
               {i === 0 && (
                 <span className="absolute top-2 right-2 px-2 py-0.5 rounded-pill bg-gradient-accent text-white text-[9px] font-bold uppercase tracking-wider">
@@ -44,7 +42,7 @@ export function ArtistPricingCards({ pricing }: ArtistPricingCardsProps) {
                 ₹{((p.min_price ?? p.min_paise ?? 0) / 100).toLocaleString('en-IN')}
                 <span className="text-text-muted font-normal text-sm"> – ₹{((p.max_price ?? p.max_paise ?? 0) / 100).toLocaleString('en-IN')}</span>
               </p>
-            </motion.div>
+            </div>
           </AnimatedSection>
         ))}
       </div>

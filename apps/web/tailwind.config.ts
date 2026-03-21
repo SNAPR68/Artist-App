@@ -175,11 +175,12 @@ const config: Config = {
 
       // ─── Animations ───────────────────────────────────
       animation: {
-        'fade-in-up': 'fadeInUp 0.5s ease-out',
-        'fade-in-down': 'fadeInDown 0.5s ease-out',
-        'fade-in-left': 'fadeInLeft 0.5s ease-out',
-        'fade-in-right': 'fadeInRight 0.5s ease-out',
-        'scale-in': 'scaleIn 0.3s ease-out',
+        'fade-in': 'fadeIn 0.5s ease-out forwards',
+        'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.25, 0.4, 0.25, 1) forwards',
+        'fade-in-down': 'fadeInDown 0.5s ease-out forwards',
+        'fade-in-left': 'fadeInLeft 0.5s ease-out forwards',
+        'fade-in-right': 'fadeInRight 0.5s ease-out forwards',
+        'scale-in': 'scaleIn 0.3s ease-out forwards',
         'slide-up': 'slideUp 0.4s ease-out',
         'slide-in-right': 'slideInRight 0.3s ease-out',
         float: 'float 6s ease-in-out infinite',
@@ -189,10 +190,17 @@ const config: Config = {
         'count-up': 'countUp 1s ease-out',
         blob: 'blob 7s infinite',
         'spin-slow': 'spin 8s linear infinite',
+        'float-slow': 'floatSlow 6s ease-in-out infinite',
+        'float-slow-reverse': 'floatSlowReverse 7s ease-in-out infinite',
+        'pulse-scale': 'pulseScale 4s ease-in-out infinite',
       },
 
       // ─── Keyframes ────────────────────────────────────
       keyframes: {
+        fadeIn: {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
         fadeInUp: {
           from: { opacity: '0', transform: 'translateY(20px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
@@ -247,6 +255,18 @@ const config: Config = {
           '25%': { borderRadius: '30% 60% 70% 40% / 50% 60% 30% 60%' },
           '50%': { borderRadius: '50% 60% 30% 60% / 30% 60% 70% 40%' },
           '75%': { borderRadius: '60% 40% 60% 30% / 70% 30% 50% 60%' },
+        },
+        floatSlow: {
+          '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+          '50%': { transform: 'translateY(-15px) rotate(5deg)' },
+        },
+        floatSlowReverse: {
+          '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+          '50%': { transform: 'translateY(10px) rotate(-5deg)' },
+        },
+        pulseScale: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.1)' },
         },
       },
 

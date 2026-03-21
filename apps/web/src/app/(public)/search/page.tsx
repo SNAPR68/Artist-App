@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { SlidersHorizontal } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 import { ArtistCard } from '../../../components/search/ArtistCard';
@@ -193,27 +192,17 @@ function SearchPageContent() {
               </div>
             ) : (
               <>
-                <motion.div
-                  className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-4"
-                  initial="hidden"
-                  animate="show"
-                  variants={{
-                    hidden: {},
-                    show: { transition: { staggerChildren: 0.05 } },
-                  }}
-                >
-                  {results.map((artist) => (
-                    <motion.div
+                <div className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-4">
+                  {results.map((artist, i) => (
+                    <div
                       key={artist.id}
-                      variants={{
-                        hidden: { opacity: 0, y: 20 },
-                        show: { opacity: 1, y: 0 },
-                      }}
+                      className="animate-fade-in-up"
+                      style={{ animationDelay: `${i * 0.05}s` }}
                     >
                       <ArtistCard {...artist} />
-                    </motion.div>
+                    </div>
                   ))}
-                </motion.div>
+                </div>
 
                 {/* Pagination */}
                 {totalPages > 1 && (

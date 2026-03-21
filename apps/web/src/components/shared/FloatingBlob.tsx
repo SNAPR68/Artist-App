@@ -1,7 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
-
 interface FloatingBlobProps {
   color?: string;
   size?: number;
@@ -22,8 +20,8 @@ export function FloatingBlob({
   delay = 0,
 }: FloatingBlobProps) {
   return (
-    <motion.div
-      className="absolute animate-blob pointer-events-none"
+    <div
+      className="absolute animate-blob pointer-events-none animate-pulse-scale"
       style={{
         width: size,
         height: size,
@@ -33,13 +31,7 @@ export function FloatingBlob({
         left,
         right,
         bottom,
-      }}
-      animate={{ scale: [1, 1.1, 0.95, 1] }}
-      transition={{
-        duration: 8,
-        repeat: Infinity,
-        ease: 'easeInOut',
-        delay,
+        animationDelay: `${delay}s`,
       }}
     />
   );

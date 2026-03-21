@@ -2,23 +2,12 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { OTPInput } from '@artist-booking/ui';
 import { UserRole } from '@artist-booking/shared';
 import { useAuthStore } from '@/lib/auth';
 import { useI18n } from '@/i18n';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Mic2, Users, Briefcase, Building2 } from 'lucide-react';
-
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.2 } },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 15 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-};
 
 function VerifyContent() {
   const router = useRouter();
@@ -102,44 +91,43 @@ function VerifyContent() {
 
   return (
     <div className="glass-card p-8">
-      <motion.div variants={container} initial="hidden" animate="show">
-        <motion.div variants={item} className="flex justify-end mb-2">
+      <div>
+        <div className="flex justify-end mb-2 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <LanguageSwitcher />
-        </motion.div>
+        </div>
 
-        <motion.div variants={item} className="text-center mb-8">
+        <div className="text-center mb-8 animate-fade-in-up" style={{ animationDelay: '0.28s' }}>
           <h1 className="text-h3 font-heading font-bold text-text-primary mb-2">{t('auth.verifyOtp')}</h1>
           <p className="text-sm text-text-muted">
             {t('auth.enterOtp')}{' '}
             <span className="font-medium text-text-secondary">+91 {maskedPhone}</span>
           </p>
-        </motion.div>
+        </div>
 
         {isNewUser && (
-          <motion.div variants={item} className="mb-6">
+          <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.36s' }}>
             <p className="text-sm font-medium text-text-secondary mb-3">{t('auth.selectRole')}</p>
             <div className="grid grid-cols-2 gap-2">
               {roles.map((role) => (
-                <motion.button
+                <button
                   key={role.value}
                   onClick={() => { setSelectedRole(role.value); setError(''); }}
-                  className={`p-3 rounded-xl border-2 text-left transition-all ${
+                  className={`p-3 rounded-xl border-2 text-left transition-all active:scale-[0.98] ${
                     selectedRole === role.value
                       ? 'border-primary-500 bg-primary-500/10 shadow-glow-sm'
                       : 'border-glass-border hover:border-primary-500/30 bg-glass-light'
                   }`}
-                  whileTap={{ scale: 0.98 }}
                 >
                   <role.icon size={18} className={selectedRole === role.value ? 'text-primary-400 mb-1' : 'text-text-muted mb-1'} />
                   <p className="text-sm font-medium text-text-primary">{t(role.labelKey)}</p>
                   <p className="text-[10px] text-text-muted">{t(role.descKey)}</p>
-                </motion.button>
+                </button>
               ))}
             </div>
-          </motion.div>
+          </div>
         )}
 
-        <motion.div variants={item} className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-center space-y-4 animate-fade-in-up" style={{ animationDelay: '0.44s' }}>
           <OTPInput
             onComplete={handleOTPComplete}
             error={error}
@@ -168,8 +156,8 @@ function VerifyContent() {
           >
             {t('auth.changePhone')}
           </button>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }

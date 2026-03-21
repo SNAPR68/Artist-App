@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 
 interface MediaItem {
@@ -61,63 +60,54 @@ export function ArtistGallery({ media, artistName }: ArtistGalleryProps) {
       </div>
 
       {/* Lightbox */}
-      <AnimatePresence>
-        {lightboxIndex !== null && (
-          <motion.div
-            className="fixed inset-0 z-modal bg-black/90 flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+      {lightboxIndex !== null && (
+        <div
+          className="fixed inset-0 z-modal bg-black/90 flex items-center justify-center p-4 transition-opacity duration-300 opacity-100"
+          onClick={() => setLightboxIndex(null)}
+        >
+          <button
             onClick={() => setLightboxIndex(null)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 z-10"
           >
+            <X size={20} />
+          </button>
+
+          {lightboxIndex > 0 && (
             <button
-              onClick={() => setLightboxIndex(null)}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 z-10"
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1); }}
+              className="absolute left-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 z-10"
             >
-              <X size={20} />
+              <ChevronLeft size={20} />
             </button>
+          )}
 
-            {lightboxIndex > 0 && (
-              <button
-                onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1); }}
-                className="absolute left-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 z-10"
-              >
-                <ChevronLeft size={20} />
-              </button>
-            )}
-
-            {lightboxIndex < media.length - 1 && (
-              <button
-                onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1); }}
-                className="absolute right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 z-10"
-              >
-                <ChevronRight size={20} />
-              </button>
-            )}
-
-            <motion.div
-              key={lightboxIndex}
-              className="max-w-4xl max-h-[80vh]"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
+          {lightboxIndex < media.length - 1 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1); }}
+              className="absolute right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 z-10"
             >
-              {media[lightboxIndex].media_type === 'image' ? (
-                <img
-                  src={getUrl(media[lightboxIndex])}
-                  alt={`${artistName} ${lightboxIndex + 1}`}
-                  className="max-w-full max-h-[80vh] object-contain rounded-lg"
-                />
-              ) : (
-                <div className="w-full aspect-video bg-surface-card rounded-lg flex items-center justify-center text-text-muted">
-                  Video Player
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <ChevronRight size={20} />
+            </button>
+          )}
+
+          <div
+            className="max-w-4xl max-h-[80vh] transition-all duration-300 scale-100 opacity-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {media[lightboxIndex].media_type === 'image' ? (
+              <img
+                src={getUrl(media[lightboxIndex])}
+                alt={`${artistName} ${lightboxIndex + 1}`}
+                className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              />
+            ) : (
+              <div className="w-full aspect-video bg-surface-card rounded-lg flex items-center justify-center text-text-muted">
+                Video Player
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }

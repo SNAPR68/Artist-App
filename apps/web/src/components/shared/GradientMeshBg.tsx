@@ -1,7 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
-
 interface GradientMeshBgProps {
   className?: string;
 }
@@ -13,44 +11,30 @@ export function GradientMeshBg({ className = '' }: GradientMeshBgProps) {
       <div className="absolute inset-0 bg-surface-bg" />
 
       {/* Animated gradient orbs */}
-      <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full opacity-20"
+      <div
+        className="absolute w-[600px] h-[600px] rounded-full opacity-20 animate-float-slow"
         style={{
           background: 'radial-gradient(circle, rgba(59,130,246,0.4) 0%, transparent 70%)',
           top: '-10%',
           left: '10%',
         }}
-        animate={{
-          x: [0, 50, -30, 0],
-          y: [0, -30, 20, 0],
-        }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
       />
-      <motion.div
-        className="absolute w-[500px] h-[500px] rounded-full opacity-15"
+      <div
+        className="absolute w-[500px] h-[500px] rounded-full opacity-15 animate-float-slow-reverse"
         style={{
           background: 'radial-gradient(circle, rgba(139,92,246,0.4) 0%, transparent 70%)',
           top: '20%',
           right: '5%',
         }}
-        animate={{
-          x: [0, -40, 30, 0],
-          y: [0, 40, -20, 0],
-        }}
-        transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
       />
-      <motion.div
-        className="absolute w-[400px] h-[400px] rounded-full opacity-10"
+      <div
+        className="absolute w-[400px] h-[400px] rounded-full opacity-10 animate-float-slow"
         style={{
           background: 'radial-gradient(circle, rgba(236,72,153,0.4) 0%, transparent 70%)',
           bottom: '10%',
           left: '30%',
+          animationDelay: '3s',
         }}
-        animate={{
-          x: [0, 30, -50, 0],
-          y: [0, -40, 30, 0],
-        }}
-        transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
       />
 
       {/* Subtle grid overlay */}
