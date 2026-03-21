@@ -179,9 +179,14 @@ export function VoiceAssistant() {
 
       try {
         // Search API returns { success, data: [artists], meta: { total } }
+        // Add timeout for Render cold starts (~30-60s)
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 20000);
         const res = await apiClient<DiscoverArtist[]>(
-          `/v1/search/artists?${queryParts.join('&')}`
+          `/v1/search/artists?${queryParts.join('&')}`,
+          { signal: controller.signal }
         );
+        clearTimeout(timeout);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const raw = res as any;
 
@@ -218,10 +223,17 @@ export function VoiceAssistant() {
         } else {
           throw new Error('Search failed');
         }
-      } catch {
+      } catch (err) {
+        const isTimeout = err instanceof DOMException && err.name === 'AbortError';
         setMessages((prev) => [
           ...prev,
-          { role: 'assistant', text: 'Sorry, something went wrong. Please try again.' },
+          {
+            role: 'assistant',
+            text: isTimeout
+              ? 'Our server is waking up (free tier). Please try again in a few seconds!'
+              : 'Sorry, something went wrong. Please try again.',
+            suggestions: ['Find a DJ in Mumbai', 'Show me singers in Delhi', 'What categories do you have?'],
+          },
         ]);
         setState('idle');
       }

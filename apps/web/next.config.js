@@ -14,7 +14,12 @@ const nextConfig = {
         protocol: 'https',
         hostname: '*.cloudfront.net',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
     ],
+    unoptimized: true,
   },
   experimental: {
     optimizePackageImports: ['@phosphor-icons/react'],

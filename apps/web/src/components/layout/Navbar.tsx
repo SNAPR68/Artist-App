@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Search, Mic, ChevronRight } from 'lucide-react';
+import { Menu, X, Search, Mic, ChevronRight, Building2 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
 
@@ -23,8 +22,24 @@ export function Navbar() {
   const { scrollDirection, isAtTop } = useScrollDirection();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
+
+  // Handle drawer open/close with CSS transition
+  useEffect(() => {
+    if (mobileOpen) {
+      requestAnimationFrame(() => setDrawerVisible(true));
+    } else {
+      setDrawerVisible(false);
+    }
+  }, [mobileOpen]);
+
+  const handleCloseDrawer = () => {
+    setDrawerVisible(false);
+    // Wait for transition to finish before unmounting
+    setTimeout(() => setMobileOpen(false), 300);
+  };
 
   const showAuth = mounted && _initialized;
   const isScrolled = !isAtTop;
@@ -35,14 +50,13 @@ export function Navbar() {
       {/* Gradient accent line at very top */}
       <div className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-accent z-[51]" />
 
-      <motion.nav
+      <nav
         className={`fixed top-[2px] left-0 right-0 z-navbar transition-all duration-300 ${
           isScrolled
             ? 'bg-surface-bg/80 backdrop-blur-glass border-b border-glass-border shadow-glass'
             : 'bg-transparent'
         }`}
-        animate={{ y: isHidden ? -80 : 0 }}
-        transition={{ duration: 0.3 }}
+        style={{ transform: isHidden ? 'translateY(-80px)' : 'translateY(0)' }}
       >
         <div className="max-w-section mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
@@ -84,97 +98,92 @@ export function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            onClick={() => setMobileOpen(!mobileOpen)}
+            onClick={() => mobileOpen ? handleCloseDrawer() : setMobileOpen(true)}
             className="md:hidden text-text-primary p-2 rounded-lg hover:bg-glass-light transition-colors"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Mobile Drawer */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              className="fixed inset-0 bg-black/60 z-[48] md:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileOpen(false)}
-            />
-            <motion.div
-              className="fixed top-0 right-0 bottom-0 w-72 bg-surface-base border-l border-glass-border z-[49] md:hidden flex flex-col"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            >
-              <div className="p-6 border-b border-glass-border flex items-center justify-between">
-                <span className="text-lg font-heading font-bold text-gradient">ArtistBook</span>
-                <button onClick={() => setMobileOpen(false)} className="text-text-muted p-1">
-                  <X size={20} />
-                </button>
-              </div>
+      {mobileOpen && (
+        <>
+          <div
+            className={`fixed inset-0 bg-black/60 z-[48] md:hidden transition-opacity duration-300 ${
+              drawerVisible ? 'opacity-100' : 'opacity-0'
+            }`}
+            onClick={handleCloseDrawer}
+          />
+          <div
+            className={`fixed top-0 right-0 bottom-0 w-72 bg-surface-base border-l border-glass-border z-[49] md:hidden flex flex-col transition-transform duration-300 ease-out ${
+              drawerVisible ? 'translate-x-0' : 'translate-x-full'
+            }`}
+          >
+            <div className="p-6 border-b border-glass-border flex items-center justify-between">
+              <span className="text-lg font-heading font-bold text-gradient">ArtistBook</span>
+              <button onClick={handleCloseDrawer} className="text-text-muted p-1">
+                <X size={20} />
+              </button>
+            </div>
 
-              <div className="flex-1 p-6 space-y-2">
-                {[
-                  { href: '/search', label: 'Find Artists', icon: Search },
-                  { href: '/artist/onboarding', label: 'List as Artist', icon: Mic },
-                ].map((item, i) => (
-                  <motion.div
-                    key={item.href}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 + i * 0.05 }}
-                  >
-                    <Link
-                      href={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-between p-3 rounded-lg text-text-secondary hover:text-text-primary hover:bg-glass-light transition-colors"
-                    >
-                      <span className="flex items-center gap-3">
-                        <item.icon size={18} className="text-text-muted" />
-                        <span className="text-sm font-medium">{item.label}</span>
-                      </span>
-                      <ChevronRight size={16} className="text-text-muted" />
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-
-              <div className="p-6 border-t border-glass-border">
-                {showAuth && isAuthenticated && user ? (
-                  <div className="space-y-2">
-                    <Link
-                      href={getDashboardHref(user.role)}
-                      onClick={() => setMobileOpen(false)}
-                      className="block w-full text-center text-sm font-medium text-white bg-gradient-accent px-4 py-3 rounded-lg"
-                    >
-                      Dashboard
-                    </Link>
-                    <button
-                      onClick={() => { logout(); setMobileOpen(false); }}
-                      className="block w-full text-center text-sm text-text-muted hover:text-text-secondary py-2"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                ) : (
+            <div className="flex-1 p-6 space-y-2">
+              {[
+                { href: '/search', label: 'Find Artists', icon: Search },
+                { href: '/login', label: 'Event Company Login', icon: Building2 },
+                { href: '/artist/onboarding', label: 'List as Artist', icon: Mic },
+              ].map((item, i) => (
+                <div
+                  key={item.href}
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${0.1 + i * 0.05}s` }}
+                >
                   <Link
-                    href="/login"
-                    onClick={() => setMobileOpen(false)}
-                    className="block w-full text-center text-sm font-semibold text-white bg-gradient-accent px-4 py-3 rounded-lg"
+                    href={item.href}
+                    onClick={handleCloseDrawer}
+                    className="flex items-center justify-between p-3 rounded-lg text-text-secondary hover:text-text-primary hover:bg-glass-light transition-colors"
                   >
-                    Get Started
+                    <span className="flex items-center gap-3">
+                      <item.icon size={18} className="text-text-muted" />
+                      <span className="text-sm font-medium">{item.label}</span>
+                    </span>
+                    <ChevronRight size={16} className="text-text-muted" />
                   </Link>
-                )}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+                </div>
+              ))}
+            </div>
+
+            <div className="p-6 border-t border-glass-border">
+              {showAuth && isAuthenticated && user ? (
+                <div className="space-y-2">
+                  <Link
+                    href={getDashboardHref(user.role)}
+                    onClick={handleCloseDrawer}
+                    className="block w-full text-center text-sm font-medium text-white bg-gradient-accent px-4 py-3 rounded-lg"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => { logout(); handleCloseDrawer(); }}
+                    className="block w-full text-center text-sm text-text-muted hover:text-text-secondary py-2"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={handleCloseDrawer}
+                  className="block w-full text-center text-sm font-semibold text-white bg-gradient-accent px-4 py-3 rounded-lg"
+                >
+                  Get Started
+                </Link>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }

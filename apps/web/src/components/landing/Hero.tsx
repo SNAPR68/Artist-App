@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, ArrowRight, Play } from 'lucide-react';
+import { Search, ArrowRight, Play, Building2 } from 'lucide-react';
 
 // Curated artist images for the hero collage (Unsplash — free to use)
 const HERO_IMAGES = [
-  { src: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=80', alt: 'Singer performing on stage' },
+  { src: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80', alt: 'Singer performing on stage' },
   { src: 'https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=600&q=80', alt: 'DJ mixing at a club' },
   { src: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&q=80', alt: 'Live concert crowd' },
   { src: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&q=80', alt: 'Music festival lights' },
@@ -16,14 +16,19 @@ const HERO_IMAGES = [
 export function Hero() {
   return (
     <section className="relative min-h-[100vh] md:min-h-[90vh] flex items-end md:items-center overflow-hidden">
-      {/* ─── Background Image Collage ─── */}
+      {/* ─── Background Image ─── */}
       <div className="absolute inset-0">
-        {/* Primary hero image */}
+        {/* Primary hero image with crossOrigin for CORS */}
         <img
           src={HERO_IMAGES[0].src}
           alt={HERO_IMAGES[0].alt}
           className="absolute inset-0 w-full h-full object-cover"
+          loading="eager"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
         />
+        {/* Fallback solid gradient if image fails */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e]" style={{ zIndex: -1 }} />
         {/* Dark overlay with gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-surface-bg via-surface-bg/80 to-surface-bg/30" />
         {/* Neon color overlay for vibe */}
@@ -36,16 +41,16 @@ export function Hero() {
       <div className="hidden lg:block absolute inset-0 overflow-hidden pointer-events-none">
         {/* Top-right cluster */}
         <div className="absolute top-24 right-[8%] w-48 h-64 rounded-2xl overflow-hidden rotate-6 opacity-60 shadow-2xl animate-float-slow">
-          <img src={HERO_IMAGES[1].src} alt={HERO_IMAGES[1].alt} className="w-full h-full object-cover" />
+          <img src={HERO_IMAGES[1].src} alt={HERO_IMAGES[1].alt} className="w-full h-full object-cover" loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
         </div>
         <div className="absolute top-40 right-[22%] w-36 h-48 rounded-2xl overflow-hidden -rotate-3 opacity-50 shadow-2xl animate-float-slow-reverse">
-          <img src={HERO_IMAGES[2].src} alt={HERO_IMAGES[2].alt} className="w-full h-full object-cover" />
+          <img src={HERO_IMAGES[2].src} alt={HERO_IMAGES[2].alt} className="w-full h-full object-cover" loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
         </div>
         {/* Left accent */}
         <div className="absolute top-32 left-[5%] w-40 h-56 rounded-2xl overflow-hidden -rotate-6 opacity-40 shadow-2xl animate-float-slow" style={{ animationDelay: '2s' }}>
-          <img src={HERO_IMAGES[3].src} alt={HERO_IMAGES[3].alt} className="w-full h-full object-cover" />
+          <img src={HERO_IMAGES[3].src} alt={HERO_IMAGES[3].alt} className="w-full h-full object-cover" loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
         </div>
       </div>
@@ -92,12 +97,19 @@ export function Hero() {
               Find Artists
             </Link>
             <Link
-              href="/artist/onboarding"
+              href="/login"
               className="group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/30 text-white font-semibold rounded-xl transition-all text-sm"
+            >
+              <Building2 size={17} />
+              Event Company Login
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="/artist/onboarding"
+              className="group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-white/80 hover:text-white font-medium rounded-xl transition-all text-sm"
             >
               <Play size={17} />
               Join as Artist
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
@@ -106,8 +118,8 @@ export function Hero() {
             {/* Avatar stack */}
             <div className="flex -space-x-2.5">
               {HERO_IMAGES.slice(0, 4).map((img, i) => (
-                <div key={i} className="w-9 h-9 rounded-full border-2 border-surface-bg overflow-hidden">
-                  <img src={img.src} alt="" className="w-full h-full object-cover" />
+                <div key={i} className="w-9 h-9 rounded-full border-2 border-surface-bg overflow-hidden bg-surface-elevated">
+                  <img src={img.src} alt="" className="w-full h-full object-cover" loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
                 </div>
               ))}
             </div>
