@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
@@ -136,10 +137,12 @@ export default function PublicPresentationPage() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-4 mb-4">
             {workspace_branding?.logo_url && (
-              <img
+              <Image
                 src={workspace_branding.logo_url}
                 alt={workspace_branding.name}
-                className="h-12 w-auto rounded bg-white/20 p-1"
+                width={48}
+                height={48}
+                className="rounded bg-white/20 p-1"
               />
             )}
             <div className="flex-1">
@@ -239,10 +242,12 @@ function ArtistCard({
       {/* Profile Image */}
       <div className="aspect-[4/3] bg-gray-100 relative">
         {artist.profile_image_url ? (
-          <img
+          <Image
             src={artist.profile_image_url}
             alt={artist.stage_name}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -313,10 +318,12 @@ function ArtistCard({
                 {item.media_type === 'video' ? (
                   item.thumbnail_url ? (
                     <div className="relative w-full h-full">
-                      <img
+                      <Image
                         src={item.thumbnail_url}
                         alt={item.title ?? 'Video thumbnail'}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="80px"
+                        className="object-cover"
                       />
                       <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                         <span className="text-white text-lg">▶</span>
@@ -328,10 +335,12 @@ function ArtistCard({
                     </div>
                   )
                 ) : (
-                  <img
+                  <Image
                     src={item.thumbnail_url ?? item.url}
                     alt={item.title ?? 'Media'}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="80px"
+                    className="object-cover"
                   />
                 )}
               </div>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Search, ArrowRight, Play, Building2, Sparkles } from 'lucide-react';
 
@@ -63,14 +64,14 @@ export function Hero() {
 
       {/* ─── Background Image ─── */}
       <div className="absolute inset-0">
-        {/* Primary hero image — no crossOrigin to avoid CORS issues with Unsplash */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        {/* Primary hero image */}
+        <Image
           src={HERO_IMAGES[0].src}
           alt={HERO_IMAGES[0].alt}
-          className="absolute inset-0 w-full h-full object-cover"
-          loading="eager"
-          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
         />
         {/* Fallback solid gradient if image fails */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e]" style={{ zIndex: -1 }} />
@@ -90,21 +91,21 @@ export function Hero() {
       <div className="hidden lg:block absolute inset-0 overflow-hidden pointer-events-none">
         {/* Top-right cluster */}
         <div className="absolute top-20 right-[10%] w-48 h-64 rounded-2xl overflow-hidden rotate-6 opacity-70 shadow-2xl animate-float-slow hover:opacity-80 transition-opacity">
-          <img src={HERO_IMAGES[1].src} alt={HERO_IMAGES[1].alt} className="w-full h-full object-cover" loading="lazy" />
+          <Image src={HERO_IMAGES[1].src} alt={HERO_IMAGES[1].alt} fill sizes="192px" className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
         </div>
         <div className="absolute top-48 right-[26%] w-36 h-48 rounded-2xl overflow-hidden -rotate-3 opacity-60 shadow-2xl animate-float-slow-reverse hover:opacity-75 transition-opacity">
-          <img src={HERO_IMAGES[2].src} alt={HERO_IMAGES[2].alt} className="w-full h-full object-cover" loading="lazy" />
+          <Image src={HERO_IMAGES[2].src} alt={HERO_IMAGES[2].alt} fill sizes="144px" className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
         </div>
         {/* Left accent */}
         <div className="absolute top-32 left-[5%] w-40 h-56 rounded-2xl overflow-hidden -rotate-6 opacity-50 shadow-2xl animate-float-slow hover:opacity-65 transition-opacity" style={{ animationDelay: '2s' }}>
-          <img src={HERO_IMAGES[3].src} alt={HERO_IMAGES[3].alt} className="w-full h-full object-cover" loading="lazy" />
+          <Image src={HERO_IMAGES[3].src} alt={HERO_IMAGES[3].alt} fill sizes="160px" className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
         </div>
         {/* Bottom right accent */}
         <div className="absolute bottom-20 right-[15%] w-32 h-44 rounded-2xl overflow-hidden rotate-3 opacity-40 shadow-xl animate-float" style={{ animationDelay: '1s' }}>
-          <img src={HERO_IMAGES[4].src} alt={HERO_IMAGES[4].alt} className="w-full h-full object-cover" loading="lazy" />
+          <Image src={HERO_IMAGES[4].src} alt={HERO_IMAGES[4].alt} fill sizes="128px" className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/60 to-transparent" />
         </div>
       </div>
@@ -229,7 +230,7 @@ export function Hero() {
             <div className="flex -space-x-2.5">
               {HERO_IMAGES.slice(0, 4).map((img, i) => (
                 <div key={i} className="w-9 h-9 rounded-full border-2 border-surface-bg overflow-hidden bg-surface-elevated ring-1 ring-primary-500/20">
-                  <img src={img.src} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  <Image src={img.src} alt="" fill sizes="36px" className="object-cover" />
                 </div>
               ))}
             </div>

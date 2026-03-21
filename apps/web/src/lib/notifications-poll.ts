@@ -188,7 +188,7 @@ export function useMarkAsRead() {
     async (notificationId: string) => {
       try {
         const response = await fetch(`/v1/notifications/${notificationId}/read`, {
-          method: 'PATCH',
+          method: 'PUT',
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',

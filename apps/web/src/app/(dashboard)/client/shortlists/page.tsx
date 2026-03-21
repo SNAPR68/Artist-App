@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Plus, Trash2, ListCheck } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
 interface Shortlist {
@@ -62,29 +63,36 @@ export default function ShortlistsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">My Shortlists</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-text-primary flex items-center gap-2">
+            <ListCheck size={32} className="text-primary-400" />
+            My Shortlists
+          </h1>
+          <p className="text-text-muted mt-1">Compare and organize artists for your events</p>
+        </div>
         <button
           onClick={() => setCreating(true)}
-          className="text-sm bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600"
+          className="glass-card border border-primary-500/30 hover-glow px-4 py-2 rounded-lg text-sm font-medium text-primary-300 flex items-center gap-2 transition-all"
         >
+          <Plus size={16} />
           New Shortlist
         </button>
       </div>
 
       {/* Create Form */}
       {creating && (
-        <form onSubmit={handleCreate} className="bg-white rounded-lg border border-gray-200 p-4 flex gap-2">
+        <form onSubmit={handleCreate} className="glass-card glass-border rounded-xl p-4 flex gap-2 animate-fade-in-up">
           <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Shortlist name (e.g., Wedding DJs)"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+            className="flex-1 px-4 py-2.5 bg-surface-bg border glass-border rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/50"
             autoFocus
           />
-          <button type="submit" className="px-4 py-2 bg-primary-500 text-white rounded-lg text-sm hover:bg-primary-600">
+          <button type="submit" className="px-4 py-2.5 bg-gradient-accent text-white rounded-lg text-sm font-medium hover-glow transition-all">
             Create
           </button>
-          <button type="button" onClick={() => setCreating(false)} className="px-4 py-2 text-gray-500 text-sm">
+          <button type="button" onClick={() => setCreating(false)} className="px-4 py-2.5 bg-surface-base text-text-muted rounded-lg text-sm font-medium hover:bg-surface-card transition-colors">
             Cancel
           </button>
         </form>
@@ -92,30 +100,47 @@ export default function ShortlistsPage() {
 
       {/* Shortlist List */}
       {shortlists.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-gray-400 mb-2">No shortlists yet</p>
-          <p className="text-sm text-gray-400">Create one to start comparing artists</p>
+        <div className="glass-card glass-border rounded-xl p-16 text-center">
+          <ListCheck size={48} className="mx-auto mb-4 text-primary-400/50" />
+          <p className="text-text-muted mb-2 font-medium">No shortlists yet</p>
+          <p className="text-sm text-text-secondary">Create one to start comparing and organizing artists for your events</p>
+          <button
+            onClick={() => setCreating(true)}
+            className="mt-4 text-primary-300 text-sm font-medium hover:text-primary-200 transition-colors"
+          >
+            Create your first shortlist →
+          </button>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {shortlists.map((sl) => (
-            <div
+            <Link
               key={sl.id}
-              className="bg-white rounded-lg border border-gray-200 p-4 flex items-center justify-between hover:border-primary-300 transition-colors"
+              href={`/client/shortlists/${sl.id}`}
+              className="group glass-card glass-border rounded-xl p-5 flex items-center justify-between hover-glow transition-all duration-300 animate-fade-in"
             >
-              <Link href={`/client/shortlists/${sl.id}`} className="flex-1">
-                <h3 className="font-medium text-gray-900">{sl.name}</h3>
-                <p className="text-xs text-gray-400">
-                  Created {new Date(sl.created_at).toLocaleDateString('en-IN')}
-                </p>
-              </Link>
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="p-2.5 rounded-lg bg-primary-500/20 border border-primary-400/30 group-hover:bg-primary-500/30 transition-colors flex-shrink-0">
+                  <ListCheck size={18} className="text-primary-400" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-heading text-text-primary group-hover:text-primary-300 transition-colors truncate">{sl.name}</h3>
+                  <p className="text-xs text-text-muted">
+                    Created {new Date(sl.created_at).toLocaleDateString('en-IN')}
+                  </p>
+                </div>
+              </div>
               <button
-                onClick={() => handleDelete(sl.id)}
-                className="text-sm text-red-400 hover:text-red-600 ml-4"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleDelete(sl.id);
+                }}
+                className="ml-4 p-2 text-text-muted hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
+                title="Delete shortlist"
               >
-                Delete
+                <Trash2 size={18} />
               </button>
-            </div>
+            </Link>
           ))}
         </div>
       )}

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 interface CTABannerProps {
@@ -38,10 +39,12 @@ export function CTABanner({ variant }: CTABannerProps) {
       <div className="max-w-section mx-auto">
         <div className="relative overflow-hidden rounded-3xl h-[280px] md:h-[320px] group">
           {/* Background image with parallax effect */}
-          <img
+          <Image
             src={config.image}
             alt=""
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            fill
+            sizes="(max-width: 768px) 100vw, 1200px"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
 
           {/* Gradient overlay */}

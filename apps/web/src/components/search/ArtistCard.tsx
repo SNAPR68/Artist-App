@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Star, MapPin, BadgeCheck, Heart } from 'lucide-react';
 
 interface ArtistCardProps {
@@ -42,10 +43,12 @@ export function ArtistCard({
       {/* Thumbnail */}
       <div className="aspect-[4/3] bg-surface-elevated relative overflow-hidden">
         {thumbnail_url ? (
-          <img
+          <Image
             src={thumbnail_url}
             alt={stage_name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500/10 to-secondary-500/10">

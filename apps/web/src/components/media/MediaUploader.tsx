@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { apiClient } from '../../lib/api-client';
 
 interface MediaItem {
@@ -92,10 +93,12 @@ export function MediaUploader({ media, onUpdate }: MediaUploaderProps) {
           {media.map((item) => (
             <div key={item.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
               {item.media_type === 'image' ? (
-                <img
+                <Image
                   src={item.thumbnail_url ?? item.original_url}
                   alt="Media"
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="(max-width: 768px) 33vw, 150px"
+                  className="object-cover"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-800 text-white text-sm">

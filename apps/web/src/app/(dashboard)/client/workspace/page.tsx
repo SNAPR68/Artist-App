@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { Building2, Users, Calendar, Plus } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
 interface Workspace {
@@ -15,11 +16,11 @@ interface Workspace {
 }
 
 const COMPANY_TYPE_COLORS: Record<string, string> = {
-  wedding_planner: 'bg-pink-100 text-pink-700',
-  corporate: 'bg-blue-100 text-blue-700',
-  college: 'bg-purple-100 text-purple-700',
-  festival: 'bg-orange-100 text-orange-700',
-  agency: 'bg-teal-100 text-teal-700',
+  wedding_planner: 'bg-gradient-to-br from-rose-500/20 via-pink-500/10 to-rose-600/5 border-rose-400/30 text-rose-300',
+  corporate: 'bg-gradient-to-br from-blue-500/20 via-cyan-500/10 to-blue-600/5 border-blue-400/30 text-blue-300',
+  college: 'bg-gradient-to-br from-purple-500/20 via-violet-500/10 to-purple-600/5 border-purple-400/30 text-purple-300',
+  festival: 'bg-gradient-to-br from-amber-500/20 via-orange-500/10 to-amber-600/5 border-amber-400/30 text-amber-300',
+  agency: 'bg-gradient-to-br from-teal-500/20 via-cyan-500/10 to-teal-600/5 border-teal-400/30 text-teal-300',
 };
 
 export default function WorkspaceListPage() {
@@ -71,34 +72,38 @@ export default function WorkspaceListPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Workspaces</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-text-primary">Workspaces</h1>
+          <p className="text-text-muted mt-1">Manage your event organizing spaces and teams</p>
+        </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600"
+          className="glass-card border border-primary-500/30 hover-glow px-4 py-2 rounded-lg text-sm font-medium text-primary-300 flex items-center gap-2 transition-all"
         >
-          {showForm ? 'Cancel' : 'Create Workspace'}
+          <Plus size={16} />
+          {showForm ? 'Cancel' : 'New Workspace'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
+        <form onSubmit={handleCreate} className="glass-card glass-border rounded-xl p-6 space-y-4 animate-fade-in-up">
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Workspace Name</label>
+            <label className="block text-sm font-medium text-text-primary mb-2">Workspace Name</label>
             <input
               type="text"
               value={formName}
               onChange={(e) => setFormName(e.target.value)}
               placeholder="e.g. My Events Company"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              className="w-full px-4 py-2.5 bg-surface-bg border glass-border rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/50"
               required
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Company Type</label>
+            <label className="block text-sm font-medium text-text-primary mb-2">Company Type</label>
             <select
               value={formType}
               onChange={(e) => setFormType(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              className="w-full px-4 py-2.5 bg-surface-bg border glass-border rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/50"
             >
               <option value="corporate">Corporate</option>
               <option value="wedding_planner">Wedding Planner</option>
@@ -107,27 +112,37 @@ export default function WorkspaceListPage() {
               <option value="agency">Agency</option>
             </select>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <button
-            type="submit"
-            disabled={submitting}
-            className="px-4 py-2 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 disabled:opacity-50"
-          >
-            {submitting ? 'Creating...' : 'Create'}
-          </button>
+          {error && <p className="text-sm text-rose-400">{error}</p>}
+          <div className="flex gap-3 pt-2">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex-1 px-4 py-2.5 bg-gradient-accent text-white rounded-lg text-sm font-medium hover-glow disabled:opacity-50 transition-all"
+            >
+              {submitting ? 'Creating...' : 'Create'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="px-4 py-2.5 bg-surface-base text-text-muted rounded-lg text-sm font-medium hover:bg-surface-card transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       )}
 
       {workspaces.length === 0 && !showForm ? (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-          <p className="text-gray-500 mb-2">
+        <div className="glass-card glass-border rounded-xl p-8 text-center animate-fade-in">
+          <Building2 size={48} className="mx-auto mb-4 text-primary-400/50" />
+          <p className="text-text-muted mb-4">
             Create your first workspace to manage events, team members, and booking pipelines.
           </p>
           <button
             onClick={() => setShowForm(true)}
-            className="text-primary-500 text-sm font-medium"
+            className="text-primary-300 text-sm font-medium hover:text-primary-200 transition-colors"
           >
-            Get Started
+            Get Started →
           </button>
         </div>
       ) : (
@@ -136,22 +151,29 @@ export default function WorkspaceListPage() {
             <Link
               key={ws.id}
               href={`/client/workspace/${ws.id}`}
-              className="bg-white border border-gray-200 rounded-lg p-5 hover:border-primary-300 transition-colors"
+              className="group glass-card glass-border rounded-xl p-6 hover-glow transition-all duration-300 animate-fade-in"
             >
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <h3 className="font-medium text-gray-900">{ws.name}</h3>
-                  <p className="text-xs text-gray-400">/{ws.slug}</p>
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <h3 className="font-heading text-lg text-text-primary group-hover:text-primary-300 transition-colors">{ws.name}</h3>
+                  <p className="text-xs text-text-muted mt-1">/{ws.slug}</p>
                 </div>
                 <span
-                  className={`text-xs px-2 py-0.5 rounded-full ${COMPANY_TYPE_COLORS[ws.company_type] ?? 'bg-gray-100 text-gray-700'}`}
+                  className={`text-xs font-semibold px-3 py-1 rounded-pill ${COMPANY_TYPE_COLORS[ws.company_type] ?? 'bg-gray-100/10 border border-gray-400/20 text-gray-300'}`}
                 >
                   {ws.company_type.replace(/_/g, ' ')}
                 </span>
               </div>
-              <div className="flex gap-4 mt-3 text-sm text-gray-500">
-                <span>{ws.member_count} member{ws.member_count !== 1 ? 's' : ''}</span>
-                <span>{ws.event_count} event{ws.event_count !== 1 ? 's' : ''}</span>
+
+              <div className="flex gap-4 text-sm">
+                <div className="flex items-center gap-2 text-text-secondary">
+                  <Users size={16} className="text-primary-400" />
+                  <span>{ws.member_count} member{ws.member_count !== 1 ? 's' : ''}</span>
+                </div>
+                <div className="flex items-center gap-2 text-text-secondary">
+                  <Calendar size={16} className="text-primary-400" />
+                  <span>{ws.event_count} event{ws.event_count !== 1 ? 's' : ''}</span>
+                </div>
               </div>
             </Link>
           ))}

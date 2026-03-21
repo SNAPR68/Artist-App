@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { X, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 
 interface MediaItem {
@@ -35,10 +36,12 @@ export function ArtistGallery({ media, artistName }: ArtistGalleryProps) {
             }`}
           >
             {item.media_type === 'image' ? (
-              <img
+              <Image
                 src={getUrl(item)}
                 alt={`${artistName} ${i + 1}`}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                fill
+                sizes="(max-width: 768px) 33vw, 300px"
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
             ) : (
               <div className="w-full h-full bg-surface-card flex items-center justify-center">
@@ -95,9 +98,12 @@ export function ArtistGallery({ media, artistName }: ArtistGalleryProps) {
             onClick={(e) => e.stopPropagation()}
           >
             {media[lightboxIndex].media_type === 'image' ? (
-              <img
+              <Image
                 src={getUrl(media[lightboxIndex])}
                 alt={`${artistName} ${lightboxIndex + 1}`}
+                width={800}
+                height={600}
+                sizes="(max-width: 768px) 100vw, 800px"
                 className="max-w-full max-h-[80vh] object-contain rounded-lg"
               />
             ) : (

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface MiniArtistCardProps {
   id: string;
@@ -56,10 +57,12 @@ export function MiniArtistCard({
       {/* Thumbnail */}
       <div className="relative h-24 w-full overflow-hidden bg-gradient-to-br from-primary-900/40 to-secondary-900/40">
         {thumbnail_url ? (
-          <img
+          <Image
             src={thumbnail_url}
             alt={stage_name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            fill
+            sizes="176px"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full items-center justify-center">

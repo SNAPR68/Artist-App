@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { apiClient } from '../../../../../../lib/api-client';
@@ -220,13 +221,12 @@ export default function WorkspaceSettingsPage() {
           />
           {logoUrl && (
             <div className="mt-2">
-              <img
+              <Image
                 src={logoUrl}
                 alt="Logo preview"
-                className="h-12 w-12 object-contain rounded border border-gray-200"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
+                width={48}
+                height={48}
+                className="object-contain rounded border border-gray-200"
               />
             </div>
           )}

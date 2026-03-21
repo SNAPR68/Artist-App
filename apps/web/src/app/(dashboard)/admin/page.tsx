@@ -1,6 +1,7 @@
 'use client';
 
 import { Fragment, useEffect, useState } from 'react';
+import { Users, Calendar, CreditCard, Shield, BarChart3 } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 import { useAuthStore } from '../../../lib/auth';
 
@@ -216,18 +217,24 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+      <div>
+        <h1 className="text-3xl font-bold text-text-primary flex items-center gap-2">
+          <Shield size={32} className="text-primary-400" />
+          Admin Dashboard
+        </h1>
+        <p className="text-text-muted mt-1">Platform oversight and management tools</p>
+      </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit">
+      <div className="glass-card glass-border rounded-xl p-1 w-fit">
         {(['overview', 'bookings', 'users', 'payments', 'disputes', 'venues', 'intelligence'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-2 text-sm rounded-md capitalize transition-colors ${
+            className={`px-4 py-2.5 text-sm rounded-lg capitalize font-medium transition-all ${
               tab === t
-                ? 'bg-white text-primary-600 font-medium shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-gradient-accent text-white shadow-glow-sm'
+                : 'text-text-secondary hover:text-text-primary'
             }`}
           >
             {t}
@@ -246,20 +253,26 @@ export default function AdminDashboardPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: 'Total Users', value: stats.users.total, sub: `+${stats.users.new_this_week} this week` },
-              { label: 'Artists', value: stats.users.artists, sub: `${stats.verified_artists} verified` },
-              { label: 'Clients', value: stats.users.clients },
-              { label: 'Total Bookings', value: stats.bookings.total },
-              { label: 'Confirmed', value: stats.bookings.confirmed, color: 'text-cyan-600' },
-              { label: 'Completed', value: stats.bookings.completed, color: 'text-green-600' },
-              { label: 'Cancelled', value: stats.bookings.cancelled, color: 'text-red-600' },
-            ].map((s) => (
-              <div key={s.label} className="bg-white border border-gray-200 rounded-lg p-4">
-                <p className="text-xs text-gray-500 uppercase">{s.label}</p>
-                <p className={`text-2xl font-bold mt-1 ${s.color ?? 'text-gray-900'}`}>{s.value}</p>
-                {s.sub && <p className="text-xs text-gray-400 mt-1">{s.sub}</p>}
-              </div>
-            ))}
+              { label: 'Total Users', value: stats.users.total, sub: `+${stats.users.new_this_week} this week`, icon: Users, color: 'from-blue-500/20 to-cyan-500/20' },
+              { label: 'Artists', value: stats.users.artists, sub: `${stats.verified_artists} verified`, icon: Users, color: 'from-purple-500/20 to-pink-500/20' },
+              { label: 'Clients', value: stats.users.clients, icon: Users, color: 'from-teal-500/20 to-cyan-500/20' },
+              { label: 'Total Bookings', value: stats.bookings.total, icon: Calendar, color: 'from-orange-500/20 to-amber-500/20' },
+              { label: 'Confirmed', value: stats.bookings.confirmed, color: 'from-cyan-500/20 to-blue-500/20', icon: Calendar, valueColor: 'text-cyan-300' },
+              { label: 'Completed', value: stats.bookings.completed, color: 'from-emerald-500/20 to-teal-500/20', icon: Calendar, valueColor: 'text-emerald-300' },
+              { label: 'Cancelled', value: stats.bookings.cancelled, color: 'from-rose-500/20 to-red-500/20', icon: Calendar, valueColor: 'text-rose-300' },
+            ].map((s) => {
+              const Icon = s.icon;
+              return (
+                <div key={s.label} className={`glass-card glass-border rounded-xl p-5 bg-gradient-to-br ${s.color} group hover-glow transition-all`}>
+                  <div className="flex items-start justify-between mb-3">
+                    <Icon size={20} className="text-primary-400 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <p className="text-xs text-text-muted uppercase font-semibold tracking-wide">{s.label}</p>
+                  <p className={`text-3xl font-bold mt-2 ${s.valueColor ?? 'text-text-primary'}`}>{s.value}</p>
+                  {s.sub && <p className="text-xs text-text-secondary mt-2">{s.sub}</p>}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -272,10 +285,10 @@ export default function AdminDashboardPage() {
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                className={`px-3 py-1.5 text-xs rounded-pill font-medium transition-all ${
                   statusFilter === s
-                    ? 'bg-primary-500 text-white border-primary-500'
-                    : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+                    ? 'bg-gradient-accent text-white shadow-glow-sm'
+                    : 'glass-card glass-border text-text-secondary hover:text-text-primary'
                 }`}
               >
                 {s === 'all' ? 'All' : s.replace('_', ' ')}
@@ -284,32 +297,32 @@ export default function AdminDashboardPage() {
             ))}
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="glass-card glass-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Booking ID</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Artist</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Event</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Date</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Amount</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Booking ID</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Artist</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Event</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Date</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Amount</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-white/10">
                   {filteredBookings.length === 0 ? (
-                    <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-500">No bookings found</td></tr>
+                    <tr><td colSpan={6} className="px-4 py-8 text-center text-text-muted">No bookings found</td></tr>
                   ) : (
                     filteredBookings.map((b) => (
-                      <tr key={b.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 font-mono text-xs text-gray-500">{b.id.slice(0, 8)}...</td>
-                        <td className="px-4 py-3 text-gray-900">{b.artist_stage_name ?? '-'}</td>
-                        <td className="px-4 py-3 text-gray-700">{b.event_type} &middot; {b.event_city}</td>
-                        <td className="px-4 py-3 text-gray-700">{new Date(b.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
-                        <td className="px-4 py-3 text-gray-900">{b.final_amount_paise ? `₹${formatINR(b.final_amount_paise)}` : '-'}</td>
+                      <tr key={b.id} className="hover:bg-white/5 transition-colors">
+                        <td className="px-4 py-3 font-mono text-xs text-text-muted">{b.id.slice(0, 8)}...</td>
+                        <td className="px-4 py-3 text-text-primary font-medium">{b.artist_stage_name ?? '-'}</td>
+                        <td className="px-4 py-3 text-text-secondary">{b.event_type} · {b.event_city}</td>
+                        <td className="px-4 py-3 text-text-secondary">{new Date(b.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
+                        <td className="px-4 py-3 text-text-primary font-semibold">{b.final_amount_paise ? `₹${formatINR(b.final_amount_paise)}` : '-'}</td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-2 py-1 rounded-full ${STATUS_COLORS[b.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                          <span className={`text-xs px-3 py-1 rounded-pill font-medium ${STATUS_COLORS[b.status] ?? 'bg-gray-100/20 text-gray-400 border border-gray-400/30'}`}>
                             {b.status.replace('_', ' ')}
                           </span>
                         </td>
@@ -326,15 +339,15 @@ export default function AdminDashboardPage() {
       {/* Users Tab */}
       {!loading && tab === 'users' && (
         <div className="space-y-4">
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {['all', 'artist', 'client', 'agent', 'event_company'].map((r) => (
               <button
                 key={r}
                 onClick={() => setRoleFilter(r)}
-                className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                className={`px-3 py-1.5 text-xs rounded-pill font-medium transition-all ${
                   roleFilter === r
-                    ? 'bg-primary-500 text-white border-primary-500'
-                    : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+                    ? 'bg-gradient-accent text-white shadow-glow-sm'
+                    : 'glass-card glass-border text-text-secondary hover:text-text-primary'
                 }`}
               >
                 {r === 'all' ? 'All Roles' : r.replace('_', ' ')}
@@ -342,57 +355,57 @@ export default function AdminDashboardPage() {
             ))}
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="glass-card glass-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Name</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Role</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">City</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Trust / Bookings</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Joined</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Actions</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Name</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Role</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">City</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Trust / Bookings</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Joined</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-white/10">
                   {users.length === 0 ? (
-                    <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No users found</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-8 text-center text-text-muted">No users found</td></tr>
                   ) : (
                     users.map((u) => (
-                      <tr key={u.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-gray-900 font-medium">
+                      <tr key={u.id} className="hover:bg-white/5 transition-colors">
+                        <td className="px-4 py-3 text-text-primary font-medium">
                           {u.stage_name || u.company_name || u.id.slice(0, 8)}
-                          {u.is_verified && <span className="ml-1 text-primary-500 text-xs">Verified</span>}
+                          {u.is_verified && <span className="ml-2 text-xs px-2 py-1 rounded-pill bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Verified</span>}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 capitalize">
+                          <span className="text-xs px-2 py-1 rounded-pill bg-primary-500/20 text-primary-300 border border-primary-400/30 font-medium capitalize">
                             {u.role?.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-gray-700">{u.base_city ?? '-'}</td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {u.role === 'artist' ? `${u.trust_score ?? 0} / ${u.total_bookings ?? 0}` : '-'}
+                        <td className="px-4 py-3 text-text-secondary">{u.base_city ?? '-'}</td>
+                        <td className="px-4 py-3 text-text-secondary font-medium">
+                          {u.role === 'artist' ? `${u.trust_score ?? 0}% / ${u.total_bookings ?? 0}` : '-'}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-2 py-1 rounded-full ${u.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          <span className={`text-xs px-3 py-1 rounded-pill font-medium ${u.is_active ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-rose-500/20 text-rose-300 border border-rose-400/30'}`}>
                             {u.is_active ? 'Active' : 'Suspended'}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-gray-500">
+                        <td className="px-4 py-3 text-xs text-text-muted">
                           {new Date(u.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex gap-2">
+                          <div className="flex gap-1">
                             {u.role === 'artist' && (
                               <button
                                 onClick={() => handleVerify(u.id, !u.is_verified)}
                                 disabled={actionLoading === u.id}
-                                className={`text-xs px-2 py-1 rounded border ${
+                                className={`text-xs px-2 py-1 rounded-lg border font-medium transition-colors ${
                                   u.is_verified
-                                    ? 'border-orange-300 text-orange-600 hover:bg-orange-50'
-                                    : 'border-green-300 text-green-600 hover:bg-green-50'
+                                    ? 'border-orange-400/30 text-orange-300 hover:bg-orange-500/10'
+                                    : 'border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/10'
                                 } disabled:opacity-50`}
                               >
                                 {u.is_verified ? 'Unverify' : 'Verify'}
@@ -401,10 +414,10 @@ export default function AdminDashboardPage() {
                             <button
                               onClick={() => handleSuspend(u.id, !u.is_active)}
                               disabled={actionLoading === u.id}
-                              className={`text-xs px-2 py-1 rounded border ${
+                              className={`text-xs px-2 py-1 rounded-lg border font-medium transition-colors ${
                                 u.is_active
-                                  ? 'border-red-300 text-red-600 hover:bg-red-50'
-                                  : 'border-green-300 text-green-600 hover:bg-green-50'
+                                  ? 'border-rose-400/30 text-rose-300 hover:bg-rose-500/10'
+                                  : 'border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/10'
                               } disabled:opacity-50`}
                             >
                               {u.is_active ? 'Suspend' : 'Activate'}
@@ -427,21 +440,33 @@ export default function AdminDashboardPage() {
           {paymentStats && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white border border-gray-200 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 uppercase">Total Payments</p>
-                  <p className="text-2xl font-bold text-gray-900">{paymentStats.total_count}</p>
+                <div className="glass-card glass-border rounded-xl p-5 bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
+                  <div className="flex items-start justify-between mb-3">
+                    <CreditCard size={20} className="text-primary-400" />
+                  </div>
+                  <p className="text-xs text-text-muted uppercase font-semibold tracking-wide">Total Payments</p>
+                  <p className="text-3xl font-bold text-text-primary mt-2">{paymentStats.total_count}</p>
                 </div>
-                <div className="bg-white border border-gray-200 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 uppercase">Total Volume</p>
-                  <p className="text-2xl font-bold text-gray-900">₹{formatINR(paymentStats.total_amount_paise)}</p>
+                <div className="glass-card glass-border rounded-xl p-5 bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                  <div className="flex items-start justify-between mb-3">
+                    <BarChart3 size={20} className="text-primary-400" />
+                  </div>
+                  <p className="text-xs text-text-muted uppercase font-semibold tracking-wide">Total Volume</p>
+                  <p className="text-3xl font-bold text-text-primary mt-2">₹{formatINR(paymentStats.total_amount_paise)}</p>
                 </div>
-                <div className="bg-white border border-gray-200 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 uppercase">Platform Revenue</p>
-                  <p className="text-2xl font-bold text-green-600">₹{formatINR(paymentStats.total_platform_fee_paise)}</p>
+                <div className="glass-card glass-border rounded-xl p-5 bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
+                  <div className="flex items-start justify-between mb-3">
+                    <CreditCard size={20} className="text-emerald-400" />
+                  </div>
+                  <p className="text-xs text-text-muted uppercase font-semibold tracking-wide">Platform Revenue</p>
+                  <p className="text-3xl font-bold text-emerald-300 mt-2">₹{formatINR(paymentStats.total_platform_fee_paise)}</p>
                 </div>
-                <div className="bg-white border border-gray-200 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 uppercase">Refunded</p>
-                  <p className="text-2xl font-bold text-orange-600">₹{formatINR(paymentStats.refunded_amount_paise)}</p>
+                <div className="glass-card glass-border rounded-xl p-5 bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                  <div className="flex items-start justify-between mb-3">
+                    <BarChart3 size={20} className="text-amber-400" />
+                  </div>
+                  <p className="text-xs text-text-muted uppercase font-semibold tracking-wide">Refunded</p>
+                  <p className="text-3xl font-bold text-amber-300 mt-2">₹{formatINR(paymentStats.refunded_amount_paise)}</p>
                 </div>
               </div>
               <button
@@ -452,44 +477,44 @@ export default function AdminDashboardPage() {
                   if (res.success) alert(`Settled ${res.data.settled_count} payment(s)`);
                 }}
                 disabled={actionLoading === 'settle'}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 disabled:opacity-50"
+                className="px-4 py-2.5 bg-gradient-to-r from-emerald-500/80 to-teal-500/80 text-white rounded-lg text-sm font-medium hover-glow disabled:opacity-50 transition-all"
               >
                 {actionLoading === 'settle' ? 'Settling...' : 'Auto-Settle Eligible Payments'}
               </button>
             </div>
           )}
 
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="glass-card glass-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Payment ID</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Artist</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Client</th>
-                    <th className="text-right px-4 py-3 font-medium text-gray-600">Amount</th>
-                    <th className="text-right px-4 py-3 font-medium text-gray-600">Platform Fee</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Date</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Payment ID</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Artist</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Client</th>
+                    <th className="text-right px-4 py-3 font-semibold text-text-primary">Amount</th>
+                    <th className="text-right px-4 py-3 font-semibold text-text-primary">Platform Fee</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-white/10">
                   {payments.length === 0 ? (
-                    <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No payments yet</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-8 text-center text-text-muted">No payments yet</td></tr>
                   ) : (
                     payments.map((p) => (
-                      <tr key={p.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 font-mono text-xs text-gray-500">{p.id.slice(0, 8)}...</td>
-                        <td className="px-4 py-3 text-gray-900">{p.artist_name ?? '-'}</td>
-                        <td className="px-4 py-3 text-gray-700">{p.client_name ?? '-'}</td>
-                        <td className="px-4 py-3 text-right text-gray-900 font-medium">₹{formatINR(p.amount_paise)}</td>
-                        <td className="px-4 py-3 text-right text-green-600">₹{formatINR(p.platform_fee_paise)}</td>
+                      <tr key={p.id} className="hover:bg-white/5 transition-colors">
+                        <td className="px-4 py-3 font-mono text-xs text-text-muted">{p.id.slice(0, 8)}...</td>
+                        <td className="px-4 py-3 text-text-primary font-medium">{p.artist_name ?? '-'}</td>
+                        <td className="px-4 py-3 text-text-secondary">{p.client_name ?? '-'}</td>
+                        <td className="px-4 py-3 text-right text-text-primary font-semibold">₹{formatINR(p.amount_paise)}</td>
+                        <td className="px-4 py-3 text-right text-emerald-300 font-semibold">₹{formatINR(p.platform_fee_paise)}</td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-2 py-1 rounded-full ${STATUS_COLORS[p.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                          <span className={`text-xs px-3 py-1 rounded-pill font-medium ${STATUS_COLORS[p.status] ?? 'bg-gray-100/20 text-gray-400 border border-gray-400/30'}`}>
                             {p.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-gray-500">
+                        <td className="px-4 py-3 text-xs text-text-muted">
                           {new Date(p.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                         </td>
                       </tr>
@@ -505,48 +530,48 @@ export default function AdminDashboardPage() {
       {/* Disputes Tab */}
       {!loading && tab === 'disputes' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="glass-card glass-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Reason</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Created</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Actions</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Reason</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Created</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-white/10">
                   {disputes.length === 0 ? (
-                    <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-500">No disputes found</td></tr>
+                    <tr><td colSpan={4} className="px-4 py-8 text-center text-text-muted">No disputes found</td></tr>
                   ) : (
                     disputes.map((d) => (
-                      <tr key={d.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-gray-900">
+                      <tr key={d.id} className="hover:bg-white/5 transition-colors">
+                        <td className="px-4 py-3 text-text-primary">
                           {d.reason.length > 100 ? `${d.reason.slice(0, 100)}...` : d.reason}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            d.status === 'submitted' ? 'bg-yellow-100 text-yellow-700' :
-                            d.status === 'under_review' ? 'bg-blue-100 text-blue-700' :
-                            d.status === 'upheld' ? 'bg-green-100 text-green-700' :
-                            d.status === 'overturned' ? 'bg-red-100 text-red-700' :
-                            d.status === 'dismissed' ? 'bg-gray-100 text-gray-600' :
-                            'bg-gray-100 text-gray-600'
+                          <span className={`text-xs px-3 py-1 rounded-pill font-medium ${
+                            d.status === 'submitted' ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :
+                            d.status === 'under_review' ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30' :
+                            d.status === 'upheld' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' :
+                            d.status === 'overturned' ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30' :
+                            d.status === 'dismissed' ? 'bg-gray-400/20 text-gray-300 border border-gray-400/30' :
+                            'bg-gray-400/20 text-gray-300 border border-gray-400/30'
                           }`}>
                             {d.status.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-gray-500">
+                        <td className="px-4 py-3 text-xs text-text-muted">
                           {new Date(d.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                         </td>
                         <td className="px-4 py-3">
                           {resolvingDispute === d.id ? (
-                            <div className="space-y-2">
+                            <div className="space-y-2 bg-surface-bg p-3 rounded-lg border glass-border">
                               <select
                                 value={resolveForm.resolution}
                                 onChange={(e) => setResolveForm((f) => ({ ...f, resolution: e.target.value }))}
-                                className="block w-full text-xs border border-gray-300 rounded px-2 py-1"
+                                className="block w-full text-xs bg-surface-card border glass-border rounded px-2 py-1.5 text-text-primary"
                               >
                                 <option value="upheld">Upheld</option>
                                 <option value="overturned">Overturned</option>
@@ -556,7 +581,7 @@ export default function AdminDashboardPage() {
                                 value={resolveForm.admin_notes}
                                 onChange={(e) => setResolveForm((f) => ({ ...f, admin_notes: e.target.value }))}
                                 placeholder="Admin notes..."
-                                className="block w-full text-xs border border-gray-300 rounded px-2 py-1 h-16 resize-none"
+                                className="block w-full text-xs bg-surface-card border glass-border rounded px-2 py-1.5 h-16 resize-none text-text-primary placeholder-text-muted"
                               />
                               <div className="flex gap-2">
                                 <button
@@ -573,13 +598,13 @@ export default function AdminDashboardPage() {
                                     if (res.success) setDisputes(res.data.disputes);
                                   }}
                                   disabled={actionLoading === d.id}
-                                  className="text-xs px-2 py-1 rounded border border-green-300 text-green-600 hover:bg-green-50 disabled:opacity-50"
+                                  className="text-xs px-2 py-1 rounded-lg border border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50 font-medium"
                                 >
                                   {actionLoading === d.id ? 'Saving...' : 'Submit'}
                                 </button>
                                 <button
                                   onClick={() => { setResolvingDispute(null); setResolveForm({ resolution: 'upheld', admin_notes: '' }); }}
-                                  className="text-xs px-2 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+                                  className="text-xs px-2 py-1 rounded-lg border glass-border text-text-secondary hover:bg-white/10 font-medium"
                                 >
                                   Cancel
                                 </button>
@@ -589,7 +614,7 @@ export default function AdminDashboardPage() {
                             <button
                               onClick={() => setResolvingDispute(d.id)}
                               disabled={d.status === 'upheld' || d.status === 'overturned' || d.status === 'dismissed'}
-                              className="text-xs px-2 py-1 rounded border border-primary-300 text-primary-600 hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="text-xs px-2 py-1 rounded-lg border border-primary-400/30 text-primary-300 hover:bg-primary-500/10 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                             >
                               Resolve
                             </button>
@@ -608,33 +633,33 @@ export default function AdminDashboardPage() {
       {/* Venues Tab */}
       {!loading && tab === 'venues' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="glass-card glass-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Name</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">City</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Type</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Capacity</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Actions</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Name</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">City</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Type</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Capacity</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-white/10">
                   {venues.length === 0 ? (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-500">No venues found</td></tr>
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-text-muted">No venues found</td></tr>
                   ) : (
                     venues.map((v) => (
                       <Fragment key={v.id}>
-                        <tr className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-gray-900 font-medium">{v.name}</td>
-                          <td className="px-4 py-3 text-gray-700">{v.city}</td>
+                        <tr className="hover:bg-white/5 transition-colors">
+                          <td className="px-4 py-3 text-text-primary font-medium">{v.name}</td>
+                          <td className="px-4 py-3 text-text-secondary">{v.city}</td>
                           <td className="px-4 py-3">
-                            <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+                            <span className="text-xs px-2 py-1 rounded-pill bg-primary-500/20 text-primary-300 border border-primary-400/30 font-medium">
                               {v.venue_type?.replace('_', ' ') ?? '-'}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-gray-700">{v.capacity?.toLocaleString() ?? '-'}</td>
+                          <td className="px-4 py-3 text-text-secondary">{v.capacity?.toLocaleString() ?? '-'}</td>
                           <td className="px-4 py-3">
                             <button
                               onClick={async () => {
@@ -649,7 +674,7 @@ export default function AdminDashboardPage() {
                                 setActionLoading(null);
                               }}
                               disabled={actionLoading === v.id}
-                              className="text-xs px-2 py-1 rounded border border-primary-300 text-primary-600 hover:bg-primary-50 disabled:opacity-50"
+                              className="text-xs px-2 py-1 rounded-lg border border-primary-400/30 text-primary-300 hover:bg-primary-500/10 disabled:opacity-50 font-medium"
                             >
                               {actionLoading === v.id ? 'Loading...' : expandedVenue === v.id ? 'Hide Issues' : 'View Issues'}
                             </button>
@@ -657,24 +682,24 @@ export default function AdminDashboardPage() {
                         </tr>
                         {expandedVenue === v.id && (
                           <tr key={`${v.id}-issues`}>
-                            <td colSpan={5} className="px-4 py-3 bg-gray-50">
+                            <td colSpan={5} className="px-4 py-3 bg-white/5">
                               {venueIssues.length === 0 ? (
-                                <p className="text-sm text-gray-500">No issues reported for this venue.</p>
+                                <p className="text-sm text-text-muted">No issues reported for this venue.</p>
                               ) : (
                                 <div className="space-y-2">
                                   {venueIssues.map((issue) => (
-                                    <div key={issue.id} className="flex items-start justify-between bg-white border border-gray-200 rounded-lg p-3">
+                                    <div key={issue.id} className="flex items-start justify-between glass-card glass-border rounded-lg p-3">
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+                                          <span className="text-xs px-2 py-1 rounded-pill bg-primary-500/20 text-primary-300 border border-primary-400/30 font-medium">
                                             {issue.issue_type.replace('_', ' ')}
                                           </span>
                                           {issue.is_verified && (
-                                            <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">Verified</span>
+                                            <span className="text-xs px-2 py-1 rounded-pill bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-medium">Verified</span>
                                           )}
                                         </div>
-                                        <p className="text-sm text-gray-700">{issue.description ?? 'No description'}</p>
-                                        <p className="text-xs text-gray-400">
+                                        <p className="text-sm text-text-primary">{issue.description ?? 'No description'}</p>
+                                        <p className="text-xs text-text-muted">
                                           {new Date(issue.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                                         </p>
                                       </div>
@@ -691,7 +716,7 @@ export default function AdminDashboardPage() {
                                             if (res.success) setVenueIssues(res.data);
                                           }}
                                           disabled={actionLoading === issue.id}
-                                          className="text-xs px-2 py-1 rounded border border-green-300 text-green-600 hover:bg-green-50 disabled:opacity-50 shrink-0"
+                                          className="text-xs px-2 py-1 rounded-lg border border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50 shrink-0 font-medium"
                                         >
                                           {actionLoading === issue.id ? 'Verifying...' : 'Verify'}
                                         </button>
@@ -716,50 +741,53 @@ export default function AdminDashboardPage() {
       {/* Intelligence Tab */}
       {!loading && tab === 'intelligence' && (
         <div className="space-y-6">
-          <h2 className="text-lg font-semibold text-gray-900">Seasonal Demand Overview</h2>
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <h2 className="text-xl font-heading text-text-primary flex items-center gap-2">
+            <BarChart3 size={24} className="text-primary-400" />
+            Seasonal Demand Overview
+          </h2>
+          <div className="glass-card glass-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">City</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Month</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Classification</th>
-                    <th className="text-right px-4 py-3 font-medium text-gray-600">Fill Rate %</th>
-                    <th className="text-right px-4 py-3 font-medium text-gray-600">YoY Trend</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">City</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Month</th>
+                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Classification</th>
+                    <th className="text-right px-4 py-3 font-semibold text-text-primary">Fill Rate %</th>
+                    <th className="text-right px-4 py-3 font-semibold text-text-primary">YoY Trend</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-white/10">
                   {seasonalCurves.length === 0 ? (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-500">No seasonal data available</td></tr>
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-text-muted">No seasonal data available</td></tr>
                   ) : (
                     seasonalCurves.map((c, i) => (
-                      <tr key={`${c.city}-${c.month}-${i}`} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-gray-900 font-medium">{c.city}</td>
-                        <td className="px-4 py-3 text-gray-700">
+                      <tr key={`${c.city}-${c.month}-${i}`} className="hover:bg-white/5 transition-colors">
+                        <td className="px-4 py-3 text-text-primary font-medium">{c.city}</td>
+                        <td className="px-4 py-3 text-text-secondary">
                           {new Date(2024, c.month - 1).toLocaleString('en-IN', { month: 'long' })}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            c.demand_classification === 'peak' ? 'bg-red-100 text-red-700' :
-                            c.demand_classification === 'high' ? 'bg-orange-100 text-orange-700' :
-                            c.demand_classification === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
-                            c.demand_classification === 'low' ? 'bg-green-100 text-green-700' :
-                            'bg-gray-100 text-gray-600'
+                          <span className={`text-xs px-3 py-1 rounded-pill font-medium ${
+                            c.demand_classification === 'peak' ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30' :
+                            c.demand_classification === 'high' ? 'bg-orange-500/20 text-orange-300 border border-orange-400/30' :
+                            c.demand_classification === 'moderate' ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :
+                            c.demand_classification === 'low' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' :
+                            'bg-gray-400/20 text-gray-300 border border-gray-400/30'
                           }`}>
                             {c.demand_classification}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right text-gray-900">
+                        <td className="px-4 py-3 text-right text-text-primary font-semibold">
                           {(c.avg_fill_rate * 100).toFixed(1)}%
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-4 py-3 text-right font-semibold">
                           {c.yoy_trend_pct !== null ? (
-                            <span className={c.yoy_trend_pct >= 0 ? 'text-green-600' : 'text-red-600'}>
-                              {c.yoy_trend_pct >= 0 ? '+' : ''}{c.yoy_trend_pct.toFixed(1)}%
+                            <span className={c.yoy_trend_pct >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
+                              {c.yoy_trend_pct >= 0 ? '↑' : '↓'} {Math.abs(c.yoy_trend_pct).toFixed(1)}%
                             </span>
                           ) : (
-                            <span className="text-gray-400">-</span>
+                            <span className="text-text-muted">-</span>
                           )}
                         </td>
                       </tr>
@@ -771,13 +799,13 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h3 className="text-sm font-medium text-gray-900">Substitution Requests</h3>
-              <p className="text-xs text-gray-400 mt-2">Coming soon</p>
+            <div className="glass-card glass-border rounded-xl p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10">
+              <h3 className="text-sm font-heading text-text-primary">Substitution Requests</h3>
+              <p className="text-xs text-text-muted mt-3">Coming soon</p>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h3 className="text-sm font-medium text-gray-900">Recommendation Stats</h3>
-              <p className="text-xs text-gray-400 mt-2">Coming soon</p>
+            <div className="glass-card glass-border rounded-xl p-6 bg-gradient-to-br from-cyan-500/10 to-blue-500/10">
+              <h3 className="text-sm font-heading text-text-primary">Recommendation Stats</h3>
+              <p className="text-xs text-text-muted mt-3">Coming soon</p>
             </div>
           </div>
         </div>

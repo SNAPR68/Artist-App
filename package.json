@@ -12,6 +12,7 @@
     "test:integration": "turbo test:integration",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "test:e2e": "pnpm --filter e2e test",
     "clean": "turbo clean",
     "db:migrate": "pnpm --filter @artist-booking/db migrate:latest",
     "db:migrate:down": "pnpm --filter @artist-booking/db migrate:rollback",

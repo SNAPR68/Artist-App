@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { Search, Plus, CheckCircle2, TrendingUp, Zap } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
 interface RosterArtist {
@@ -22,6 +23,18 @@ interface RosterArtist {
     gig_advisor_count?: number;
   };
 }
+
+const ArtistCardSkeleton = () => (
+  <div className="glass-card rounded-2xl p-6 animate-pulse">
+    <div className="flex gap-4">
+      <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary-400/20 to-transparent" />
+      <div className="flex-1">
+        <div className="h-4 bg-gradient-to-r from-primary-400/20 to-transparent rounded w-32 mb-2" />
+        <div className="h-3 bg-gradient-to-r from-primary-400/10 to-transparent rounded w-24" />
+      </div>
+    </div>
+  </div>
+);
 
 export default function AgentRosterPage() {
   const [roster, setRoster] = useState<RosterArtist[]>([]);
@@ -67,157 +80,188 @@ export default function AgentRosterPage() {
       a.genres.some((g) => g.toLowerCase().includes(search.toLowerCase()))
   );
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Artist Roster</h1>
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h1 className="text-4xl font-bold text-gradient mb-2">Artist Roster</h1>
+        <p className="text-text-muted">{roster.length} artists in your roster</p>
       </div>
 
-      {/* Add Artist */}
-      <form onSubmit={handleAdd} className="bg-white border border-gray-200 rounded-lg p-4">
+      {/* Add Artist Form */}
+      <form onSubmit={handleAdd} className="glass-card rounded-2xl p-6 border glass-border">
+        <label className="block text-sm font-semibold text-text-primary mb-3">Add Artist to Roster</label>
         <div className="flex gap-3">
-          <input
-            type="text"
-            value={artistId}
-            onChange={(e) => setArtistId(e.target.value)}
-            placeholder="Add artist by ID"
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
-          />
+          <div className="flex-1 relative">
+            <Plus size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+            <input
+              type="text"
+              value={artistId}
+              onChange={(e) => setArtistId(e.target.value)}
+              placeholder="Enter artist ID"
+              className="w-full glass-card bg-surface-card border glass-border rounded-xl pl-10 pr-4 py-3 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-400/50 transition-all"
+            />
+          </div>
           <button
             type="submit"
             disabled={adding}
-            className="bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 disabled:opacity-50"
+            className="glass-card px-6 py-3 rounded-xl text-sm font-semibold text-text-primary hover:hover-glow disabled:opacity-50 transition-all border glass-border flex items-center gap-2"
           >
-            {adding ? 'Adding...' : 'Add to Roster'}
+            {adding ? 'Adding...' : 'Add'}
           </button>
         </div>
-        {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
+        {error && (
+          <div className="mt-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
       </form>
 
       {/* Search/Filter */}
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search roster by name, city, or genre..."
-        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-      />
+      <div className="relative">
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name, city, or genre..."
+          className="w-full glass-card bg-surface-card border glass-border rounded-xl pl-12 pr-4 py-3 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-400/50 transition-all"
+        />
+      </div>
 
       {/* Roster Grid */}
-      {filtered.length === 0 ? (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-          <p className="text-gray-500">
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <ArtistCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="glass-card rounded-2xl p-12 text-center border glass-border">
+          <Search size={48} className="mx-auto text-text-muted/40 mb-4" />
+          <p className="text-text-muted mb-4">
             {roster.length === 0 ? 'Your roster is empty. Add artists to get started.' : 'No artists match your search.'}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtered.map((artist) => {
-            const initials = artist.stage_name
-              .split(' ')
-              .map((w) => w[0])
-              .join('')
-              .slice(0, 2)
-              .toUpperCase();
             const isExpanded = expandedId === artist.artist_id;
 
             return (
-              <div key={artist.artist_id} className="bg-white border border-gray-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-sm font-bold flex-shrink-0">
-                    {initials}
+              <div key={artist.artist_id} className="glass-card rounded-2xl p-6 border glass-border hover:hover-glow transition-all group">
+                {/* Header */}
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/30 to-primary-600/30 flex items-center justify-center flex-shrink-0 text-primary-300 font-semibold">
+                    {artist.stage_name.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-gray-900 truncate">{artist.stage_name}</h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-text-primary truncate group-hover:text-primary-300 transition-colors">{artist.stage_name}</h3>
                       {artist.is_verified && (
-                        <span className="bg-green-100 text-green-700 text-xs px-1.5 py-0.5 rounded">Verified</span>
+                        <div className="flex-shrink-0 bg-emerald-500/20 rounded-full p-1.5">
+                          <CheckCircle2 size={14} className="text-emerald-400" />
+                        </div>
                       )}
                     </div>
                     {artist.trust_score != null && (
-                      <span className="text-xs text-gray-500">Trust: {artist.trust_score}%</span>
+                      <p className="text-xs text-text-muted">Trust Score: <span className="text-primary-300 font-semibold">{artist.trust_score}%</span></p>
                     )}
-                    <p className="text-sm text-gray-500">{artist.base_city}</p>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {artist.genres.slice(0, 3).map((g) => (
-                        <span key={g} className="bg-primary-50 text-primary-700 text-xs px-2 py-0.5 rounded-full">
-                          {g}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Stats Row */}
-                    <div className="flex gap-4 mt-3 text-xs text-gray-500">
-                      {artist.total_bookings != null && <span>{artist.total_bookings} total</span>}
-                      {artist.month_bookings != null && <span>{artist.month_bookings} this month</span>}
-                      {artist.rebook_rate != null && <span>{artist.rebook_rate}% rebook</span>}
-                    </div>
-
-                    {/* Intelligence Toggle */}
-                    <button
-                      onClick={() => setExpandedId(isExpanded ? null : artist.artist_id)}
-                      className="text-xs text-primary-500 hover:underline mt-2"
-                    >
-                      {isExpanded ? 'Hide Intelligence' : 'View Intelligence'}
-                    </button>
-
-                    {isExpanded && artist.intelligence && (
-                      <div className="mt-3 bg-gray-50 rounded-lg p-3 space-y-2 text-xs text-gray-600">
-                        <div className="grid grid-cols-2 gap-2">
-                          {artist.intelligence.booking_velocity_30d != null && (
-                            <div>
-                              <span className="text-gray-400">Velocity (30d):</span>{' '}
-                              <span className="font-medium">{artist.intelligence.booking_velocity_30d}</span>
-                            </div>
-                          )}
-                          {artist.intelligence.booking_velocity_90d != null && (
-                            <div>
-                              <span className="text-gray-400">Velocity (90d):</span>{' '}
-                              <span className="font-medium">{artist.intelligence.booking_velocity_90d}</span>
-                            </div>
-                          )}
-                          {artist.intelligence.demand_alignment_pct != null && (
-                            <div>
-                              <span className="text-gray-400">Demand Alignment:</span>{' '}
-                              <span className="font-medium">{artist.intelligence.demand_alignment_pct}%</span>
-                            </div>
-                          )}
-                          {artist.intelligence.gig_advisor_count != null && (
-                            <div>
-                              <span className="text-gray-400">Gig Advisor:</span>{' '}
-                              <span className="font-medium">{artist.intelligence.gig_advisor_count} recs</span>
-                            </div>
-                          )}
-                        </div>
-                        {artist.intelligence.top_event_types && artist.intelligence.top_event_types.length > 0 && (
-                          <div>
-                            <span className="text-gray-400">Top events:</span>{' '}
-                            {artist.intelligence.top_event_types.map((t) => (
-                              <span key={t} className="inline-block bg-white border border-gray-200 text-gray-600 text-xs px-1.5 py-0.5 rounded mr-1">
-                                {t}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
+                    <p className="text-sm text-text-muted">{artist.base_city}</p>
                   </div>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-gray-100">
+                {/* Genres */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {artist.genres.slice(0, 3).map((g) => (
+                    <span key={g} className="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-primary-400/20 to-primary-600/20 text-primary-300 font-medium">
+                      {g}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Stats Pills */}
+                {(artist.total_bookings != null || artist.month_bookings != null || artist.rebook_rate != null) && (
+                  <div className="flex flex-wrap gap-2 mb-4 pb-4 border-t border-glass-border">
+                    {artist.total_bookings != null && (
+                      <div className="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-full bg-gradient-to-r from-primary-400/10 to-primary-600/10">
+                        <TrendingUp size={14} className="text-primary-400" />
+                        <span className="text-xs text-text-secondary font-medium">{artist.total_bookings} total</span>
+                      </div>
+                    )}
+                    {artist.month_bookings != null && (
+                      <div className="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-full bg-gradient-to-r from-emerald-400/10 to-emerald-600/10">
+                        <Zap size={14} className="text-emerald-400" />
+                        <span className="text-xs text-text-secondary font-medium">{artist.month_bookings} this month</span>
+                      </div>
+                    )}
+                    {artist.rebook_rate != null && (
+                      <div className="mt-4 inline-flex items-center gap-2 px-3 py-2 rounded-full bg-gradient-to-r from-blue-400/10 to-blue-600/10">
+                        <CheckCircle2 size={14} className="text-blue-400" />
+                        <span className="text-xs text-text-secondary font-medium">{artist.rebook_rate}% rebook</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Intelligence Toggle */}
+                <button
+                  onClick={() => setExpandedId(isExpanded ? null : artist.artist_id)}
+                  className="text-xs text-primary-400 hover:text-primary-300 font-semibold transition-colors mb-2"
+                >
+                  {isExpanded ? '- Hide Intelligence' : '+ View Intelligence'}
+                </button>
+
+                {/* Intelligence Details */}
+                {isExpanded && artist.intelligence && (
+                  <div className="mt-4 pt-4 border-t border-glass-border bg-glass-light rounded-xl p-4 space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      {artist.intelligence.booking_velocity_30d != null && (
+                        <div className="bg-surface-card rounded-lg p-2">
+                          <p className="text-xs text-text-muted">Velocity (30d)</p>
+                          <p className="text-sm font-semibold text-primary-300">{artist.intelligence.booking_velocity_30d}</p>
+                        </div>
+                      )}
+                      {artist.intelligence.booking_velocity_90d != null && (
+                        <div className="bg-surface-card rounded-lg p-2">
+                          <p className="text-xs text-text-muted">Velocity (90d)</p>
+                          <p className="text-sm font-semibold text-primary-300">{artist.intelligence.booking_velocity_90d}</p>
+                        </div>
+                      )}
+                      {artist.intelligence.demand_alignment_pct != null && (
+                        <div className="bg-surface-card rounded-lg p-2">
+                          <p className="text-xs text-text-muted">Demand Alignment</p>
+                          <p className="text-sm font-semibold text-emerald-300">{artist.intelligence.demand_alignment_pct}%</p>
+                        </div>
+                      )}
+                      {artist.intelligence.gig_advisor_count != null && (
+                        <div className="bg-surface-card rounded-lg p-2">
+                          <p className="text-xs text-text-muted">Gig Advisor</p>
+                          <p className="text-sm font-semibold text-blue-300">{artist.intelligence.gig_advisor_count} recs</p>
+                        </div>
+                      )}
+                    </div>
+                    {artist.intelligence.top_event_types && artist.intelligence.top_event_types.length > 0 && (
+                      <div>
+                        <p className="text-xs text-text-muted mb-2">Top Event Types</p>
+                        <div className="flex flex-wrap gap-2">
+                          {artist.intelligence.top_event_types.map((t) => (
+                            <span key={t} className="inline-block bg-surface-card border border-glass-border text-text-secondary text-xs px-2.5 py-1 rounded-full">
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Footer Link */}
+                <div className="mt-4 pt-4 border-t border-glass-border">
                   <Link
                     href={`/artists/${artist.artist_id}`}
-                    className="text-xs text-primary-500 hover:underline"
+                    className="text-xs text-primary-400 hover:text-primary-300 font-semibold transition-colors"
                   >
-                    View Public Profile
+                    View Public Profile →
                   </Link>
                 </div>
               </div>

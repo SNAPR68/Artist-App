@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useDragScroll } from '@/hooks/useDragScroll';
 
 const GENRES = [
@@ -112,10 +113,12 @@ export function Categories() {
               href={event.href}
               className="group relative w-[160px] md:w-[200px] aspect-[3/4] rounded-2xl overflow-hidden shrink-0"
             >
-              <img
+              <Image
                 src={event.image}
                 alt={event.name}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                fill
+                sizes="(max-width: 768px) 160px, 200px"
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
               {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />

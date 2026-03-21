@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronLeft, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 import { useAuthStore } from '../../../../lib/auth';
@@ -355,7 +356,7 @@ export default function GigDetailPage() {
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                       {app.profile_image_url ? (
-                        <img src={app.profile_image_url} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary-500/30" />
+                        <Image src={app.profile_image_url} alt="" width={48} height={48} className="rounded-full object-cover ring-2 ring-primary-500/30" />
                       ) : (
                         <div className="w-12 h-12 rounded-full bg-gradient-accent/20 flex items-center justify-center text-text-primary text-sm font-semibold border border-gradient-accent/30">
                           {app.stage_name?.[0] ?? '?'}

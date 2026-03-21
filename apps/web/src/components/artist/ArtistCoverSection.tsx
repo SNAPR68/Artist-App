@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { BadgeCheck, MapPin, Star } from 'lucide-react';
 
 interface ArtistCoverSectionProps {
@@ -24,10 +25,13 @@ export function ArtistCoverSection({
       {/* Cover Image */}
       <div className="relative h-48 sm:h-64 rounded-xl overflow-hidden">
         {coverUrl ? (
-          <img
+          <Image
             src={coverUrl}
             alt={stageName}
-            className="w-full h-full object-cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-primary-500/20 via-secondary-500/10 to-accent-magenta/10" />

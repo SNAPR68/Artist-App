@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Users, Wallet, TrendingUp, CheckCircle2, Clipboard } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 
 interface AgentProfile {
@@ -29,6 +30,13 @@ interface CommissionStats {
   total_commission_paid_paise: number;
 }
 
+const StatSkeleton = () => (
+  <div className="glass-card p-6 rounded-2xl animate-pulse">
+    <div className="h-4 bg-gradient-to-r from-primary-400/20 to-transparent rounded w-24 mb-3" />
+    <div className="h-8 bg-gradient-to-r from-primary-400/30 to-transparent rounded w-20" />
+  </div>
+);
+
 export default function AgentDashboard() {
   const [profile, setProfile] = useState<AgentProfile | null>(null);
   const [roster, setRoster] = useState<RosterArtist[]>([]);
@@ -50,7 +58,9 @@ export default function AgentDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full animate-spin" style={{ backgroundImage: 'conic-gradient(from 0deg, transparent 50%, rgba(168, 85, 247, 0.8))' }} />
+        </div>
       </div>
     );
   }
@@ -58,109 +68,207 @@ export default function AgentDashboard() {
   if (!profile) {
     return (
       <div className="max-w-2xl mx-auto py-16 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Welcome, Agent!</h1>
-        <p className="text-gray-500 mb-6">Set up your agency profile to start managing artists.</p>
-        <Link
-          href="/agent/onboarding"
-          className="inline-block bg-primary-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600"
-        >
-          Create Agency Profile
-        </Link>
+        <div className="glass-card p-12 rounded-3xl">
+          <h1 className="text-3xl font-bold text-gradient mb-4">Welcome, Agent!</h1>
+          <p className="text-text-muted mb-8">Set up your agency profile to start managing artists.</p>
+          <Link
+            href="/agent/onboarding"
+            className="inline-block bg-gradient-accent text-white px-8 py-3 rounded-full font-semibold hover:shadow-glow-sm transition-all"
+          >
+            Create Agency Profile
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 space-y-8">
+    <div className="max-w-7xl mx-auto py-8 px-4 space-y-8 animate-fade-in">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{profile.agency_name}</h1>
-          <p className="text-gray-500">{profile.contact_person} · {profile.city}</p>
+          <h1 className="text-4xl font-bold text-gradient">{profile.agency_name}</h1>
+          <p className="text-text-muted mt-2">{profile.contact_person} · {profile.city}</p>
         </div>
         <Link
           href="/agent/roster"
-          className="bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600"
+          className="glass-card px-6 py-3 rounded-full text-sm font-semibold text-text-primary hover:hover-glow transition-all flex items-center gap-2"
         >
+          <Users size={18} />
           Manage Roster
         </Link>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-          <p className="text-sm text-gray-600 uppercase tracking-wide">Artists</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{roster.length}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-          <p className="text-sm text-gray-600 uppercase tracking-wide">Commission %</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{profile.commission_pct}%</p>
-        </div>
-        {commissions && (
+        {loading ? (
           <>
-            <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-              <p className="text-sm text-gray-600 uppercase tracking-wide">Earned</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">₹{(commissions.total_commission_earned_paise / 100).toLocaleString('en-IN')}</p>
+            <StatSkeleton />
+            <StatSkeleton />
+            <StatSkeleton />
+            <StatSkeleton />
+            <StatSkeleton />
+          </>
+        ) : (
+          <>
+            <div className="glass-card p-6 rounded-2xl hover:hover-glow transition-all">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-text-muted text-sm font-semibold uppercase tracking-wider">Artists</p>
+                  <p className="text-3xl font-bold text-gradient mt-2">{roster.length}</p>
+                </div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center">
+                  <Users size={24} className="text-primary-400" />
+                </div>
+              </div>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-              <p className="text-sm text-gray-600 uppercase tracking-wide">Pending</p>
-              <p className="text-2xl font-bold text-yellow-600 mt-1">₹{(commissions.total_commission_pending_paise / 100).toLocaleString('en-IN')}</p>
+
+            <div className="glass-card p-6 rounded-2xl hover:hover-glow transition-all">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-text-muted text-sm font-semibold uppercase tracking-wider">Commission</p>
+                  <p className="text-3xl font-bold text-gradient mt-2">{profile.commission_pct}%</p>
+                </div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center">
+                  <TrendingUp size={24} className="text-primary-400" />
+                </div>
+              </div>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-              <p className="text-sm text-gray-600 uppercase tracking-wide">Paid</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">₹{(commissions.total_commission_paid_paise / 100).toLocaleString('en-IN')}</p>
-            </div>
+
+            {commissions && (
+              <>
+                <div className="glass-card p-6 rounded-2xl hover:hover-glow transition-all">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-text-muted text-sm font-semibold uppercase tracking-wider">Earned</p>
+                      <p className="text-2xl font-bold text-emerald-400 mt-2">₹{(commissions.total_commission_earned_paise / 100).toLocaleString('en-IN')}</p>
+                    </div>
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 flex items-center justify-center">
+                      <CheckCircle2 size={24} className="text-emerald-400" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass-card p-6 rounded-2xl hover:hover-glow transition-all">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-text-muted text-sm font-semibold uppercase tracking-wider">Pending</p>
+                      <p className="text-2xl font-bold text-amber-400 mt-2">₹{(commissions.total_commission_pending_paise / 100).toLocaleString('en-IN')}</p>
+                    </div>
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400/20 to-amber-600/20 flex items-center justify-center">
+                      <Wallet size={24} className="text-amber-400" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass-card p-6 rounded-2xl hover:hover-glow transition-all">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-text-muted text-sm font-semibold uppercase tracking-wider">Paid</p>
+                      <p className="text-2xl font-bold text-blue-400 mt-2">₹{(commissions.total_commission_paid_paise / 100).toLocaleString('en-IN')}</p>
+                    </div>
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400/20 to-blue-600/20 flex items-center justify-center">
+                      <CheckCircle2 size={24} className="text-blue-400" />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Link href="/agent/bookings" className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary-300 hover:shadow-sm transition-all">
-          <p className="text-2xl mb-2">📋</p>
-          <p className="font-medium text-gray-900">Booking Pipeline</p>
-          <p className="text-sm text-gray-500 mt-1">Manage and track all bookings</p>
-        </Link>
-        <Link href="/agent/commissions" className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary-300 hover:shadow-sm transition-all">
-          <p className="text-2xl mb-2">💰</p>
-          <p className="font-medium text-gray-900">Commission Dashboard</p>
-          <p className="text-sm text-gray-500 mt-1">Track earnings and payouts</p>
-        </Link>
-        <Link href="/agent/roster" className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary-300 hover:shadow-sm transition-all">
-          <p className="text-2xl mb-2">👥</p>
-          <p className="font-medium text-gray-900">Manage Roster</p>
-          <p className="text-sm text-gray-500 mt-1">Add and manage your artists</p>
-        </Link>
-        <Link href="/agent/recommendations" className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary-300 hover:shadow-sm transition-all">
-          <p className="text-2xl mb-2">✨</p>
-          <p className="font-medium text-gray-900">AI Recommendations</p>
-          <p className="text-sm text-gray-500 mt-1">Get booking suggestions</p>
-        </Link>
+      <div>
+        <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+          <div className="w-1 h-6 bg-gradient-accent rounded-full" />
+          Quick Actions
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link href="/agent/bookings" className="group glass-card rounded-2xl p-6 hover:hover-glow transition-all">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Clipboard size={24} className="text-primary-400" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-text-primary">Booking Pipeline</p>
+                <p className="text-text-muted text-sm mt-1">Manage and track all bookings</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/agent/commissions" className="group glass-card rounded-2xl p-6 hover:hover-glow transition-all">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Wallet size={24} className="text-primary-400" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-text-primary">Commission Dashboard</p>
+                <p className="text-text-muted text-sm mt-1">Track earnings and payouts</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/agent/roster" className="group glass-card rounded-2xl p-6 hover:hover-glow transition-all">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Users size={24} className="text-primary-400" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-text-primary">Manage Roster</p>
+                <p className="text-text-muted text-sm mt-1">Add and manage your artists</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/agent/recommendations" className="group glass-card rounded-2xl p-6 hover:hover-glow transition-all">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <TrendingUp size={24} className="text-primary-400" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-text-primary">AI Recommendations</p>
+                <p className="text-text-muted text-sm mt-1">Get booking suggestions</p>
+              </div>
+            </div>
+          </Link>
+        </div>
       </div>
 
       {/* Roster Preview */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Your Artists</h2>
+        <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+          <div className="w-1 h-6 bg-gradient-accent rounded-full" />
+          Your Artists
+        </h2>
         {roster.length === 0 ? (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-            <p className="text-gray-500">No artists in your roster yet.</p>
-            <Link href="/agent/roster" className="text-primary-500 text-sm mt-2 inline-block hover:underline">
+          <div className="glass-card rounded-2xl p-12 text-center">
+            <Users size={48} className="mx-auto text-text-muted/40 mb-4" />
+            <p className="text-text-muted mb-4">No artists in your roster yet.</p>
+            <Link href="/agent/roster" className="text-primary-400 text-sm font-semibold hover:text-primary-300 transition-colors">
               Add artists to your roster
             </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {roster.slice(0, 6).map((artist) => (
-              <div key={artist.artist_id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-medium text-gray-900">{artist.stage_name}</h3>
+              <div key={artist.artist_id} className="glass-card rounded-2xl p-6 hover:hover-glow transition-all group">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-text-primary group-hover:text-primary-300 transition-colors">{artist.stage_name}</h3>
+                    <p className="text-text-muted text-sm mt-1">{artist.base_city}</p>
+                  </div>
                   {artist.is_verified && (
-                    <span className="bg-green-100 text-green-700 text-xs px-1.5 py-0.5 rounded">Verified</span>
+                    <div className="flex-shrink-0 bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 rounded-full p-2">
+                      <CheckCircle2 size={16} className="text-emerald-400" />
+                    </div>
                   )}
                 </div>
-                <p className="text-sm text-gray-500">{artist.base_city}</p>
-                <div className="flex flex-wrap gap-1 mt-2">
+                <div className="flex flex-wrap gap-2 mt-4">
                   {artist.genres.slice(0, 3).map((g) => (
-                    <span key={g} className="bg-primary-50 text-primary-700 text-xs px-2 py-0.5 rounded-full">{g}</span>
+                    <span key={g} className="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-primary-400/20 to-primary-600/20 text-primary-300">
+                      {g}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -168,7 +276,7 @@ export default function AgentDashboard() {
           </div>
         )}
         {roster.length > 6 && (
-          <Link href="/agent/roster" className="text-primary-500 text-sm mt-4 inline-block hover:underline">
+          <Link href="/agent/roster" className="text-primary-400 text-sm font-semibold mt-4 inline-block hover:text-primary-300 transition-colors">
             View all {roster.length} artists →
           </Link>
         )}

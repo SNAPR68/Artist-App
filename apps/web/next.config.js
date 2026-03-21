@@ -45,7 +45,7 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
       },
     ],
-    unoptimized: true,
+    unoptimized: false,
   },
   experimental: {
     optimizePackageImports: ['@phosphor-icons/react'],

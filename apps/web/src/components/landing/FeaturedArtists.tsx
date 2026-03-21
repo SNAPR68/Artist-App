@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Star, BadgeCheck, ArrowRight, Sparkles } from 'lucide-react';
 import { useDragScroll } from '@/hooks/useDragScroll';
 
@@ -127,10 +128,12 @@ export function FeaturedArtists() {
                 <div className="glass-card rounded-2xl overflow-hidden p-0 border border-glass-border group-hover:border-primary-400/50 transition-all duration-300 group-hover:shadow-glow group-hover:-translate-y-2 h-full flex flex-col">
                   {/* Image Container (16:9 aspect) */}
                   <div className="relative w-full pt-[56.25%] overflow-hidden bg-gradient-to-br from-surface-elevated to-surface-bg">
-                    <img
+                    <Image
                       src={artist.image}
                       alt={artist.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      fill
+                      sizes="(max-width: 768px) 200px, 240px"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/80 via-transparent to-transparent" />

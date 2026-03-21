@@ -7,6 +7,8 @@ import { I18nProvider } from '@/i18n';
 import { AuthInitializer } from '@/components/AuthInitializer';
 import { SessionExpiredModal } from '@/components/SessionExpiredModal';
 import { VoiceAssistant } from '@/components/voice/VoiceAssistant';
+import { AnalyticsProvider } from '@/components/AnalyticsProvider';
+import { PushNotificationPrompt } from '@/components/PushNotificationPrompt';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -90,10 +92,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ErrorBoundary>
           <I18nProvider>
             <ToastProvider>
+              <AnalyticsProvider />
               <AuthInitializer />
               <SessionExpiredModal />
               {children}
               <VoiceAssistant />
+              <PushNotificationPrompt />
             </ToastProvider>
           </I18nProvider>
         </ErrorBoundary>
