@@ -44,25 +44,29 @@ export function FilterSidebar({
             <h3 className="font-semibold text-text-primary text-sm">Filters</h3>
           </div>
           {hasFilters && (
-            <button onClick={onClearAll} className="text-xs text-primary-400 hover:text-primary-300 transition-colors">
+            <button onClick={onClearAll} aria-label="Clear all filters" className="text-xs text-primary-400 hover:text-primary-300 transition-colors">
               Clear all
             </button>
           )}
         </div>
 
-        <FilterGroup
-          title="Genre"
-          items={facets?.genres ?? []}
-          selected={genre}
-          onSelect={onGenreChange}
-        />
+        <div role="group" aria-label="Genre filters">
+          <FilterGroup
+            title="Genre"
+            items={facets?.genres ?? []}
+            selected={genre}
+            onSelect={onGenreChange}
+          />
+        </div>
 
-        <FilterGroup
-          title="City"
-          items={facets?.cities ?? []}
-          selected={city}
-          onSelect={onCityChange}
-        />
+        <div role="group" aria-label="City filters">
+          <FilterGroup
+            title="City"
+            items={facets?.cities ?? []}
+            selected={city}
+            onSelect={onCityChange}
+          />
+        </div>
 
         <FilterGroup
           title="Event Type"

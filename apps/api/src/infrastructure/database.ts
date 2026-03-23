@@ -4,11 +4,12 @@ import { config } from '../config/index.js';
 // Supabase direct connection (db.*.supabase.co) is IPv6-only and unreachable from Render.
 // Automatically rewrite to the IPv4-compatible session pooler if needed.
 function getConnectionUrl(url: string): string {
+  const poolerHost = process.env.SUPABASE_POOLER_HOST || 'aws-1-ap-southeast-2.pooler.supabase.com';
   const match = url.match(/db\.([a-z0-9]+)\.supabase\.co/);
   if (match) {
     const rewritten = url.replace(
       `db.${match[1]}.supabase.co`,
-      'aws-1-ap-southeast-2.pooler.supabase.com'
+      poolerHost
     ).replace(
       /postgresql:\/\/postgres:/,
       `postgresql://postgres.${match[1]}:`
@@ -25,31 +26,32 @@ export const db = knex({
   client: 'pg',
   connection: {
     connectionString: connectionUrl,
-    ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: config.NODE_ENV === 'production' ? true : false,
   },
   pool: {
-    min: config.DATABASE_POOL_MIN,
-    max: config.DATABASE_POOL_MAX,
+    min: config.DATABASE_POOL_MIN ?? 5,
+    max: config.DATABASE_POOL_MAX ?? 20,
+    idleTimeoutMillis: 30000,
     afterCreate: (conn: any, done: Function) => {
-      // Set 30s query timeout to prevent runaway queries
-      conn.query('SET statement_timeout = 30000', (err: any) => done(err, conn));
+      conn.query('SET statement_timeout = 30000', (err: any) => {
+        if (err) return done(err, conn);
+        conn.query('SET idle_in_transaction_session_timeout = 60000', (err2: any) => done(err2, conn));
+      });
     },
   },
-  acquireConnectionTimeout: 10_000,
+  acquireConnectionTimeout: 5_000,
 });
 
-// Slow query logging (> 1 second)
-if (config.NODE_ENV === 'production') {
-  db.on('query', (query: any) => {
-    query.__startTime = Date.now();
-  });
-  db.on('query-response', (_response: any, query: any) => {
-    const duration = Date.now() - (query.__startTime || Date.now());
-    if (duration > 1000) {
-      console.warn(`[SLOW QUERY] ${duration}ms: ${(query.sql || '').substring(0, 200)}`);
-    }
-  });
-}
+// Slow query logging (> 1 second) — all environments
+db.on('query', (query: any) => {
+  query.__startTime = Date.now();
+});
+db.on('query-response', (_response: any, query: any) => {
+  const duration = Date.now() - (query.__startTime || Date.now());
+  if (duration > 1000) {
+    console.warn(`[SLOW QUERY] ${duration}ms: ${(query.sql || '').substring(0, 200)}`);
+  }
+});
 
 export async function checkDatabaseHealth(): Promise<{ ok: boolean; error?: string }> {
   try {

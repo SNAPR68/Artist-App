@@ -110,4 +110,16 @@ function loadConfig() {
 }
 
 export const config = loadConfig();
+
+// Warn about missing recommended production env vars
+if (config.NODE_ENV === 'production') {
+  const missing: string[] = [];
+  if (!config.RAZORPAY_KEY_ID) missing.push('RAZORPAY_KEY_ID');
+  if (!config.MSG91_AUTH_KEY) missing.push('MSG91_AUTH_KEY');
+  if (!config.SENTRY_DSN) missing.push('SENTRY_DSN');
+  if (missing.length > 0) {
+    console.warn(`[CONFIG] Missing recommended production env vars: ${missing.join(', ')}`);
+  }
+}
+
 export type Config = z.infer<typeof envSchema>;

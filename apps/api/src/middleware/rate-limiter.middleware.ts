@@ -16,7 +16,7 @@ export function rateLimit(tier: RateLimitTier) {
 
   return async (request: FastifyRequest, reply: FastifyReply) => {
     // Use user_id if authenticated, otherwise IP
-    const identifier = request.user?.user_id ?? request.ip;
+    const identifier = request.user?.user_id ?? (request.headers['x-forwarded-for']?.toString().split(',')[0]?.trim() || request.ip);
     const key = `ratelimit:${String(tier)}:${identifier}`;
     const now = Date.now();
     const windowStart = now - windowMs;
@@ -30,15 +30,9 @@ export function rateLimit(tier: RateLimitTier) {
 
     const results = await pipeline.exec();
     if (!results) {
-      // Redis unreachable: return 429 (fail closed for security)
-      return reply.status(429).send({
-        success: false,
-        data: null,
-        errors: [{
-          code: 'SERVICE_UNAVAILABLE',
-          message: 'Rate limiting service temporarily unavailable',
-        }],
-      });
+      // Redis unreachable: fail-open with warning (don't block legitimate traffic)
+      request.log.warn('[RATELIMIT] Redis unreachable, allowing request');
+      return;
     }
 
     const requestCount = results[2]?.[1] as number;

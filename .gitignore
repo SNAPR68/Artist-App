@@ -44,3 +44,4 @@ apps/api/keys/
 npm-debug.log*
 pnpm-debug.log*
 .vercel
+.env.production

@@ -35,11 +35,6 @@ async function validateRazorpayWebhookIP(request: FastifyRequest, reply: Fastify
   // Get client IP from request
   const clientIP = request.ip || request.socket.remoteAddress || '';
 
-  // In development/test mode, allow all IPs
-  if (process.env.NODE_ENV !== 'production') {
-    return;
-  }
-
   // Check if client IP is in allowed ranges
   const isAllowed = allAllowedIPs.some(range => {
     // Simple check: if it's a CIDR range, convert to range check
@@ -162,7 +157,7 @@ export async function paymentRoutes(app: FastifyInstance) {
    * POST /v1/payments/settle/:paymentId — Admin: manually settle a payment
    */
   app.post('/v1/payments/settle/:paymentId', {
-    preHandler: [authMiddleware, requirePermission('admin:manage')],
+    preHandler: [authMiddleware, requirePermission('admin:payments')],
   }, async (request, reply) => {
     const { paymentId } = request.params as { paymentId: string };
     const result = await paymentService.settlePayment(paymentId);
@@ -178,7 +173,7 @@ export async function paymentRoutes(app: FastifyInstance) {
    * POST /v1/payments/settle-eligible — Admin: trigger auto-settlement
    */
   app.post('/v1/payments/settle-eligible', {
-    preHandler: [authMiddleware, requirePermission('admin:manage')],
+    preHandler: [authMiddleware, requirePermission('admin:payments')],
   }, async (request, reply) => {
     settleEligibleSchema.parse(request.body);
     const count = await paymentService.autoSettleEligible();

@@ -67,9 +67,11 @@ function SearchPageContent() {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const doSearch = useCallback(async () => {
     setLoading(true);
+    setError(null);
     const params = new URLSearchParams();
     if (query) params.set('q', query);
     if (genre) params.set('genre', genre);
@@ -79,14 +81,22 @@ function SearchPageContent() {
     params.set('page', String(page));
     params.set('per_page', '20');
 
-    const res = await apiClient<SearchResponse>(`/v1/search/artists?${params.toString()}`);
+    try {
+      const res = await apiClient<SearchResponse>(`/v1/search/artists?${params.toString()}`);
 
-    if (res.success) {
-      const data = res as unknown as { data: ArtistResult[]; meta: SearchResponse['meta']; facets: SearchResponse['facets'] };
-      setResults(data.data);
-      setFacets(data.facets);
-      setTotal(data.meta.total);
-      setTotalPages(data.meta.total_pages);
+      if (res.success) {
+        const data = res as unknown as { data: ArtistResult[]; meta: SearchResponse['meta']; facets: SearchResponse['facets'] };
+        setResults(data.data ?? []);
+        setFacets(data.facets);
+        setTotal(data.meta.total);
+        setTotalPages(data.meta.total_pages);
+      } else {
+        console.error('[Search] API returned error:', res.errors);
+        setError('Failed to load artists. The server may be starting up — try again in 30 seconds.');
+      }
+    } catch (err) {
+      console.error('[Search] fetch error:', err);
+      setError('Could not connect to the server. Please try again.');
     }
     setLoading(false);
   }, [query, genre, city, eventType, sortBy, page]);
@@ -214,6 +224,23 @@ function SearchPageContent() {
                     <SkeletonCard />
                   </div>
                 ))}
+              </div>
+            ) : error ? (
+              /* Error State */
+              <div className="text-center py-20 animate-fade-in-up">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/30 mb-4">
+                  <Search size={32} className="text-red-400 opacity-70" />
+                </div>
+                <h3 className="text-xl font-heading text-text-primary mb-2">Something went wrong</h3>
+                <p className="text-sm text-text-muted mb-6 max-w-sm mx-auto">
+                  {error}
+                </p>
+                <button
+                  onClick={doSearch}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-accent text-white text-sm font-semibold rounded-lg hover-glow transition-all"
+                >
+                  Try again
+                </button>
               </div>
             ) : results.length === 0 ? (
               /* Empty State */

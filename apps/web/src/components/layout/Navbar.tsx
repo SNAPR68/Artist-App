@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Menu, X, Search, Mic, ChevronRight, Building2 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
@@ -23,8 +23,16 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
 
   // Handle drawer open/close with CSS transition
   useEffect(() => {
@@ -38,7 +46,7 @@ export function Navbar() {
   const handleCloseDrawer = () => {
     setDrawerVisible(false);
     // Wait for transition to finish before unmounting
-    setTimeout(() => setMobileOpen(false), 300);
+    closeTimerRef.current = setTimeout(() => setMobileOpen(false), 300);
   };
 
   const showAuth = mounted && _initialized;

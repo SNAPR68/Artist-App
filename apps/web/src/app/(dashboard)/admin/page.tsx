@@ -1,9 +1,10 @@
 'use client';
 
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, useMemo } from 'react';
 import { Users, Calendar, CreditCard, Shield, BarChart3 } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 import { useAuthStore } from '../../../lib/auth';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 type Tab = 'overview' | 'users' | 'bookings' | 'payments' | 'disputes' | 'venues' | 'intelligence';
 
@@ -201,9 +202,12 @@ export default function AdminDashboardPage() {
     setActionLoading(null);
   };
 
-  const filteredBookings = statusFilter === 'all'
-    ? bookings
-    : bookings.filter((b) => b.status === statusFilter);
+  const filteredBookings = useMemo(
+    () => statusFilter === 'all'
+      ? bookings
+      : bookings.filter((b) => b.status === statusFilter),
+    [bookings, statusFilter]
+  );
   const statuses = ['all', ...new Set(bookings.map((b) => b.status))];
 
   if (user && user.role !== 'admin') {
@@ -216,6 +220,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-text-primary flex items-center gap-2">
@@ -811,5 +816,6 @@ export default function AdminDashboardPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   );
 }

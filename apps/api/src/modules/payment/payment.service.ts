@@ -24,8 +24,14 @@ export class PaymentService {
       throw new PaymentError('INVALID_STATE', 'Booking must be confirmed before payment', 400);
     }
 
-    // Idempotency: check if order already exists
+    // Idempotency: check if order already exists (with FOR UPDATE lock to prevent races)
     const idempotencyKey = `pay:${bookingId}`;
+    const existingLocked = await db('payments')
+      .where({ booking_id: bookingId, status: 'pending' })
+      .forUpdate()
+      .first();
+    if (existingLocked) return existingLocked;
+
     const existing = await paymentRepository.findByIdempotencyKey(idempotencyKey);
     if (existing && existing.status === 'pending') {
       return existing;
@@ -79,6 +85,11 @@ export class PaymentService {
     const payment = await paymentRepository.findByOrderId(params.razorpay_order_id);
     if (!payment) {
       throw new PaymentError('NOT_FOUND', 'Payment not found', 404);
+    }
+
+    // Double-spend check: prevent re-verification of already processed payments
+    if (payment.status !== 'pending') {
+      return { success: true, message: 'Payment already verified', payment };
     }
 
     // Update payment: captured → in_escrow (funds held until event completion + 3 days)
@@ -290,7 +301,7 @@ export class PaymentService {
     }
 
     // Atomic transaction: update payment + booking state together
-    const result = await db.transaction(async (trx) => {
+    await db.transaction(async (trx) => {
       // Lock the payment row to prevent concurrent settlement attempts
       const lockedPayment = await trx('payments')
         .where({ id: payment.id })
@@ -344,15 +355,15 @@ export class PaymentService {
           });
       }
 
+      // Create payout record (non-blocking — logged if fails)
+      try {
+        await payoutService.createPayout(settlement.id);
+      } catch (err) {
+        console.error(`[SETTLEMENT] Payout record failed, will retry:`, err);
+      }
+
       return settlement;
     });
-
-    // Auto-create payout transfer record (outside transaction)
-    try {
-      await payoutService.createPayout(result.id);
-    } catch (err) {
-      console.error(`[SETTLEMENT] Failed to create payout for settlement ${result.id}:`, err);
-    }
 
     return {
       payment_id: payment.id,

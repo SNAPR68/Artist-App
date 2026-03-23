@@ -1,6 +1,5 @@
 import type { FastifyError, FastifyRequest, FastifyReply } from 'fastify';
 import { ZodError } from 'zod';
-import { config } from '../config/index.js';
 
 /**
  * Global error handler for the Fastify app.
@@ -62,9 +61,7 @@ export function errorHandler(
     data: null,
     errors: [{
       code: 'INTERNAL_ERROR',
-      message: config.NODE_ENV === 'production'
-        ? 'An internal error occurred'
-        : error.message || 'Unknown error',
+      message: 'An internal error occurred',
     }],
   });
 }

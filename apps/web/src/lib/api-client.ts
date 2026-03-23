@@ -118,20 +118,48 @@ export async function apiClient<T>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  let response = await fetch(url, { ...options, headers });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+  let response: Response;
+  try {
+    response = await fetch(url, { ...options, headers, signal: controller.signal });
+    clearTimeout(timeoutId);
+  } catch (err) {
+    clearTimeout(timeoutId);
+    const message = err instanceof Error
+      ? (err.name === 'AbortError' ? 'Request timed out' : err.message)
+      : 'Network error';
+    console.error(`[apiClient] fetch failed: ${url}`, err);
+    return { success: false, data: {} as T, errors: [{ code: 'NETWORK_ERROR', message }] } as ApiResponse<T>;
+  }
 
   // Auto-refresh on 401
   if (response.status === 401) {
     const refreshed = await refreshAccessToken();
     if (refreshed) {
       headers['Authorization'] = `Bearer ${getAccessToken()}`;
-      response = await fetch(url, { ...options, headers });
+      const retryController = new AbortController();
+      const retryTimeoutId = setTimeout(() => retryController.abort(), 30000);
+      try {
+        response = await fetch(url, { ...options, headers, signal: retryController.signal });
+        clearTimeout(retryTimeoutId);
+      } catch (err) {
+        clearTimeout(retryTimeoutId);
+        const message = err instanceof Error
+          ? (err.name === 'AbortError' ? 'Request timed out' : err.message)
+          : 'Network error';
+        return { success: false, data: {} as T, errors: [{ code: 'NETWORK_ERROR', message }] } as ApiResponse<T>;
+      }
     } else {
-      // Don't hard-redirect — the SessionExpiredModal handles UX.
       return { success: false, data: {} as T, errors: [{ code: 'UNAUTHORIZED', message: 'Session expired. Please log in again.' }] } as ApiResponse<T>;
     }
   }
 
-  const json = await response.json();
-  return json as ApiResponse<T>;
+  try {
+    const json = await response.json();
+    return json as ApiResponse<T>;
+  } catch {
+    return { success: false, data: {} as T, errors: [{ code: 'PARSE_ERROR', message: `Invalid JSON from ${path}` }] } as ApiResponse<T>;
+  }
 }

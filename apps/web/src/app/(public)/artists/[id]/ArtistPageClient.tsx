@@ -69,6 +69,9 @@ export default function PublicArtistPage() {
       if (availRes.success) {
         setAvailability(availRes.data);
       }
+    }).catch((err) => {
+      console.error('[ArtistPage] Failed to load data:', err);
+      setError('Failed to load artist profile. Please try again.');
     }).finally(() => setLoading(false));
   }, [id]);
 

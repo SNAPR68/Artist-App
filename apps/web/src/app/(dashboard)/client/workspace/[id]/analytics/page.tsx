@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { apiClient } from '../../../../../../lib/api-client';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -131,6 +132,7 @@ export default function WorkspaceAnalyticsPage() {
       : 0;
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -293,5 +295,6 @@ export default function WorkspaceAnalyticsPage() {
         )}
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

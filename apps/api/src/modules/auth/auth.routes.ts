@@ -101,6 +101,9 @@ export async function authRoutes(app: FastifyInstance) {
     const userId = request.user!.user_id;
 
     await db.transaction(async (trx) => {
+      // Get artist profile ID before anonymizing (for cache invalidation)
+      const artistProfile = await trx('artist_profiles').where({ user_id: userId }).first();
+
       // Soft-delete user and anonymize PII
       await trx('users')
         .where({ id: userId })
@@ -123,19 +126,18 @@ export async function authRoutes(app: FastifyInstance) {
           base_city: null,
         });
 
-      // Revoke all refresh tokens
+      // Revoke all refresh tokens (inside transaction)
       await trx('refresh_tokens')
         .where({ user_id: userId })
         .update({ revoked_at: trx.fn.now() });
-    });
 
-    // Clear any cached data
-    try {
-      const artistProfile = await db('artist_profiles').where({ user_id: userId }).first();
-      if (artistProfile) {
-        await redis.del(`artist:profile:${artistProfile.id}`);
-      }
-    } catch {}
+      // Clear cached data (inside transaction — best-effort)
+      try {
+        if (artistProfile) {
+          await redis.del(`artist:profile:${artistProfile.id}`);
+        }
+      } catch {}
+    });
 
     return reply.status(200).send({
       success: true,

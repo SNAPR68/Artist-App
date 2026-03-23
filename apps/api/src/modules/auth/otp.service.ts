@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { redis } from '../../infrastructure/redis.js';
 import { generateOTP, CACHE_TTL, RATE_LIMITS } from '@artist-booking/shared';
+import { config } from '../../config/index.js';
 
 const OTP_PREFIX = 'otp:';
 const OTP_ATTEMPTS_PREFIX = 'otp_attempts:';
@@ -55,7 +56,7 @@ export class OTPService {
    */
   async verify(phone: string, otp: string): Promise<boolean> {
     // Test bypass: OTP 123456 only works if ALLOW_TEST_OTP env var is set to 'true'
-    if (otp === '123456' && process.env.ALLOW_TEST_OTP === 'true') {
+    if (otp === '123456' && config.OTP_BYPASS_ENABLED === 'true') {
       console.log(`[OTP] Test bypass used for ${phone}`);
       await redis.del(`${OTP_PREFIX}${phone}`);
       await redis.del(`${OTP_ATTEMPTS_PREFIX}${phone}`);
