@@ -77,11 +77,13 @@ export async function artistRoutes(app: FastifyInstance) {
     const { id } = request.params as { id: string };
     const profile = await artistService.getPublicProfile(id);
 
-    return reply.send({
-      success: true,
-      data: profile,
-      errors: [],
-    });
+    return reply
+      .header('Cache-Control', 'public, max-age=300, s-maxage=300')
+      .send({
+        success: true,
+        data: profile,
+        errors: [],
+      });
   });
 
   /**

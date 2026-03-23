@@ -1,6 +1,10 @@
 import { artistRepository } from './artist.repository.js';
 import type { CreateArtistProfileData, UpdateArtistProfileData } from './artist.repository.js';
 import { db } from '../../infrastructure/database.js';
+import { redis } from '../../infrastructure/redis.js';
+
+const PROFILE_CACHE_TTL = 300; // 5 minutes
+const PROFILE_CACHE_PREFIX = 'artist:profile:';
 
 /** Postgres text[]/enum[] columns sometimes return as "{a,b}" strings instead of arrays */
 function normalizeArrayFields<T extends Record<string, unknown>>(profile: T): T {
@@ -39,6 +43,13 @@ export class ArtistService {
   }
 
   async getPublicProfile(artistId: string) {
+    // Check cache first
+    const cacheKey = `${PROFILE_CACHE_PREFIX}${artistId}`;
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) return JSON.parse(cached);
+    } catch {}
+
     const profile = await artistRepository.findPublicById(artistId);
     if (!profile) {
       throw new ArtistError('PROFILE_NOT_FOUND', 'Artist not found', 404);
@@ -57,7 +68,14 @@ export class ArtistService {
       .orderBy('reviews.created_at', 'desc')
       .limit(10);
 
-    return { ...normalizeArrayFields(profile), media, reviews };
+    const result = { ...normalizeArrayFields(profile), media, reviews };
+
+    // Cache for 5 minutes
+    try {
+      await redis.set(cacheKey, JSON.stringify(result), 'EX', PROFILE_CACHE_TTL);
+    } catch {}
+
+    return result;
   }
 
   async updateProfile(userId: string, data: UpdateArtistProfileData) {
@@ -83,7 +101,14 @@ export class ArtistService {
       }
     }
 
-    return artistRepository.update(userId, data);
+    const updated = await artistRepository.update(userId, data);
+
+    // Invalidate public profile cache
+    try {
+      await redis.del(`${PROFILE_CACHE_PREFIX}${existing.id}`);
+    } catch {}
+
+    return updated;
   }
 
   async listArtists(params: { page: number; per_page: number; city?: string; genre?: string }) {

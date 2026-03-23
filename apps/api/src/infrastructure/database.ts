@@ -30,9 +30,26 @@ export const db = knex({
   pool: {
     min: config.DATABASE_POOL_MIN,
     max: config.DATABASE_POOL_MAX,
+    afterCreate: (conn: any, done: Function) => {
+      // Set 30s query timeout to prevent runaway queries
+      conn.query('SET statement_timeout = 30000', (err: any) => done(err, conn));
+    },
   },
   acquireConnectionTimeout: 10_000,
 });
+
+// Slow query logging (> 1 second)
+if (config.NODE_ENV === 'production') {
+  db.on('query', (query: any) => {
+    query.__startTime = Date.now();
+  });
+  db.on('query-response', (_response: any, query: any) => {
+    const duration = Date.now() - (query.__startTime || Date.now());
+    if (duration > 1000) {
+      console.warn(`[SLOW QUERY] ${duration}ms: ${(query.sql || '').substring(0, 200)}`);
+    }
+  });
+}
 
 export async function checkDatabaseHealth(): Promise<{ ok: boolean; error?: string }> {
   try {

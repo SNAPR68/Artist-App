@@ -31,17 +31,19 @@ export async function searchRoutes(app: FastifyInstance) {
       per_page,
     });
 
-    return reply.send({
-      success: true,
-      data: result.data,
-      meta: {
-        page,
-        per_page,
-        total: result.total,
-        total_pages: Math.ceil(result.total / per_page),
-      },
-      facets: result.facets,
-      errors: [],
-    });
+    return reply
+      .header('Cache-Control', 'public, max-age=120, s-maxage=120')
+      .send({
+        success: true,
+        data: result.data,
+        meta: {
+          page,
+          per_page,
+          total: result.total,
+          total_pages: Math.ceil(result.total / per_page),
+        },
+        facets: result.facets,
+        errors: [],
+      });
   });
 }

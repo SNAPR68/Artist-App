@@ -23,8 +23,9 @@ interface SearchParams {
 
 export class SearchService {
   async searchArtists(params: SearchParams) {
-    // Check cache
-    const cacheKey = `search:${JSON.stringify(params)}`;
+    // Check cache (sorted keys prevent collision from different key orderings)
+    const sortedKey = Object.keys(params).sort().map(k => `${k}=${(params as any)[k] ?? ''}`).join('&');
+    const cacheKey = `search:${sortedKey}`;
     const cached = await redis.get(cacheKey);
     if (cached) {
       return JSON.parse(cached);
