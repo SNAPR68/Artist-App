@@ -84,6 +84,7 @@ class EmailService {
       });
 
       if (!response.ok) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Resend error shape varies
         const errorData = await response.json() as any;
         throw new Error(`Resend API error: ${errorData?.message || 'Unknown error'}`);
       }

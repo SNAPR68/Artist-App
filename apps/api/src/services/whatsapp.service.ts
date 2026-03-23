@@ -201,17 +201,20 @@ class WhatsAppService {
       })),
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- PromiseSettledResult value typing
     const successCount = results.filter(r => r.status === 'fulfilled' && (r.value as any).success).length;
     const errors = results
       .map((r, i) => ({
         phone: recipients[i].phoneNumber,
         result: r,
       }))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .filter(({ result }) => result.status === 'rejected' || (result.status === 'fulfilled' && !(result.value as any).success))
       .map(({ phone, result }) => ({
         phone,
         error: result.status === 'rejected'
           ? (result.reason instanceof Error ? result.reason.message : 'Unknown error')
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           : (result.value as any).error || 'Unknown error',
       }));
 

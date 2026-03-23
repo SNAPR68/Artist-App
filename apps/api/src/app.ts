@@ -132,7 +132,7 @@ if (config.SENTRY_DSN) {
       return event;
     },
   });
-  console.log(`[SENTRY] Initialized for ${config.NODE_ENV}`);
+  app.log.info(`[SENTRY] Initialized for ${config.NODE_ENV}`);
 }
 
 // ─── Health Check ────────────────────────────────────────────

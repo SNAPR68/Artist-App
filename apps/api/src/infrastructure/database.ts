@@ -14,7 +14,7 @@ function getConnectionUrl(url: string): string {
       /postgresql:\/\/postgres:/,
       `postgresql://postgres.${match[1]}:`
     );
-    console.log(`[database] Rewrote direct connection to session pooler`);
+    // Rewritten to session pooler for IPv4 compatibility
     return rewritten;
   }
   return url;

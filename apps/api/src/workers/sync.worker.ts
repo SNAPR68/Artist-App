@@ -110,11 +110,11 @@ async function syncArtists() {
   }
 
   lastSyncAt = new Date();
-  console.log(`Synced ${updatedProfiles.length} artist(s) to OpenSearch`);
+  console.info(`Synced ${updatedProfiles.length} artist(s) to OpenSearch`);
 }
 
 async function startSyncLoop() {
-  console.log('Starting PG → OpenSearch sync worker...');
+  console.info('Starting PG → OpenSearch sync worker...');
   await ensureIndex();
 
   // Initial full sync
