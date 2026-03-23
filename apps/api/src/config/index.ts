@@ -37,8 +37,8 @@ const envSchema = z.object({
   // JWT
   JWT_PRIVATE_KEY_PATH: z.string().optional(),
   JWT_PUBLIC_KEY_PATH: z.string().optional(),
-  JWT_ACCESS_TOKEN_EXPIRY: z.string().default('24h'),
-  JWT_REFRESH_TOKEN_EXPIRY: z.string().default('7d'),
+  JWT_ACCESS_TOKEN_EXPIRY: z.string().default('1h'),
+  JWT_REFRESH_TOKEN_EXPIRY: z.string().default('30d'),
 
   // PII Encryption
   PII_ENCRYPTION_KEY: z.string().min(32),

@@ -9,6 +9,7 @@ import { checkRedisHealth, redis } from './infrastructure/redis.js';
 import { db } from './infrastructure/database.js';
 import { errorHandler } from './middleware/error-handler.middleware.js';
 import { requestLogger } from './middleware/request-logger.middleware.js';
+import { sanitizeInput } from './middleware/sanitize.middleware.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { artistRoutes } from './modules/artist/artist.routes.js';
 import { clientRoutes } from './modules/client/client.routes.js';
@@ -55,6 +56,7 @@ const app = Fastify({
         : undefined,
   },
   genReqId: () => crypto.randomUUID(),
+  bodyLimit: 1_048_576, // 1MB default limit for all routes
 } as any);
 
 // ─── Plugins ─────────────────────────────────────────────────
@@ -170,6 +172,9 @@ app.setErrorHandler(async (error, request, reply) => {
   }
   return (errorHandler as any)(error, request, reply);
 });
+
+// ─── Input Sanitization ─────────────────────────────────────
+app.addHook('preHandler', sanitizeInput);
 
 // ─── Request Logging ─────────────────────────────────────────
 app.addHook('onResponse', requestLogger);
