@@ -162,8 +162,68 @@ export function VoiceAssistant() {
         return;
       }
 
-      // Check for category browsing intent
+      // ─── Check for navigation commands (guest-safe routes) ───
       const lower = text.toLowerCase();
+      const navKeywords = ['go to', 'take me to', 'navigate to', 'open', 'show me the', 'switch to'];
+      const isNavCommand = navKeywords.some(kw => lower.includes(kw));
+
+      if (isNavCommand) {
+        const guestRoutes: Record<string, { route: string; label: string }> = {
+          'login': { route: '/login', label: 'login page' },
+          'sign in': { route: '/login', label: 'login page' },
+          'sign up': { route: '/login', label: 'sign up page' },
+          'register': { route: '/login', label: 'registration page' },
+          'search': { route: '/search', label: 'search page' },
+          'find artist': { route: '/search', label: 'search page' },
+          'explore': { route: '/search', label: 'explore artists' },
+          'home': { route: '/', label: 'home page' },
+          'event company': { route: '/login', label: 'event company login' },
+          'event login': { route: '/login', label: 'event company login' },
+          'artist login': { route: '/login', label: 'artist login' },
+          'join': { route: '/login', label: 'sign up page' },
+          'gigs': { route: '/gigs', label: 'gig listings' },
+          'privacy': { route: '/privacy', label: 'privacy policy' },
+          'terms': { route: '/terms', label: 'terms of service' },
+        };
+
+        let matchedRoute: { route: string; label: string } | null = null;
+        for (const [keyword, routeInfo] of Object.entries(guestRoutes)) {
+          if (lower.includes(keyword)) {
+            matchedRoute = routeInfo;
+            break;
+          }
+        }
+
+        const authPages = ['dashboard', 'booking', 'earning', 'payment', 'calendar', 'wallet', 'profile', 'workspace', 'setting', 'notification'];
+        const needsAuth = authPages.some(p => lower.includes(p));
+
+        if (needsAuth && !matchedRoute) {
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            text: 'You need to sign in to access that page. Would you like to log in?',
+            suggestions: ['Log in now', 'Find a DJ in Mumbai', 'Explore artists'],
+            action: { type: 'navigate', route: '/login' },
+          }]);
+          speakResponse('You need to sign in to access that page. Would you like to log in?');
+          return;
+        }
+
+        if (matchedRoute) {
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            text: `Taking you to ${matchedRoute!.label}...`,
+            suggestions: ['Find a DJ', 'Show me singers', 'Go home'],
+            action: { type: 'navigate', route: matchedRoute!.route },
+          }]);
+          speakResponse(`Taking you to ${matchedRoute!.label}`);
+          setTimeout(() => {
+            router.push(matchedRoute!.route);
+          }, 1000);
+          return;
+        }
+      }
+
+      // Check for category browsing intent
       if (lower.includes('categor') || lower.includes('what do you have') || lower.includes('what kind')) {
         setMessages((prev) => [
           ...prev,
@@ -455,7 +515,7 @@ export function VoiceAssistant() {
             </button>
             {/* Label */}
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-semibold text-text-primary leading-tight">{user ? 'Voice Assistant' : 'ArtistChat'}</span>
+              <span className="text-sm font-semibold text-text-primary leading-tight">Voice Assistant</span>
               <span className="text-[10px] text-text-muted leading-tight">{user ? 'Ask or speak for anything' : 'Ask or speak to find artists'}</span>
             </div>
             {/* Online dot */}
@@ -495,10 +555,10 @@ export function VoiceAssistant() {
                 </div>
                 <div>
                   <h3 className="font-heading font-semibold text-white text-sm leading-tight">
-                    {user ? 'Voice Assistant' : 'ArtistChat'}
+                    Voice Assistant
                   </h3>
                   <p className="text-[10px] text-white/70 leading-tight">
-                    {user ? 'Voice commands for everything' : 'AI-powered artist discovery'}
+                    Ask me anything — search, navigate, or get help
                   </p>
                 </div>
               </div>
@@ -663,7 +723,7 @@ export function VoiceAssistant() {
                   type="text"
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
-                  placeholder="Ask about artists, pricing, events..."
+                  placeholder="Ask anything — search, navigate, book..."
                   className="flex-1 bg-surface-elevated border border-glass-border rounded-pill px-4 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
                   disabled={state !== 'idle'}
                 />
