@@ -51,6 +51,12 @@ export class PaymentRepository {
       .first();
   }
 
+  async findByRazorpayPaymentId(razorpayPaymentId: string) {
+    return db('payments')
+      .where({ razorpay_payment_id: razorpayPaymentId })
+      .first();
+  }
+
   async findByIdempotencyKey(key: string) {
     return db('payments')
       .where({ idempotency_key: key })
@@ -96,6 +102,13 @@ export class PaymentRepository {
       })
       .returning('*');
     return record;
+  }
+
+  async findStalePending(cutoffDate: Date) {
+    return db('payments')
+      .where('status', 'pending')
+      .where('created_at', '<', cutoffDate)
+      .select('*');
   }
 
   async findSettlementEligible(cutoffDate: Date) {

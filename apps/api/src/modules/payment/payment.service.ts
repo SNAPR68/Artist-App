@@ -121,6 +121,46 @@ export class PaymentService {
         }
         break;
       }
+      case 'refund.processed': {
+        const refundEntity = (payload.refund as { entity?: Record<string, unknown> })?.entity as
+          { payment_id: string; amount: number; id: string } | undefined;
+        if (refundEntity) {
+          const payment = await paymentRepository.findByRazorpayPaymentId(refundEntity.payment_id);
+          if (payment) {
+            // Full refund if refund amount equals payment amount, otherwise partial
+            const newStatus = refundEntity.amount >= payment.amount_paise
+              ? PaymentStatus.REFUNDED
+              : PaymentStatus.PARTIALLY_REFUNDED;
+            await paymentRepository.updateStatus(payment.id, newStatus);
+            console.log(`[WEBHOOK] Refund processed: ${refundEntity.id} → ${newStatus}`);
+
+            // Transition booking to cancelled if full refund
+            if (newStatus === PaymentStatus.REFUNDED) {
+              const booking = await bookingRepository.findById(payment.booking_id);
+              if (booking && booking.state !== BookingState.CANCELLED) {
+                await bookingService.transitionState(payment.booking_id, 'system:refund', BookingState.CANCELLED, {
+                  refund_id: refundEntity.id,
+                  refund_amount_paise: refundEntity.amount,
+                });
+              }
+            }
+          }
+        }
+        break;
+      }
+      case 'refund.failed': {
+        const refundEntity = (payload.refund as { entity?: Record<string, unknown> })?.entity as
+          { payment_id: string; id: string } | undefined;
+        if (refundEntity) {
+          const payment = await paymentRepository.findByRazorpayPaymentId(refundEntity.payment_id);
+          if (payment && payment.status === PaymentStatus.REFUND_INITIATED) {
+            // Revert to previous captured/in_escrow state
+            await paymentRepository.updateStatus(payment.id, PaymentStatus.CAPTURED);
+            console.error(`[WEBHOOK] Refund failed: ${refundEntity.id} for payment ${payment.id}`);
+          }
+        }
+        break;
+      }
     }
   }
 
@@ -320,6 +360,43 @@ export class PaymentService {
       artist_payout_paise: payment.artist_payout_paise,
       status: PaymentStatus.SETTLED,
     };
+  }
+
+  /**
+   * Reconcile stale pending payments by checking Razorpay status.
+   * Runs every 15 minutes to catch payments where webhook was missed.
+   */
+  async reconcileStalePending(): Promise<number> {
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const stalePayments = await paymentRepository.findStalePending(thirtyMinutesAgo);
+
+    let reconciledCount = 0;
+    for (const payment of stalePayments) {
+      try {
+        if (!payment.razorpay_order_id) continue;
+
+        // Skip mock orders
+        if (payment.razorpay_order_id.startsWith('order_mock_')) continue;
+
+        const rzpPayment = await razorpayClient.fetchPayment(payment.razorpay_payment_id || payment.razorpay_order_id);
+        const rzpStatus = (rzpPayment as any)?.status;
+
+        if (rzpStatus === 'captured') {
+          await paymentRepository.updateStatus(payment.id, PaymentStatus.CAPTURED, (rzpPayment as any).id);
+          reconciledCount++;
+          console.log(`[RECONCILE] Payment ${payment.id} reconciled as captured`);
+        } else if (rzpStatus === 'failed') {
+          await paymentRepository.updateStatus(payment.id, PaymentStatus.FAILED);
+          reconciledCount++;
+          console.log(`[RECONCILE] Payment ${payment.id} reconciled as failed`);
+        }
+        // If still authorized/created, leave as pending — customer may still complete
+      } catch (err) {
+        console.error(`[RECONCILE] Failed to reconcile payment ${payment.id}:`, err);
+      }
+    }
+
+    return reconciledCount;
   }
 
   /**

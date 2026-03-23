@@ -10,7 +10,11 @@ function maskPhoneNumber(phone: string): string {
   return phone.slice(0, 2) + '****' + phone.slice(-4);
 }
 
-const isMockMode = !config.RAZORPAY_KEY_ID || config.RAZORPAY_KEY_ID === 'rzp_test_placeholder';
+const isMockMode = config.RAZORPAY_MOCK_MODE === 'true' || (!config.RAZORPAY_KEY_ID || config.RAZORPAY_KEY_ID === 'rzp_test_placeholder');
+
+if (isMockMode && config.NODE_ENV === 'production') {
+  console.warn('[RAZORPAY] ⚠️ Running in MOCK mode in production! Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET for real payments.');
+}
 
 const razorpay = isMockMode
   ? null

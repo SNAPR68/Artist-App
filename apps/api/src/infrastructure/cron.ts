@@ -18,6 +18,7 @@ import { emergencySubstitutionService } from '../modules/emergency-substitution/
 import { gigMarketplaceService } from '../modules/gig-marketplace/gig-marketplace.service.js';
 import { gamificationService } from '../modules/gamification/gamification.service.js';
 
+const PAYMENT_RECONCILIATION_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
 const HOLD_EXPIRY_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 const REVIEW_PUBLISH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 const SETTLEMENT_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
@@ -46,6 +47,18 @@ const GAMIFICATION_BADGE_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
  */
 export function startCronJobs() {
   console.log('[CRON] Starting background jobs...');
+
+  // 0. Payment reconciliation — check Razorpay for missed webhooks (every 15min)
+  setInterval(async () => {
+    try {
+      const count = await paymentService.reconcileStalePending();
+      if (count > 0) {
+        console.log(`[CRON] Reconciled ${count} stale pending payments`);
+      }
+    } catch (err) {
+      console.error('[CRON] Payment reconciliation failed:', err);
+    }
+  }, PAYMENT_RECONCILIATION_INTERVAL_MS);
 
   // 1. Expire stale calendar holds (48h)
   setInterval(async () => {
