@@ -26,21 +26,30 @@ export function FeaturedArtists() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchFeatured() {
+    let retryCount = 0;
+    const maxRetries = 3;
+
+    async function fetchFeatured(): Promise<void> {
       try {
         const res = await apiClient<ArtistData[]>('/v1/search/artists?per_page=6&sort_by=rating');
         if (res.success) {
           const data = res as unknown as { data: ArtistData[] };
           setArtists(data.data ?? []);
+          setError(null);
+          setLoading(false);
         } else {
-          console.error('[FeaturedArtists] API error:', res.errors);
-          setError('Could not load artists');
+          throw new Error(res.errors?.[0]?.message ?? 'API returned error');
         }
       } catch (err) {
-        console.error('[FeaturedArtists] fetch error:', err);
-        setError('Could not load artists');
-      } finally {
-        setLoading(false);
+        console.error(`[FeaturedArtists] fetch attempt ${retryCount + 1}/${maxRetries}:`, err);
+        retryCount++;
+        if (retryCount < maxRetries) {
+          setError('warming_up');
+          setTimeout(fetchFeatured, 5000);
+        } else {
+          setError('Could not load artists');
+          setLoading(false);
+        }
       }
     }
     fetchFeatured();
@@ -71,8 +80,21 @@ export function FeaturedArtists() {
     );
   }
 
+  if (error === 'warming_up') {
+    return (
+      <section className="py-12 md:py-20">
+        <div className="max-w-section mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-surface-elevated border border-glass-border">
+            <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-text-muted">Waking up the server... artists loading shortly</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   if (error || artists.length === 0) {
-    return null; // Don't show section if no artists
+    return null;
   }
 
   return (
