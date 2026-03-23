@@ -233,9 +233,8 @@ export class RecommendationService {
         target_artist_id: entry.artistId,
         recommendation_type: 'popular_for_event',
         score: Math.round(entry.score * 1000) / 1000,
-        context: { event_type: eventType, city },
+        context: { event_type: eventType, city, rising_star: entry.risingStar },
         expires_at: expires,
-        rising_star: entry.risingStar,
       });
       count++;
 
@@ -247,9 +246,8 @@ export class RecommendationService {
           target_artist_id: entry.artistId,
           recommendation_type: 'rising_star',
           score: Math.round(entry.score * 1000) / 1000,
-          context: { event_type: eventType, city },
+          context: { event_type: eventType, city, rising_star: true },
           expires_at: expires,
-          rising_star: true,
         });
       }
     }

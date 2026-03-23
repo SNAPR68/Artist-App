@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import compress from '@fastify/compress';
 import helmet from '@fastify/helmet';
+import * as Sentry from '@sentry/node';
 import { config } from './config/index.js';
 import { checkDatabaseHealth } from './infrastructure/database.js';
 import { checkRedisHealth, redis } from './infrastructure/redis.js';
@@ -79,6 +80,25 @@ await app.register(helmet, {
 
 await app.register(compress, { global: true });
 
+// ─── Sentry Error Tracking ──────────────────────────────────
+if (config.SENTRY_DSN) {
+  Sentry.init({
+    dsn: config.SENTRY_DSN,
+    environment: config.NODE_ENV,
+    release: config.SENTRY_RELEASE ?? 'unknown',
+    tracesSampleRate: config.NODE_ENV === 'production' ? 0.1 : 1.0,
+    beforeSend(event) {
+      // Scrub PII from error events
+      if (event.request?.headers) {
+        delete event.request.headers['authorization'];
+        delete event.request.headers['cookie'];
+      }
+      return event;
+    },
+  });
+  console.log(`[SENTRY] Initialized for ${config.NODE_ENV}`);
+}
+
 // ─── Health Check ────────────────────────────────────────────
 app.get('/health', async () => {
   const [dbResult, redisOk] = await Promise.all([checkDatabaseHealth(), checkRedisHealth()]);
@@ -136,7 +156,20 @@ app.get('/v1/health', async () => {
 });
 
 // ─── Global Error Handler ────────────────────────────────────
-app.setErrorHandler(errorHandler as any);
+app.setErrorHandler(async (error, request, reply) => {
+  // Capture server errors in Sentry (skip 4xx client errors)
+  const statusCode = (error as any).statusCode as number | undefined;
+  if (!statusCode || statusCode >= 500) {
+    Sentry.captureException(error, {
+      extra: {
+        url: request.url,
+        method: request.method,
+        requestId: request.id,
+      },
+    });
+  }
+  return (errorHandler as any)(error, request, reply);
+});
 
 // ─── Request Logging ─────────────────────────────────────────
 app.addHook('onResponse', requestLogger);
@@ -181,6 +214,7 @@ await app.register(gamificationRoutes);
 // ─── Graceful Shutdown ───────────────────────────────────────
 async function shutdown(signal: string) {
   app.log.info(`Received ${signal}, shutting down gracefully...`);
+  await Sentry.flush(2000).catch(() => {}); // Flush pending Sentry events
   await app.close();
   await db.destroy();
   redis.disconnect();

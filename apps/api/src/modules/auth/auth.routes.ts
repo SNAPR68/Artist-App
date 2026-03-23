@@ -2,13 +2,16 @@ import type { FastifyInstance } from 'fastify';
 import { authService } from './auth.service.js';
 import { generateOtpSchema, verifyOtpSchema, refreshTokenSchema } from '@artist-booking/shared';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
+import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
 
 export async function authRoutes(app: FastifyInstance) {
   /**
    * POST /v1/auth/otp/generate
    * Send OTP to phone number
    */
-  app.post('/v1/auth/otp/generate', async (request, reply) => {
+  app.post('/v1/auth/otp/generate', {
+    preHandler: [rateLimit('OTP_GENERATE')],
+  }, async (request, reply) => {
     const body = generateOtpSchema.parse(request.body);
 
     const result = await authService.generateOTP(body.phone);
@@ -27,7 +30,9 @@ export async function authRoutes(app: FastifyInstance) {
    * POST /v1/auth/otp/verify
    * Verify OTP and get tokens
    */
-  app.post('/v1/auth/otp/verify', async (request, reply) => {
+  app.post('/v1/auth/otp/verify', {
+    preHandler: [rateLimit('OTP_VERIFY')],
+  }, async (request, reply) => {
     const body = verifyOtpSchema.parse(request.body);
 
     const result = await authService.verifyOTP(body.phone, body.otp, body.role);

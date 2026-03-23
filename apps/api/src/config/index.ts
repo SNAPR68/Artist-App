@@ -67,6 +67,9 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default('Artist Booking <noreply@artistbooking.in>'),
 
+  // OTP Bypass (only enable in dev/staging, NEVER in production)
+  OTP_BYPASS_ENABLED: z.string().default('false'),
+
   // Sentry
   SENTRY_DSN: z.string().optional(),
   SENTRY_RELEASE: z.string().optional(),

@@ -22,6 +22,7 @@ function VerifyContent() {
   const [selectedRole, setSelectedRole] = useState<UserRole | undefined>();
   const [countdown, setCountdown] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [lastOtp, setLastOtp] = useState('');
 
   useEffect(() => {
     if (!phone) router.replace('/login');
@@ -38,6 +39,7 @@ function VerifyContent() {
 
   const handleOTPComplete = async (otp: string) => {
     setError('');
+    setLastOtp(otp);
     try {
       await verifyOTP(phone, otp, selectedRole);
 
@@ -103,10 +105,21 @@ function VerifyContent() {
         </div>
 
         <div className="text-center mb-8 animate-fade-in-up" style={{ animationDelay: '0.28s' }}>
-          <h1 className="text-h3 font-heading font-bold text-text-primary mb-2">{t('auth.verifyOtp')}</h1>
+          <h1 className="text-h3 font-heading font-bold text-text-primary mb-2">
+            {isNewUser ? t('auth.selectRole') : t('auth.verifyOtp')}
+          </h1>
           <p className="text-sm text-text-muted">
-            {t('auth.enterOtp')}{' '}
-            <span className="font-medium text-text-secondary">+91 {maskedPhone}</span>
+            {isNewUser ? (
+              <span className="flex items-center justify-center gap-1.5">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-500/20 text-green-400">✓</span>
+                {t('auth.otpVerified') || 'OTP verified'} · +91 {maskedPhone}
+              </span>
+            ) : (
+              <>
+                {t('auth.enterOtp')}{' '}
+                <span className="font-medium text-text-secondary">+91 {maskedPhone}</span>
+              </>
+            )}
           </p>
         </div>
 
@@ -134,27 +147,53 @@ function VerifyContent() {
         )}
 
         <div className="flex flex-col items-center space-y-4 animate-fade-in-up" style={{ animationDelay: '0.44s' }}>
-          <OTPInput
-            onComplete={handleOTPComplete}
-            error={error}
-            disabled={isLoading}
-          />
-
-          <div className="text-center">
-            {canResend ? (
-              <button
-                onClick={handleResend}
+          {isNewUser ? (
+            <>
+              {selectedRole && (
+                <button
+                  onClick={() => handleOTPComplete(lastOtp)}
+                  disabled={isLoading}
+                  className="w-full py-3 px-6 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition-all active:scale-[0.98] disabled:opacity-50 shadow-glow-sm"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      {t('auth.creatingAccount') || 'Creating account...'}
+                    </span>
+                  ) : (
+                    t('auth.createAccount') || 'Create Account'
+                  )}
+                </button>
+              )}
+              {error && (
+                <p className="text-sm text-red-400 text-center">{error}</p>
+              )}
+            </>
+          ) : (
+            <>
+              <OTPInput
+                onComplete={handleOTPComplete}
+                error={error}
                 disabled={isLoading}
-                className="text-sm text-primary-400 hover:text-primary-300 font-medium transition-colors disabled:opacity-50"
-              >
-                {t('auth.resendOtp')}
-              </button>
-            ) : (
-              <p className="text-sm text-text-muted">
-                {t('auth.resendIn')} <span className="text-text-secondary font-medium">{countdown}s</span>
-              </p>
-            )}
-          </div>
+              />
+
+              <div className="text-center">
+                {canResend ? (
+                  <button
+                    onClick={handleResend}
+                    disabled={isLoading}
+                    className="text-sm text-primary-400 hover:text-primary-300 font-medium transition-colors disabled:opacity-50"
+                  >
+                    {t('auth.resendOtp')}
+                  </button>
+                ) : (
+                  <p className="text-sm text-text-muted">
+                    {t('auth.resendIn')} <span className="text-text-secondary font-medium">{countdown}s</span>
+                  </p>
+                )}
+              </div>
+            </>
+          )}
 
           <button
             onClick={() => router.push('/login')}
