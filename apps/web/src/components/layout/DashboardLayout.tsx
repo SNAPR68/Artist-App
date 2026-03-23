@@ -20,6 +20,7 @@ import {
   Search,
   Bell,
   LogOut,
+  DollarSign,
 } from 'lucide-react';
 
 interface NavItem {
@@ -58,11 +59,19 @@ const ADMIN_NAV: NavItem[] = [
   { href: '/admin', labelKey: 'nav.home', icon: <Home size={20} /> },
 ];
 
+const EVENT_COMPANY_NAV: NavItem[] = [
+  { href: '/event-company', labelKey: 'nav.home', icon: <Home size={20} /> },
+  { href: '/client/bookings', labelKey: 'nav.bookings', icon: <Calendar size={20} /> },
+  { href: '/client/workspace', labelKey: 'nav.workspace', icon: <Building2 size={20} /> },
+  { href: '/client/payments', labelKey: 'nav.payments', icon: <DollarSign size={20} /> },
+  { href: '/search', labelKey: 'nav.search', icon: <Search size={20} /> },
+];
+
 function getNavItems(role?: string): NavItem[] {
   switch (role) {
     case 'artist': return ARTIST_NAV;
-    case 'client':
-    case 'event_company': return CLIENT_NAV;
+    case 'event_company': return EVENT_COMPANY_NAV;
+    case 'client': return CLIENT_NAV;
     case 'agent': return AGENT_NAV;
     case 'admin': return ADMIN_NAV;
     default: return ARTIST_NAV;
@@ -72,8 +81,8 @@ function getNavItems(role?: string): NavItem[] {
 function getHomeHref(role?: string): string {
   switch (role) {
     case 'artist': return '/artist';
-    case 'client':
-    case 'event_company': return '/client';
+    case 'event_company': return '/event-company';
+    case 'client': return '/client';
     case 'agent': return '/agent';
     case 'admin': return '/admin';
     default: return '/';

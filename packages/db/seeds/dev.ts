@@ -327,7 +327,7 @@ export async function seed(knex: Knex): Promise<void> {
             event_type: 'state_transition',
             from_state: prevState,
             to_state: stateOrder[s],
-            triggered_by: s < 2 ? clientUser.userId : (s === 2 ? artist.userId : 'system'),
+            triggered_by: s < 2 ? clientUser.userId : (s === 2 ? artist.userId : clientUser.userId),
             metadata: JSON.stringify({}),
             created_at: new Date(createdAt.getTime() + s * 3600000),
           });

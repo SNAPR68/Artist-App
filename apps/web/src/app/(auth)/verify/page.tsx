@@ -48,8 +48,8 @@ function VerifyContent() {
         // New users always go to onboarding regardless of redirect param
         switch (currentUser.role) {
           case UserRole.ARTIST: router.push('/artist/onboarding'); break;
-          case UserRole.CLIENT:
-          case UserRole.EVENT_COMPANY: router.push('/client/onboarding'); break;
+          case UserRole.EVENT_COMPANY: router.push('/event-company/onboarding'); break;
+          case UserRole.CLIENT: router.push('/client/onboarding'); break;
           case UserRole.AGENT: router.push('/agent/onboarding'); break;
           default: router.push('/');
         }
@@ -60,8 +60,8 @@ function VerifyContent() {
         // Returning user — go to role dashboard
         switch (currentUser?.role) {
           case UserRole.ARTIST: router.push('/artist'); break;
-          case UserRole.CLIENT:
-          case UserRole.EVENT_COMPANY: router.push('/client'); break;
+          case UserRole.EVENT_COMPANY: router.push('/event-company'); break;
+          case UserRole.CLIENT: router.push('/client'); break;
           case UserRole.AGENT: router.push('/agent'); break;
           case UserRole.ADMIN: router.push('/admin'); break;
           default: router.push('/');
