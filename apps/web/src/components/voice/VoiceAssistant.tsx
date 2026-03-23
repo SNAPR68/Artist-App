@@ -516,7 +516,7 @@ export function VoiceAssistant() {
             {/* Label */}
             <div className="flex flex-col min-w-0">
               <span className="text-sm font-semibold text-text-primary leading-tight">Voice Assistant</span>
-              <span className="text-[10px] text-text-muted leading-tight">{user ? 'Ask or speak for anything' : 'Ask or speak to find artists'}</span>
+              <span className="text-[10px] text-text-muted leading-tight">Ask or speak for anything</span>
             </div>
             {/* Online dot */}
             <span className="relative flex h-2 w-2 shrink-0 ml-1">
