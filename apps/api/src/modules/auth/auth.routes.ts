@@ -3,6 +3,8 @@ import { authService } from './auth.service.js';
 import { generateOtpSchema, verifyOtpSchema, refreshTokenSchema } from '@artist-booking/shared';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
+import { db } from '../../infrastructure/database.js';
+import { redis } from '../../infrastructure/redis.js';
 
 export async function authRoutes(app: FastifyInstance) {
   /**
@@ -85,6 +87,59 @@ export async function authRoutes(app: FastifyInstance) {
     return reply.status(200).send({
       success: true,
       data: { message: 'Logged out successfully' },
+      errors: [],
+    });
+  });
+
+  /**
+   * DELETE /v1/auth/account
+   * GDPR: Soft-delete user account, anonymize PII, revoke all tokens
+   */
+  app.delete('/v1/auth/account', {
+    preHandler: [authMiddleware, rateLimit('WRITE')],
+  }, async (request, reply) => {
+    const userId = request.user!.user_id;
+
+    await db.transaction(async (trx) => {
+      // Soft-delete user and anonymize PII
+      await trx('users')
+        .where({ id: userId })
+        .update({
+          deleted_at: trx.fn.now(),
+          phone_encrypted: 'DELETED',
+          phone_hash: 'DELETED',
+          full_name: 'Deleted User',
+          email: null,
+          is_active: false,
+        });
+
+      // Soft-delete artist profile if exists
+      await trx('artist_profiles')
+        .where({ user_id: userId })
+        .update({
+          deleted_at: trx.fn.now(),
+          stage_name: 'Deleted Artist',
+          bio: null,
+          base_city: null,
+        });
+
+      // Revoke all refresh tokens
+      await trx('refresh_tokens')
+        .where({ user_id: userId })
+        .update({ revoked_at: trx.fn.now() });
+    });
+
+    // Clear any cached data
+    try {
+      const artistProfile = await db('artist_profiles').where({ user_id: userId }).first();
+      if (artistProfile) {
+        await redis.del(`artist:profile:${artistProfile.id}`);
+      }
+    } catch {}
+
+    return reply.status(200).send({
+      success: true,
+      data: { message: 'Account deleted successfully. Your data has been anonymized.' },
       errors: [],
     });
   });

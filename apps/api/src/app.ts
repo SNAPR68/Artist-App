@@ -2,6 +2,8 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import compress from '@fastify/compress';
 import helmet from '@fastify/helmet';
+import swagger from '@fastify/swagger';
+import swaggerUi from '@fastify/swagger-ui';
 import * as Sentry from '@sentry/node';
 import { config } from './config/index.js';
 import { checkDatabaseHealth } from './infrastructure/database.js';
@@ -81,6 +83,38 @@ await app.register(helmet, {
 });
 
 await app.register(compress, { global: true });
+
+// ─── API Documentation (Swagger) ────────────────────────────
+await app.register(swagger, {
+  openapi: {
+    info: {
+      title: 'Artist Booking Platform API',
+      description: 'API for booking live entertainment artists for events',
+      version: '1.0.0',
+    },
+    servers: [
+      { url: 'https://artist-booking-api.onrender.com', description: 'Production' },
+      { url: 'http://localhost:3000', description: 'Local Development' },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+  },
+});
+
+await app.register(swaggerUi, {
+  routePrefix: '/docs',
+  uiConfig: {
+    docExpansion: 'list',
+    deepLinking: true,
+  },
+});
 
 // ─── Sentry Error Tracking ──────────────────────────────────
 if (config.SENTRY_DSN) {

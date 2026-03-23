@@ -9,6 +9,7 @@ import { SessionExpiredModal } from '@/components/SessionExpiredModal';
 import { VoiceAssistant } from '@/components/voice/VoiceAssistant';
 import { AnalyticsProvider } from '@/components/AnalyticsProvider';
 import { PushNotificationPrompt } from '@/components/PushNotificationPrompt';
+import { CookieConsent } from '@/components/CookieConsent';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -98,6 +99,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
               <VoiceAssistant />
               <PushNotificationPrompt />
+              <CookieConsent />
             </ToastProvider>
           </I18nProvider>
         </ErrorBoundary>

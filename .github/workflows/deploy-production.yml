@@ -53,10 +53,35 @@ jobs:
       - name: Smoke tests
         env:
           API_URL: ${{ vars.PRODUCTION_API_URL }}
+          WEB_URL: ${{ vars.PRODUCTION_WEB_URL }}
         run: |
           sleep 10
           curl -sf "$API_URL/health" | grep -q '"ok"'
-          echo "Production smoke tests passed"
+          echo "API health check passed"
+
+      - name: Health check Web
+        env:
+          WEB_URL: ${{ vars.PRODUCTION_WEB_URL }}
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${WEB_URL:-https://artist-booking-web.vercel.app}")
+          if [ "$STATUS" != "200" ]; then echo "Web health check failed: $STATUS"; exit 1; fi
+          echo "Web health check passed"
+
+      - name: Search endpoint check
+        env:
+          API_URL: ${{ vars.PRODUCTION_API_URL }}
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${API_URL:-https://artist-booking-api.onrender.com}/v1/search/artists")
+          if [ "$STATUS" != "200" ]; then echo "Search check failed: $STATUS"; exit 1; fi
+          echo "Search endpoint check passed"
+
+      - name: API version check
+        env:
+          API_URL: ${{ vars.PRODUCTION_API_URL }}
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${API_URL:-https://artist-booking-api.onrender.com}/v1")
+          if [ "$STATUS" != "200" ]; then echo "API version check failed: $STATUS"; exit 1; fi
+          echo "All smoke tests passed"
 
   # Frontend auto-deploys via Vercel Git integration
   # Vercel watches 'main' branch for production deployments

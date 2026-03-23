@@ -51,4 +51,30 @@ export const analytics = {
     if (!initialized) return;
     posthog.reset();
   },
+
+  /**
+   * Check if a feature flag is enabled for the current user.
+   * Returns false if PostHog is not initialized or the flag doesn't exist.
+   */
+  isFeatureEnabled(flagName: string): boolean {
+    if (!initialized) return false;
+    return posthog.isFeatureEnabled(flagName) ?? false;
+  },
+
+  /**
+   * Get the value of a feature flag (for multivariate flags).
+   * Returns undefined if PostHog is not initialized.
+   */
+  getFeatureFlag(flagName: string): string | boolean | undefined {
+    if (!initialized) return undefined;
+    return posthog.getFeatureFlag(flagName) ?? undefined;
+  },
+
+  /**
+   * Reload feature flags from PostHog (e.g., after user identification).
+   */
+  reloadFeatureFlags() {
+    if (!initialized) return;
+    posthog.reloadFeatureFlags();
+  },
 };
