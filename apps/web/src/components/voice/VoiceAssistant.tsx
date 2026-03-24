@@ -724,7 +724,7 @@ export function VoiceAssistant() {
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
                   placeholder="Ask anything — search, navigate, book..."
-                  className="flex-1 bg-surface-elevated border border-glass-border rounded-pill px-4 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
+                  className="flex-1 bg-white border border-neutral-200 rounded-pill px-4 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
                   disabled={state !== 'idle'}
                 />
                 <button
