@@ -19,10 +19,10 @@ const ToastContext = createContext<ToastContextType>({ addToast: () => {} });
 export const useToast = () => useContext(ToastContext);
 
 const TOAST_COLORS: Record<ToastType, string> = {
-  success: 'bg-green-500 text-white',
-  error: 'bg-red-500 text-white',
-  info: 'bg-blue-500 text-white',
-  warning: 'bg-yellow-500 text-gray-900',
+  success: 'glass-card border-l-4 border-nocturne-success text-nocturne-text-primary',
+  error: 'glass-card border-l-4 border-nocturne-error text-nocturne-text-primary',
+  info: 'glass-card border-l-4 border-nocturne-info text-nocturne-text-primary',
+  warning: 'glass-card border-l-4 border-nocturne-warning text-nocturne-text-primary',
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {

@@ -18,36 +18,36 @@ function formatINR(paise: number) {
 
 export function QuoteBreakdown({ breakdown }: QuoteBreakdownProps) {
   return (
-    <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+    <div className="bg-nocturne-surface-2 rounded-lg p-4 space-y-2 text-sm border border-nocturne-border">
       <div className="flex justify-between">
-        <span className="text-gray-600">Base Fee</span>
-        <span className="font-medium">{formatINR(breakdown.base_amount_paise)}</span>
+        <span className="text-nocturne-text-secondary">Base Fee</span>
+        <span className="font-medium text-nocturne-text-primary">{formatINR(breakdown.base_amount_paise)}</span>
       </div>
       {breakdown.travel_surcharge_paise > 0 && (
         <div className="flex justify-between">
-          <span className="text-gray-600">Travel Surcharge</span>
-          <span className="font-medium">{formatINR(breakdown.travel_surcharge_paise)}</span>
+          <span className="text-nocturne-text-secondary">Travel Surcharge</span>
+          <span className="font-medium text-nocturne-text-primary">{formatINR(breakdown.travel_surcharge_paise)}</span>
         </div>
       )}
       <div className="flex justify-between">
-        <span className="text-gray-600">Platform Fee (10%)</span>
-        <span className="font-medium">{formatINR(breakdown.platform_fee_paise)}</span>
+        <span className="text-nocturne-text-secondary">Platform Fee (10%)</span>
+        <span className="font-medium text-nocturne-text-primary">{formatINR(breakdown.platform_fee_paise)}</span>
       </div>
       <div className="flex justify-between">
-        <span className="text-gray-600">GST on Platform Fee (18%)</span>
-        <span className="font-medium">{formatINR(breakdown.gst_on_platform_fee_paise)}</span>
+        <span className="text-nocturne-text-secondary">GST on Platform Fee (18%)</span>
+        <span className="font-medium text-nocturne-text-primary">{formatINR(breakdown.gst_on_platform_fee_paise)}</span>
       </div>
-      <hr className="border-gray-200" />
-      <div className="flex justify-between font-semibold text-gray-900">
+      <hr className="border-nocturne-border" />
+      <div className="flex justify-between font-semibold text-nocturne-text-primary">
         <span>Total (Client Pays)</span>
         <span>{formatINR(breakdown.total_client_pays_paise)}</span>
       </div>
-      <hr className="border-gray-200" />
-      <div className="flex justify-between text-gray-500 text-xs">
+      <hr className="border-nocturne-border" />
+      <div className="flex justify-between text-nocturne-text-secondary text-xs">
         <span>TDS Deducted (10% Sec 194J)</span>
         <span>-{formatINR(breakdown.tds_paise)}</span>
       </div>
-      <div className="flex justify-between text-green-700 font-medium">
+      <div className="flex justify-between text-nocturne-success font-medium">
         <span>Artist Receives</span>
         <span>{formatINR(breakdown.artist_receives_paise)}</span>
       </div>

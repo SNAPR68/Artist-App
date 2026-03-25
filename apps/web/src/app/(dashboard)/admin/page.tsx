@@ -223,23 +223,23 @@ export default function AdminDashboardPage() {
     <ErrorBoundary>
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-text-primary flex items-center gap-2">
-          <Shield size={32} className="text-primary-400" />
+        <h1 className="text-3xl font-bold text-nocturne-text-primary flex items-center gap-2">
+          <Shield size={32} className="text-nocturne-accent" />
           Admin Dashboard
         </h1>
-        <p className="text-text-muted mt-1">Platform oversight and management tools</p>
+        <p className="text-nocturne-text-secondary mt-1">Platform oversight and management tools</p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="glass-card glass-border rounded-xl p-1 w-fit">
+      <div className="glass-card border-nocturne-border rounded-xl p-1 w-fit">
         {(['overview', 'bookings', 'users', 'payments', 'disputes', 'venues', 'intelligence'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`px-4 py-2.5 text-sm rounded-lg capitalize font-medium transition-all ${
               tab === t
-                ? 'bg-gradient-accent text-white shadow-glow-sm'
-                : 'text-text-secondary hover:text-text-primary'
+                ? 'bg-nocturne-primary-light text-nocturne-accent shadow-nocturne-glow-sm'
+                : 'text-nocturne-text-secondary hover:text-nocturne-text-primary'
             }`}
           >
             {t}
@@ -249,7 +249,7 @@ export default function AdminDashboardPage() {
 
       {loading && (
         <div className="flex items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-nocturne-accent" />
         </div>
       )}
 
@@ -268,13 +268,13 @@ export default function AdminDashboardPage() {
             ].map((s) => {
               const Icon = s.icon;
               return (
-                <div key={s.label} className={`glass-card glass-border rounded-xl p-5 bg-gradient-to-br ${s.color} group hover-glow transition-all`}>
+                <div key={s.label} className={`glass-card border-nocturne-border rounded-xl p-5 bg-gradient-to-br ${s.color} group hover-glow transition-all`}>
                   <div className="flex items-start justify-between mb-3">
-                    <Icon size={20} className="text-primary-400 group-hover:scale-110 transition-transform" />
+                    <Icon size={20} className="text-nocturne-accent group-hover:scale-110 transition-transform" />
                   </div>
-                  <p className="text-xs text-text-muted uppercase font-semibold tracking-wide">{s.label}</p>
-                  <p className={`text-3xl font-bold mt-2 ${s.valueColor ?? 'text-text-primary'}`}>{s.value}</p>
-                  {s.sub && <p className="text-xs text-text-secondary mt-2">{s.sub}</p>}
+                  <p className="text-xs text-nocturne-text-secondary uppercase font-semibold tracking-wide">{s.label}</p>
+                  <p className={`text-3xl font-bold mt-2 ${s.valueColor ?? 'text-nocturne-text-primary'}`}>{s.value}</p>
+                  {s.sub && <p className="text-xs text-nocturne-text-secondary mt-2">{s.sub}</p>}
                 </div>
               );
             })}
@@ -292,8 +292,8 @@ export default function AdminDashboardPage() {
                 onClick={() => setStatusFilter(s)}
                 className={`px-3 py-1.5 text-xs rounded-pill font-medium transition-all ${
                   statusFilter === s
-                    ? 'bg-gradient-accent text-white shadow-glow-sm'
-                    : 'glass-card glass-border text-text-secondary hover:text-text-primary'
+                    ? 'bg-nocturne-primary-light text-nocturne-accent shadow-nocturne-glow-sm'
+                    : 'glass-card border-nocturne-border text-nocturne-text-secondary hover:text-nocturne-text-primary'
                 }`}
               >
                 {s === 'all' ? 'All' : s.replace('_', ' ')}
@@ -302,30 +302,30 @@ export default function AdminDashboardPage() {
             ))}
           </div>
 
-          <div className="glass-card glass-border rounded-xl overflow-hidden">
+          <div className="glass-card border-nocturne-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
+                <thead className="bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface border-b border-nocturne-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Booking ID</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Artist</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Event</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Date</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Amount</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Booking ID</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Artist</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Event</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Date</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Amount</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {filteredBookings.length === 0 ? (
-                    <tr><td colSpan={6} className="px-4 py-8 text-center text-text-muted">No bookings found</td></tr>
+                    <tr><td colSpan={6} className="px-4 py-8 text-center text-nocturne-text-secondary">No bookings found</td></tr>
                   ) : (
                     filteredBookings.map((b) => (
-                      <tr key={b.id} className="hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-3 font-mono text-xs text-text-muted">{b.id.slice(0, 8)}...</td>
-                        <td className="px-4 py-3 text-text-primary font-medium">{b.artist_stage_name ?? '-'}</td>
-                        <td className="px-4 py-3 text-text-secondary">{b.event_type} · {b.event_city}</td>
-                        <td className="px-4 py-3 text-text-secondary">{new Date(b.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
-                        <td className="px-4 py-3 text-text-primary font-semibold">{b.final_amount_paise ? `₹${formatINR(b.final_amount_paise)}` : '-'}</td>
+                      <tr key={b.id} className="hover:bg-nocturne-surface/5 transition-colors">
+                        <td className="px-4 py-3 font-mono text-xs text-nocturne-text-secondary">{b.id.slice(0, 8)}...</td>
+                        <td className="px-4 py-3 text-nocturne-text-primary font-medium">{b.artist_stage_name ?? '-'}</td>
+                        <td className="px-4 py-3 text-nocturne-text-secondary">{b.event_type} · {b.event_city}</td>
+                        <td className="px-4 py-3 text-nocturne-text-secondary">{new Date(b.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
+                        <td className="px-4 py-3 text-nocturne-text-primary font-semibold">{b.final_amount_paise ? `₹${formatINR(b.final_amount_paise)}` : '-'}</td>
                         <td className="px-4 py-3">
                           <span className={`text-xs px-3 py-1 rounded-pill font-medium ${STATUS_COLORS[b.status] ?? 'bg-gray-100/20 text-gray-400 border border-gray-400/30'}`}>
                             {b.status.replace('_', ' ')}
@@ -351,8 +351,8 @@ export default function AdminDashboardPage() {
                 onClick={() => setRoleFilter(r)}
                 className={`px-3 py-1.5 text-xs rounded-pill font-medium transition-all ${
                   roleFilter === r
-                    ? 'bg-gradient-accent text-white shadow-glow-sm'
-                    : 'glass-card glass-border text-text-secondary hover:text-text-primary'
+                    ? 'bg-nocturne-primary-light text-nocturne-accent shadow-nocturne-glow-sm'
+                    : 'glass-card border-nocturne-border text-nocturne-text-secondary hover:text-nocturne-text-primary'
                 }`}
               >
                 {r === 'all' ? 'All Roles' : r.replace('_', ' ')}
@@ -360,37 +360,37 @@ export default function AdminDashboardPage() {
             ))}
           </div>
 
-          <div className="glass-card glass-border rounded-xl overflow-hidden">
+          <div className="glass-card border-nocturne-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
+                <thead className="bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface border-b border-nocturne-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Name</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Role</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">City</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Trust / Bookings</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Status</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Joined</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Actions</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Name</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Role</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">City</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Trust / Bookings</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Joined</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {users.length === 0 ? (
-                    <tr><td colSpan={7} className="px-4 py-8 text-center text-text-muted">No users found</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-8 text-center text-nocturne-text-secondary">No users found</td></tr>
                   ) : (
                     users.map((u) => (
-                      <tr key={u.id} className="hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-3 text-text-primary font-medium">
+                      <tr key={u.id} className="hover:bg-nocturne-surface/5 transition-colors">
+                        <td className="px-4 py-3 text-nocturne-text-primary font-medium">
                           {u.stage_name || u.company_name || u.id.slice(0, 8)}
                           {u.is_verified && <span className="ml-2 text-xs px-2 py-1 rounded-pill bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Verified</span>}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-xs px-2 py-1 rounded-pill bg-primary-500/20 text-primary-300 border border-primary-400/30 font-medium capitalize">
+                          <span className="text-xs px-2 py-1 rounded-pill bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium capitalize">
                             {u.role?.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-text-secondary">{u.base_city ?? '-'}</td>
-                        <td className="px-4 py-3 text-text-secondary font-medium">
+                        <td className="px-4 py-3 text-nocturne-text-secondary">{u.base_city ?? '-'}</td>
+                        <td className="px-4 py-3 text-nocturne-text-secondary font-medium">
                           {u.role === 'artist' ? `${u.trust_score ?? 0}% / ${u.total_bookings ?? 0}` : '-'}
                         </td>
                         <td className="px-4 py-3">
@@ -398,7 +398,7 @@ export default function AdminDashboardPage() {
                             {u.is_active ? 'Active' : 'Suspended'}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-text-muted">
+                        <td className="px-4 py-3 text-xs text-nocturne-text-secondary">
                           {new Date(u.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                         </td>
                         <td className="px-4 py-3">
@@ -445,32 +445,32 @@ export default function AdminDashboardPage() {
           {paymentStats && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="glass-card glass-border rounded-xl p-5 bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
+                <div className="glass-card border-nocturne-border rounded-xl p-5 bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
                   <div className="flex items-start justify-between mb-3">
-                    <CreditCard size={20} className="text-primary-400" />
+                    <CreditCard size={20} className="text-nocturne-accent" />
                   </div>
-                  <p className="text-xs text-text-muted uppercase font-semibold tracking-wide">Total Payments</p>
-                  <p className="text-3xl font-bold text-text-primary mt-2">{paymentStats.total_count}</p>
+                  <p className="text-xs text-nocturne-text-secondary uppercase font-semibold tracking-wide">Total Payments</p>
+                  <p className="text-3xl font-bold text-nocturne-text-primary mt-2">{paymentStats.total_count}</p>
                 </div>
-                <div className="glass-card glass-border rounded-xl p-5 bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                <div className="glass-card border-nocturne-border rounded-xl p-5 bg-gradient-to-br from-purple-500/20 to-pink-500/20">
                   <div className="flex items-start justify-between mb-3">
-                    <BarChart3 size={20} className="text-primary-400" />
+                    <BarChart3 size={20} className="text-nocturne-accent" />
                   </div>
-                  <p className="text-xs text-text-muted uppercase font-semibold tracking-wide">Total Volume</p>
-                  <p className="text-3xl font-bold text-text-primary mt-2">₹{formatINR(paymentStats.total_amount_paise)}</p>
+                  <p className="text-xs text-nocturne-text-secondary uppercase font-semibold tracking-wide">Total Volume</p>
+                  <p className="text-3xl font-bold text-nocturne-text-primary mt-2">₹{formatINR(paymentStats.total_amount_paise)}</p>
                 </div>
-                <div className="glass-card glass-border rounded-xl p-5 bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
+                <div className="glass-card border-nocturne-border rounded-xl p-5 bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
                   <div className="flex items-start justify-between mb-3">
                     <CreditCard size={20} className="text-emerald-400" />
                   </div>
-                  <p className="text-xs text-text-muted uppercase font-semibold tracking-wide">Platform Revenue</p>
+                  <p className="text-xs text-nocturne-text-secondary uppercase font-semibold tracking-wide">Platform Revenue</p>
                   <p className="text-3xl font-bold text-emerald-300 mt-2">₹{formatINR(paymentStats.total_platform_fee_paise)}</p>
                 </div>
-                <div className="glass-card glass-border rounded-xl p-5 bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                <div className="glass-card border-nocturne-border rounded-xl p-5 bg-gradient-to-br from-amber-500/20 to-orange-500/20">
                   <div className="flex items-start justify-between mb-3">
                     <BarChart3 size={20} className="text-amber-400" />
                   </div>
-                  <p className="text-xs text-text-muted uppercase font-semibold tracking-wide">Refunded</p>
+                  <p className="text-xs text-nocturne-text-secondary uppercase font-semibold tracking-wide">Refunded</p>
                   <p className="text-3xl font-bold text-amber-300 mt-2">₹{formatINR(paymentStats.refunded_amount_paise)}</p>
                 </div>
               </div>
@@ -489,37 +489,37 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
-          <div className="glass-card glass-border rounded-xl overflow-hidden">
+          <div className="glass-card border-nocturne-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
+                <thead className="bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface border-b border-nocturne-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Payment ID</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Artist</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Client</th>
-                    <th className="text-right px-4 py-3 font-semibold text-text-primary">Amount</th>
-                    <th className="text-right px-4 py-3 font-semibold text-text-primary">Platform Fee</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Status</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Date</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Payment ID</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Artist</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Client</th>
+                    <th className="text-right px-4 py-3 font-semibold text-nocturne-text-primary">Amount</th>
+                    <th className="text-right px-4 py-3 font-semibold text-nocturne-text-primary">Platform Fee</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {payments.length === 0 ? (
-                    <tr><td colSpan={7} className="px-4 py-8 text-center text-text-muted">No payments yet</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-8 text-center text-nocturne-text-secondary">No payments yet</td></tr>
                   ) : (
                     payments.map((p) => (
-                      <tr key={p.id} className="hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-3 font-mono text-xs text-text-muted">{p.id.slice(0, 8)}...</td>
-                        <td className="px-4 py-3 text-text-primary font-medium">{p.artist_name ?? '-'}</td>
-                        <td className="px-4 py-3 text-text-secondary">{p.client_name ?? '-'}</td>
-                        <td className="px-4 py-3 text-right text-text-primary font-semibold">₹{formatINR(p.amount_paise)}</td>
+                      <tr key={p.id} className="hover:bg-nocturne-surface/5 transition-colors">
+                        <td className="px-4 py-3 font-mono text-xs text-nocturne-text-secondary">{p.id.slice(0, 8)}...</td>
+                        <td className="px-4 py-3 text-nocturne-text-primary font-medium">{p.artist_name ?? '-'}</td>
+                        <td className="px-4 py-3 text-nocturne-text-secondary">{p.client_name ?? '-'}</td>
+                        <td className="px-4 py-3 text-right text-nocturne-text-primary font-semibold">₹{formatINR(p.amount_paise)}</td>
                         <td className="px-4 py-3 text-right text-emerald-300 font-semibold">₹{formatINR(p.platform_fee_paise)}</td>
                         <td className="px-4 py-3">
                           <span className={`text-xs px-3 py-1 rounded-pill font-medium ${STATUS_COLORS[p.status] ?? 'bg-gray-100/20 text-gray-400 border border-gray-400/30'}`}>
                             {p.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-text-muted">
+                        <td className="px-4 py-3 text-xs text-nocturne-text-secondary">
                           {new Date(p.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                         </td>
                       </tr>
@@ -535,24 +535,24 @@ export default function AdminDashboardPage() {
       {/* Disputes Tab */}
       {!loading && tab === 'disputes' && (
         <div className="space-y-4">
-          <div className="glass-card glass-border rounded-xl overflow-hidden">
+          <div className="glass-card border-nocturne-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
+                <thead className="bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface border-b border-nocturne-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Reason</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Status</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Created</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Actions</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Reason</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Created</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {disputes.length === 0 ? (
-                    <tr><td colSpan={4} className="px-4 py-8 text-center text-text-muted">No disputes found</td></tr>
+                    <tr><td colSpan={4} className="px-4 py-8 text-center text-nocturne-text-secondary">No disputes found</td></tr>
                   ) : (
                     disputes.map((d) => (
-                      <tr key={d.id} className="hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-3 text-text-primary">
+                      <tr key={d.id} className="hover:bg-nocturne-surface/5 transition-colors">
+                        <td className="px-4 py-3 text-nocturne-text-primary">
                           {d.reason.length > 100 ? `${d.reason.slice(0, 100)}...` : d.reason}
                         </td>
                         <td className="px-4 py-3">
@@ -567,16 +567,16 @@ export default function AdminDashboardPage() {
                             {d.status.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-text-muted">
+                        <td className="px-4 py-3 text-xs text-nocturne-text-secondary">
                           {new Date(d.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                         </td>
                         <td className="px-4 py-3">
                           {resolvingDispute === d.id ? (
-                            <div className="space-y-2 bg-surface-bg p-3 rounded-lg border glass-border">
+                            <div className="space-y-2 bg-surface-bg p-3 rounded-lg border border-nocturne-border">
                               <select
                                 value={resolveForm.resolution}
                                 onChange={(e) => setResolveForm((f) => ({ ...f, resolution: e.target.value }))}
-                                className="block w-full text-xs bg-surface-card border glass-border rounded px-2 py-1.5 text-text-primary"
+                                className="block w-full text-xs bg-surface-card border border-nocturne-border rounded px-2 py-1.5 text-nocturne-text-primary"
                               >
                                 <option value="upheld">Upheld</option>
                                 <option value="overturned">Overturned</option>
@@ -586,7 +586,7 @@ export default function AdminDashboardPage() {
                                 value={resolveForm.admin_notes}
                                 onChange={(e) => setResolveForm((f) => ({ ...f, admin_notes: e.target.value }))}
                                 placeholder="Admin notes..."
-                                className="block w-full text-xs bg-surface-card border glass-border rounded px-2 py-1.5 h-16 resize-none text-text-primary placeholder-text-muted"
+                                className="block w-full text-xs bg-surface-card border border-nocturne-border rounded px-2 py-1.5 h-16 resize-none text-nocturne-text-primary placeholder-text-muted"
                               />
                               <div className="flex gap-2">
                                 <button
@@ -609,7 +609,7 @@ export default function AdminDashboardPage() {
                                 </button>
                                 <button
                                   onClick={() => { setResolvingDispute(null); setResolveForm({ resolution: 'upheld', admin_notes: '' }); }}
-                                  className="text-xs px-2 py-1 rounded-lg border glass-border text-text-secondary hover:bg-white/10 font-medium"
+                                  className="text-xs px-2 py-1 rounded-lg border border-nocturne-border text-nocturne-text-secondary hover:bg-nocturne-surface/10 font-medium"
                                 >
                                   Cancel
                                 </button>
@@ -619,7 +619,7 @@ export default function AdminDashboardPage() {
                             <button
                               onClick={() => setResolvingDispute(d.id)}
                               disabled={d.status === 'upheld' || d.status === 'overturned' || d.status === 'dismissed'}
-                              className="text-xs px-2 py-1 rounded-lg border border-primary-400/30 text-primary-300 hover:bg-primary-500/10 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                              className="text-xs px-2 py-1 rounded-lg border border-nocturne-border-subtle text-nocturne-accent hover:bg-primary-500/10 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                             >
                               Resolve
                             </button>
@@ -638,33 +638,33 @@ export default function AdminDashboardPage() {
       {/* Venues Tab */}
       {!loading && tab === 'venues' && (
         <div className="space-y-4">
-          <div className="glass-card glass-border rounded-xl overflow-hidden">
+          <div className="glass-card border-nocturne-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
+                <thead className="bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface border-b border-nocturne-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Name</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">City</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Type</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Capacity</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Actions</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Name</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">City</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Type</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Capacity</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {venues.length === 0 ? (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-text-muted">No venues found</td></tr>
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-nocturne-text-secondary">No venues found</td></tr>
                   ) : (
                     venues.map((v) => (
                       <Fragment key={v.id}>
-                        <tr className="hover:bg-white/5 transition-colors">
-                          <td className="px-4 py-3 text-text-primary font-medium">{v.name}</td>
-                          <td className="px-4 py-3 text-text-secondary">{v.city}</td>
+                        <tr className="hover:bg-nocturne-surface/5 transition-colors">
+                          <td className="px-4 py-3 text-nocturne-text-primary font-medium">{v.name}</td>
+                          <td className="px-4 py-3 text-nocturne-text-secondary">{v.city}</td>
                           <td className="px-4 py-3">
-                            <span className="text-xs px-2 py-1 rounded-pill bg-primary-500/20 text-primary-300 border border-primary-400/30 font-medium">
+                            <span className="text-xs px-2 py-1 rounded-pill bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium">
                               {v.venue_type?.replace('_', ' ') ?? '-'}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-text-secondary">{v.capacity?.toLocaleString() ?? '-'}</td>
+                          <td className="px-4 py-3 text-nocturne-text-secondary">{v.capacity?.toLocaleString() ?? '-'}</td>
                           <td className="px-4 py-3">
                             <button
                               onClick={async () => {
@@ -679,7 +679,7 @@ export default function AdminDashboardPage() {
                                 setActionLoading(null);
                               }}
                               disabled={actionLoading === v.id}
-                              className="text-xs px-2 py-1 rounded-lg border border-primary-400/30 text-primary-300 hover:bg-primary-500/10 disabled:opacity-50 font-medium"
+                              className="text-xs px-2 py-1 rounded-lg border border-nocturne-border-subtle text-nocturne-accent hover:bg-primary-500/10 disabled:opacity-50 font-medium"
                             >
                               {actionLoading === v.id ? 'Loading...' : expandedVenue === v.id ? 'Hide Issues' : 'View Issues'}
                             </button>
@@ -687,24 +687,24 @@ export default function AdminDashboardPage() {
                         </tr>
                         {expandedVenue === v.id && (
                           <tr key={`${v.id}-issues`}>
-                            <td colSpan={5} className="px-4 py-3 bg-white/5">
+                            <td colSpan={5} className="px-4 py-3 bg-nocturne-surface/5">
                               {venueIssues.length === 0 ? (
-                                <p className="text-sm text-text-muted">No issues reported for this venue.</p>
+                                <p className="text-sm text-nocturne-text-secondary">No issues reported for this venue.</p>
                               ) : (
                                 <div className="space-y-2">
                                   {venueIssues.map((issue) => (
-                                    <div key={issue.id} className="flex items-start justify-between glass-card glass-border rounded-lg p-3">
+                                    <div key={issue.id} className="flex items-start justify-between glass-card border-nocturne-border rounded-lg p-3">
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <span className="text-xs px-2 py-1 rounded-pill bg-primary-500/20 text-primary-300 border border-primary-400/30 font-medium">
+                                          <span className="text-xs px-2 py-1 rounded-pill bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium">
                                             {issue.issue_type.replace('_', ' ')}
                                           </span>
                                           {issue.is_verified && (
                                             <span className="text-xs px-2 py-1 rounded-pill bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-medium">Verified</span>
                                           )}
                                         </div>
-                                        <p className="text-sm text-text-primary">{issue.description ?? 'No description'}</p>
-                                        <p className="text-xs text-text-muted">
+                                        <p className="text-sm text-nocturne-text-primary">{issue.description ?? 'No description'}</p>
+                                        <p className="text-xs text-nocturne-text-secondary">
                                           {new Date(issue.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                                         </p>
                                       </div>
@@ -746,30 +746,30 @@ export default function AdminDashboardPage() {
       {/* Intelligence Tab */}
       {!loading && tab === 'intelligence' && (
         <div className="space-y-6">
-          <h2 className="text-xl font-heading text-text-primary flex items-center gap-2">
-            <BarChart3 size={24} className="text-primary-400" />
+          <h2 className="text-xl font-display text-nocturne-text-primary flex items-center gap-2">
+            <BarChart3 size={24} className="text-nocturne-accent" />
             Seasonal Demand Overview
           </h2>
-          <div className="glass-card glass-border rounded-xl overflow-hidden">
+          <div className="glass-card border-nocturne-border rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 border-b glass-border">
+                <thead className="bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface border-b border-nocturne-border">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">City</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Month</th>
-                    <th className="text-left px-4 py-3 font-semibold text-text-primary">Classification</th>
-                    <th className="text-right px-4 py-3 font-semibold text-text-primary">Fill Rate %</th>
-                    <th className="text-right px-4 py-3 font-semibold text-text-primary">YoY Trend</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">City</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Month</th>
+                    <th className="text-left px-4 py-3 font-semibold text-nocturne-text-primary">Classification</th>
+                    <th className="text-right px-4 py-3 font-semibold text-nocturne-text-primary">Fill Rate %</th>
+                    <th className="text-right px-4 py-3 font-semibold text-nocturne-text-primary">YoY Trend</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {seasonalCurves.length === 0 ? (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-text-muted">No seasonal data available</td></tr>
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-nocturne-text-secondary">No seasonal data available</td></tr>
                   ) : (
                     seasonalCurves.map((c, i) => (
-                      <tr key={`${c.city}-${c.month}-${i}`} className="hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-3 text-text-primary font-medium">{c.city}</td>
-                        <td className="px-4 py-3 text-text-secondary">
+                      <tr key={`${c.city}-${c.month}-${i}`} className="hover:bg-nocturne-surface/5 transition-colors">
+                        <td className="px-4 py-3 text-nocturne-text-primary font-medium">{c.city}</td>
+                        <td className="px-4 py-3 text-nocturne-text-secondary">
                           {new Date(2024, c.month - 1).toLocaleString('en-IN', { month: 'long' })}
                         </td>
                         <td className="px-4 py-3">
@@ -783,7 +783,7 @@ export default function AdminDashboardPage() {
                             {c.demand_classification}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right text-text-primary font-semibold">
+                        <td className="px-4 py-3 text-right text-nocturne-text-primary font-semibold">
                           {(c.avg_fill_rate * 100).toFixed(1)}%
                         </td>
                         <td className="px-4 py-3 text-right font-semibold">
@@ -792,7 +792,7 @@ export default function AdminDashboardPage() {
                               {c.yoy_trend_pct >= 0 ? '↑' : '↓'} {Math.abs(c.yoy_trend_pct).toFixed(1)}%
                             </span>
                           ) : (
-                            <span className="text-text-muted">-</span>
+                            <span className="text-nocturne-text-secondary">-</span>
                           )}
                         </td>
                       </tr>
@@ -804,13 +804,13 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="glass-card glass-border rounded-xl p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10">
-              <h3 className="text-sm font-heading text-text-primary">Substitution Requests</h3>
-              <p className="text-xs text-text-muted mt-3">Coming soon</p>
+            <div className="glass-card border-nocturne-border rounded-xl p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10">
+              <h3 className="text-sm font-display text-nocturne-text-primary">Substitution Requests</h3>
+              <p className="text-xs text-nocturne-text-secondary mt-3">Coming soon</p>
             </div>
-            <div className="glass-card glass-border rounded-xl p-6 bg-gradient-to-br from-cyan-500/10 to-blue-500/10">
-              <h3 className="text-sm font-heading text-text-primary">Recommendation Stats</h3>
-              <p className="text-xs text-text-muted mt-3">Coming soon</p>
+            <div className="glass-card border-nocturne-border rounded-xl p-6 bg-gradient-to-br from-cyan-500/10 to-blue-500/10">
+              <h3 className="text-sm font-display text-nocturne-text-primary">Recommendation Stats</h3>
+              <p className="text-xs text-nocturne-text-secondary mt-3">Coming soon</p>
             </div>
           </div>
         </div>

@@ -177,8 +177,8 @@ export function SpinnerLoader({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
 
   return (
     <div className={`${sizeClass} relative`}>
-      <div className="absolute inset-0 rounded-full border-2 border-surface-300" />
-      <div className="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      <div className="absolute inset-0 rounded-full border-2 border-nocturne-surface-2" />
+      <div className="absolute inset-0 rounded-full border-2 border-nocturne-primary border-t-transparent animate-spin" />
     </div>
   );
 }

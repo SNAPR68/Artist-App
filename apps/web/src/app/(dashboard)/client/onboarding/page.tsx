@@ -90,29 +90,29 @@ export default function ClientOnboardingPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="theme-nocturne bg-nocturne-base min-h-screen max-w-2xl mx-auto">
       {/* Progress Bar */}
       <div className="mb-8">
-        <div className="flex justify-between text-sm text-gray-500 mb-2">
+        <div className="flex justify-between text-sm text-nocturne-text-secondary mb-2">
           {stepLabels.map((label, i) => (
             <span
               key={label}
-              className={`${i + 1 <= step ? 'text-primary-500 font-medium' : ''}`}
+              className={`${i + 1 <= step ? 'text-nocturne-accent font-medium' : ''}`}
             >
               {label}
             </span>
           ))}
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-nocturne-surface-2 rounded-full h-2">
           <div
-            className="bg-primary-500 h-2 rounded-full transition-all duration-300"
+            className="bg-nocturne-primary h-2 rounded-full transition-all duration-300"
             style={{ width: `${(step / totalSteps) * 100}%` }}
           />
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+        <div className="bg-red-900/20 border border-red-800 text-red-700 px-4 py-3 rounded-lg mb-6">
           {error}
         </div>
       )}
@@ -120,13 +120,13 @@ export default function ClientOnboardingPage() {
       {/* Step 1: Company Info */}
       {step === 1 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-gray-900">Tell us about your company</h2>
+          <h2 className="text-xl font-bold text-nocturne-text-primary">Tell us about your company</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Client Type *</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Client Type *</label>
             <select
               value={clientType}
               onChange={(e) => setClientType(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
             >
               <option value="">Select a type...</option>
               {CLIENT_TYPES.map((ct) => (
@@ -135,32 +135,32 @@ export default function ClientOnboardingPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Company Name</label>
             <input
               type="text"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="Your company or organization name"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Company Type</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Company Type</label>
             <input
               type="text"
               value={companyType}
               onChange={(e) => setCompanyType(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="e.g., Entertainment Agency, Corporate HR, Venue"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">City</label>
             <input
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="e.g., Mumbai, Delhi, Bangalore"
             />
           </div>
@@ -170,10 +170,10 @@ export default function ClientOnboardingPage() {
       {/* Step 2: Event Preferences */}
       {step === 2 && (
         <div className="space-y-6">
-          <h2 className="text-xl font-bold text-gray-900">Event Preferences</h2>
+          <h2 className="text-xl font-bold text-nocturne-text-primary">Event Preferences</h2>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Event Types You're Interested In *</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-2">Event Types You're Interested In *</label>
             <div className="flex flex-wrap gap-2">
               {EVENT_TYPES.map((type) => (
                 <button
@@ -181,8 +181,8 @@ export default function ClientOnboardingPage() {
                   onClick={() => toggleEventType(type)}
                   className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                     eventTypesInterested.includes(type)
-                      ? 'bg-primary-500 text-white border-primary-500'
-                      : 'bg-white text-gray-700 border-gray-300 hover:border-primary-300'
+                      ? 'bg-nocturne-primary text-white border-primary-500'
+                      : 'bg-nocturne-surface text-nocturne-text-secondary border-nocturne-border hover:border-nocturne-accent'
                   }`}
                 >
                   {type}
@@ -193,24 +193,24 @@ export default function ClientOnboardingPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Average Budget Min (INR)</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Average Budget Min (INR)</label>
               <input
                 type="number"
                 value={averageBudgetMin || ''}
                 onChange={(e) => setAverageBudgetMin(Number(e.target.value))}
                 min={0}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary"
                 placeholder="e.g., 25000"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Average Budget Max (INR)</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Average Budget Max (INR)</label>
               <input
                 type="number"
                 value={averageBudgetMax || ''}
                 onChange={(e) => setAverageBudgetMax(Number(e.target.value))}
                 min={0}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary"
                 placeholder="e.g., 200000"
               />
             </div>
@@ -221,14 +221,14 @@ export default function ClientOnboardingPage() {
       {/* Step 3: Team Setup (event_company only) */}
       {step === 3 && isEventCompany && (
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-gray-900">Team Setup</h2>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-            <p className="text-blue-800 mb-3">
+          <h2 className="text-xl font-bold text-nocturne-text-primary">Team Setup</h2>
+          <div className="bg-blue-900/20 border border-blue-200 rounded-lg p-6 text-center">
+            <p className="text-blue-300 mb-3">
               You can create a workspace and invite team members from your dashboard after setup.
             </p>
             <Link
               href="/client/workspace"
-              className="text-sm font-medium text-primary-500 hover:text-primary-600 underline"
+              className="text-sm font-medium text-nocturne-accent hover:text-nocturne-primary-hover underline"
             >
               Go to Workspace Settings
             </Link>
@@ -241,7 +241,7 @@ export default function ClientOnboardingPage() {
         <button
           onClick={() => setStep(Math.max(1, step - 1))}
           disabled={step === 1}
-          className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 text-sm font-medium text-nocturne-text-secondary bg-nocturne-surface border border-nocturne-border rounded-lg hover:bg-nocturne-surface-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Back
         </button>
@@ -250,7 +250,7 @@ export default function ClientOnboardingPage() {
           <button
             onClick={() => setStep(step + 1)}
             disabled={!canProceed()}
-            className="px-6 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 text-sm font-medium text-white bg-nocturne-primary rounded-lg hover:bg-nocturne-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Continue
           </button>
@@ -258,7 +258,7 @@ export default function ClientOnboardingPage() {
           <button
             onClick={handleSubmit}
             disabled={isSubmitting || !canProceed()}
-            className="px-6 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50"
+            className="px-6 py-2 text-sm font-medium text-white bg-nocturne-primary rounded-lg hover:bg-nocturne-primary-hover disabled:opacity-50"
           >
             {isSubmitting ? 'Creating...' : 'Complete Setup'}
           </button>

@@ -492,7 +492,7 @@ export function VoiceAssistant() {
       {/* ─── Collapsed: Compact chat bar (doesn't overlap content) ─── */}
       {!isOpen && (
         <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-modal animate-scale-in">
-          <div className="flex items-center gap-2 rounded-full border border-glass-border bg-surface-base/[0.97] backdrop-blur-glass-lg shadow-glass pl-1.5 pr-3 py-1.5 cursor-pointer hover:shadow-glow-md transition-all" onClick={() => setIsOpen(true)}>
+          <div className="flex items-center gap-2 rounded-full bg-nocturne-glass-floating backdrop-blur-3xl cursor-pointer hover:shadow-glow-md transition-all animate-glow-pulse pl-1.5 pr-3 py-1.5" onClick={() => setIsOpen(true)}>
             {/* Mic button */}
             <button
               onClick={(e) => {
@@ -515,8 +515,8 @@ export function VoiceAssistant() {
             </button>
             {/* Label */}
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-semibold text-text-primary leading-tight">Voice Assistant</span>
-              <span className="text-[10px] text-text-muted leading-tight">Ask or speak for anything</span>
+              <span className="text-sm font-semibold text-nocturne-text-primary leading-tight">Backstage AI</span>
+              <span className="text-[10px] text-nocturne-text-secondary leading-tight">Ask or speak for anything</span>
             </div>
             {/* Online dot */}
             <span className="relative flex h-2 w-2 shrink-0 ml-1">
@@ -536,7 +536,7 @@ export function VoiceAssistant() {
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-modal md:w-[400px] md:h-[600px] md:rounded-2xl flex flex-col overflow-hidden bg-surface-base/[0.97] backdrop-blur-glass-lg border-0 md:border md:border-glass-border md:shadow-glass animate-scale-in">
+          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-modal md:w-[400px] md:h-[600px] md:rounded-2xl flex flex-col overflow-hidden bg-nocturne-base/95 backdrop-blur-[80px] border-0 md:border md:border-glass-border md:shadow-glass animate-scale-in">
             {/* ─── Header ─── */}
             <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-gradient-to-r from-primary-600 to-accent-violet">
               <div className="flex items-center gap-2.5">
@@ -554,8 +554,8 @@ export function VoiceAssistant() {
                   {sparkleIcon(16, 'white')}
                 </div>
                 <div>
-                  <h3 className="font-heading font-semibold text-white text-sm leading-tight">
-                    Voice Assistant
+                  <h3 className="font-display font-semibold text-gradient-nocturne text-sm leading-tight">
+                    Backstage AI
                   </h3>
                   <p className="text-[10px] text-white/70 leading-tight">
                     Ask me anything — search, navigate, or get help
@@ -588,7 +588,7 @@ export function VoiceAssistant() {
                   {/* Welcome message as chat bubble */}
                   <div className="flex justify-start">
                     <div className="max-w-[90%] space-y-3">
-                      <div className="rounded-2xl px-4 py-3 bg-glass-medium border border-glass-border text-text-primary">
+                      <div className="rounded-2xl px-4 py-3 glass-card text-nocturne-text-primary">
                         <p className="text-sm leading-relaxed">
                           {user
                             ? 'Hey! I can help you find artists, check bookings, manage your calendar, and more. What do you need?'
@@ -601,7 +601,7 @@ export function VoiceAssistant() {
                           <button
                             key={q}
                             onClick={() => sendQueryCb(q)}
-                            className="text-xs bg-glass-light border border-glass-border text-text-secondary rounded-pill px-3 py-1.5 hover:bg-glass-medium hover:border-primary-500/30 hover:text-text-primary transition-all"
+                            className="text-xs badge-nocturne rounded-pill px-3 py-1.5 transition-all"
                           >
                             {q}
                           </button>
@@ -619,8 +619,8 @@ export function VoiceAssistant() {
                     <div
                       className={`rounded-2xl px-4 py-2.5 ${
                         msg.role === 'user'
-                          ? 'bg-gradient-accent text-white'
-                          : 'bg-glass-medium border border-glass-border text-text-primary'
+                          ? 'bg-gradient-nocturne text-white'
+                          : 'glass-card rounded-2xl text-nocturne-text-primary'
                       }`}
                     >
                       <p className="text-sm leading-relaxed whitespace-pre-line">{msg.text}</p>
@@ -641,7 +641,7 @@ export function VoiceAssistant() {
                     {msg.action?.type === 'navigate' && msg.action.route && (
                       <button
                         onClick={() => handleNavigateAction(msg.action!.route!)}
-                        className="flex items-center gap-2 w-full text-left text-xs bg-glass-light border border-glass-border text-primary-400 rounded-lg px-3 py-2 hover:bg-glass-medium hover:border-primary-500/30 transition-all"
+                        className="flex items-center gap-2 w-full text-left text-xs badge-nocturne rounded-lg px-3 py-2 transition-all"
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M5 12h14" />
@@ -658,7 +658,7 @@ export function VoiceAssistant() {
                           <button
                             key={j}
                             onClick={() => handleSuggestionClick(s)}
-                            className="text-xs bg-glass-light border border-glass-border text-text-secondary rounded-pill px-2.5 py-1 hover:bg-glass-medium hover:border-primary-500/30 hover:text-text-primary transition-all"
+                            className="text-xs badge-nocturne rounded-pill px-2.5 py-1 transition-all"
                           >
                             {s}
                           </button>
@@ -676,7 +676,7 @@ export function VoiceAssistant() {
               <div className="shrink-0 px-4 py-2 text-center border-t border-glass-border bg-surface-card/60">
                 <VoiceWaveform isActive={true} />
                 {interimTranscript && (
-                  <p className="text-xs text-text-muted italic mt-1">{interimTranscript}</p>
+                  <p className="text-xs text-nocturne-text-secondary italic mt-1">{interimTranscript}</p>
                 )}
                 <p className="text-xs text-primary-400 mt-1">Listening...</p>
               </div>
@@ -688,12 +688,12 @@ export function VoiceAssistant() {
                   <span className="w-1.5 h-1.5 rounded-full bg-accent-violet animate-pulse [animation-delay:0.2s]" />
                   <span className="w-1.5 h-1.5 rounded-full bg-accent-magenta animate-pulse [animation-delay:0.4s]" />
                 </div>
-                <p className="text-xs text-text-muted mt-1">Thinking...</p>
+                <p className="text-xs text-nocturne-text-secondary mt-1">Thinking...</p>
               </div>
             )}
             {state === 'responding' && (
               <div className="shrink-0 px-4 py-2 text-center border-t border-glass-border bg-surface-card/60">
-                <p className="text-xs text-accent-violet animate-pulse">Speaking...</p>
+                <p className="text-xs text-nocturne-text-primary animate-pulse">Speaking...</p>
               </div>
             )}
 
@@ -706,7 +706,7 @@ export function VoiceAssistant() {
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shrink-0 ${
                   state === 'listening'
                     ? 'bg-red-500/90 text-white animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.4)]'
-                    : 'bg-glass-medium border border-glass-border text-text-primary hover:bg-glass-heavy'
+                    : 'glass-card text-nocturne-text-primary hover:bg-glass-heavy'
                 } disabled:opacity-40 disabled:cursor-not-allowed`}
                 aria-label={state === 'listening' ? 'Stop listening' : 'Start voice input'}
               >
@@ -724,7 +724,7 @@ export function VoiceAssistant() {
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
                   placeholder="Ask anything — search, navigate, book..."
-                  className="flex-1 bg-white border border-neutral-200 rounded-pill px-4 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
+                  className="flex-1 input-nocturne rounded-pill px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
                   disabled={state !== 'idle'}
                 />
                 <button

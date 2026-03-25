@@ -31,8 +31,8 @@ const StatsSkeleton = () => (
   <div className="animate-pulse grid grid-cols-3 gap-4 mb-8">
     {[...Array(3)].map((_, i) => (
       <div key={i} className="glass-card p-6 rounded-xl">
-        <div className="h-4 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded w-3/4 mb-3" />
-        <div className="h-8 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded w-1/2" />
+        <div className="h-4 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-3/4 mb-3" />
+        <div className="h-8 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-1/2" />
       </div>
     ))}
   </div>
@@ -43,9 +43,9 @@ const QuickActionsSkeleton = () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
       {[...Array(6)].map((_, i) => (
         <div key={i} className="glass-card p-6 rounded-xl">
-          <div className="w-12 h-12 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded-lg mb-3" />
-          <div className="h-4 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded w-4/5 mb-2" />
-          <div className="h-3 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded w-3/4" />
+          <div className="w-12 h-12 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded-lg mb-3" />
+          <div className="h-4 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-4/5 mb-2" />
+          <div className="h-3 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-3/4" />
         </div>
       ))}
     </div>
@@ -75,7 +75,7 @@ export default function ClientDashboardPage() {
   if (loading) {
     return (
       <div className="space-y-8">
-        <div className="h-10 bg-gradient-to-r from-primary-500/20 to-primary-500/5 rounded-lg w-1/2 animate-pulse" />
+        <div className="h-10 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded-lg w-1/2 animate-pulse" />
         <StatsSkeleton />
         <QuickActionsSkeleton />
       </div>
@@ -86,47 +86,47 @@ export default function ClientDashboardPage() {
     <div className="space-y-8 animate-fade-in">
       {/* Welcome Header */}
       <div>
-        <h1 className="text-4xl font-heading font-bold text-text-primary mb-2">
+        <h1 className="text-4xl font-display font-bold text-nocturne-text-primary mb-2">
           {profile?.company_name ? `Welcome, ${profile.company_name}` : 'Client Dashboard'}
         </h1>
-        <p className="text-text-muted text-lg">
+        <p className="text-nocturne-text-secondary text-lg">
           Find and book premium artists for your events
         </p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="glass-card rounded-xl p-6 border glass-border hover:border-primary-500/50 transition-all group">
+        <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all group">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-text-muted font-medium">Active Bookings</p>
-            <Calendar className="w-5 h-5 text-primary-400 group-hover:scale-110 transition-transform" />
+            <p className="text-sm text-nocturne-text-secondary font-medium">Active Bookings</p>
+            <Calendar className="w-5 h-5 text-nocturne-accent group-hover:scale-110 transition-transform" />
           </div>
-          <p className="text-3xl font-bold text-text-primary">0</p>
-          <p className="text-xs text-text-muted mt-2">Coming up soon</p>
+          <p className="text-3xl font-bold text-nocturne-text-primary">0</p>
+          <p className="text-xs text-nocturne-text-secondary mt-2">Coming up soon</p>
         </div>
 
-        <div className="glass-card rounded-xl p-6 border glass-border hover:border-primary-500/50 transition-all group">
+        <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all group">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-text-muted font-medium">Shortlisted Artists</p>
+            <p className="text-sm text-nocturne-text-secondary font-medium">Shortlisted Artists</p>
             <Heart className="w-5 h-5 text-accent-magenta group-hover:scale-110 transition-transform" />
           </div>
-          <p className="text-3xl font-bold text-text-primary">{shortlists.length}</p>
-          <p className="text-xs text-text-muted mt-2">Ready to contact</p>
+          <p className="text-3xl font-bold text-nocturne-text-primary">{shortlists.length}</p>
+          <p className="text-xs text-nocturne-text-secondary mt-2">Ready to contact</p>
         </div>
 
-        <div className="glass-card rounded-xl p-6 border glass-border hover:border-primary-500/50 transition-all group">
+        <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all group">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-text-muted font-medium">Total Events</p>
+            <p className="text-sm text-nocturne-text-secondary font-medium">Total Events</p>
             <Sparkles className="w-5 h-5 text-success group-hover:scale-110 transition-transform" />
           </div>
-          <p className="text-3xl font-bold text-text-primary">0</p>
-          <p className="text-xs text-text-muted mt-2">Planned this year</p>
+          <p className="text-3xl font-bold text-nocturne-text-primary">0</p>
+          <p className="text-xs text-nocturne-text-secondary mt-2">Planned this year</p>
         </div>
       </div>
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-xl font-heading font-bold text-text-primary mb-4">Quick Actions</h2>
+        <h2 className="text-xl font-display font-bold text-nocturne-text-primary mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <QuickActionCard
             href="/search"
@@ -184,10 +184,10 @@ export default function ClientDashboardPage() {
       {shortlists.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-heading font-bold text-text-primary">Recent Shortlists</h2>
+            <h2 className="text-xl font-display font-bold text-nocturne-text-primary">Recent Shortlists</h2>
             <Link
               href="/client/shortlists"
-              className="text-sm font-medium text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1"
+              className="text-sm font-medium text-nocturne-accent hover:text-nocturne-accent transition-colors flex items-center gap-1"
             >
               View all <ArrowRight className="w-4 h-4" />
             </Link>
@@ -198,13 +198,13 @@ export default function ClientDashboardPage() {
                 key={sl.id}
                 href={`/client/shortlists/${sl.id}`}
               >
-                <div className="glass-card rounded-xl p-4 border glass-border hover:border-primary-500/50 hover:shadow-glow-sm transition-all group cursor-pointer">
+                <div className="glass-card rounded-xl p-4 border border-nocturne-border hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm transition-all group cursor-pointer">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-text-primary group-hover:text-primary-300 transition-colors">
+                      <h3 className="font-semibold text-nocturne-text-primary group-hover:text-nocturne-accent transition-colors">
                         {sl.name}
                       </h3>
-                      <div className="flex items-center gap-1 text-xs text-text-muted mt-1">
+                      <div className="flex items-center gap-1 text-xs text-nocturne-text-secondary mt-1">
                         <Clock className="w-3 h-3" />
                         <span>
                           {new Date(sl.created_at).toLocaleDateString('en-IN', {
@@ -215,7 +215,7 @@ export default function ClientDashboardPage() {
                         </span>
                       </div>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-text-muted group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-5 h-5 text-nocturne-text-secondary group-hover:text-nocturne-accent group-hover:translate-x-1 transition-all" />
                   </div>
                 </div>
               </Link>
@@ -251,8 +251,8 @@ function QuickActionCard({
       <div
         className={`rounded-xl p-6 border transition-all duration-300 h-full group cursor-pointer ${
           isPrimary
-            ? `bg-gradient-to-br ${gradientFrom} ${gradientTo} border-primary-500/30 hover:border-primary-400 hover:shadow-glow-sm`
-            : `glass-card glass-border hover:border-primary-500/50 hover:shadow-glow-sm`
+            ? `bg-gradient-to-br ${gradientFrom} ${gradientTo} border-nocturne-border hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm`
+            : `glass-card border-nocturne-border hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm`
         }`}
       >
         <div
@@ -268,17 +268,17 @@ function QuickActionCard({
           className={`font-semibold mb-1 group-hover:translate-y-0 transition-all ${
             isPrimary
               ? 'text-white'
-              : 'text-text-primary group-hover:text-primary-300'
+              : 'text-nocturne-text-primary group-hover:text-nocturne-accent'
           }`}
         >
           {title}
         </h3>
-        <p className={`text-sm mb-3 ${isPrimary ? 'text-white/80' : 'text-text-muted'}`}>
+        <p className={`text-sm mb-3 ${isPrimary ? 'text-white/80' : 'text-nocturne-text-secondary'}`}>
           {description}
         </p>
         <div
           className={`flex items-center text-xs font-medium group-hover:translate-x-1 transition-transform ${
-            isPrimary ? 'text-white/70' : 'text-primary-400'
+            isPrimary ? 'text-white/70' : 'text-nocturne-accent'
           }`}
         >
           Explore <ArrowRight className="ml-1 w-3 h-3" />

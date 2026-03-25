@@ -65,12 +65,12 @@ export function ArtistGallery({ media, artistName }: ArtistGalleryProps) {
       {/* Lightbox */}
       {lightboxIndex !== null && (
         <div
-          className="fixed inset-0 z-modal bg-black/90 flex items-center justify-center p-4 transition-opacity duration-300 opacity-100"
+          className="fixed inset-0 z-modal bg-black/90 backdrop-blur-lg flex items-center justify-center p-4 transition-opacity duration-300 opacity-100"
           onClick={() => setLightboxIndex(null)}
         >
           <button
             onClick={() => setLightboxIndex(null)}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 z-10"
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-nocturne-surface/60 backdrop-blur-sm flex items-center justify-center text-nocturne-text-primary hover:bg-nocturne-surface/80 z-10"
           >
             <X size={20} />
           </button>
@@ -78,7 +78,7 @@ export function ArtistGallery({ media, artistName }: ArtistGalleryProps) {
           {lightboxIndex > 0 && (
             <button
               onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1); }}
-              className="absolute left-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 z-10"
+              className="absolute left-4 w-10 h-10 rounded-full bg-nocturne-surface/60 backdrop-blur-sm flex items-center justify-center text-nocturne-text-primary hover:bg-nocturne-surface/80 z-10"
             >
               <ChevronLeft size={20} />
             </button>
@@ -87,7 +87,7 @@ export function ArtistGallery({ media, artistName }: ArtistGalleryProps) {
           {lightboxIndex < media.length - 1 && (
             <button
               onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1); }}
-              className="absolute right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 z-10"
+              className="absolute right-4 w-10 h-10 rounded-full bg-nocturne-surface/60 backdrop-blur-sm flex items-center justify-center text-nocturne-text-primary hover:bg-nocturne-surface/80 z-10"
             >
               <ChevronRight size={20} />
             </button>
@@ -107,7 +107,7 @@ export function ArtistGallery({ media, artistName }: ArtistGalleryProps) {
                 className="max-w-full max-h-[80vh] object-contain rounded-lg"
               />
             ) : (
-              <div className="w-full aspect-video bg-surface-card rounded-lg flex items-center justify-center text-text-muted">
+              <div className="w-full aspect-video bg-nocturne-surface-2 rounded-lg flex items-center justify-center text-nocturne-text-secondary">
                 Video Player
               </div>
             )}

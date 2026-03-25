@@ -76,15 +76,15 @@ export default function CancellationModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
-        <h2 className="text-xl font-bold text-gray-900">Cancel Booking</h2>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-lg flex items-center justify-center z-50 p-4">
+      <div className="glass-card rounded-xl max-w-md w-full p-6 space-y-4">
+        <h2 className="text-xl font-bold text-nocturne-text-primary">Cancel Booking</h2>
 
         {step === 'info' && (
           <>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <p className="text-sm font-medium text-yellow-800 mb-1">Refund Policy</p>
-              <p className="text-sm text-yellow-700 mb-3">
+            <div className="bg-nocturne-warning/15 border border-nocturne-warning/30 rounded-lg p-4">
+              <p className="text-sm font-medium text-nocturne-warning mb-1">Refund Policy</p>
+              <p className="text-sm text-nocturne-text-secondary mb-3">
                 Your event is <strong>{daysUntil} days</strong> away. You are eligible for a <strong>{refundPercent}</strong> refund.
               </p>
               <div className="space-y-1.5">
@@ -93,8 +93,8 @@ export default function CancellationModal({
                     key={tier.label}
                     className={`flex justify-between text-xs px-2 py-1 rounded ${
                       tier.refund === refundPercent
-                        ? 'bg-yellow-200 font-medium text-yellow-900'
-                        : 'text-yellow-700'
+                        ? 'bg-nocturne-warning/25 font-medium text-nocturne-warning'
+                        : 'text-nocturne-text-secondary'
                     }`}
                   >
                     <span>{tier.label}</span>
@@ -105,11 +105,11 @@ export default function CancellationModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Reason for cancellation</label>
+              <label className="block text-sm font-medium text-nocturne-text-primary mb-1">Reason for cancellation</label>
               <textarea
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full bg-nocturne-surface border border-nocturne-border rounded-lg p-3 text-sm text-nocturne-text-primary focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
                 rows={3}
                 placeholder="Optional: let us know why..."
               />
@@ -118,13 +118,13 @@ export default function CancellationModal({
             <div className="flex gap-3">
               <button
                 onClick={onClose}
-                className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                className="flex-1 border border-nocturne-border text-nocturne-text-primary py-2.5 rounded-lg font-medium hover:bg-nocturne-surface-2 transition-colors"
               >
                 Keep Booking
               </button>
               <button
                 onClick={() => setStep('type')}
-                className="flex-1 bg-red-500 text-white py-2.5 rounded-lg font-medium hover:bg-red-600 transition-colors"
+                className="flex-1 bg-nocturne-error text-nocturne-text-primary py-2.5 rounded-lg font-medium hover:bg-nocturne-error/80 transition-colors"
               >
                 Continue
               </button>
@@ -135,14 +135,14 @@ export default function CancellationModal({
         {step === 'type' && (
           <>
             <div className="space-y-3">
-              <h3 className="font-medium text-gray-900">Cancellation Type</h3>
+              <h3 className="font-medium text-nocturne-text-primary">Cancellation Type</h3>
               {CANCELLATION_SUBTYPES.map((type) => (
                 <label
                   key={type.value}
                   className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
                     subType === type.value
-                      ? 'border-primary-500 bg-primary-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-nocturne-primary bg-nocturne-primary/15'
+                      : 'border-nocturne-border hover:border-nocturne-border/80'
                   }`}
                 >
                   <input
@@ -154,8 +154,8 @@ export default function CancellationModal({
                     className="mt-1"
                   />
                   <div className="flex-1">
-                    <p className="font-medium text-gray-900 text-sm">{type.label}</p>
-                    <p className="text-xs text-gray-600 mt-0.5">{type.description}</p>
+                    <p className="font-medium text-nocturne-text-primary text-sm">{type.label}</p>
+                    <p className="text-xs text-nocturne-text-secondary mt-0.5">{type.description}</p>
                   </div>
                 </label>
               ))}
@@ -164,13 +164,13 @@ export default function CancellationModal({
             <div className="flex gap-3">
               <button
                 onClick={() => setStep('info')}
-                className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                className="flex-1 border border-nocturne-border text-nocturne-text-primary py-2.5 rounded-lg font-medium hover:bg-nocturne-surface-2 transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={() => setStep('confirm')}
-                className="flex-1 bg-red-500 text-white py-2.5 rounded-lg font-medium hover:bg-red-600 transition-colors"
+                className="flex-1 bg-nocturne-error text-nocturne-text-primary py-2.5 rounded-lg font-medium hover:bg-nocturne-error/80 transition-colors"
               >
                 Continue
               </button>
@@ -180,16 +180,16 @@ export default function CancellationModal({
 
         {step === 'confirm' && (
           <>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="bg-nocturne-error/15 border border-nocturne-error/30 rounded-lg p-4">
               <div className="text-center mb-4">
-                <p className="text-sm text-red-700 font-medium">
+                <p className="text-sm text-nocturne-error font-medium">
                   Are you sure? This action cannot be undone.
                 </p>
-                <p className="text-lg font-bold text-red-800 mt-2">
+                <p className="text-lg font-bold text-nocturne-error mt-2">
                   Refund: {refundPercent}
                 </p>
               </div>
-              <div className="bg-red-100 rounded p-3 text-xs text-red-700">
+              <div className="bg-nocturne-error/20 rounded p-3 text-xs text-nocturne-text-primary">
                 <p className="font-medium mb-1">Cancellation Type: {CANCELLATION_SUBTYPES.find(t => t.value === subType)?.label}</p>
                 {reason && <p>{reason}</p>}
               </div>
@@ -198,14 +198,14 @@ export default function CancellationModal({
             <div className="flex gap-3">
               <button
                 onClick={() => setStep('type')}
-                className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                className="flex-1 border border-nocturne-border text-nocturne-text-primary py-2.5 rounded-lg font-medium hover:bg-nocturne-surface-2 transition-colors"
               >
                 Go Back
               </button>
               <button
                 onClick={handleCancel}
                 disabled={confirming}
-                className="flex-1 bg-red-600 text-white py-2.5 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                className="flex-1 bg-nocturne-error text-nocturne-text-primary py-2.5 rounded-lg font-medium hover:bg-nocturne-error/80 transition-colors disabled:opacity-50"
               >
                 {confirming ? 'Cancelling...' : 'Confirm Cancellation'}
               </button>

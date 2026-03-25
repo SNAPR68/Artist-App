@@ -115,17 +115,17 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
     return (
       <div className="glass-card p-6">
         <div className="text-center animate-fade-in-up">
-          <div className="w-14 h-14 bg-green-500/15 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Check size={28} className="text-green-400" />
+          <div className="w-14 h-14 bg-nocturne-success/15 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Check size={28} className="text-nocturne-success" />
           </div>
-          <h3 className="text-lg font-heading font-semibold text-text-primary mb-1">Inquiry Sent!</h3>
-          <p className="text-sm text-text-muted mb-3">
-            Your booking inquiry for <strong className="text-text-secondary">{artistName}</strong> has been submitted.
+          <h3 className="text-lg font-heading font-semibold text-nocturne-text-primary mb-1">Inquiry Sent!</h3>
+          <p className="text-sm text-nocturne-text-secondary mb-3">
+            Your booking inquiry for <strong className="text-nocturne-text-primary">{artistName}</strong> has been submitted.
           </p>
-          <p className="text-xs text-text-muted mb-4">
-            Booking ID: <code className="bg-glass-light border border-glass-border px-2 py-0.5 rounded text-text-secondary">{successBookingId}</code>
+          <p className="text-xs text-nocturne-text-secondary mb-4">
+            Booking ID: <code className="bg-nocturne-surface border border-nocturne-border px-2 py-0.5 rounded text-nocturne-text-primary">{successBookingId}</code>
           </p>
-          <p className="text-sm text-text-muted mb-4">
+          <p className="text-sm text-nocturne-text-secondary mb-4">
             The artist will review your request and respond soon.
           </p>
           <button
@@ -135,7 +135,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
               setCurrentStep(1);
               setFormData((prev) => ({ ...prev, event_date: '', event_city: '', event_venue: '', budget: '', message: '' }));
             }}
-            className="text-sm text-primary-400 hover:text-primary-300 font-medium transition-colors"
+            className="text-sm text-nocturne-primary hover:text-nocturne-primary-hover font-medium transition-colors"
           >
             Send another inquiry
           </button>
@@ -148,13 +148,13 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
   if (!isAuthenticated) {
     return (
       <div className="glass-card p-6">
-        <h3 className="text-lg font-heading font-semibold text-text-primary mb-2">Book This Artist</h3>
-        <p className="text-sm text-text-muted mb-4">
+        <h3 className="text-lg font-heading font-semibold text-nocturne-text-primary mb-2">Book This Artist</h3>
+        <p className="text-sm text-nocturne-text-secondary mb-4">
           Sign in to send a booking inquiry to {artistName}.
         </p>
         <a
           href={`/login?redirect=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '')}`}
-          className="block w-full text-center bg-gradient-accent hover:bg-gradient-accent-hover text-white font-medium py-3 px-4 rounded-xl transition-all hover-glow"
+          className="block w-full text-center bg-gradient-nocturne hover:bg-gradient-nocturne text-nocturne-text-primary font-medium py-3 px-4 rounded-xl transition-all shadow-nocturne-glow-sm"
         >
           Sign in to Book
         </a>
@@ -165,7 +165,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
   // --- Multi-step Inquiry form ---
   return (
     <div className="glass-card p-6">
-      <h3 className="text-lg font-heading font-semibold text-text-primary mb-4">Book This Artist</h3>
+      <h3 className="text-lg font-heading font-semibold text-nocturne-text-primary mb-4">Book This Artist</h3>
 
       <BookingStepIndicator currentStep={currentStep} totalSteps={3} labels={STEP_LABELS} />
 
@@ -233,7 +233,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
                 : 'opacity-0 absolute inset-0 pointer-events-none -translate-x-full'
             }`}
           >
-            <h4 className="text-sm font-medium text-text-primary mb-2">Review Your Inquiry</h4>
+            <h4 className="text-sm font-medium text-nocturne-text-primary mb-2">Review Your Inquiry</h4>
             <ReviewRow label="Event Type" value={formData.event_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} />
             <ReviewRow label="Date" value={formData.event_date} />
             <ReviewRow label="City" value={formData.event_city} />
@@ -246,7 +246,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
 
         {/* Error */}
         {error && (
-          <div className="mt-4 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-sm text-red-400">
+          <div className="mt-4 bg-nocturne-error/15 border border-nocturne-error/30 rounded-lg px-3 py-2 text-sm text-nocturne-error">
             {error}
           </div>
         )}
@@ -257,7 +257,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
             <button
               type="button"
               onClick={prevStep}
-              className="flex items-center gap-1 px-4 py-2.5 bg-glass-light border border-glass-border rounded-xl text-sm text-text-secondary hover:bg-glass-medium transition-colors"
+              className="flex items-center gap-1 px-4 py-2.5 bg-nocturne-surface border border-nocturne-border rounded-xl text-sm text-nocturne-text-secondary hover:bg-nocturne-surface-2 transition-colors"
             >
               <ArrowLeft size={14} />
               Back
@@ -268,7 +268,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
             <button
               type="button"
               onClick={nextStep}
-              className="flex-1 flex items-center justify-center gap-1 py-2.5 bg-gradient-accent hover:bg-gradient-accent-hover text-white font-semibold rounded-xl transition-all hover-glow"
+              className="flex-1 flex items-center justify-center gap-1 py-2.5 bg-gradient-nocturne hover:bg-gradient-nocturne text-nocturne-text-primary font-semibold rounded-xl transition-all shadow-nocturne-glow-sm"
             >
               Next
               <ArrowRight size={14} />
@@ -277,7 +277,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 py-2.5 bg-gradient-accent hover:bg-gradient-accent-hover disabled:opacity-50 text-white font-semibold rounded-xl transition-all hover-glow"
+              className="flex-1 py-2.5 bg-gradient-nocturne hover:bg-gradient-nocturne disabled:opacity-50 text-nocturne-text-primary font-semibold rounded-xl transition-all shadow-nocturne-glow-sm"
             >
               {submitting ? 'Sending...' : 'Send Inquiry'}
             </button>
@@ -290,19 +290,19 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
           width: 100%;
           padding: 0.625rem 0.75rem;
           font-size: 0.875rem;
-          color: var(--tw-text-opacity, 1) #F9FAFB;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.10);
+          color: #FFFFFF;
+          background: rgba(26, 26, 29, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 0.75rem;
           outline: none;
           transition: border-color 0.2s, box-shadow 0.2s;
         }
         .form-input:focus {
-          border-color: rgba(59, 130, 246, 0.5);
-          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+          border-color: rgba(138, 43, 226, 0.5);
+          box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.15);
         }
         .form-input::placeholder {
-          color: #9CA3AF;
+          color: rgba(255, 255, 255, 0.4);
         }
       `}</style>
     </div>
@@ -312,8 +312,8 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
 function FormField({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-text-muted mb-1.5">
-        {label} {required && <span className="text-red-400">*</span>}
+      <label className="block text-xs font-medium text-nocturne-text-secondary mb-1.5">
+        {label} {required && <span className="text-nocturne-error">*</span>}
       </label>
       {children}
     </div>
@@ -322,9 +322,9 @@ function FormField({ label, required, children }: { label: string; required?: bo
 
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between py-2 border-b border-glass-border last:border-0">
-      <span className="text-xs text-text-muted">{label}</span>
-      <span className="text-sm text-text-primary font-medium text-right max-w-[60%]">{value}</span>
+    <div className="flex justify-between py-2 border-b border-nocturne-border last:border-0">
+      <span className="text-xs text-nocturne-text-secondary">{label}</span>
+      <span className="text-sm text-nocturne-text-primary font-medium text-right max-w-[60%]">{value}</span>
     </div>
   );
 }

@@ -78,7 +78,7 @@ export default function PublicArtistPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-nocturne-accent" />
       </div>
     );
   }
@@ -86,8 +86,8 @@ export default function PublicArtistPage() {
   if (error || !profile) {
     return (
       <div className="text-center py-20">
-        <h1 className="text-2xl font-heading font-bold text-text-primary">Artist not found</h1>
-        <p className="text-text-muted mt-2">This artist profile doesn&apos;t exist or is no longer active.</p>
+        <h1 className="text-2xl font-display font-bold text-nocturne-text-primary">Artist not found</h1>
+        <p className="text-nocturne-text-secondary mt-2">This artist profile doesn&apos;t exist or is no longer active.</p>
       </div>
     );
   }
@@ -96,7 +96,7 @@ export default function PublicArtistPage() {
   const coverUrl = profile.media.find(m => m.media_type === 'image')?.cdn_url ?? profile.media.find(m => m.media_type === 'image')?.original_url;
 
   return (
-    <div className="max-w-section mx-auto px-4 sm:px-6 py-8 lg:grid lg:grid-cols-[1fr_340px] lg:gap-8">
+    <div className="theme-nocturne bg-nocturne-base max-w-section mx-auto px-4 sm:px-6 py-8 lg:grid lg:grid-cols-[1fr_340px] lg:gap-8">
       <div>
         {/* Cover + Profile Info */}
         <ArtistCoverSection
@@ -114,43 +114,43 @@ export default function PublicArtistPage() {
         {/* Bio */}
         {profile.bio && (
           <AnimatedSection>
-            <div className="mb-8">
-              <h2 className="text-lg font-heading font-semibold text-text-primary mb-2">About</h2>
-              <p className="text-sm text-text-secondary leading-relaxed">{profile.bio}</p>
+            <div className="glass-card p-8 mb-8">
+              <h2 className="text-lg font-display font-semibold text-nocturne-text-primary mb-2">About</h2>
+              <p className="text-sm text-nocturne-text-secondary leading-relaxed">{profile.bio}</p>
             </div>
           </AnimatedSection>
         )}
 
         {/* Details Grid */}
         <AnimatedSection delay={0.1}>
-          <div className="grid grid-cols-2 gap-6 mb-8">
+          <div className="glass-card p-8 grid grid-cols-2 gap-6 mb-8">
             <div>
-              <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Genres</h3>
+              <h3 className="text-xs font-semibold text-nocturne-text-secondary uppercase tracking-wider mb-2">Genres</h3>
               <div className="flex flex-wrap gap-1.5">
                 {profile.genres.map((g) => (
-                  <span key={g} className="px-2.5 py-1 rounded-pill bg-primary-500/10 border border-primary-500/20 text-primary-300 text-xs">
+                  <span key={g} className="badge-nocturne px-2.5 py-1 rounded-pill text-nocturne-accent text-xs">
                     {g}
                   </span>
                 ))}
               </div>
             </div>
             <div>
-              <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Event Types</h3>
+              <h3 className="text-xs font-semibold text-nocturne-text-secondary uppercase tracking-wider mb-2">Event Types</h3>
               <div className="flex flex-wrap gap-1.5">
                 {profile.event_types.map((t) => (
-                  <span key={t} className="px-2.5 py-1 rounded-pill bg-secondary-500/10 border border-secondary-500/20 text-secondary-300 text-xs">
+                  <span key={t} className="badge-nocturne px-2.5 py-1 rounded-pill text-nocturne-accent text-xs">
                     {t}
                   </span>
                 ))}
               </div>
             </div>
             <div>
-              <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Languages</h3>
-              <p className="text-sm text-text-secondary">{profile.languages.join(', ')}</p>
+              <h3 className="text-xs font-semibold text-nocturne-text-secondary uppercase tracking-wider mb-2">Languages</h3>
+              <p className="text-sm text-nocturne-text-secondary">{profile.languages.join(', ')}</p>
             </div>
             <div>
-              <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Duration</h3>
-              <p className="text-sm text-text-secondary">{profile.performance_duration_min}–{profile.performance_duration_max} minutes</p>
+              <h3 className="text-xs font-semibold text-nocturne-text-secondary uppercase tracking-wider mb-2">Duration</h3>
+              <p className="text-sm text-nocturne-text-secondary">{profile.performance_duration_min}–{profile.performance_duration_max} minutes</p>
             </div>
           </div>
         </AnimatedSection>
@@ -165,8 +165,8 @@ export default function PublicArtistPage() {
               { label: 'Profile', value: `${profile.profile_completion_pct}%` },
             ].map((stat) => (
               <div key={stat.label} className="glass-card p-3 text-center">
-                <p className="text-lg font-heading font-bold text-text-primary">{stat.value}</p>
-                <p className="text-[10px] text-text-muted uppercase tracking-wider">{stat.label}</p>
+                <p className="text-lg font-display font-bold text-nocturne-text-primary">{stat.value}</p>
+                <p className="text-[10px] text-nocturne-text-secondary uppercase tracking-wider">{stat.label}</p>
               </div>
             ))}
           </div>

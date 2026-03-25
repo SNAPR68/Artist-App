@@ -79,14 +79,14 @@ export default function EventCompanyOnboarding() {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center">
+    <div className="theme-nocturne bg-nocturne-base min-h-screen flex items-center justify-center">
       <div className="w-full max-w-lg">
         {/* Progress */}
         <div className="flex items-center gap-2 mb-8">
           {[1, 2, 3].map((s) => (
             <div key={s} className="flex-1">
               <div className={`h-1.5 rounded-full transition-all duration-500 ${
-                s <= step ? 'bg-gradient-accent' : 'bg-glass-border'
+                s <= step ? 'bg-nocturne-primary' : 'bg-nocturne-surface-2'
               }`} />
             </div>
           ))}
@@ -95,20 +95,20 @@ export default function EventCompanyOnboarding() {
         {step === 1 && (
           <div className="animate-fade-in space-y-6">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-violet-600 flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 rounded-2xl bg-nocturne-primary flex items-center justify-center mx-auto mb-4">
                 <Building2 className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-3xl font-heading font-bold text-text-primary mb-2">
+              <h1 className="text-3xl font-display font-bold text-nocturne-text-primary mb-2">
                 Set up your Event Company
               </h1>
-              <p className="text-text-muted">
+              <p className="text-nocturne-text-secondary">
                 Tell us about your company so we can personalize your experience
               </p>
             </div>
 
-            <div className="glass-card rounded-xl p-6 border glass-border space-y-4">
+            <div className="glass-card-nocturne rounded-xl p-6 border border-nocturne-border space-y-4">
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2">
+                <label className="block text-sm font-medium text-nocturne-text-secondary mb-2">
                   Company Name
                 </label>
                 <input
@@ -116,12 +116,12 @@ export default function EventCompanyOnboarding() {
                   value={companyName}
                   onChange={(e) => { setCompanyName(e.target.value); setError(''); }}
                   placeholder="e.g., Stellar Events Pvt Ltd"
-                  className="w-full px-4 py-3 bg-surface-bg border glass-border rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                  className="w-full px-4 py-3 bg-nocturne-surface-2 border border-nocturne-border rounded-lg text-nocturne-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-nocturne-primary/50"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2">
+                <label className="block text-sm font-medium text-nocturne-text-secondary mb-2">
                   What type of events do you organize?
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -131,12 +131,12 @@ export default function EventCompanyOnboarding() {
                       onClick={() => { setCompanyType(ct.value); setError(''); }}
                       className={`p-3 rounded-lg border text-left transition-all ${
                         companyType === ct.value
-                          ? 'border-primary-500 bg-primary-500/10 shadow-glow-sm'
-                          : 'border-glass-border bg-glass-light hover:border-primary-500/30'
+                          ? 'border-nocturne-primary bg-nocturne-primary/10 shadow-nocturne-glow-sm'
+                          : 'border-border-nocturne-border bg-nocturne-surface hover:border-nocturne-accent'
                       }`}
                     >
                       <span className="text-lg">{ct.emoji}</span>
-                      <p className="text-sm font-medium text-text-primary mt-1">{ct.label}</p>
+                      <p className="text-sm font-medium text-nocturne-text-primary mt-1">{ct.label}</p>
                     </button>
                   ))}
                 </div>
@@ -152,7 +152,7 @@ export default function EventCompanyOnboarding() {
                   if (!companyType) { setError('Select your company type'); return; }
                   setStep(2);
                 }}
-                className="w-full py-3 bg-gradient-accent text-white rounded-lg font-medium hover-glow transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 bg-nocturne-primary text-white rounded-lg font-medium hover:shadow-nocturne-glow-sm transition-all flex items-center justify-center gap-2"
               >
                 Continue <ArrowRight className="w-4 h-4" />
               </button>
@@ -163,10 +163,10 @@ export default function EventCompanyOnboarding() {
         {step === 2 && (
           <div className="animate-fade-in space-y-6">
             <div className="text-center">
-              <h1 className="text-3xl font-heading font-bold text-text-primary mb-2">
+              <h1 className="text-3xl font-display font-bold text-nocturne-text-primary mb-2">
                 Here&apos;s what you can do
               </h1>
-              <p className="text-text-muted">
+              <p className="text-nocturne-text-secondary">
                 Your event company dashboard is packed with features
               </p>
             </div>
@@ -178,13 +178,13 @@ export default function EventCompanyOnboarding() {
                 { icon: Building2, title: 'Presentation Builder', desc: 'Create branded artist proposal PDFs for clients' },
                 { icon: Mic, title: 'Voice Commands', desc: 'Say "find DJs in Mumbai" or "create a presentation" — hands free' },
               ].map((feature) => (
-                <div key={feature.title} className="glass-card rounded-xl p-4 border glass-border flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-500 to-violet-600 flex items-center justify-center flex-shrink-0">
+                <div key={feature.title} className="glass-card-nocturne rounded-xl p-4 border border-nocturne-border flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-nocturne-primary flex items-center justify-center flex-shrink-0">
                     <feature.icon className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-text-primary">{feature.title}</h3>
-                    <p className="text-sm text-text-muted">{feature.desc}</p>
+                    <h3 className="font-semibold text-nocturne-text-primary">{feature.title}</h3>
+                    <p className="text-sm text-nocturne-text-secondary">{feature.desc}</p>
                   </div>
                 </div>
               ))}
@@ -195,7 +195,7 @@ export default function EventCompanyOnboarding() {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full py-3 bg-gradient-accent text-white rounded-lg font-medium hover-glow transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 bg-nocturne-primary text-white rounded-lg font-medium hover:shadow-nocturne-glow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -211,13 +211,13 @@ export default function EventCompanyOnboarding() {
 
         {step === 3 && (
           <div className="animate-fade-in text-center space-y-6">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center mx-auto">
+            <div className="w-20 h-20 rounded-full bg-emerald-600 flex items-center justify-center mx-auto">
               <Check className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-3xl font-heading font-bold text-text-primary">
+            <h1 className="text-3xl font-display font-bold text-nocturne-text-primary">
               You&apos;re all set!
             </h1>
-            <p className="text-text-muted text-lg">
+            <p className="text-nocturne-text-secondary text-lg">
               Welcome to {companyName}. Redirecting to your dashboard...
             </p>
           </div>

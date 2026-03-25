@@ -159,29 +159,29 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="theme-nocturne bg-nocturne-base min-h-screen max-w-2xl mx-auto">
       {/* Progress Bar */}
       <div className="mb-8">
-        <div className="flex justify-between text-sm text-gray-500 mb-2">
+        <div className="flex justify-between text-sm text-nocturne-text-secondary mb-2">
           {['Basic Info', 'Performance', 'Pricing', 'Media'].map((label, i) => (
             <span
               key={label}
-              className={`${i + 1 <= step ? 'text-primary-500 font-medium' : ''}`}
+              className={`${i + 1 <= step ? 'text-nocturne-accent font-medium' : ''}`}
             >
               {label}
             </span>
           ))}
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-nocturne-surface-2 rounded-full h-2">
           <div
-            className="bg-primary-500 h-2 rounded-full transition-all duration-300"
+            className="bg-nocturne-primary h-2 rounded-full transition-all duration-300"
             style={{ width: `${(step / 4) * 100}%` }}
           />
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+        <div className="bg-red-900/20 border border-red-800 text-red-700 px-4 py-3 rounded-lg mb-6">
           {error}
         </div>
       )}
@@ -189,45 +189,45 @@ export default function OnboardingPage() {
       {/* Step 1: Basic Info */}
       {step === 1 && (
         <div className="space-y-4">
-          <div className="mb-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
+          <div className="mb-4 p-3 bg-blue-900/20 rounded-lg text-sm text-blue-300">
             Want to import your profile?{' '}
             <a href="/artist/onboarding/social" className="font-semibold underline">
               Analyze your social media profile &rarr;
             </a>
           </div>
-          <h2 className="text-xl font-bold text-gray-900">Tell us about yourself</h2>
+          <h2 className="text-xl font-bold text-nocturne-text-primary">Tell us about yourself</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Stage Name *</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Stage Name *</label>
             <input
               type="text"
               value={stageName}
               onChange={(e) => setStageName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="Your artist/band name"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Bio</label>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="Tell clients about your act, experience, and what makes you unique..."
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Base City *</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Base City *</label>
             <input
               type="text"
               value={baseCity}
               onChange={(e) => setBaseCity(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="e.g., Mumbai, Delhi, Bangalore"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">
               Travel Radius: {travelRadius} km
             </label>
             <input
@@ -239,7 +239,7 @@ export default function OnboardingPage() {
               onChange={(e) => setTravelRadius(Number(e.target.value))}
               className="w-full"
             />
-            <div className="flex justify-between text-xs text-gray-400">
+            <div className="flex justify-between text-xs text-nocturne-text-tertiary">
               <span>Local only</span>
               <span>500 km</span>
             </div>
@@ -250,10 +250,10 @@ export default function OnboardingPage() {
       {/* Step 2: Performance Details */}
       {step === 2 && (
         <div className="space-y-6">
-          <h2 className="text-xl font-bold text-gray-900">Performance Details</h2>
+          <h2 className="text-xl font-bold text-nocturne-text-primary">Performance Details</h2>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Genres *</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-2">Genres *</label>
             <div className="flex flex-wrap gap-2">
               {GENRES.map((genre) => (
                 <button
@@ -261,8 +261,8 @@ export default function OnboardingPage() {
                   onClick={() => toggleItem(selectedGenres, genre, setSelectedGenres)}
                   className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                     selectedGenres.includes(genre)
-                      ? 'bg-primary-500 text-white border-primary-500'
-                      : 'bg-white text-gray-700 border-gray-300 hover:border-primary-300'
+                      ? 'bg-nocturne-primary text-white border-primary-500'
+                      : 'bg-nocturne-surface text-nocturne-text-secondary border-nocturne-border hover:border-nocturne-accent'
                   }`}
                 >
                   {genre}
@@ -272,7 +272,7 @@ export default function OnboardingPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Languages *</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-2">Languages *</label>
             <div className="flex flex-wrap gap-2">
               {LANGUAGES.map((lang) => (
                 <button
@@ -280,8 +280,8 @@ export default function OnboardingPage() {
                   onClick={() => toggleItem(selectedLanguages, lang, setSelectedLanguages)}
                   className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                     selectedLanguages.includes(lang)
-                      ? 'bg-primary-500 text-white border-primary-500'
-                      : 'bg-white text-gray-700 border-gray-300 hover:border-primary-300'
+                      ? 'bg-nocturne-primary text-white border-primary-500'
+                      : 'bg-nocturne-surface text-nocturne-text-secondary border-nocturne-border hover:border-nocturne-accent'
                   }`}
                 >
                   {lang}
@@ -291,7 +291,7 @@ export default function OnboardingPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Event Types *</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-2">Event Types *</label>
             <div className="flex flex-wrap gap-2">
               {EVENT_TYPES.map((type) => (
                 <button
@@ -299,8 +299,8 @@ export default function OnboardingPage() {
                   onClick={() => toggleItem(selectedEventTypes, type.value, setSelectedEventTypes)}
                   className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                     selectedEventTypes.includes(type.value)
-                      ? 'bg-primary-500 text-white border-primary-500'
-                      : 'bg-white text-gray-700 border-gray-300 hover:border-primary-300'
+                      ? 'bg-nocturne-primary text-white border-primary-500'
+                      : 'bg-nocturne-surface text-nocturne-text-secondary border-nocturne-border hover:border-nocturne-accent'
                   }`}
                 >
                   {type.label}
@@ -311,25 +311,25 @@ export default function OnboardingPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Min Duration (min)</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Min Duration (min)</label>
               <input
                 type="number"
                 value={durationMin}
                 onChange={(e) => setDurationMin(Number(e.target.value))}
                 min={15}
                 max={480}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Max Duration (min)</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Max Duration (min)</label>
               <input
                 type="number"
                 value={durationMax}
                 onChange={(e) => setDurationMax(Number(e.target.value))}
                 min={15}
                 max={480}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary"
               />
             </div>
           </div>
@@ -339,26 +339,26 @@ export default function OnboardingPage() {
       {/* Step 3: Pricing Matrix */}
       {step === 3 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-gray-900">Set Your Pricing</h2>
-          <p className="text-sm text-gray-500">Set price ranges per event type and city tier. Clients will see these as indicative ranges.</p>
+          <h2 className="text-xl font-bold text-nocturne-text-primary">Set Your Pricing</h2>
+          <p className="text-sm text-nocturne-text-secondary">Set price ranges per event type and city tier. Clients will see these as indicative ranges.</p>
 
           {pricing.map((entry, i) => (
-            <div key={i} className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+            <div key={i} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4 space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-700">Rate #{i + 1}</span>
+                <span className="text-sm font-medium text-nocturne-text-secondary">Rate #{i + 1}</span>
                 {pricing.length > 1 && (
-                  <button onClick={() => removePricingRow(i)} className="text-sm text-red-500 hover:text-red-700">
+                  <button onClick={() => removePricingRow(i)} className="text-sm text-red-500 hover:text-red-200">
                     Remove
                   </button>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Event Type</label>
+                  <label className="block text-xs text-nocturne-text-secondary mb-1">Event Type</label>
                   <select
                     value={entry.event_type}
                     onChange={(e) => updatePricing(i, 'event_type', e.target.value)}
-                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                    className="w-full px-2 py-1.5 border border-nocturne-border rounded text-sm"
                   >
                     {EVENT_TYPES.map((t) => (
                       <option key={t.value} value={t.value}>{t.label}</option>
@@ -366,11 +366,11 @@ export default function OnboardingPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">City Tier</label>
+                  <label className="block text-xs text-nocturne-text-secondary mb-1">City Tier</label>
                   <select
                     value={entry.city_tier}
                     onChange={(e) => updatePricing(i, 'city_tier', e.target.value)}
-                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                    className="w-full px-2 py-1.5 border border-nocturne-border rounded text-sm"
                   >
                     <option value="tier_1">Tier 1 (Metro)</option>
                     <option value="tier_2">Tier 2</option>
@@ -378,23 +378,23 @@ export default function OnboardingPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Min Price (INR)</label>
+                  <label className="block text-xs text-nocturne-text-secondary mb-1">Min Price (INR)</label>
                   <input
                     type="number"
                     value={entry.min_price}
                     onChange={(e) => updatePricing(i, 'min_price', Number(e.target.value))}
                     min={0}
-                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                    className="w-full px-2 py-1.5 border border-nocturne-border rounded text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Max Price (INR)</label>
+                  <label className="block text-xs text-nocturne-text-secondary mb-1">Max Price (INR)</label>
                   <input
                     type="number"
                     value={entry.max_price}
                     onChange={(e) => updatePricing(i, 'max_price', Number(e.target.value))}
                     min={0}
-                    className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                    className="w-full px-2 py-1.5 border border-nocturne-border rounded text-sm"
                   />
                 </div>
               </div>
@@ -403,7 +403,7 @@ export default function OnboardingPage() {
 
           <button
             onClick={addPricingRow}
-            className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-300 hover:text-primary-500 transition-colors"
+            className="w-full py-2 border-2 border-dashed border-nocturne-border rounded-lg text-sm text-nocturne-text-secondary hover:border-nocturne-accent hover:text-nocturne-accent transition-colors"
           >
             + Add another rate
           </button>
@@ -413,16 +413,16 @@ export default function OnboardingPage() {
       {/* Step 4: Media Upload */}
       {step === 4 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-gray-900">Upload Media</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-bold text-nocturne-text-primary">Upload Media</h2>
+          <p className="text-sm text-nocturne-text-secondary">
             Add photos and videos to showcase your performances. This step is optional — you can always add more later from your profile.
           </p>
           {profileCreated ? (
             <MediaUploader media={media} onUpdate={loadMedia} />
           ) : (
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <p className="text-gray-400 mb-2">Create your profile first to upload media</p>
-              <p className="text-xs text-gray-400">Supports: JPG, PNG, MP4 (up to 500MB)</p>
+            <div className="border-2 border-dashed border-nocturne-border rounded-lg p-8 text-center">
+              <p className="text-nocturne-text-tertiary mb-2">Create your profile first to upload media</p>
+              <p className="text-xs text-nocturne-text-tertiary">Supports: JPG, PNG, MP4 (up to 500MB)</p>
             </div>
           )}
         </div>
@@ -433,7 +433,7 @@ export default function OnboardingPage() {
         <button
           onClick={() => setStep(Math.max(1, step - 1))}
           disabled={step === 1 || (step === 4 && profileCreated)}
-          className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 text-sm font-medium text-nocturne-text-secondary bg-nocturne-surface border border-nocturne-border rounded-lg hover:bg-nocturne-surface-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Back
         </button>
@@ -442,7 +442,7 @@ export default function OnboardingPage() {
           <button
             onClick={() => setStep(step + 1)}
             disabled={!canProceed()}
-            className="px-6 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 text-sm font-medium text-white bg-nocturne-primary rounded-lg hover:bg-nocturne-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Continue
           </button>
@@ -450,14 +450,14 @@ export default function OnboardingPage() {
           <button
             onClick={handleCreateProfile}
             disabled={isSubmitting || !canProceed()}
-            className="px-6 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50"
+            className="px-6 py-2 text-sm font-medium text-white bg-nocturne-primary rounded-lg hover:bg-nocturne-primary-hover disabled:opacity-50"
           >
             {isSubmitting ? 'Creating...' : 'Create Profile & Continue'}
           </button>
         ) : (
           <button
             onClick={() => router.push('/artist')}
-            className="px-6 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600"
+            className="px-6 py-2 text-sm font-medium text-white bg-nocturne-primary rounded-lg hover:bg-nocturne-primary-hover"
           >
             {media.length > 0 ? 'Finish' : 'Skip & Finish'}
           </button>

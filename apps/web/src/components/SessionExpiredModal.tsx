@@ -36,17 +36,17 @@ export function SessionExpiredModal() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-lg"
       role="dialog"
       aria-modal="true"
       aria-labelledby="session-expired-title"
     >
-      <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full mx-4 p-6 animate-in fade-in zoom-in-95">
+      <div className="glass-card rounded-xl shadow-2xl max-w-sm w-full mx-4 p-6 animate-in fade-in zoom-in-95">
         {/* Icon */}
-        <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+        <div className="mx-auto w-12 h-12 rounded-full bg-nocturne-warning/25 flex items-center justify-center mb-4">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-amber-600"
+            className="h-6 w-6 text-nocturne-warning"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -62,18 +62,18 @@ export function SessionExpiredModal() {
 
         <h2
           id="session-expired-title"
-          className="text-lg font-semibold text-gray-900 text-center"
+          className="text-lg font-semibold text-nocturne-text-primary text-center"
         >
           Session Expired
         </h2>
-        <p className="mt-2 text-sm text-gray-600 text-center">
+        <p className="mt-2 text-sm text-nocturne-text-secondary text-center">
           Your session has expired for security reasons. Please log in again to
           continue where you left off.
         </p>
 
         <button
           onClick={handleLogin}
-          className="mt-6 w-full rounded-lg bg-primary-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
+          className="mt-6 w-full rounded-lg bg-nocturne-primary px-4 py-2.5 text-sm font-semibold text-nocturne-text-primary shadow-sm hover:bg-nocturne-primary-hover focus:outline-none focus:ring-2 focus:ring-nocturne-primary focus:ring-offset-0 transition-colors"
         >
           Log in again
         </button>
