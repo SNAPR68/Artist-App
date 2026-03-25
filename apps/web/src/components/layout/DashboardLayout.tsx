@@ -21,6 +21,7 @@ import {
   Bell,
   LogOut,
   DollarSign,
+  Sparkle,
 } from 'lucide-react';
 
 interface NavItem {
@@ -30,41 +31,41 @@ interface NavItem {
 }
 
 const ARTIST_NAV: NavItem[] = [
-  { href: '/artist', labelKey: 'nav.home', icon: <Home size={20} /> },
-  { href: '/artist/bookings', labelKey: 'nav.bookings', icon: <Calendar size={20} /> },
-  { href: '/gigs', labelKey: 'nav.gigs', icon: <Target size={20} /> },
-  { href: '/artist/intelligence', labelKey: 'nav.intelligence', icon: <Brain size={20} /> },
-  { href: '/artist/financial', labelKey: 'nav.finances', icon: <Wallet size={20} /> },
-  { href: '/artist/calendar', labelKey: 'nav.calendar', icon: <CalendarDays size={20} /> },
+  { href: '/artist', labelKey: 'nav.home', icon: <Home size={18} /> },
+  { href: '/artist/bookings', labelKey: 'nav.bookings', icon: <Calendar size={18} /> },
+  { href: '/gigs', labelKey: 'nav.gigs', icon: <Target size={18} /> },
+  { href: '/artist/intelligence', labelKey: 'nav.intelligence', icon: <Brain size={18} /> },
+  { href: '/artist/financial', labelKey: 'nav.finances', icon: <Wallet size={18} /> },
+  { href: '/artist/calendar', labelKey: 'nav.calendar', icon: <CalendarDays size={18} /> },
 ];
 
 const CLIENT_NAV: NavItem[] = [
-  { href: '/client', labelKey: 'nav.home', icon: <Home size={20} /> },
-  { href: '/client/bookings', labelKey: 'nav.bookings', icon: <Calendar size={20} /> },
-  { href: '/gigs', labelKey: 'nav.gigs', icon: <Target size={20} /> },
-  { href: '/client/workspace', labelKey: 'nav.workspace', icon: <Building2 size={20} /> },
-  { href: '/client/recommendations', labelKey: 'nav.discover', icon: <Sparkles size={20} /> },
-  { href: '/search', labelKey: 'nav.search', icon: <Search size={20} /> },
+  { href: '/client', labelKey: 'nav.home', icon: <Home size={18} /> },
+  { href: '/client/bookings', labelKey: 'nav.bookings', icon: <Calendar size={18} /> },
+  { href: '/gigs', labelKey: 'nav.gigs', icon: <Target size={18} /> },
+  { href: '/client/workspace', labelKey: 'nav.workspace', icon: <Building2 size={18} /> },
+  { href: '/client/recommendations', labelKey: 'nav.discover', icon: <Sparkles size={18} /> },
+  { href: '/search', labelKey: 'nav.search', icon: <Search size={18} /> },
 ];
 
 const AGENT_NAV: NavItem[] = [
-  { href: '/agent', labelKey: 'nav.home', icon: <Home size={20} /> },
-  { href: '/agent/roster', labelKey: 'nav.roster', icon: <Users size={20} /> },
-  { href: '/agent/bookings', labelKey: 'nav.bookings', icon: <Calendar size={20} /> },
-  { href: '/gigs', labelKey: 'nav.gigs', icon: <Target size={20} /> },
-  { href: '/agent/recommendations', labelKey: 'nav.discover', icon: <Sparkles size={20} /> },
+  { href: '/agent', labelKey: 'nav.home', icon: <Home size={18} /> },
+  { href: '/agent/roster', labelKey: 'nav.roster', icon: <Users size={18} /> },
+  { href: '/agent/bookings', labelKey: 'nav.bookings', icon: <Calendar size={18} /> },
+  { href: '/gigs', labelKey: 'nav.gigs', icon: <Target size={18} /> },
+  { href: '/agent/recommendations', labelKey: 'nav.discover', icon: <Sparkles size={18} /> },
 ];
 
 const ADMIN_NAV: NavItem[] = [
-  { href: '/admin', labelKey: 'nav.home', icon: <Home size={20} /> },
+  { href: '/admin', labelKey: 'nav.home', icon: <Home size={18} /> },
 ];
 
 const EVENT_COMPANY_NAV: NavItem[] = [
-  { href: '/event-company', labelKey: 'nav.home', icon: <Home size={20} /> },
-  { href: '/client/bookings', labelKey: 'nav.bookings', icon: <Calendar size={20} /> },
-  { href: '/client/workspace', labelKey: 'nav.workspace', icon: <Building2 size={20} /> },
-  { href: '/client/payments', labelKey: 'nav.payments', icon: <DollarSign size={20} /> },
-  { href: '/search', labelKey: 'nav.search', icon: <Search size={20} /> },
+  { href: '/event-company', labelKey: 'nav.home', icon: <Home size={18} /> },
+  { href: '/client/bookings', labelKey: 'nav.bookings', icon: <Calendar size={18} /> },
+  { href: '/client/workspace', labelKey: 'nav.workspace', icon: <Building2 size={18} /> },
+  { href: '/client/payments', labelKey: 'nav.payments', icon: <DollarSign size={18} /> },
+  { href: '/search', labelKey: 'nav.search', icon: <Search size={18} /> },
 ];
 
 function getNavItems(role?: string): NavItem[] {
@@ -98,105 +99,103 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const navItems = getNavItems(user?.role);
   const homeHref = getHomeHref(user?.role);
 
-  // Ensure auth is initialized on client
   useEffect(() => {
     initialize();
   }, [initialize]);
 
-  // Client-side auth guard — redirect if not authenticated after initialization
   useEffect(() => {
     if (_initialized && !isAuthenticated) {
       router.replace(`/login?redirect=${encodeURIComponent(pathname ?? '/')}`);
     }
   }, [_initialized, isAuthenticated, pathname, router]);
 
-  // Show loading skeleton while auth initializes or if not authenticated
   if (!_initialized || !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-surface-bg via-surface-base to-primary-50 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <div className="text-center space-y-3">
-          <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-sm text-text-muted">Loading...</p>
+          <div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-[13px] text-neutral-500">Loading...</p>
         </div>
       </div>
     );
   }
 
-  // Get user initials for avatar (user has phone, not name)
   const initials = user?.phone
     ? user.phone.slice(-2).toUpperCase()
     : 'U';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-surface-bg via-surface-base to-primary-50 pb-24 sm:pb-0">
-      {/* Gradient Accent Line */}
-      <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-accent z-[51]" />
-
-      {/* Top Bar - Desktop */}
-      <header className="hidden sm:flex sticky top-0 z-navbar items-center justify-between px-6 py-4 glass-card glass-border backdrop-blur-md">
+    <div className="min-h-screen bg-neutral-50 pb-20 sm:pb-0">
+      {/* Desktop Top Bar */}
+      <header className="hidden sm:flex sticky top-0 z-navbar items-center justify-between px-6 h-14 bg-white/80 backdrop-blur-lg border-b border-neutral-200 shadow-sm">
         {/* Logo */}
         <Link
           href={homeHref}
-          className="text-xl font-heading font-bold text-primary-500 shrink-0 hover:text-primary-600 transition-colors"
+          className="flex items-center gap-2 shrink-0"
         >
-          AB
+          <div className="w-6 h-6 rounded-md bg-primary-600 flex items-center justify-center">
+            <Sparkle size={16} className="text-white" />
+          </div>
+          <span className="text-sm font-heading font-bold text-neutral-900 hidden lg:block">ArtistBook</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="flex items-center gap-2 flex-1 mx-8">
+        <nav className="flex items-center gap-0.5 flex-1 mx-8">
           {navItems.map((item) => {
             const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-medium transition-all duration-200 border-l-2 ${
                   isActive
-                    ? 'bg-gradient-accent text-white shadow-glow-sm'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-elevated'
+                    ? 'bg-primary-50 text-primary-700 border-l-primary-600'
+                    : 'text-neutral-500 hover:text-neutral-600 border-l-transparent hover:bg-neutral-50'
                 }`}
               >
                 <span className="flex-shrink-0">{item.icon}</span>
-                <span>{t(item.labelKey)}</span>
+                <span className="hidden lg:inline">{t(item.labelKey)}</span>
               </Link>
             );
           })}
         </nav>
 
         {/* Right Section */}
-        <div className="flex items-center gap-4 shrink-0">
+        <div className="flex items-center gap-0.5 shrink-0">
           {/* Notification Bell */}
           <Link
             href="/notifications"
-            className="relative text-text-secondary hover:text-text-primary transition-colors p-2 hover:bg-surface-elevated rounded-lg"
+            className="relative text-neutral-500 hover:text-primary-600 transition-colors p-2 rounded-lg hover:bg-primary-50 min-h-11 min-w-11 flex items-center justify-center"
             aria-label={t('nav.notifications')}
           >
-            <Bell size={20} />
+            <Bell size={18} />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-gradient-accent rounded-full animate-pulse shadow-glow-sm">
+              <span className="absolute top-1 right-1 inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold leading-none text-white bg-primary-600 rounded-full">
                 {unreadCount > 99 ? '99+' : unreadCount}
               </span>
             )}
           </Link>
 
-          {/* Language Switcher */}
           <LanguageSwitcher />
 
+          {/* Divider */}
+          <div className="w-px h-5 bg-neutral-200 mx-2" />
+
           {/* User Avatar */}
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-elevated hover-glow transition-all">
-            <div className="w-8 h-8 rounded-full bg-gradient-accent flex items-center justify-center text-white font-bold text-xs">
+          <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-neutral-100 transition-all cursor-default min-h-11">
+            <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold text-[11px] flex-shrink-0">
               {initials}
             </div>
-            <div className="hidden md:flex flex-col gap-0.5">
-              <p className="text-xs font-semibold text-text-primary">{user?.phone || 'User'}</p>
-              <p className="text-xs text-text-muted capitalize">{user?.role}</p>
+            <div className="hidden xl:flex flex-col min-w-0">
+              <p className="text-[12px] font-medium text-neutral-900 truncate">{user?.phone || 'User'}</p>
+              <p className="text-[10px] text-neutral-500 capitalize">{user?.role}</p>
             </div>
           </div>
 
-          {/* Logout Button */}
+          {/* Logout */}
           <button
             onClick={() => logout()}
-            className="flex items-center gap-2 text-text-secondary hover:text-text-primary p-2 rounded-lg hover:bg-surface-elevated transition-all"
+            className="text-neutral-500 hover:text-primary-600 p-2 rounded-lg hover:bg-primary-50 transition-all min-h-11 min-w-11 flex items-center justify-center"
             title={t('nav.logout')}
           >
             <LogOut size={18} />
@@ -205,37 +204,33 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Mobile Header */}
-      <header className="sm:hidden sticky top-0 z-navbar px-4 py-3 glass-card glass-border backdrop-blur-md">
+      <header className="sm:hidden sticky top-0 z-navbar px-4 py-3 bg-white/80 backdrop-blur-lg border-b border-neutral-200 shadow-sm">
         <div className="flex items-center justify-between">
-          <Link
-            href={homeHref}
-            className="text-lg font-heading font-bold text-primary-500 shrink-0 hover:text-primary-600 transition-colors"
-          >
-            AB
+          <Link href={homeHref} className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-md bg-primary-600 flex items-center justify-center">
+              <Sparkle size={16} className="text-white" />
+            </div>
           </Link>
 
-          <div className="flex items-center gap-3">
-            {/* Notification Bell */}
+          <div className="flex items-center gap-0.5">
             <Link
               href="/notifications"
-              className="relative text-text-secondary hover:text-text-primary transition-colors p-2 hover:bg-surface-elevated rounded-lg"
+              className="relative text-neutral-500 hover:text-primary-600 transition-colors p-2 rounded-lg hover:bg-primary-50 min-h-11 min-w-11 flex items-center justify-center"
               aria-label={t('nav.notifications')}
             >
-              <Bell size={20} />
+              <Bell size={18} />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-gradient-accent rounded-full animate-pulse shadow-glow-sm">
+                <span className="absolute top-1 right-1 inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold leading-none text-white bg-primary-600 rounded-full">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
             </Link>
 
-            {/* Language Switcher */}
             <LanguageSwitcher />
 
-            {/* Logout Button */}
             <button
               onClick={() => logout()}
-              className="text-text-secondary hover:text-text-primary p-2 rounded-lg hover:bg-surface-elevated transition-all"
+              className="text-neutral-500 hover:text-primary-600 p-2 rounded-lg hover:bg-primary-50 transition-all min-h-11 min-w-11 flex items-center justify-center"
               title={t('nav.logout')}
             >
               <LogOut size={18} />
@@ -245,12 +240,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Content Area */}
-      <main className="max-w-6xl mx-auto px-4 py-6 animate-fade-in">
+      <main className="max-w-6xl mx-auto px-4 py-6">
         {children}
       </main>
 
-      {/* Bottom Navigation - Mobile */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 glass-card glass-border glass-medium backdrop-blur-md border-t z-navbar">
+      {/* Bottom Navigation — Mobile */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 z-navbar shadow-sm">
         <div className="flex justify-around items-stretch">
           {navItems.slice(0, 5).map((item) => {
             const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
@@ -258,14 +253,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center gap-1 px-3 py-3 flex-1 transition-all duration-200 relative ${
-                  isActive ? 'text-primary-500' : 'text-text-secondary hover:text-text-primary'
+                className={`flex flex-col items-center justify-center gap-1 px-2 py-3 flex-1 transition-all duration-200 relative min-h-[3.5rem] ${
+                  isActive ? 'text-primary-600' : 'text-neutral-500 hover:text-neutral-600'
                 }`}
               >
                 <span className="flex-shrink-0">{item.icon}</span>
-                <span className="text-xs font-medium whitespace-nowrap">{t(item.labelKey)}</span>
+                <span className="text-[10px] font-medium whitespace-nowrap">{t(item.labelKey)}</span>
                 {isActive && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-accent rounded-t-lg animate-fade-in" />
+                  <div className="absolute -top-1 w-1 h-1 bg-primary-600 rounded-full" />
                 )}
               </Link>
             );

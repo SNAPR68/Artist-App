@@ -13,15 +13,16 @@ import { CookieConsent } from '@/components/CookieConsent';
 
 const inter = Inter({
   subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-inter',
   display: 'swap',
-  variable: '--font-sans',
 });
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-heading',
   weight: ['500', '600', '700', '800'],
+  variable: '--font-plus-jakarta',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -54,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             position: fixed;
             inset: 0;
             z-index: 9999;
-            background: linear-gradient(135deg, #0A0F1A 0%, #111827 100%);
+            background: #FFFFFF;
             transition: opacity 0.3s ease;
           }
           .auth-loading body::after {
@@ -66,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             width: 2rem;
             height: 2rem;
             margin: -1rem 0 0 -1rem;
-            border: 2px solid rgba(255,255,255,0.1);
+            border: 2px solid #E4E4E7;
             border-top-color: #8B5CF6;
             border-radius: 50%;
             animation: auth-spin 0.6s linear infinite;

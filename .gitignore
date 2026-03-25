@@ -45,3 +45,6 @@ npm-debug.log*
 pnpm-debug.log*
 .vercel
 .env.production
+apps/web/tmp/
+*.bak
+_tmp_*

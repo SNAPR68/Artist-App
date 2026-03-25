@@ -239,8 +239,18 @@ export class PaymentService {
 
   /**
    * Get payment details for a booking.
+   * Enforces ownership: caller must be a booking participant or admin.
    */
-  async getPaymentDetails(bookingId: string) {
+  async getPaymentDetails(bookingId: string, userId: string, userRole: string) {
+    const booking = await bookingRepository.findByIdWithDetails(bookingId);
+    if (!booking) {
+      throw new PaymentError('NOT_FOUND', 'Booking not found', 404);
+    }
+
+    if (userRole !== 'admin' && booking.client_user_id !== userId && booking.artist_user_id !== userId) {
+      throw new PaymentError('FORBIDDEN', 'You do not have access to this payment', 403);
+    }
+
     return paymentRepository.findByBookingId(bookingId);
   }
 
@@ -260,14 +270,21 @@ export class PaymentService {
 
   /**
    * Generate GST invoice for a payment.
+   * Enforces ownership: caller must be a booking participant or admin.
    */
-  async generateInvoice(paymentId: string) {
+  async generateInvoice(paymentId: string, userId: string, userRole: string) {
     const payment = await paymentRepository.findById(paymentId);
     if (!payment) {
       throw new PaymentError('NOT_FOUND', 'Payment not found', 404);
     }
 
     const booking = await bookingRepository.findByIdWithDetails(payment.booking_id);
+
+    if (booking) {
+      if (userRole !== 'admin' && booking.client_user_id !== userId && booking.artist_user_id !== userId) {
+        throw new PaymentError('FORBIDDEN', 'You do not have access to this invoice', 403);
+      }
+    }
 
     const { generateInvoice: genInvoice, formatInvoiceDocument } = await import('../document/invoice.generator.js');
 

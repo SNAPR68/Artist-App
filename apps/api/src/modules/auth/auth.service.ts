@@ -93,12 +93,19 @@ export class AuthService {
   }
 
   /**
-   * Logout: revoke both access and refresh tokens
+   * Logout: revoke both access and refresh tokens.
+   * If a specific refresh token is provided, revoke it.
+   * Otherwise, revoke ALL refresh tokens for this user to prevent session leakage.
    */
-  async logout(accessToken: string, refreshToken?: string): Promise<void> {
+  async logout(accessToken: string, refreshToken?: string, userId?: string): Promise<void> {
     await jwtService.revokeAccessToken(accessToken);
     if (refreshToken) {
       await jwtService.revokeRefreshToken(refreshToken);
+    } else if (userId) {
+      // No refresh token sent — revoke all refresh tokens for this user
+      await db('refresh_tokens')
+        .where({ user_id: userId, revoked_at: null })
+        .update({ revoked_at: db.fn.now() });
     }
   }
 }

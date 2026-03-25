@@ -12,6 +12,13 @@ import type { Knex } from 'knex';
  * - Admin:         9876543214
  */
 export async function up(knex: Knex): Promise<void> {
+  // ─── Guard: Never seed demo data in production ─────────────
+  const env = process.env.NODE_ENV || 'development';
+  if (env === 'production') {
+    console.warn('[MIGRATION] Skipping demo user creation in production. Use `pnpm db:seed` for dev data.');
+    return;
+  }
+
   // ─── Client Demo User ──────────────────────────────────────
   const existingClient = await knex('users').where('phone_hash', 'hash_9876543211').first();
   if (!existingClient) {

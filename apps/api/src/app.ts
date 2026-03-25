@@ -59,6 +59,9 @@ const app = Fastify({
   },
   genReqId: () => crypto.randomUUID(),
   bodyLimit: 1_048_576, // 1MB default limit for all routes
+  // Trust proxy headers (X-Forwarded-For) when behind Render/Vercel/load balancer.
+  // This ensures request.ip reflects the real client IP, not the proxy's.
+  trustProxy: config.NODE_ENV === 'production',
 } as any);
 
 // ─── Plugins ─────────────────────────────────────────────────

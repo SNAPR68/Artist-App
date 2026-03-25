@@ -109,8 +109,8 @@ const config: Config = {
 
       // ─── Typography ─────────────────────────────────────
       fontFamily: {
-        heading: ['var(--font-heading)', 'Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
-        sans: ['var(--font-sans)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        heading: ['var(--font-plus-jakarta)', 'Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-inter)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'monospace'],
       },
       fontSize: {

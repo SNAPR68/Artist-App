@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { FadeIn } from '@/components/motion/FadeIn';
 
 interface CTABannerProps {
   variant: 'artist' | 'company';
@@ -15,9 +16,9 @@ const variants = {
     cta: 'Create Your Profile',
     ctaHref: '/artist/onboarding',
     badge: '5,000+ Artists',
-    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80',
-    gradient: 'from-primary-900/95 via-primary-900/80 to-primary-900/40',
-    accentColor: 'from-primary-500 to-primary-600',
+    bgGradient: 'from-violet-600 via-purple-600 to-violet-800',
+    buttonBg: 'bg-white',
+    buttonText: 'text-violet-700',
   },
   company: {
     title: 'Run events at scale?',
@@ -25,80 +26,115 @@ const variants = {
     cta: 'Set Up Workspace',
     ctaHref: '/login',
     badge: '10,000+ Events',
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
-    gradient: 'from-secondary-900/95 via-secondary-900/80 to-secondary-900/40',
-    accentColor: 'from-secondary-500 to-secondary-600',
+    bgGradient: 'from-neutral-900 via-neutral-800 to-neutral-900',
+    buttonBg: 'bg-violet-600 hover:bg-violet-700',
+    buttonText: 'text-white',
   },
 };
 
+const FloatingCircle = ({ delay, size, className }: { delay: number; size: string; className: string }) => (
+  <motion.div
+    className={`absolute rounded-full opacity-20 ${className} ${size}`}
+    animate={{
+      y: [0, -20, 0],
+      x: [0, 10, 0],
+    }}
+    transition={{
+      duration: 4,
+      delay,
+      repeat: Infinity,
+      ease: 'easeInOut',
+    }}
+  />
+);
+
 export function CTABanner({ variant }: CTABannerProps) {
   const config = variants[variant];
+  const isArtist = variant === 'artist';
 
   return (
     <section className="py-8 md:py-12 px-6">
       <div className="max-w-section mx-auto">
-        <div className="relative overflow-hidden rounded-3xl h-[280px] md:h-[320px] group">
-          {/* Background image with parallax effect */}
-          <Image
-            src={config.image}
-            alt=""
-            fill
-            sizes="(max-width: 768px) 100vw, 1200px"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+        <motion.section
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          viewport={{ once: true, amount: 0.3 }}
+          className={`bg-gradient-to-br ${config.bgGradient} rounded-3xl overflow-hidden py-16 px-8 md:px-12 text-white relative`}
+        >
+          {/* Animated Mesh/Grain Overlay */}
+          {isArtist && (
+            <motion.div
+              className="absolute inset-0 opacity-30"
+              style={{
+                backgroundImage:
+                  'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" seed="2"/%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)"%3E%3C/rect%3E%3C/svg%3E")',
+              }}
+              animate={{ opacity: [0.25, 0.35, 0.25] }}
+              transition={{ duration: 3, repeat: Infinity }}
+            />
+          )}
 
-          {/* Gradient overlay */}
-          <div className={`absolute inset-0 bg-gradient-to-r ${config.gradient}`} />
+          {/* Floating Circles Background */}
+          <FloatingCircle delay={0} size="w-40 h-40" className="top-0 right-0 bg-white" />
+          <FloatingCircle delay={1} size="w-32 h-32" className="bottom-10 left-10 bg-white" />
+          <FloatingCircle delay={0.5} size="w-24 h-24" className="top-1/3 left-1/4 bg-white" />
 
-          {/* Decorative floating elements */}
-          <div className="absolute top-8 right-12 w-24 h-24 rounded-full bg-gradient-to-br from-accent-magenta/20 to-accent-pink/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="absolute bottom-6 left-10 w-32 h-32 rounded-full bg-gradient-to-br from-primary-500/15 to-secondary-500/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-          {/* Animated dots pattern */}
-          <div className="absolute top-6 right-6 space-y-3 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
-            <div className="flex gap-3">
-              <div className="w-2 h-2 rounded-full bg-white/40" />
-              <div className="w-2 h-2 rounded-full bg-white/40" />
-              <div className="w-2 h-2 rounded-full bg-white/40" />
-            </div>
-          </div>
-
-          {/* Glass card overlay on the right side */}
-          <div className="absolute inset-y-0 right-0 w-full md:w-5/12 bg-gradient-to-l from-glass-medium via-glass-medium/50 to-transparent border-l border-glass-border/30 flex items-center justify-end" />
-
-          {/* Content - positioned on left, visible over glass overlay */}
-          <div className="relative z-20 h-full flex flex-col justify-center px-6 md:px-10 max-w-md">
+          {/* Content */}
+          <div className="max-w-xl relative z-10">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-glass-medium border border-glass-border/50 w-fit mb-4 text-xs font-semibold text-white/80">
-              <Sparkles size={14} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.12] border border-white/[0.20] w-fit mb-4 text-[11px] font-semibold text-white/80"
+            >
+              <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity }}>
+                <Sparkles size={12} />
+              </motion.div>
               {config.badge}
-            </div>
+            </motion.div>
 
             {/* Title */}
-            <h2 className="text-2xl md:text-3xl font-heading font-bold text-white mb-3 leading-tight">
-              {config.title}
-            </h2>
+            <FadeIn direction="up" delay={0.2} duration={0.7}>
+              <h2 className="text-3xl md:text-4xl font-heading font-bold text-white mb-4 leading-tight">
+                {config.title}
+              </h2>
+            </FadeIn>
 
             {/* Subtitle */}
-            <p className="text-sm md:text-base text-white/80 mb-6 leading-relaxed">
-              {config.subtitle}
-            </p>
+            <FadeIn direction="up" delay={0.3} duration={0.7}>
+              <p className="text-[15px] text-white/80 mb-8 leading-relaxed max-w-sm">
+                {config.subtitle}
+              </p>
+            </FadeIn>
 
-            {/* CTA Button with glow */}
-            <Link
-              href={config.ctaHref}
-              className={`group/btn inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${config.accentColor} hover:shadow-glow-sm text-white font-semibold text-sm rounded-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] w-fit relative overflow-hidden`}
+            {/* CTA Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
             >
-              {/* Button glow background */}
-              <div className="absolute inset-0 opacity-0 group-hover/btn:opacity-20 bg-white transition-opacity duration-300" />
-
-              <span className="relative flex items-center gap-2">
-                {config.cta}
-                <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform duration-300" />
-              </span>
-            </Link>
+              <Link
+                href={config.ctaHref}
+                className={`inline-flex items-center gap-2 px-6 py-3 ${config.buttonBg} ${config.buttonText} font-semibold text-sm rounded-xl shadow-md transition-all duration-300 active:scale-[0.97]`}
+              >
+                <motion.span whileHover={{ x: 0 }} className="relative">
+                  {config.cta}
+                </motion.span>
+                <motion.div
+                  animate={{ x: [0, 3, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  whileHover={{ x: 4 }}
+                >
+                  <ArrowRight size={16} />
+                </motion.div>
+              </Link>
+            </motion.div>
           </div>
-        </div>
+        </motion.section>
       </div>
     </section>
   );

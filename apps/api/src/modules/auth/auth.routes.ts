@@ -82,7 +82,7 @@ export async function authRoutes(app: FastifyInstance) {
     const accessToken = authHeader?.replace('Bearer ', '') ?? '';
     const refreshToken = (request.body as { refresh_token?: string })?.refresh_token;
 
-    await authService.logout(accessToken, refreshToken);
+    await authService.logout(accessToken, refreshToken, request.user!.user_id);
 
     return reply.status(200).send({
       success: true,

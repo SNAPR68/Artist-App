@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm --filter @artist-booking/shared build && pnpm --filter @artist-booking/ui build && pnpm --filter @artist-booking/web build",
+  "buildCommand": "pnpm turbo build --filter=@artist-booking/web",
   "outputDirectory": "apps/web/.next",
   "git": {
     "silent": false

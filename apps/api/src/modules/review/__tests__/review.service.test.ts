@@ -28,7 +28,7 @@ describe('ReviewService', () => {
 
   const mockBooking = {
     id: 'booking-1',
-    status: 'completed',
+    state: 'completed',
     artist_user_id: 'artist-user-1',
     client_user_id: 'client-user-1',
     artist_id: 'artist-profile-1',
@@ -82,7 +82,7 @@ describe('ReviewService', () => {
     });
 
     it('should reject review for non-completed booking', async () => {
-      mockBookingRepo.findByIdWithDetails.mockResolvedValue({ ...mockBooking, status: 'confirmed' });
+      mockBookingRepo.findByIdWithDetails.mockResolvedValue({ ...mockBooking, state: 'confirmed' });
 
       await expect(
         service.submitReview('client-user-1', {

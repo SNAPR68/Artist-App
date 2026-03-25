@@ -13,42 +13,60 @@ import {
 } from '@artist-booking/shared';
 
 /**
- * Validate that webhook request is from Razorpay IP range
+ * Parse an IPv4 address into a 32-bit number.
+ */
+function ipToNumber(ip: string): number {
+  // Strip IPv6-mapped IPv4 prefix (e.g. ::ffff:1.2.3.4)
+  const cleanIP = ip.replace(/^::ffff:/, '');
+  const parts = cleanIP.split('.');
+  if (parts.length !== 4) return 0;
+  return parts.reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+}
+
+/**
+ * Check if an IP address falls within a CIDR range.
+ */
+function isIPInCIDR(ip: string, cidr: string): boolean {
+  const [rangeIP, prefixStr] = cidr.split('/');
+  if (!prefixStr) {
+    // Exact IP match
+    return ip.replace(/^::ffff:/, '') === rangeIP;
+  }
+  const prefix = parseInt(prefixStr, 10);
+  const mask = prefix === 0 ? 0 : (~0 << (32 - prefix)) >>> 0;
+  return (ipToNumber(ip) & mask) === (ipToNumber(rangeIP) & mask);
+}
+
+/**
+ * Validate that webhook request is from Razorpay IP range.
+ * This is an optional secondary check — signature validation is the primary security control.
+ * If RAZORPAY_WEBHOOK_IP_CHECK is set to 'false', this check is skipped.
  */
 async function validateRazorpayWebhookIP(request: FastifyRequest, reply: FastifyReply) {
-  // List of Razorpay's known IP ranges (as of 2024)
-  // In production, consider maintaining this list or fetching from Razorpay's API
-  const allowedIPs = [
-    '49.12.34.0/24',    // Razorpay main
+  // Allow disabling IP check (signature is the primary control)
+  if (process.env.RAZORPAY_WEBHOOK_IP_CHECK === 'false') return;
+
+  const allowedCIDRs = [
+    '49.12.34.0/24',
     '49.12.35.0/24',
     '49.12.37.0/24',
     '49.12.38.0/24',
     '49.12.39.0/24',
     '49.12.40.0/24',
-    '192.186.128.0/18', // Additional Razorpay IP ranges
+    '192.186.128.0/18',
   ];
 
   // Allow configuration via ENV var for flexibility
-  const customAllowedIPs = process.env.RAZORPAY_WEBHOOK_IPS?.split(',') || [];
-  const allAllowedIPs = [...allowedIPs, ...customAllowedIPs];
+  const customAllowedIPs = process.env.RAZORPAY_WEBHOOK_IPS?.split(',').map(s => s.trim()).filter(Boolean) || [];
+  const allAllowed = [...allowedCIDRs, ...customAllowedIPs];
 
-  // Get client IP from request
+  // Get client IP — Fastify's request.ip respects trustProxy setting
   const clientIP = request.ip || request.socket.remoteAddress || '';
 
-  // Check if client IP is in allowed ranges
-  const isAllowed = allAllowedIPs.some(range => {
-    // Simple check: if it's a CIDR range, convert to range check
-    // For now, we do a simple string match for exact IPs or check if IP starts with the range prefix
-    if (range.includes('/')) {
-      // CIDR notation - for simplicity, check prefix
-      const prefix = range.split('/')[0];
-      return clientIP.startsWith(prefix);
-    }
-    return clientIP === range;
-  });
+  const isAllowed = allAllowed.some(cidr => isIPInCIDR(clientIP, cidr));
 
   if (!isAllowed) {
-    console.warn(`[WEBHOOK] Unauthorized IP: ${clientIP}`);
+    request.log.warn({ clientIP }, '[WEBHOOK] IP not in Razorpay allowlist — rejecting');
     return reply.status(403).send({ error: 'Forbidden: IP not authorized' });
   }
 }
@@ -128,7 +146,7 @@ export async function paymentRoutes(app: FastifyInstance) {
     preHandler: [authMiddleware],
   }, async (request, reply) => {
     const { paymentId } = request.params as { paymentId: string };
-    const invoice = await paymentService.generateInvoice(paymentId);
+    const invoice = await paymentService.generateInvoice(paymentId, request.user!.user_id, request.user!.role);
 
     return reply.send({
       success: true,
@@ -144,7 +162,7 @@ export async function paymentRoutes(app: FastifyInstance) {
     preHandler: [authMiddleware, requirePermission('payment:read_own')],
   }, async (request, reply) => {
     const { bookingId } = request.params as { bookingId: string };
-    const payment = await paymentService.getPaymentDetails(bookingId);
+    const payment = await paymentService.getPaymentDetails(bookingId, request.user!.user_id, request.user!.role);
 
     return reply.send({
       success: true,
@@ -192,7 +210,7 @@ export async function paymentRoutes(app: FastifyInstance) {
     preHandler: [authMiddleware],
   }, async (request, reply) => {
     const { paymentId } = request.params as { paymentId: string };
-    const invoice = await paymentService.generateInvoice(paymentId);
+    const invoice = await paymentService.generateInvoice(paymentId, request.user!.user_id, request.user!.role);
 
     const { renderInvoicePDF } = await import('../document/pdf.renderer.js');
     const pdfBuffer = await renderInvoicePDF(invoice);
@@ -218,6 +236,13 @@ export async function paymentRoutes(app: FastifyInstance) {
     const booking = await bookingRepository.findByIdWithDetails(bookingId);
     if (!booking) {
       return reply.status(404).send({ success: false, errors: [{ code: 'NOT_FOUND', message: 'Booking not found' }] });
+    }
+
+    // Ownership check: only booking participants or admins can download the contract
+    const userId = request.user!.user_id;
+    const userRole = request.user!.role;
+    if (userRole !== 'admin' && booking.client_user_id !== userId && booking.artist_user_id !== userId) {
+      return reply.status(403).send({ success: false, errors: [{ code: 'FORBIDDEN', message: 'You do not have access to this contract' }] });
     }
 
     const split = calculatePaymentSplit({ baseAmountPaise: booking.final_amount_paise });

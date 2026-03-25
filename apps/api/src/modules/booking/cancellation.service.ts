@@ -53,7 +53,9 @@ export class CancellationService {
     // Calculate refund (only if payment exists)
     let refundAmountPaise = 0;
     let artistAmountPaise = 0;
-    const payment = await paymentService.getPaymentDetails(bookingId);
+    // User is already verified as participant above — determine role for payment access control
+    const callerRole = booking.artist_user_id === userId ? 'artist' : 'client';
+    const payment = await paymentService.getPaymentDetails(bookingId, userId, callerRole);
 
     if (payment && (payment.status === 'in_escrow' || payment.status === 'captured')) {
       const refund = calculateRefund({

@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Star, BadgeCheck, ArrowRight, Sparkles } from 'lucide-react';
+import { Star, BadgeCheck, ArrowRight, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { apiClient } from '@/lib/api-client';
+import { FadeIn } from '@/components/motion';
 
 interface ArtistData {
   id: string;
@@ -18,6 +20,19 @@ interface ArtistData {
   thumbnail_url?: string;
   pricing?: Array<{ min_price?: number; max_price?: number }>;
 }
+
+const SkeletonCard = ({ index }: { index: number }) => (
+  <motion.div
+    className="shrink-0 w-[280px] md:w-[300px] h-[420px] rounded-2xl bg-neutral-200"
+    animate={{ opacity: [0.5, 1, 0.5] }}
+    transition={{
+      duration: 2,
+      repeat: Infinity,
+      ease: 'easeInOut',
+      delay: index * 0.1,
+    }}
+  />
+);
 
 export function FeaturedArtists() {
   const scrollRef = useDragScroll<HTMLDivElement>();
@@ -60,7 +75,6 @@ export function FeaturedArtists() {
     if (!p) return 'Contact';
     const min = p.min_price ?? 0;
     if (min >= 100) {
-      // Prices stored in paise — convert to rupees
       return `₹${Math.round(min / 100).toLocaleString('en-IN')}`;
     }
     return `₹${min.toLocaleString('en-IN')}`;
@@ -68,11 +82,11 @@ export function FeaturedArtists() {
 
   if (loading) {
     return (
-      <section className="py-12 md:py-20">
-        <div className="max-w-section mx-auto px-6">
-          <div className="flex gap-5 overflow-hidden">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="shrink-0 w-[200px] md:w-[240px] h-[320px] rounded-2xl bg-surface-elevated animate-pulse" />
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-section mx-auto">
+          <div className="flex gap-6 overflow-hidden pb-4">
+            {[...Array(4)].map((_, i) => (
+              <SkeletonCard key={i} index={i} />
             ))}
           </div>
         </div>
@@ -82,12 +96,20 @@ export function FeaturedArtists() {
 
   if (error === 'warming_up') {
     return (
-      <section className="py-12 md:py-20">
+      <section className="py-20 px-6 bg-white">
         <div className="max-w-section mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-surface-elevated border border-glass-border">
-            <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-text-muted">Waking up the server... artists loading shortly</p>
-          </div>
+          <motion.div
+            className="inline-flex items-center gap-3 px-5 py-3 rounded-xl bg-violet-50 border border-violet-200"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <motion.div
+              className="w-4 h-4 border-2 border-violet-600 border-t-transparent rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            />
+            <p className="text-sm text-violet-700 font-medium">Loading artists...</p>
+          </motion.div>
         </div>
       </section>
     );
@@ -98,127 +120,243 @@ export function FeaturedArtists() {
   }
 
   return (
-    <section className="py-12 md:py-20 relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-primary-950/20 via-transparent to-transparent pointer-events-none" />
-
-      <div className="relative z-10 max-w-section mx-auto px-6">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-500/15 border border-primary-400/30 text-xs font-bold text-primary-300 tracking-wider">
-                <Sparkles size={12} className="animate-pulse" />
-                FEATURED
-              </span>
+    <section className="py-20 px-6 bg-white">
+      <div className="relative max-w-section mx-auto">
+        {/* Header */}
+        <FadeIn direction="down" delay={0.1} once={true}>
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <motion.div
+                className="inline-block mb-3"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.5 }}
+              >
+                <span className="bg-violet-50 text-violet-700 rounded-full px-4 py-2 text-xs font-semibold">
+                  Featured Artists
+                </span>
+              </motion.div>
+              <h2 className="text-4xl md:text-5xl font-bold text-neutral-900">
+                Top Rated Artists
+              </h2>
             </div>
-            <h2 className="text-2xl md:text-3xl font-heading font-bold text-text-primary">
-              Most Popular Artists
-            </h2>
-            <p className="text-sm text-text-muted mt-1">Top-rated performers this month</p>
+            <Link
+              href="/search"
+              className="group hidden sm:flex items-center gap-2 text-sm font-medium text-violet-600 hover:text-violet-700 transition-colors"
+            >
+              <span>View all</span>
+              <motion.div
+                animate={{ x: [0, 4, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <ArrowRight size={16} />
+              </motion.div>
+            </Link>
           </div>
-          <Link
-            href="/search"
-            className="group flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary-400/50 text-sm font-semibold text-primary-400 hover:text-primary-300 transition-all"
-          >
-            See All
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
+        </FadeIn>
 
+        {/* Scroll container */}
         <div className="relative">
-          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-surface-bg to-transparent z-20 pointer-events-none rounded-l-2xl" />
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-surface-bg to-transparent z-20 pointer-events-none rounded-r-2xl" />
+          <motion.div
+            className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-20 pointer-events-none"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+          />
+          <motion.div
+            className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-20 pointer-events-none"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+          />
 
           <div
             ref={scrollRef}
-            className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide drag-scroll"
+            className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide drag-scroll"
           >
-            {artists.map((artist) => (
-              <Link
+            {artists.map((artist, idx) => (
+              <motion.div
                 key={artist.id}
-                href={`/artists/${artist.id}`}
-                className="group shrink-0 w-[200px] md:w-[240px]"
+                initial={{ opacity: 0, x: 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{
+                  duration: 0.6,
+                  delay: idx * 0.1,
+                  ease: 'easeOut',
+                }}
+                className="shrink-0"
               >
-                <div className="glass-card rounded-2xl overflow-hidden p-0 border border-glass-border group-hover:border-primary-400/50 transition-all duration-300 group-hover:shadow-glow group-hover:-translate-y-2 h-full flex flex-col">
-                  <div className="relative w-full pt-[56.25%] overflow-hidden bg-gradient-to-br from-surface-elevated to-surface-bg">
-                    {artist.thumbnail_url ? (
-                      <Image
-                        src={artist.thumbnail_url}
-                        alt={artist.stage_name}
-                        fill
-                        sizes="(max-width: 768px) 200px, 240px"
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-3xl font-bold text-primary-400/40">
-                        {artist.stage_name.charAt(0)}
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-surface-bg/80 via-transparent to-transparent" />
-
-                    {artist.is_verified && (
-                      <div className="absolute top-3 right-3 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary-500/90 backdrop-blur-sm border border-primary-400/50 shadow-lg">
-                        <BadgeCheck size={14} className="text-white fill-white" />
-                        <span className="text-xs font-bold text-white">Verified</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex-1 p-4 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-base font-bold text-text-primary group-hover:text-primary-300 transition-colors line-clamp-1">
-                        {artist.stage_name}
-                      </h3>
-
-                      <div className="mt-2">
-                        <span className="inline-block px-2.5 py-1 rounded-full bg-primary-500/20 border border-primary-400/30 text-xs font-semibold text-primary-300">
-                          {artist.genres?.[0] ?? 'Artist'}
-                        </span>
-                      </div>
-
-                      <p className="text-xs text-text-muted mt-2.5">
-                        📍 {artist.base_city}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-glass-border space-y-2.5">
-                      <div className="flex items-center gap-2.5">
-                        <div className="flex items-center gap-1">
-                          <Star size={14} className="text-amber-400 fill-amber-400" />
-                          <span className="text-sm font-bold text-text-primary">
-                            {parseFloat(String(artist.trust_score)).toFixed(1)}
-                          </span>
-                          <span className="text-xs text-text-muted">
-                            ({artist.total_bookings})
+                <Link
+                  href={`/artists/${artist.id}`}
+                  className="group block"
+                >
+                  <motion.div
+                    className="min-w-[280px] md:min-w-[300px] rounded-2xl overflow-hidden bg-white border border-neutral-200 shadow-sm h-full flex flex-col"
+                    whileHover={{
+                      y: -8,
+                      scale: 1.02,
+                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+                    }}
+                    transition={{
+                      type: 'spring',
+                      damping: 15,
+                      stiffness: 200,
+                    }}
+                  >
+                    {/* Image Container */}
+                    <div className="relative w-full aspect-[3/4] overflow-hidden bg-neutral-100">
+                      {artist.thumbnail_url ? (
+                        <motion.div
+                          className="relative w-full h-full overflow-hidden"
+                          whileHover={{ scale: 1.08 }}
+                          transition={{ duration: 0.5, ease: 'easeOut' }}
+                        >
+                          <Image
+                            src={artist.thumbnail_url}
+                            alt={artist.stage_name}
+                            fill
+                            sizes="(max-width: 768px) 280px, 300px"
+                            className="object-cover"
+                          />
+                        </motion.div>
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-violet-100 to-violet-50">
+                          <span className="text-6xl font-bold text-violet-200">
+                            {artist.stage_name.charAt(0)}
                           </span>
                         </div>
-                      </div>
+                      )}
 
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-2xl font-bold text-primary-300">
-                          {formatPrice(artist)}
-                        </span>
-                        <span className="text-xs text-text-muted">/event</span>
-                      </div>
+                      {/* Gradient Overlay on Hover */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
+                        initial={{ opacity: 0 }}
+                        whileHover={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      />
+
+                      {/* Info Overlay */}
+                      <motion.div
+                        className="absolute inset-0 flex flex-col justify-end p-4 text-white"
+                        initial={{ opacity: 0 }}
+                        whileHover={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className="mb-2">
+                          <h4 className="text-sm font-bold line-clamp-1">
+                            {artist.stage_name}
+                          </h4>
+                          <p className="text-xs text-white/80">
+                            {artist.genres?.[0] ?? 'Artist'}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs font-semibold">
+                          <Star size={14} className="text-amber-300 fill-amber-300" />
+                          <span>{parseFloat(String(artist.trust_score)).toFixed(1)}</span>
+                        </div>
+                      </motion.div>
+
+                      {/* Verified Badge */}
+                      {artist.is_verified && (
+                        <motion.div
+                          className="absolute top-3 right-3 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-violet-600 backdrop-blur-md shadow-lg"
+                          initial={{ scale: 0, rotate: -180 }}
+                          whileInView={{ scale: 1, rotate: 0 }}
+                          viewport={{ once: true }}
+                          transition={{
+                            type: 'spring',
+                            damping: 10,
+                            stiffness: 200,
+                            delay: idx * 0.1 + 0.3,
+                          }}
+                        >
+                          <BadgeCheck size={14} className="text-white" />
+                          <span className="text-[10px] font-bold text-white uppercase tracking-wide">
+                            Verified
+                          </span>
+                        </motion.div>
+                      )}
                     </div>
-                  </div>
 
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-primary-950/40 via-transparent to-transparent pointer-events-none rounded-2xl" />
-                </div>
-              </Link>
+                    {/* Content */}
+                    <motion.div className="flex-1 p-4 flex flex-col">
+                      <motion.h3
+                        className="text-sm font-semibold text-neutral-900 line-clamp-1 group-hover:text-violet-600 transition-colors"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.4, delay: idx * 0.1 + 0.2 }}
+                      >
+                        {artist.stage_name}
+                      </motion.h3>
+
+                      <motion.p
+                        className="text-xs text-neutral-500 mt-1"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.4, delay: idx * 0.1 + 0.25 }}
+                      >
+                        {artist.genres?.[0] ?? 'Artist'}
+                      </motion.p>
+
+                      {/* Location */}
+                      <motion.div
+                        className="flex items-center gap-1.5 text-xs text-neutral-500 mt-2 mb-4"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.4, delay: idx * 0.1 + 0.3 }}
+                      >
+                        <MapPin size={12} className="flex-shrink-0" />
+                        <span className="line-clamp-1">{artist.base_city}</span>
+                      </motion.div>
+
+                      {/* Footer */}
+                      <motion.div
+                        className="mt-auto pt-4 border-t border-neutral-100 flex items-center justify-between"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.4, delay: idx * 0.1 + 0.35 }}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Star size={14} className="text-amber-400 fill-amber-400" />
+                          <span className="text-sm font-semibold text-neutral-900 tabular-nums">
+                            {parseFloat(String(artist.trust_score)).toFixed(1)}
+                          </span>
+                        </div>
+
+                        <motion.span
+                          className="text-sm font-bold text-violet-600"
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ type: 'spring', damping: 20 }}
+                        >
+                          {formatPrice(artist)}
+                        </motion.span>
+                      </motion.div>
+                    </motion.div>
+                  </motion.div>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
 
-        <p className="text-xs text-text-muted text-center mt-4 md:hidden">
-          Swipe to see more artists →
-        </p>
+        <motion.p
+          className="text-xs text-neutral-500 text-center mt-6 md:hidden"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+        >
+          Swipe to see more artists
+        </motion.p>
       </div>
-
-      <style>{`
-        .drag-scroll { scroll-behavior: smooth; }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
     </section>
   );
 }

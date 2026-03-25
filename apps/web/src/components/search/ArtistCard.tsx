@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Star, MapPin, BadgeCheck, Heart } from 'lucide-react';
+import { Star, MapPin, ArrowUpRight } from 'lucide-react';
 
 interface ArtistCardProps {
   id: string;
@@ -21,15 +21,15 @@ interface ArtistCardProps {
 export function ArtistCard({
   id,
   stage_name,
-  bio,
+  bio: _bio,
   genres,
   base_city,
   trust_score,
   total_bookings,
-  is_verified,
+  is_verified: _is_verified,
   thumbnail_url,
   pricing,
-  onShortlist,
+  onShortlist: _onShortlist,
 }: ArtistCardProps) {
   const prices = pricing
     ?.map((p) => p.min_price ?? p.min_paise)
@@ -37,97 +37,83 @@ export function ArtistCard({
   const minPrice = prices?.length ? Math.min(...prices) : null;
 
   return (
-    <div
-      className="group glass-card overflow-hidden hover:-translate-y-1 transition-all duration-300"
+    <Link
+      href={`/artists/${id}`}
+      className="group relative flex flex-col rounded-2xl overflow-hidden bg-white border border-neutral-200 shadow-sm hover:shadow-md transition-all duration-200"
     >
-      {/* Thumbnail */}
-      <div className="aspect-[4/3] bg-surface-elevated relative overflow-hidden">
+      {/* ── Image ── */}
+      <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
         {thumbnail_url ? (
           <Image
             src={thumbnail_url}
             alt={stage_name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500/10 to-secondary-500/10">
-            <span className="text-4xl opacity-30">&#9834;</span>
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary-50 to-neutral-100">
+            <span className="text-5xl font-bold text-primary-200">
+              {stage_name.charAt(0)}
+            </span>
           </div>
         )}
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-surface-bg/80 to-transparent" />
-
-        {/* Verified badge */}
-        {is_verified && (
-          <span className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 rounded-pill bg-primary-500/80 backdrop-blur-sm text-white text-[10px] font-bold">
-            <BadgeCheck size={10} />
-            VERIFIED
-          </span>
-        )}
-
-        {/* Heart / Shortlist */}
-        <button
-          onClick={(e) => { e.preventDefault(); onShortlist?.(id); }}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface-bg/40 backdrop-blur-sm border border-glass-border flex items-center justify-center text-text-muted hover:text-accent-magenta hover:scale-110 transition-all"
-          title="Add to shortlist"
-        >
-          <Heart size={14} />
-        </button>
-
-        {/* Book Now overlay on hover */}
-        <div className="absolute inset-x-3 bottom-3 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-          <Link
-            href={`/artists/${id}`}
-            className="block w-full text-center py-2.5 bg-gradient-accent text-white text-sm font-semibold rounded-lg hover-glow"
+        {/* Hover overlay: arrow button top-right */}
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center text-neutral-600 hover:text-primary-600 transition-colors"
+            title="View profile"
+            aria-label="View artist profile"
           >
-            View Profile
-          </Link>
+            <ArrowUpRight size={18} />
+          </button>
         </div>
       </div>
 
-      {/* Content */}
-      <Link href={`/artists/${id}`} className="block p-4">
-        <div className="flex items-center justify-between mb-1">
-          <h3 className="font-semibold text-text-primary truncate">{stage_name}</h3>
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <Star size={13} className="text-amber-400 fill-amber-400" />
-            <span className="text-sm font-medium text-text-primary">{trust_score}</span>
+      {/* ── Content ── */}
+      <div className="flex flex-col flex-1 p-4 space-y-2">
+        {/* Name */}
+        <h3 className="text-base font-semibold text-neutral-900 truncate leading-tight">
+          {stage_name}
+        </h3>
+
+        {/* Category/genre */}
+        <p className="text-sm text-neutral-500 line-clamp-1">
+          {genres.slice(0, 2).join(', ')}
+        </p>
+
+        {/* Rating */}
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-0.5">
+            <Star size={14} className="text-amber-400 fill-amber-400" />
+            <span className="text-sm font-medium text-neutral-900 tabular-nums">{trust_score.toFixed(1)}</span>
           </div>
+          <span className="text-xs text-neutral-400">({total_bookings})</span>
         </div>
 
-        <div className="flex items-center gap-1 text-xs text-text-muted mb-2">
-          <MapPin size={11} />
+        {/* Location */}
+        <div className="flex items-center gap-1 text-xs text-neutral-400">
+          <MapPin size={13} className="shrink-0" />
           <span>{base_city}</span>
-          <span className="text-glass-border mx-1">&middot;</span>
-          <span>{total_bookings} bookings</span>
         </div>
 
-        {/* Genres */}
-        <div className="flex flex-wrap gap-1 mb-2">
-          {genres.slice(0, 3).map((g) => (
-            <span key={g} className="bg-glass-light border border-glass-border text-text-muted text-[10px] px-2 py-0.5 rounded-pill">
-              {g}
-            </span>
-          ))}
-          {genres.length > 3 && (
-            <span className="text-[10px] text-text-muted">+{genres.length - 3}</span>
+        {/* Price — pushed to bottom */}
+        <div className="mt-auto pt-2 border-t border-neutral-100">
+          {minPrice !== null ? (
+            <p className="text-sm">
+              <span className="text-neutral-400 text-xs font-normal">from</span>
+              {' '}
+              <span className="text-primary-600 font-bold text-lg">
+                &#8377;{(minPrice / 100).toLocaleString('en-IN')}
+              </span>
+            </p>
+          ) : (
+            <p className="text-xs text-neutral-400 font-medium">Contact for pricing</p>
           )}
         </div>
-
-        {/* Bio preview */}
-        {bio && (
-          <p className="text-xs text-text-muted line-clamp-2 mb-2">{bio}</p>
-        )}
-
-        {/* Price */}
-        {minPrice !== null && (
-          <p className="text-sm font-semibold text-text-primary">
-            From &#8377;{(minPrice / 100).toLocaleString('en-IN')}
-          </p>
-        )}
-      </Link>
-    </div>
+      </div>
+    </Link>
   );
 }

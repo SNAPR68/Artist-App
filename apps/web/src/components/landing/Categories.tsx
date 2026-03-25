@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useDragScroll } from '@/hooks/useDragScroll';
+import { FadeIn } from '@/components/motion';
 
 const GENRES = [
   { name: 'All', genre: '', emoji: '🎵', active: true },
@@ -54,81 +57,151 @@ const EVENT_TYPES = [
   },
 ];
 
+const eventCardVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.08,
+      type: 'spring',
+      damping: 20,
+      stiffness: 100,
+    },
+  }),
+};
+
 export function Categories() {
   const genreScrollRef = useDragScroll<HTMLDivElement>();
   const eventScrollRef = useDragScroll<HTMLDivElement>();
+  const [activeGenre, setActiveGenre] = useState('All');
 
   return (
-    <section className="py-12 md:py-16">
-      {/* ─── Genre Chips ─── */}
-      <div className="max-w-section mx-auto px-6 mb-10">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg md:text-xl font-heading font-bold text-text-primary">
-            Genres
-          </h2>
-          <Link href="/search" className="text-xs font-semibold text-primary-400 hover:text-primary-300 transition-colors">
-            See All
-          </Link>
+    <section className="bg-white py-20 px-6">
+      <div className="max-w-section mx-auto">
+        {/* Header */}
+        <FadeIn>
+          <div className="flex items-center justify-center mb-12">
+            <div className="text-center">
+              <motion.span
+                className="inline-block mb-4 px-3 py-1 rounded-full bg-violet-50 text-violet-600 text-xs font-semibold uppercase tracking-wider"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ type: 'spring', damping: 20, stiffness: 100 }}
+              >
+                Categories
+              </motion.span>
+              <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-3">
+                Browse by Category
+              </h2>
+              <p className="text-neutral-500 text-base">
+                Explore a wide range of artists and entertainers
+              </p>
+            </div>
+          </div>
+        </FadeIn>
+
+        {/* Genre Chips */}
+        <div className="mb-16">
+          <div
+            ref={genreScrollRef}
+            className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide drag-scroll justify-center md:justify-start"
+          >
+            <AnimatePresence mode="wait">
+              {GENRES.map((g) => (
+                <motion.div
+                  key={g.name}
+                  initial={{ opacity: 0, y: -10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  viewport={{ once: true }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                >
+                  <Link
+                    href={g.genre ? `/search?genre=${encodeURIComponent(g.genre)}` : '/search'}
+                    onClick={() => setActiveGenre(g.name)}
+                  >
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`flex items-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 shrink-0 relative ${
+                        g.active || activeGenre === g.name
+                          ? 'text-white'
+                          : 'border border-neutral-200 text-neutral-600 hover:border-violet-300 hover:text-violet-600'
+                      }`}
+                    >
+                      {(g.active || activeGenre === g.name) && (
+                        <motion.div
+                          layoutId="activeGenre"
+                          className="absolute inset-0 bg-violet-600 rounded-full -z-10"
+                          transition={{ type: 'spring', damping: 20, stiffness: 100 }}
+                        />
+                      )}
+                      <span className="text-base">{g.emoji}</span>
+                      {g.name}
+                    </motion.button>
+                  </Link>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
         </div>
 
-        <div
-          ref={genreScrollRef}
-          className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide drag-scroll"
-        >
-          {GENRES.map((g) => (
-            <Link
-              key={g.name}
-              href={g.genre ? `/search?genre=${encodeURIComponent(g.genre)}` : '/search'}
-              className={`flex items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-pill text-sm font-medium transition-all shrink-0 ${
-                g.active
-                  ? 'bg-gradient-accent text-white shadow-glow-sm'
-                  : 'bg-glass-medium border border-glass-border text-text-secondary hover:bg-glass-heavy hover:text-text-primary hover:border-primary-500/30'
-              }`}
-            >
-              <span className="text-base">{g.emoji}</span>
-              {g.name}
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* ─── Event Type Cards ─── */}
-      <div className="max-w-section mx-auto px-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg md:text-xl font-heading font-bold text-text-primary">
-            Browse by Event
-          </h2>
-          <Link href="/search" className="text-xs font-semibold text-primary-400 hover:text-primary-300 transition-colors">
-            See All
-          </Link>
-        </div>
-
-        <div
-          ref={eventScrollRef}
-          className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide drag-scroll"
-        >
-          {EVENT_TYPES.map((event) => (
-            <Link
-              key={event.name}
-              href={event.href}
-              className="group relative w-[160px] md:w-[200px] aspect-[3/4] rounded-2xl overflow-hidden shrink-0"
-            >
-              <Image
-                src={event.image}
-                alt={event.name}
-                fill
-                sizes="(max-width: 768px) 160px, 200px"
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              {/* Content */}
-              <div className="absolute inset-x-0 bottom-0 p-4">
-                <h3 className="text-white font-semibold text-sm">{event.name}</h3>
-                <p className="text-white/60 text-xs mt-0.5">{event.count} bookings</p>
-              </div>
-            </Link>
-          ))}
+        {/* Event Type Cards */}
+        <div>
+          <div
+            ref={eventScrollRef}
+            className="grid grid-cols-2 md:grid-cols-5 gap-4"
+          >
+            {EVENT_TYPES.map((event, index) => (
+              <motion.div
+                key={event.name}
+                custom={index}
+                variants={eventCardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                whileHover={{ y: -6 }}
+                transition={{ type: 'spring', damping: 20, stiffness: 100 }}
+              >
+                <Link href={event.href}>
+                  <div className="group relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer">
+                    <Image
+                      src={event.image}
+                      alt={event.name}
+                      fill
+                      sizes="(max-width: 768px) 160px, 220px"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                    />
+                    {/* Overlay gradient */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"
+                      initial={{ opacity: 0.6 }}
+                      whileHover={{ opacity: 0.8 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    {/* Content */}
+                    <motion.div
+                      className="absolute inset-x-0 bottom-0 p-4"
+                      initial={{ y: 8, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.1 + index * 0.08, duration: 0.4 }}
+                    >
+                      <h3 className="text-white text-sm font-semibold">{event.name}</h3>
+                      <motion.p
+                        className="text-white/70 text-xs mt-1"
+                        whileHover={{ color: 'rgba(255, 255, 255, 1)' }}
+                      >
+                        {event.count} bookings
+                      </motion.p>
+                    </motion.div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

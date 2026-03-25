@@ -159,7 +159,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: async () => {
     try {
-      await apiClient('/v1/auth/logout', { method: 'POST' });
+      // Send refresh token so the server can revoke it
+      const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+      await apiClient('/v1/auth/logout', {
+        method: 'POST',
+        body: JSON.stringify({ refresh_token: refreshToken ?? undefined }),
+      });
     } catch {
       // Best-effort — token may already be expired
     } finally {

@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'staging', 'production']).default('development'),
+  NODE_ENV: z.enum(['development', 'staging', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(3001),
   API_BASE_URL: z.string().default('http://localhost:3001'),
 
@@ -102,8 +102,12 @@ const envSchema = z.object({
 function loadConfig() {
   const result = envSchema.safeParse(process.env);
   if (!result.success) {
-    console.error('❌ Invalid environment variables:');
-    console.error(result.error.format());
+    const message = `Invalid environment variables:\n${JSON.stringify(result.error.format(), null, 2)}`;
+    // In test context, throw so tests can catch config errors instead of killing the process
+    if (process.env.NODE_ENV === 'test') {
+      throw new Error(message);
+    }
+    console.error('❌ ' + message);
     process.exit(1);
   }
   return result.data;
