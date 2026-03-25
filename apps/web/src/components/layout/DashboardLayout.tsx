@@ -125,7 +125,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     : 'U';
 
   return (
-    <div className="min-h-screen bg-neutral-50 pb-20 sm:pb-0">
+    <div className="theme-nocturne min-h-screen bg-nocturne-base text-nocturne-text-primary pb-20 sm:pb-0">
       {/* Desktop Top Bar */}
       <header className="hidden sm:flex sticky top-0 z-navbar items-center justify-between px-6 h-14 bg-white/80 backdrop-blur-lg border-b border-neutral-200 shadow-sm">
         {/* Logo */}

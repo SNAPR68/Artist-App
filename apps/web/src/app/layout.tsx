@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
+import { Inter, Plus_Jakarta_Sans, Manrope } from 'next/font/google';
 import '@/styles/globals.css';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
@@ -25,6 +25,13 @@ const plusJakarta = Plus_Jakarta_Sans({
   display: 'swap',
 });
 
+const manrope = Manrope({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-manrope',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: 'Artist Booking Platform',
   description: 'Book live artists for your events — weddings, corporate events, concerts & more.',
@@ -45,7 +52,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${plusJakarta.variable}`}>
+    <html lang="en" className={`${inter.variable} ${plusJakarta.variable} ${manrope.variable}`}>
       {/* Inline auth loading skeleton — prevents white flash while JS boots.
           The AuthInitializer component removes this class once auth state resolves. */}
       <head>

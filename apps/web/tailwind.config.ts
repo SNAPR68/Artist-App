@@ -90,6 +90,38 @@ const config: Config = {
           heavy: 'rgba(255,255,255,0.92)',
           border: 'rgba(228,228,231,0.6)',
         },
+        // ─── Nocturne Hollywood Theme ──────────────────
+        nocturne: {
+          base: '#0E0E0F',
+          surface: '#1A1A1D',
+          'surface-2': '#242428',
+          primary: '#8A2BE2',
+          'primary-hover': '#6A1BB2',
+          'primary-light': 'rgba(138, 43, 226, 0.15)',
+          accent: '#A1FAFF',
+          'accent-dim': 'rgba(161, 250, 255, 0.6)',
+          success: '#00E676',
+          warning: '#FFD740',
+          error: '#FF5252',
+          info: '#448AFF',
+          gold: '#FFD700',
+          glass: {
+            panel: 'rgba(255, 255, 255, 0.04)',
+            card: 'rgba(255, 255, 255, 0.06)',
+            elevated: 'rgba(255, 255, 255, 0.10)',
+            floating: 'rgba(255, 255, 255, 0.12)',
+          },
+          border: {
+            subtle: 'rgba(255, 255, 255, 0.08)',
+            DEFAULT: 'rgba(255, 255, 255, 0.15)',
+            strong: 'rgba(255, 255, 255, 0.25)',
+          },
+          text: {
+            primary: '#FFFFFF',
+            secondary: 'rgba(255, 255, 255, 0.65)',
+            tertiary: 'rgba(255, 255, 255, 0.4)',
+          },
+        },
         // Booking states
         bookingStates: {
           inquiry: '#8B5CF6',
@@ -112,6 +144,7 @@ const config: Config = {
         heading: ['var(--font-plus-jakarta)', 'Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
         sans: ['var(--font-inter)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'monospace'],
+        display: ['var(--font-manrope)', 'Manrope', 'system-ui', '-apple-system', 'sans-serif'],
       },
       fontSize: {
         'hero': ['4.5rem', { lineHeight: '1.05', letterSpacing: '-0.03em', fontWeight: '800' }],
@@ -164,6 +197,7 @@ const config: Config = {
         xl: '16px',
         '2xl': '20px',
         '3xl': '24px',
+        '4xl': '32px',
         pill: '999px',
       },
 
@@ -171,6 +205,8 @@ const config: Config = {
       backdropBlur: {
         'glass': '8px',
         'glass-lg': '16px',
+        '3xl': '64px',
+        '4xl': '80px',
       },
 
       // ─── Box Shadows (light theme — soft, layered) ──────
@@ -193,6 +229,12 @@ const config: Config = {
         'focus': '0 0 0 3px rgba(139,92,246,0.2)',
         'focus-error': '0 0 0 3px rgba(239,68,68,0.2)',
         'glass': '0 4px 30px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05)',
+        // Nocturne shadows
+        'nocturne-card': '0 8px 32px rgba(0, 0, 0, 0.4)',
+        'nocturne-card-hover': '0 20px 50px -10px rgba(0, 0, 0, 0.5), 0 0 30px -5px rgba(138, 43, 226, 0.3)',
+        'nocturne-glow-purple': '0 0 30px -5px rgba(138, 43, 226, 0.5)',
+        'nocturne-glow-cyan': '0 0 20px -5px rgba(161, 250, 255, 0.4)',
+        'nocturne-glow-sm': '0 0 15px -3px rgba(138, 43, 226, 0.3)',
       },
 
       // ─── Gradients ──────────────────────────────────────
@@ -207,6 +249,11 @@ const config: Config = {
         'gradient-dark': 'linear-gradient(135deg, #18181B 0%, #1E1B4B 50%, #18181B 100%)',
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        // Nocturne gradients
+        'gradient-nocturne': 'linear-gradient(135deg, #8A2BE2, #6A1BB2)',
+        'gradient-nocturne-accent': 'linear-gradient(135deg, #8A2BE2, #A1FAFF)',
+        'gradient-nocturne-hero': 'radial-gradient(ellipse at 30% 20%, rgba(138,43,226,0.25) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(161,250,255,0.1) 0%, transparent 50%), #0E0E0F',
+        'gradient-nocturne-card': 'linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)',
       },
 
       // ─── Z-Index ────────────────────────────────────────
@@ -238,6 +285,10 @@ const config: Config = {
         'pulse-subtle': 'pulseSubtle 3s ease-in-out infinite',
         'count-up': 'countUp 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
         'spin-slow': 'spin 8s linear infinite',
+        // Nocturne animations
+        'glow-pulse': 'glowPulse 3s ease-in-out infinite',
+        'tilt-in': 'tiltIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'voice-bar': 'voiceBar 0.8s ease-in-out infinite alternate',
       },
 
       keyframes: {
@@ -280,6 +331,19 @@ const config: Config = {
         countUp: {
           from: { opacity: '0', transform: 'translateY(8px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        // Nocturne keyframes
+        glowPulse: {
+          '0%, 100%': { boxShadow: '0 0 20px -5px rgba(138, 43, 226, 0.3)' },
+          '50%': { boxShadow: '0 0 40px -5px rgba(138, 43, 226, 0.6)' },
+        },
+        tiltIn: {
+          from: { opacity: '0', transform: 'perspective(1000px) rotateX(10deg) translateY(20px)' },
+          to: { opacity: '1', transform: 'perspective(1000px) rotateX(0) translateY(0)' },
+        },
+        voiceBar: {
+          '0%': { transform: 'scaleY(0.3)' },
+          '100%': { transform: 'scaleY(1)' },
         },
       },
 
