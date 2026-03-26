@@ -96,9 +96,13 @@ export default function PublicArtistPage() {
   const coverUrl = profile.media.find(m => m.media_type === 'image')?.cdn_url ?? profile.media.find(m => m.media_type === 'image')?.original_url;
 
   return (
-    <div className="theme-nocturne bg-nocturne-base max-w-section mx-auto px-4 sm:px-6 py-8 lg:grid lg:grid-cols-[1fr_340px] lg:gap-8">
-      <div>
-        {/* Cover + Profile Info */}
+    <div className="theme-nocturne bg-[#0e0e0f] min-h-screen">
+      {/* ─── Cinematic Hero ─── */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full" />
+          <div className="absolute top-20 right-0 w-80 h-80 bg-[#a1faff]/5 blur-[100px] rounded-full" />
+        </div>
         <ArtistCoverSection
           stageName={profile.stage_name}
           baseCity={profile.base_city}
@@ -107,7 +111,10 @@ export default function PublicArtistPage() {
           isVerified={profile.is_verified}
           coverUrl={coverUrl}
         />
+      </div>
 
+      <div className="max-w-section mx-auto px-4 sm:px-6 py-8 lg:grid lg:grid-cols-[1fr_340px] lg:gap-8">
+      <div>
         {/* Gallery */}
         <ArtistGallery media={profile.media} artistName={profile.stage_name} />
 
@@ -155,18 +162,18 @@ export default function PublicArtistPage() {
           </div>
         </AnimatedSection>
 
-        {/* Stats */}
+        {/* Stats — Cinematic Bento */}
         <AnimatedSection delay={0.15}>
-          <div className="grid grid-cols-4 gap-3 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[
-              { label: 'Bookings', value: profile.total_bookings ?? 0 },
-              { label: 'Acceptance', value: `${profile.acceptance_rate ?? 0}%` },
-              { label: 'Response', value: `${profile.avg_response_time_hours ?? '-'}h` },
-              { label: 'Profile', value: `${profile.profile_completion_pct}%` },
+              { label: 'Bookings', value: String(profile.total_bookings ?? 0), color: 'text-[#a1faff]' },
+              { label: 'Acceptance', value: `${profile.acceptance_rate ?? 0}%`, color: 'text-[#c39bff]' },
+              { label: 'Response', value: `${profile.avg_response_time_hours ?? '-'}h`, color: 'text-[#ffbf00]' },
+              { label: 'Profile', value: `${profile.profile_completion_pct}%`, color: 'text-green-400' },
             ].map((stat) => (
-              <div key={stat.label} className="glass-card p-3 text-center border border-nocturne-border">
-                <p className="text-lg font-display font-bold text-nocturne-text-primary">{stat.value}</p>
-                <p className="text-[10px] text-nocturne-text-secondary uppercase tracking-wider">{stat.label}</p>
+              <div key={stat.label} className="glass-card p-5 text-center border border-white/5 hover:border-white/15 transition-all">
+                <p className={`text-3xl font-extrabold ${stat.color}`}>{stat.value}</p>
+                <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mt-1 font-bold">{stat.label}</p>
               </div>
             ))}
           </div>

@@ -125,16 +125,54 @@ function SearchPageContent() {
 
   return (
     <div className="theme-nocturne bg-gradient-nocturne-hero min-h-screen">
-      {/* Enhanced Search Header */}
-      <div className="bg-gradient-to-b from-nocturne-surface/50 to-transparent border-b border-nocturne-border sticky top-0 z-40 backdrop-blur-sm">
-        <div className="max-w-section mx-auto px-4 sm:px-6 py-6">
-          <div className="mb-4 animate-fade-in-up">
-            <h1 className="text-3xl sm:text-hero font-display text-gradient-nocturne mb-2">
-              Find Your Perfect Artist
+      {/* ─── Cinematic Search Header ─── */}
+      <div className="relative border-b border-white/5 sticky top-0 z-40 bg-[#0e0e0f]/80 backdrop-blur-xl">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full" />
+          <div className="absolute -top-20 right-0 w-64 h-64 bg-[#a1faff]/5 blur-[100px] rounded-full" />
+        </div>
+        <div className="max-w-section mx-auto px-4 sm:px-6 py-8 relative z-10">
+          <div className="mb-6 animate-fade-in-up">
+            <h1 className="font-display text-4xl lg:text-5xl font-extrabold tracking-tighter text-white mb-2">
+              Discover <span className="bg-gradient-to-r from-[#c39bff] to-[#a1faff] bg-clip-text text-transparent">talent</span> for your event
             </h1>
-            <p className="text-nocturne-text-secondary text-sm">Browse thousands of talented performers for your event</p>
+            <p className="text-white/40 text-sm">Search 5,000+ verified artists across 10 cities in India</p>
           </div>
-          <SearchBar value={query} onChange={setQuery} onSubmit={handleSearch} />
+          {/* Glass Search Bar with Voice Visualizer */}
+          <div className="relative group max-w-2xl">
+            <div className="absolute inset-0 bg-[#c39bff]/10 blur-2xl rounded-full group-focus-within:bg-[#c39bff]/20 transition-all duration-500" />
+            <form onSubmit={handleSearch} className="relative glass-card flex items-center px-6 py-4 rounded-full border border-white/10 ring-1 ring-white/5 shadow-2xl">
+              <Search className="text-[#c39bff] w-5 h-5 mr-4 shrink-0" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="bg-transparent border-none focus:outline-none focus:ring-0 text-white placeholder-white/40 w-full text-lg font-light tracking-wide"
+                placeholder="Search artists, genres, or cities..."
+              />
+              <div className="flex items-center gap-1 px-4 border-l border-white/10 ml-4">
+                {[4, 7, 5, 8, 4].map((h, i) => (
+                  <div key={i} className={`w-1 rounded-full animate-pulse ${i % 2 === 0 ? 'bg-[#a1faff]' : 'bg-[#c39bff]'}`} style={{ height: `${h * 4}px`, animationDelay: `${i * 0.15}s` }} />
+                ))}
+              </div>
+            </form>
+          </div>
+          {/* Genre Quick Filters */}
+          <div className="flex flex-wrap gap-3 mt-6">
+            {['Bollywood', 'EDM', 'Live Band', 'Comedy', 'Classical', 'Sufi', 'Rock', 'Hip-Hop'].map((g, i) => (
+              <button
+                key={g}
+                onClick={() => { setGenre(genre === g ? '' : g); setPage(1); }}
+                className={`px-5 py-2 rounded-full text-xs font-bold tracking-widest uppercase cursor-pointer transition-all ${
+                  genre === g
+                    ? 'glass-card border border-[#c39bff]/30 text-[#c39bff] bg-[#c39bff]/10'
+                    : 'glass-card border border-white/10 text-white/50 hover:text-white hover:border-white/20'
+                }`}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -261,8 +299,8 @@ function SearchPageContent() {
               </div>
             ) : (
               <>
-                {/* Results Grid */}
-                <div className="grid grid-cols-1 tablet:grid-cols-2 gap-4 mb-8">
+                {/* Cinematic Poster Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                   {results.map((artist, i) => (
                     <div
                       key={artist.id}
