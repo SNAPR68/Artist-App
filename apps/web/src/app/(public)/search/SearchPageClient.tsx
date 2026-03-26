@@ -298,15 +298,21 @@ function SearchPageContent() {
               </div>
             ) : (
               <>
-                {/* Cinematic Poster Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {/* Cinematic Bento Grid — first result gets hero treatment */}
+                <div className="grid grid-cols-12 gap-6 mb-8">
                   {results.map((artist, i) => (
                     <div
                       key={artist.id}
-                      className="animate-fade-in-up"
+                      className={`animate-fade-in-up ${
+                        i === 0
+                          ? 'col-span-12 md:col-span-8'
+                          : i <= 2
+                          ? 'col-span-12 sm:col-span-6 md:col-span-4'
+                          : 'col-span-12 sm:col-span-6 md:col-span-4'
+                      }`}
                       style={{ animationDelay: `${i * 0.05}s` }}
                     >
-                      <ArtistCard {...artist} />
+                      <ArtistCard {...artist} isHero={i === 0} />
                     </div>
                   ))}
                 </div>

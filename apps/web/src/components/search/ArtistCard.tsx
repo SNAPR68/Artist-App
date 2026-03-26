@@ -16,6 +16,7 @@ interface ArtistCardProps {
   thumbnail_url?: string;
   pricing?: Array<{ min_price?: number; max_price?: number; min_paise?: number; max_paise?: number }>;
   onShortlist?: (id: string) => void;
+  isHero?: boolean;
 }
 
 export function ArtistCard({
@@ -30,6 +31,7 @@ export function ArtistCard({
   thumbnail_url,
   pricing,
   onShortlist: _onShortlist,
+  isHero,
 }: ArtistCardProps) {
   const prices = pricing
     ?.map((p) => p.min_price ?? p.min_paise)
@@ -43,7 +45,7 @@ export function ArtistCard({
       style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
     >
       {/* ── Poster Image ── */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-[#1a191b]">
+      <div className={`relative overflow-hidden bg-[#1a191b] ${isHero ? 'aspect-[21/9]' : 'aspect-[3/4]'}`}>
         {thumbnail_url ? (
           <Image
             src={thumbnail_url}
@@ -85,7 +87,7 @@ export function ArtistCard({
           </div>
 
           {/* Artist name */}
-          <h3 className="text-xl font-display font-bold text-white tracking-tight leading-tight uppercase">
+          <h3 className={`font-display font-bold text-white tracking-tight leading-tight uppercase ${isHero ? 'text-3xl md:text-5xl' : 'text-xl'}`}>
             {stage_name}
           </h3>
 
