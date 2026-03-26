@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
@@ -21,77 +21,6 @@ const itemVariants = {
     transition: { type: 'spring', damping: 25, stiffness: 100 },
   },
 };
-
-function AIVisualizer() {
-  const [bars, setBars] = useState<number[]>(Array(9).fill(50));
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setBars(prev => prev.map(() => 20 + Math.random() * 80));
-    }, 600);
-    return () => clearInterval(interval);
-  }, []);
-
-  const barColors = [
-    'bg-[#b489f3]', 'bg-[#c39bff]', 'bg-[#a1faff]', 'bg-[#ffbf00]',
-    'bg-[#c39bff]', 'bg-[#00e5ee]', 'bg-[#bf94ff]', 'bg-[#ffca53]',
-    'bg-[#c39bff]',
-  ];
-
-  const barGlows = [
-    'shadow-[0_0_10px_rgba(195,155,255,0.5)]',
-    'shadow-[0_0_15px_rgba(195,155,255,0.6)]',
-    'shadow-[0_0_20px_rgba(161,250,255,0.7)]',
-    'shadow-[0_0_12px_rgba(255,191,0,0.5)]',
-    'shadow-[0_0_18px_rgba(195,155,255,0.6)]',
-    'shadow-[0_0_10px_rgba(0,229,238,0.5)]',
-    'shadow-[0_0_15px_rgba(191,148,255,0.6)]',
-    'shadow-[0_0_8px_rgba(255,202,83,0.4)]',
-    'shadow-[0_0_20px_rgba(195,155,255,0.7)]',
-  ];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 1.2, duration: 0.8 }}
-      className="relative z-10 mt-16 p-8 rounded-2xl w-full max-w-2xl border border-white/10 mx-auto"
-      style={{
-        background: 'rgba(38, 38, 39, 0.6)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        boxShadow: '0px 48px 64px rgba(0,0,0,0.6)',
-      }}
-    >
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-[#ffbf00] animate-pulse" />
-          <span className="text-sm text-[#a1faff] tracking-widest uppercase font-medium">Backstage AI</span>
-        </div>
-        <span className="text-xs text-white/40 font-mono">Voice Assistant</span>
-      </div>
-      <div className="flex items-end justify-center gap-1.5 h-24 mb-6">
-        {bars.map((height, i) => (
-          <div
-            key={i}
-            className={`w-1.5 rounded-full transition-all duration-500 ${barColors[i]} ${barGlows[i]}`}
-            style={{ height: `${height}%` }}
-          />
-        ))}
-      </div>
-      <div className="flex flex-col items-center gap-1">
-        <p className="text-white/50 text-sm italic text-center">
-          &ldquo;Find me a DJ for a wedding in Mumbai under 2 lakhs...&rdquo;
-        </p>
-        <div className="mt-4 flex gap-4 text-[10px] text-white/30 tracking-tighter uppercase font-bold">
-          <span>5,000+ artists</span>
-          <span>10 cities</span>
-          <span>Instant results</span>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
 
 export function Hero() {
   const router = useRouter();
@@ -202,8 +131,7 @@ export function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* ─── AI Voice Visualizer ─── */}
-        <AIVisualizer />
+        {/* Voice assistant is the floating Backstage AI widget — no placeholder needed here */}
       </div>
     </section>
   );

@@ -20,6 +20,7 @@ export function Categories() {
             src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80"
             alt="AI Artist Discovery"
             fill
+            loading="lazy"
             className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
           />
           <div className="absolute bottom-0 left-0 p-10 z-20 space-y-4 max-w-xl">
