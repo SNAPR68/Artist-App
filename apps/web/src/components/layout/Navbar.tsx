@@ -85,10 +85,13 @@ export function Navbar() {
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-1">
             <NavLink href="/search" isActive={activeNavLink === '/search'} onHoverStart={() => setActiveNavLink('/search')} onHoverEnd={() => setActiveNavLink(null)}>
-              Find Artists
+              Artists
             </NavLink>
-            <NavLink href="/artist/onboarding" isActive={activeNavLink === '/artist/onboarding'} onHoverStart={() => setActiveNavLink('/artist/onboarding')} onHoverEnd={() => setActiveNavLink(null)}>
-              List as Artist
+            <NavLink href="/search" isActive={activeNavLink === '/bookings'} onHoverStart={() => setActiveNavLink('/bookings')} onHoverEnd={() => setActiveNavLink(null)}>
+              Bookings
+            </NavLink>
+            <NavLink href="/search" isActive={activeNavLink === '/live'} onHoverStart={() => setActiveNavLink('/live')} onHoverEnd={() => setActiveNavLink(null)}>
+              Live
             </NavLink>
 
             <motion.div

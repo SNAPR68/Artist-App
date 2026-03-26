@@ -1,20 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Search, ArrowRight, Star, ChevronDown } from 'lucide-react';
+import { Search, ArrowRight } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-
-const HERO_IMAGES = [
-  { src: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80', alt: 'Singer performing on stage' },
-  { src: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80', alt: 'DJ mixing at a club' },
-  { src: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80', alt: 'Live concert crowd' },
-  { src: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=600&q=80', alt: 'Music festival lights' },
-  { src: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80', alt: 'DJ performing with lights' },
-  { src: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=600&q=80', alt: 'Band performing live' },
-];
 
 const CITIES = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Kolkata', 'Jaipur'];
 
@@ -22,10 +12,7 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.15,
-    },
+    transition: { staggerChildren: 0.1, delayChildren: 0.15 },
   },
 };
 
@@ -34,13 +21,80 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      type: 'spring',
-      damping: 25,
-      stiffness: 100,
-    },
+    transition: { type: 'spring', damping: 25, stiffness: 100 },
   },
 };
+
+function AIVisualizer() {
+  const [bars, setBars] = useState<number[]>(Array(9).fill(50));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBars(prev => prev.map(() => 20 + Math.random() * 80));
+    }, 600);
+    return () => clearInterval(interval);
+  }, []);
+
+  const barColors = [
+    'bg-[#b489f3]', 'bg-[#c39bff]', 'bg-[#a1faff]', 'bg-[#ffbf00]',
+    'bg-[#c39bff]', 'bg-[#00e5ee]', 'bg-[#bf94ff]', 'bg-[#ffca53]',
+    'bg-[#c39bff]',
+  ];
+
+  const barGlows = [
+    'shadow-[0_0_10px_rgba(195,155,255,0.5)]',
+    'shadow-[0_0_15px_rgba(195,155,255,0.6)]',
+    'shadow-[0_0_20px_rgba(161,250,255,0.7)]',
+    'shadow-[0_0_12px_rgba(255,191,0,0.5)]',
+    'shadow-[0_0_18px_rgba(195,155,255,0.6)]',
+    'shadow-[0_0_10px_rgba(0,229,238,0.5)]',
+    'shadow-[0_0_15px_rgba(191,148,255,0.6)]',
+    'shadow-[0_0_8px_rgba(255,202,83,0.4)]',
+    'shadow-[0_0_20px_rgba(195,155,255,0.7)]',
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.2, duration: 0.8 }}
+      className="relative z-10 mt-16 p-8 rounded-2xl w-full max-w-2xl border border-white/10 mx-auto"
+      style={{
+        background: 'rgba(38, 38, 39, 0.6)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        boxShadow: '0px 48px 64px rgba(0,0,0,0.6)',
+      }}
+    >
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full bg-[#ffbf00] animate-pulse" />
+          <span className="text-sm text-[#a1faff] tracking-widest uppercase font-medium">Backstage AI</span>
+        </div>
+        <span className="text-xs text-white/40 font-mono">Voice Assistant</span>
+      </div>
+      <div className="flex items-end justify-center gap-1.5 h-24 mb-6">
+        {bars.map((height, i) => (
+          <div
+            key={i}
+            className={`w-1.5 rounded-full transition-all duration-500 ${barColors[i]} ${barGlows[i]}`}
+            style={{ height: `${height}%` }}
+          />
+        ))}
+      </div>
+      <div className="flex flex-col items-center gap-1">
+        <p className="text-white/50 text-sm italic text-center">
+          &ldquo;Find me a DJ for a wedding in Mumbai under 2 lakhs...&rdquo;
+        </p>
+        <div className="mt-4 flex gap-4 text-[10px] text-white/30 tracking-tighter uppercase font-bold">
+          <span>5,000+ artists</span>
+          <span>10 cities</span>
+          <span>Instant results</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export function Hero() {
   const router = useRouter();
@@ -52,7 +106,6 @@ export function Hero() {
 
   const violetOrbY = useTransform(scrollY, [0, 500], [0, 150]);
   const cyanOrbY = useTransform(scrollY, [0, 500], [0, -100]);
-  const roseOrbY = useTransform(scrollY, [0, 500], [0, 120]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,270 +121,107 @@ export function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-nocturne-base"
+      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#0e0e0f] px-6"
     >
-      {/* ─── Stage Lighting Orbs ─── */}
+      {/* ─── Stage Lighting Background ─── */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Violet Glow - Top Left */}
         <motion.div
           style={{ y: violetOrbY }}
-          className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-30 blur-3xl"
+          className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.3 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 1.5 }}
         >
-          <div
-            className="w-full h-full"
-            style={{
-              background: 'radial-gradient(circle, rgba(138,43,226,0.4) 0%, transparent 70%)',
-            }}
-          />
+          <div className="w-full h-full bg-[#c39bff]/10 blur-[120px] rounded-full" />
         </motion.div>
 
-        {/* Cyan Glow - Bottom Right */}
         <motion.div
           style={{ y: cyanOrbY }}
-          className="absolute -bottom-32 -right-48 w-[500px] h-[500px] rounded-full opacity-20 blur-3xl"
+          className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.2 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 1.5, delay: 0.2 }}
         >
-          <div
-            className="w-full h-full"
-            style={{
-              background: 'radial-gradient(circle, rgba(161,250,255,0.3) 0%, transparent 70%)',
-            }}
-          />
+          <div className="w-full h-full bg-[#ffbf00]/5 blur-[100px] rounded-full" />
         </motion.div>
 
-        {/* Rose Glow - Right Center */}
-        <motion.div
-          style={{ y: roseOrbY }}
-          className="absolute top-1/3 -right-32 w-[400px] h-[400px] rounded-full opacity-15 blur-3xl"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.15 }}
-          transition={{ duration: 1.5, delay: 0.4 }}
-        >
-          <div
-            className="w-full h-full"
-            style={{
-              background: 'radial-gradient(circle, rgba(255,139,154,0.3) 0%, transparent 70%)',
-            }}
-          />
-        </motion.div>
+        {/* Carbon fibre texture overlay */}
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: "url('https://www.transparenttextures.com/patterns/carbon-fibre.png')",
+          }}
+        />
       </div>
 
-      {/* ─── Main Content Container ─── */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 py-20 md:py-32">
+      {/* ─── Main Content ─── */}
+      <div className="relative z-10 max-w-6xl w-full text-center">
         <motion.div
-          className="space-y-8 md:space-y-12"
+          className="space-y-8"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          {/* ─── Main Heading ─── */}
-          <div className="max-w-3xl space-y-4">
-            <div className="space-y-3">
-              <motion.h1
-                variants={itemVariants}
-                className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-display font-extrabold text-white tracking-tighter leading-[1.05]"
-              >
-                Book the
-              </motion.h1>
-
-              <motion.h1
-                variants={itemVariants}
-                className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-display font-extrabold bg-gradient-to-r from-nocturne-primary via-nocturne-violet to-nocturne-accent text-transparent bg-clip-text tracking-tighter leading-[1.05]"
-              >
-                perfect artist
-              </motion.h1>
-
-              <motion.h1
-                variants={itemVariants}
-                className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-display font-extrabold text-white tracking-tighter leading-[1.05]"
-              >
-                for your event
-              </motion.h1>
-            </div>
-
-            <motion.p
-              variants={itemVariants}
-              className="text-lg text-nocturne-text-secondary max-w-xl leading-relaxed font-sans pt-2"
-            >
-              Discover and book verified DJs, singers, bands, and comedians instantly. Transparent pricing, secure payments.
-            </motion.p>
-          </div>
-
-          {/* ─── Search Form ─── */}
-          <motion.form
-            onSubmit={handleSearch}
-            variants={itemVariants}
-            className="mt-4 max-w-xl"
+          {/* ─── Badge ─── */}
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-[#a1faff]"
+            style={{
+              background: 'rgba(38, 38, 39, 0.6)',
+              backdropFilter: 'blur(20px)',
+            }}
           >
-            <motion.div
-              className="glass-card rounded-2xl p-2 focus-within:shadow-nocturne-glow-purple transition-all duration-300"
-              whileHover={{ boxShadow: '0 0 30px -5px rgba(138, 43, 226, 0.3)' }}
-            >
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="text"
-                  placeholder="Artist name, category..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 px-5 py-3.5 bg-transparent border-0 text-white placeholder:text-nocturne-text-tertiary focus:outline-none font-sans text-sm"
-                />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+            <span className="text-[0.6875rem] font-bold tracking-widest uppercase">Verified Artists · Secure Payments</span>
+          </motion.div>
 
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="px-5 py-3.5 bg-transparent border-0 text-nocturne-text-secondary focus:outline-none font-sans text-sm appearance-none cursor-pointer hover:text-white transition-colors"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ffffff' opacity='0.4' d='M1 1l5 5 5-5'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 16px center',
-                    paddingRight: '32px',
-                  }}
-                >
-                  <option>All Cities</option>
-                  {CITIES.map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-                </select>
+          {/* ─── Headline ─── */}
+          <motion.h1
+            variants={itemVariants}
+            className="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[0.9] max-w-4xl mx-auto text-white"
+          >
+            Book the{' '}
+            <span className="bg-gradient-to-r from-[#c39bff] via-[#b68cf6] to-[#a1faff] bg-clip-text text-transparent italic">
+              perfect artist
+            </span>{' '}
+            for your event
+          </motion.h1>
 
-                <motion.button
-                  type="submit"
-                  disabled={isSearching}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="btn-nocturne-primary px-6 py-3.5 min-h-12 rounded-xl flex items-center justify-center gap-2 shrink-0 disabled:opacity-60 disabled:cursor-not-allowed text-sm whitespace-nowrap"
-                >
-                  <Search size={18} />
-                  <span className="hidden sm:inline">Search</span>
-                </motion.button>
-              </div>
-            </motion.div>
-          </motion.form>
+          {/* ─── Subtitle ─── */}
+          <motion.p
+            variants={itemVariants}
+            className="text-white/50 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed"
+          >
+            DJs, singers, bands, comedians — 5,000+ verified artists across India.
+            Browse, compare, book, and pay. All in one place.
+          </motion.p>
 
           {/* ─── CTA Buttons ─── */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 pt-2"
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
           >
             <motion.button
               onClick={() => router.push('/search')}
-              whileHover={{ scale: 1.03, y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              className="btn-nocturne-primary px-8 py-4 min-h-12 rounded-xl flex items-center justify-center gap-2 text-sm"
+              whileHover={{ scale: 1.05, boxShadow: '0px 24px 48px rgba(195,155,255,0.4)' }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 bg-gradient-to-br from-[#c39bff] to-[#b68cf6] text-[#3f0e7a] font-bold rounded-full transition-all duration-300"
             >
-              <Search size={18} />
-              Explore Artists
+              Find Artists
             </motion.button>
 
-            <motion.div
+            <motion.button
+              onClick={() => router.push('/login')}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full sm:w-auto"
+              className="px-8 py-4 bg-transparent border border-white/20 text-white font-bold rounded-full transition-all duration-300 hover:bg-white/5 hover:border-white/40"
             >
-              <Link
-                href="/login"
-                className="btn-nocturne-secondary px-8 py-4 min-h-12 rounded-xl flex items-center justify-center gap-2 text-sm group w-full"
-              >
-                Event Company Login
-                <span className="inline-block group-hover:translate-x-1 transition-transform duration-300">
-                  <ArrowRight size={18} />
-                </span>
-              </Link>
-            </motion.div>
-          </motion.div>
-
-          {/* ─── Social Proof ─── */}
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center gap-6 pt-4">
-            <div className="flex -space-x-2">
-              {HERO_IMAGES.slice(0, 4).map((img, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{
-                    type: 'spring',
-                    damping: 20,
-                    stiffness: 100,
-                    delay: 1.0 + i * 0.1,
-                  }}
-                  whileHover={{ scale: 1.15, zIndex: 10 }}
-                  className="relative w-10 h-10 rounded-full border-2 border-nocturne-surface overflow-hidden bg-nocturne-surface-2 shadow-nocturne-card hover:shadow-nocturne-glow-purple transition-shadow"
-                >
-                  <Image src={img.src} alt="" fill sizes="40px" className="object-cover" />
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="text-sm font-sans">
-                <span className="text-white font-semibold">5,000+</span>
-                <span className="text-nocturne-text-secondary ml-2">verified artists</span>
-              </div>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.4, type: 'spring', damping: 25, stiffness: 100 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 glass-panel rounded-full"
-              >
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{
-                        delay: 1.5 + i * 0.05,
-                        type: 'spring',
-                        damping: 20,
-                        stiffness: 100,
-                      }}
-                    >
-                      <Star size={14} className="fill-nocturne-gold text-nocturne-gold" />
-                    </motion.div>
-                  ))}
-                </div>
-                <span className="text-xs font-semibold text-white">4.9</span>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.6 }}
-                className="flex items-center gap-2 text-xs font-medium text-nocturne-text-secondary"
-              >
-                <motion.div
-                  className="w-2 h-2 rounded-full bg-nocturne-success"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                />
-                Available now
-              </motion.div>
-            </div>
+              I&apos;m an Event Company
+            </motion.button>
           </motion.div>
         </motion.div>
+
+        {/* ─── AI Voice Visualizer ─── */}
+        <AIVisualizer />
       </div>
-
-      {/* ─── Scroll Indicator ─── */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 hidden md:flex flex-col items-center gap-2"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2, duration: 0.6 }}
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-        >
-          <ChevronDown size={24} className="text-nocturne-text-tertiary" strokeWidth={1.5} />
-        </motion.div>
-      </motion.div>
     </section>
   );
 }

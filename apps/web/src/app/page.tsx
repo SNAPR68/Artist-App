@@ -7,15 +7,10 @@ import { useAuthStore } from '@/lib/auth';
 import { Navbar } from '@/components/layout/Navbar';
 import { Hero } from '@/components/landing/Hero';
 
-// Lazy-load below-the-fold components to prevent webpack compilation hang
-const ScrollProgress = dynamic(() => import('@/components/motion/ScrollProgress').then(m => ({ default: m.ScrollProgress })), { ssr: false });
-const StatsBar = dynamic(() => import('@/components/landing/StatsBar').then(m => ({ default: m.StatsBar })), { ssr: false });
+// Lazy-load below-the-fold components
 const Categories = dynamic(() => import('@/components/landing/Categories').then(m => ({ default: m.Categories })), { ssr: false });
 const FeaturedArtists = dynamic(() => import('@/components/landing/FeaturedArtists').then(m => ({ default: m.FeaturedArtists })), { ssr: false });
-const HowItWorks = dynamic(() => import('@/components/landing/HowItWorks').then(m => ({ default: m.HowItWorks })), { ssr: false });
-const Testimonials = dynamic(() => import('@/components/landing/Testimonials').then(m => ({ default: m.Testimonials })), { ssr: false });
 const CTABanner = dynamic(() => import('@/components/landing/CTABanner').then(m => ({ default: m.CTABanner })), { ssr: false });
-const TrustSignals = dynamic(() => import('@/components/landing/TrustSignals').then(m => ({ default: m.TrustSignals })), { ssr: false });
 const Footer = dynamic(() => import('@/components/layout/Footer').then(m => ({ default: m.Footer })), { ssr: false });
 
 function getDashboardHref(role?: string): string {
@@ -36,7 +31,6 @@ export default function HomePage() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Authenticated users: redirect to their dashboard
   useEffect(() => {
     if (mounted && _initialized && isAuthenticated && user) {
       router.replace(getDashboardHref(user.role));
@@ -44,18 +38,12 @@ export default function HomePage() {
   }, [mounted, _initialized, isAuthenticated, user, router]);
 
   return (
-    <main className="min-h-screen bg-nocturne-base">
-      <ScrollProgress />
+    <main className="min-h-screen bg-[#0e0e0f] text-white font-sans">
       <Navbar />
       <Hero />
-      <StatsBar />
       <Categories />
       <FeaturedArtists />
-      <CTABanner variant="artist" />
-      <HowItWorks />
-      <Testimonials />
-      <CTABanner variant="company" />
-      <TrustSignals />
+      <CTABanner />
       <Footer />
     </main>
   );

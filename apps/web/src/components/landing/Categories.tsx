@@ -1,205 +1,128 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useDragScroll } from '@/hooks/useDragScroll';
-import { FadeIn } from '@/components/motion';
-
-const GENRES = [
-  { name: 'All', genre: '', emoji: '🎵', active: true },
-  { name: 'Bollywood', genre: 'Bollywood', emoji: '🎤' },
-  { name: 'EDM', genre: 'EDM', emoji: '🎧' },
-  { name: 'Live Band', genre: 'Live Band', emoji: '🎸' },
-  { name: 'Classical', genre: 'Classical', emoji: '🎻' },
-  { name: 'Hip-Hop', genre: 'Hip-Hop', emoji: '🎤' },
-  { name: 'Rock', genre: 'Rock', emoji: '🤘' },
-  { name: 'Sufi', genre: 'Sufi', emoji: '💫' },
-  { name: 'Jazz', genre: 'Jazz', emoji: '🎷' },
-  { name: 'Comedy', genre: 'Comedy', emoji: '😂' },
-  { name: 'Folk', genre: 'Folk', emoji: '💃' },
-  { name: 'Wedding', genre: 'Wedding', emoji: '💍' },
-  { name: 'Acoustic', genre: 'Acoustic', emoji: '🎵' },
-  { name: 'Fusion', genre: 'Fusion', emoji: '🔥' },
-];
-
-const EVENT_TYPES = [
-  {
-    name: 'Weddings',
-    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80',
-    count: '2,500+',
-    href: '/search?event_type=wedding',
-  },
-  {
-    name: 'Corporate',
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80',
-    count: '1,800+',
-    href: '/search?event_type=corporate',
-  },
-  {
-    name: 'House Parties',
-    image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=400&q=80',
-    count: '3,200+',
-    href: '/search?event_type=house_party',
-  },
-  {
-    name: 'Concerts',
-    image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400&q=80',
-    count: '900+',
-    href: '/search?event_type=concert',
-  },
-  {
-    name: 'College Fests',
-    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&q=80',
-    count: '1,100+',
-    href: '/search?event_type=college',
-  },
-];
-
-const eventCardVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.08,
-      type: 'spring',
-      damping: 20,
-      stiffness: 100,
-    },
-  }),
-};
 
 export function Categories() {
-  const genreScrollRef = useDragScroll<HTMLDivElement>();
-  const eventScrollRef = useDragScroll<HTMLDivElement>();
-  const [activeGenre, setActiveGenre] = useState('All');
-
   return (
-    <section className="bg-nocturne-base py-20 px-6">
-      <div className="max-w-section mx-auto">
-        <FadeIn>
-          <div className="flex items-center justify-center mb-12">
-            <div className="text-center">
-              <motion.span
-                className="inline-block mb-4 px-3 py-1 rounded-full bg-nocturne-primary-light text-nocturne-accent text-xs font-semibold uppercase tracking-wider"
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ type: 'spring', damping: 20, stiffness: 100 }}
-              >
-                Categories
-              </motion.span>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                Browse by Category
-              </h2>
-              <p className="text-nocturne-text-secondary text-base">
-                Explore a wide range of artists and entertainers
-              </p>
+    <section className="py-32 px-6 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* Large Card: AI Discovery */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="md:col-span-8 group relative overflow-hidden rounded-xl bg-[#1a191b] h-[500px]"
+        >
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10" />
+          <Image
+            src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80"
+            alt="AI Artist Discovery"
+            fill
+            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+          />
+          <div className="absolute bottom-0 left-0 p-10 z-20 space-y-4 max-w-xl">
+            <span className="px-3 py-1 bg-[#a1faff]/10 text-[#a1faff] text-[10px] font-bold tracking-widest uppercase rounded-full border border-[#a1faff]/20">
+              Smart Search
+            </span>
+            <h3 className="text-4xl font-display font-extrabold tracking-tight text-white">
+              Find the right artist in minutes
+            </h3>
+            <p className="text-white/50 text-lg">
+              Search by city, genre, budget, and availability. Compare ratings, watch showreels, and check real reviews — all before you book.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Tall Card: Branded PDFs */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="md:col-span-4 rounded-xl bg-[#2c2c2d] p-10 flex flex-col justify-between border border-white/5"
+        >
+          <div className="space-y-6">
+            <div className="w-16 h-16 rounded-2xl bg-[#c39bff]/10 flex items-center justify-center text-[#c39bff]">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg>
+            </div>
+            <h3 className="text-2xl font-display font-bold text-white">Proposals in seconds</h3>
+            <p className="text-white/50 leading-relaxed">
+              Create branded PDF proposals with artist profiles, pricing, and rider details. Share with clients instantly via WhatsApp or email.
+            </p>
+          </div>
+          <div className="mt-8 pt-8 border-t border-white/5">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-16 bg-[#1a191b] rounded border border-white/10 flex flex-col items-center justify-center gap-1 opacity-50">
+                <div className="w-8 h-1 bg-white/20 rounded-full" />
+                <div className="w-6 h-1 bg-white/20 rounded-full" />
+                <div className="w-4 h-1 bg-white/20 rounded-full" />
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffbf00" strokeWidth="2" className="animate-bounce"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+              <div className="w-12 h-16 bg-[#b68cf6] rounded flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#320067"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5z"/></svg>
+              </div>
             </div>
           </div>
-        </FadeIn>
+        </motion.div>
 
-        {/* Genre Chips */}
-        <div className="mb-16">
-          <div
-            ref={genreScrollRef}
-            className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide drag-scroll justify-center md:justify-start"
-          >
-            <AnimatePresence mode="wait">
-              {GENRES.map((g) => (
-                <motion.div
-                  key={g.name}
-                  initial={{ opacity: 0, y: -10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  viewport={{ once: true }}
-                  transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                >
-                  <Link
-                    href={g.genre ? `/search?genre=${encodeURIComponent(g.genre)}` : '/search'}
-                    onClick={() => setActiveGenre(g.name)}
-                  >
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={`flex items-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 shrink-0 relative ${
-                        g.active || activeGenre === g.name
-                          ? 'text-white'
-                          : 'border border-white/[0.15] text-nocturne-text-secondary hover:border-nocturne-primary hover:text-white'
-                      }`}
-                    >
-                      {(g.active || activeGenre === g.name) && (
-                        <motion.div
-                          layoutId="activeGenre"
-                          className="absolute inset-0 bg-gradient-nocturne rounded-full -z-10 shadow-nocturne-glow-sm"
-                          transition={{ type: 'spring', damping: 20, stiffness: 100 }}
-                        />
-                      )}
-                      <span className="text-base">{g.emoji}</span>
-                      {g.name}
-                    </motion.button>
-                  </Link>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+        {/* Secure Payments */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="md:col-span-4 rounded-xl bg-[#201f21] p-10 border border-white/5 hover:bg-[#2c2c2d] transition-colors"
+        >
+          <div className="space-y-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffbf00"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+            <h3 className="text-xl font-display font-bold text-white">Money stays safe</h3>
+            <p className="text-white/50 text-sm leading-relaxed">
+              Payments are held in escrow until the event is done. Artists get paid on time. Clients get protection. No middleman drama.
+            </p>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Event Type Cards */}
-        <div>
-          <div
-            ref={eventScrollRef}
-            className="grid grid-cols-2 md:grid-cols-5 gap-4"
-          >
-            {EVENT_TYPES.map((event, index) => (
-              <motion.div
-                key={event.name}
-                custom={index}
-                variants={eventCardVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
-                whileHover={{ y: -6 }}
-                transition={{ type: 'spring', damping: 20, stiffness: 100 }}
-              >
-                <Link href={event.href}>
-                  <div className="group relative w-full aspect-[4/3] rounded-4xl overflow-hidden shadow-nocturne-card hover:shadow-nocturne-card-hover transition-shadow duration-300 cursor-pointer">
-                    <Image
-                      src={event.image}
-                      alt={event.name}
-                      fill
-                      sizes="(max-width: 768px) 160px, 220px"
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                    />
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"
-                      initial={{ opacity: 0.7 }}
-                      whileHover={{ opacity: 0.9 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                    <motion.div
-                      className="absolute inset-x-0 bottom-0 p-4"
-                      initial={{ y: 8, opacity: 0 }}
-                      whileInView={{ y: 0, opacity: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.1 + index * 0.08, duration: 0.4 }}
-                    >
-                      <h3 className="text-white text-sm font-semibold">{event.name}</h3>
-                      <motion.p
-                        className="text-nocturne-accent/70 text-xs mt-1"
-                        whileHover={{ color: 'rgba(161, 250, 255, 1)' }}
-                      >
-                        {event.count} bookings
-                      </motion.p>
-                    </motion.div>
+        {/* Global Network */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="md:col-span-8 rounded-xl bg-[#262627] overflow-hidden border border-white/5"
+        >
+          <div className="flex flex-col md:flex-row h-full">
+            <div className="p-10 flex-1 flex flex-col justify-center">
+              <h3 className="text-xl font-display font-bold mb-4 text-white">5,000+ verified artists</h3>
+              <p className="text-white/50 text-sm mb-6">
+                DJs, singers, bands, comedians, dancers — across Mumbai, Delhi, Bangalore, and 7 more cities. Every artist is ID-verified and reviewed.
+              </p>
+              <div className="flex -space-x-3">
+                {[
+                  'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=80&q=80',
+                  'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=80&q=80',
+                  'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=80&q=80',
+                ].map((src, i) => (
+                  <div key={i} className="w-10 h-10 rounded-full border-2 border-[#262627] overflow-hidden relative">
+                    <Image src={src} alt="" fill sizes="40px" className="object-cover" />
                   </div>
-                </Link>
-              </motion.div>
-            ))}
+                ))}
+                <div className="w-10 h-10 rounded-full border-2 border-[#262627] bg-[#c39bff] text-[10px] font-bold flex items-center justify-center text-[#320067]">
+                  +450
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 min-h-[200px] relative">
+              <Image
+                src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=800&q=80"
+                alt="Global Reach"
+                fill
+                className="object-cover"
+              />
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
