@@ -79,18 +79,35 @@ export default function EventCompanyOnboarding() {
   }
 
   return (
-    <div className="theme-nocturne bg-nocturne-base min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-lg">
-        {/* Progress */}
-        <div className="flex items-center gap-2 mb-8">
-          {[1, 2, 3].map((s) => (
-            <div key={s} className="flex-1">
-              <div className={`h-1.5 rounded-full transition-all duration-500 ${
-                s <= step ? 'bg-nocturne-primary' : 'bg-nocturne-surface-2'
-              }`} />
+    <div className="bg-[#0e0e0f] min-h-screen relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full" />
+        <div className="absolute top-1/3 right-0 w-80 h-80 bg-[#a1faff]/5 blur-[100px] rounded-full" />
+      </div>
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          <div className="lg:col-span-5 space-y-6">
+            <span className="inline-block px-4 py-1 rounded-full border border-[#c39bff]/20 bg-[#c39bff]/5 text-[#c39bff] text-[10px] font-bold tracking-[0.2em] uppercase">Step {step} of 3</span>
+            <h1 className="text-4xl lg:text-5xl font-display font-light tracking-tight leading-tight text-white">
+              {step === 1 && <>Set up your <span className="font-bold italic">company</span></>}
+              {step === 2 && <>Invite your <span className="font-bold italic">team</span></>}
+              {step === 3 && <>You&apos;re <span className="font-bold italic">ready</span></>}
+            </h1>
+            <p className="text-white/50 text-lg leading-relaxed max-w-md">
+              {step === 1 && 'Tell us about your event company so we can match you with the right artists.'}
+              {step === 2 && 'Add team members to collaborate on bookings and events.'}
+              {step === 3 && 'Your workspace is set up. Start finding and booking artists.'}
+            </p>
+            <div className="flex items-center gap-3 pt-4">
+              {[1, 2, 3].map((s) => (
+                <div key={s} className={`h-1.5 rounded-full transition-all duration-300 ${s <= step ? 'w-8 bg-[#c39bff]' : 'w-4 bg-white/10'}`} />
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+          <div className="lg:col-span-7">
+            <div className="glass-card rounded-3xl p-8 lg:p-10 border border-white/5 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#c39bff]/10 blur-3xl rounded-full pointer-events-none" />
+              <div className="relative z-10">
 
         {step === 1 && (
           <div className="animate-fade-in space-y-6">
@@ -222,7 +239,11 @@ export default function EventCompanyOnboarding() {
             </p>
           </div>
         )}
-      </div>
-    </div>
+              </div>{/* end relative z-10 */}
+            </div>{/* end glass card */}
+          </div>{/* end lg:col-span-7 */}
+        </div>{/* end grid */}
+      </div>{/* end max-w-6xl */}
+    </div>{/* end bg */}
   );
 }
