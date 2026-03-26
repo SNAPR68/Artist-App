@@ -176,7 +176,7 @@ export default function WorkspaceTeamPage() {
           >
             &larr; Back to Workspace
           </Link>
-          <h1 className="text-2xl font-bold text-nocturne-text-primary mt-1">Team Members</h1>
+          <h1 className="text-2xl font-display font-extrabold tracking-tighter text-white mt-1">Team Members</h1>
           <p className="text-sm text-nocturne-text-tertiary mt-0.5">
             Manage team members and their permissions
           </p>

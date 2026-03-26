@@ -38,7 +38,7 @@ export default function AgentOnboarding() {
 
   return (
     <div className="max-w-2xl mx-auto py-12 px-4">
-      <h1 className="text-2xl font-bold text-nocturne-text-primary mb-2">Agency Onboarding</h1>
+      <h1 className="text-2xl font-display font-extrabold tracking-tighter text-white mb-2">Agency Onboarding</h1>
       <p className="text-nocturne-text-tertiary mb-8">Set up your agency profile to start managing artist rosters and bookings.</p>
 
       <form onSubmit={handleSubmit} className="space-y-6">

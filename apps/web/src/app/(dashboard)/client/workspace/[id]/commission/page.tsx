@@ -135,7 +135,7 @@ export default function WorkspaceCommissionPage() {
         <Link href={`/client/workspace/${workspaceId}`} className="text-sm text-primary-500 hover:underline">
           &larr; Back to Workspace
         </Link>
-        <h1 className="text-2xl font-bold text-nocturne-text-primary mt-1">Commission Tracking</h1>
+        <h1 className="text-2xl font-display font-extrabold tracking-tighter text-white mt-1">Commission Tracking</h1>
       </div>
 
       {/* Default Commission Rate */}

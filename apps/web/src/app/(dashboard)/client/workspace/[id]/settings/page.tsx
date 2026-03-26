@@ -126,7 +126,7 @@ export default function WorkspaceSettingsPage() {
         >
           &larr; Back to Workspace
         </Link>
-        <h1 className="text-2xl font-bold text-nocturne-text-primary mt-1">Settings</h1>
+        <h1 className="text-2xl font-display font-extrabold tracking-tighter text-white mt-1">Settings</h1>
       </div>
 
       {/* Toast */}

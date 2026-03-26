@@ -143,7 +143,7 @@ export default function WorkspaceAnalyticsPage() {
           >
             &larr; Back to Workspace
           </Link>
-          <h1 className="text-2xl font-bold text-nocturne-text-primary mt-1">Analytics</h1>
+          <h1 className="text-2xl font-display font-extrabold tracking-tighter text-white mt-1">Analytics</h1>
         </div>
 
         {/* Date Range Filter */}
