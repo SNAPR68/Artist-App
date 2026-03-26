@@ -73,54 +73,74 @@ export default function EarningsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-nocturne-text-primary">Earnings</h1>
-        <div className="flex gap-1 bg-nocturne-surface rounded-lg p-1">
-          {(['current', '1m', '3m', '6m'] as const).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                period === p
-                  ? 'bg-nocturne-surface text-nocturne-accent font-medium shadow-sm'
-                  : 'text-nocturne-text-secondary hover:text-white'
-              }`}
-            >
-              {p === 'current' ? 'This Month' : p === '1m' ? 'Last Month' : p === '3m' ? '3 Months' : '6 Months'}
-            </button>
-          ))}
+      {/* ─── Bento Hero ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Revenue</span>
+                <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white">Earnings</h1>
+              </div>
+              <div className="flex gap-1 bg-white/5 rounded-lg p-1">
+                {(['current', '1m', '3m', '6m'] as const).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPeriod(p)}
+                    className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
+                      period === p
+                        ? 'bg-[#c39bff]/20 text-[#c39bff] font-medium'
+                        : 'text-white/40 hover:text-white'
+                    }`}
+                  >
+                    {p === 'current' ? 'This Month' : p === '1m' ? 'Last Month' : p === '3m' ? '3 Months' : '6 Months'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <p className="text-[10px] text-white/40 uppercase font-bold mb-1">Gross</p>
+                <p className="text-lg font-bold text-white">₹{formatINR(summary?.gross_total ?? null)}</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-lg">
+                <p className="text-[10px] text-white/40 uppercase font-bold mb-1">TDS</p>
+                <p className="text-lg font-bold text-red-400">-₹{formatINR(summary?.total_tds ?? null)}</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-lg">
+                <p className="text-[10px] text-white/40 uppercase font-bold mb-1">Platform Fee</p>
+                <p className="text-lg font-bold text-white/40">-₹{formatINR(summary?.total_platform_fee ?? null)}</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-lg border border-green-400/20">
+                <p className="text-[10px] text-green-400 uppercase font-bold mb-1">Net Payout</p>
+                <p className="text-lg font-bold text-green-400">₹{formatINR(summary?.net_total ?? null)}</p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
-          <p className="text-sm text-nocturne-text-tertiary">Gross Earnings</p>
-          <p className="text-xl font-bold text-nocturne-text-primary">₹{formatINR(summary?.gross_total ?? null)}</p>
+        <div className="md:col-span-4 glass-card rounded-xl p-6 border border-white/5 border-l-4 border-l-green-400 flex flex-col justify-between">
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white/40 mb-6">Summary</h3>
+            <div className="space-y-4">
+              <div>
+                <p className="text-3xl font-extrabold text-white">₹{formatINR(summary?.net_total ?? null)}</p>
+                <p className="text-xs text-white/40">Net earnings this period</p>
+              </div>
+              <div className="pt-4 border-t border-white/5">
+                <p className="text-xl font-bold text-[#a1faff]">{summary?.transaction_count ?? 0}</p>
+                <p className="text-xs text-white/40">Settled transactions</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
-          <p className="text-sm text-nocturne-text-tertiary">TDS Deducted</p>
-          <p className="text-xl font-bold text-nocturne-error">-₹{formatINR(summary?.total_tds ?? null)}</p>
-        </div>
-        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
-          <p className="text-sm text-nocturne-text-tertiary">Platform Fee</p>
-          <p className="text-xl font-bold text-nocturne-text-tertiary">-₹{formatINR(summary?.total_platform_fee ?? null)}</p>
-        </div>
-        <div className="bg-nocturne-success/15 rounded-lg p-4 border border-nocturne-success">
-          <p className="text-sm text-nocturne-success">Net Payout</p>
-          <p className="text-xl font-bold text-nocturne-success">₹{formatINR(summary?.net_total ?? null)}</p>
-        </div>
-      </div>
-
-      {/* Transaction Count */}
-      <div className="text-sm text-nocturne-text-tertiary">
-        {summary?.transaction_count ?? 0} settled transaction{(summary?.transaction_count ?? 0) !== 1 ? 's' : ''} in this period
       </div>
 
       {/* Transaction List */}
-      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
-        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
-          <h2 className="text-lg font-semibold text-nocturne-text-primary">Payment History</h2>
+      <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+          <h2 className="text-lg font-display font-bold text-white">Payment History</h2>
+          <span className="text-xs text-white/40">{summary?.transaction_count ?? 0} transactions</span>
         </div>
         {transactions.length === 0 ? (
           <div className="p-8 text-center text-nocturne-text-tertiary">No transactions yet</div>

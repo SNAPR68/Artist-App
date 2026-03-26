@@ -96,7 +96,7 @@ export default function HelpPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-nocturne-text-primary mb-2">Help & FAQ</h1>
+      <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white mb-2">Help & FAQ</h1>
       <p className="text-nocturne-text-tertiary mb-8">
         Find answers to common questions about using ArtistBooking.
       </p>

@@ -147,7 +147,7 @@ function ArtistGigsView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-nocturne-text-primary">Gig Marketplace</h1>
+        <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Gig Marketplace</h1></section>
       </div>
 
       {/* Tabs */}
@@ -315,7 +315,7 @@ function ClientGigsView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-nocturne-text-primary">My Gig Posts</h1>
+        <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white">My Gig Posts</h1>
         <button
           onClick={() => setShowForm(!showForm)}
           className="text-sm bg-nocturne-primary text-white px-4 py-2 rounded-lg hover:bg-nocturne-primary"

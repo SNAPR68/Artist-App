@@ -9,7 +9,7 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
       <Link href="/" className="text-primary-500 text-sm hover:underline">&larr; Back to Home</Link>
-      <h1 className="text-3xl font-bold text-nocturne-text-primary mt-4 mb-8">Privacy Policy</h1>
+      <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white mt-4 mb-8">Privacy Policy</h1>
       <p className="text-sm text-nocturne-text-tertiary mb-6">Last updated: March 2026</p>
 
       <div className="prose prose-sm prose-gray max-w-none space-y-6">

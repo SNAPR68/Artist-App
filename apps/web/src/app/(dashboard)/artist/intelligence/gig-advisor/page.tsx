@@ -106,7 +106,7 @@ export default function GigAdvisorPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-nocturne-text-primary">Gig Advisor</h1>
+      <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Gig Advisor</h1></section>
 
       {/* Active Inquiries */}
       <section>
