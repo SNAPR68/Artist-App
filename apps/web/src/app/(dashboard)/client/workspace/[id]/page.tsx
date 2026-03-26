@@ -205,53 +205,51 @@ export default function WorkspaceDetailPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <Link href="/client/workspace" className="text-sm text-primary-500 hover:underline">
-            &larr; Back to Workspaces
-          </Link>
-          <h1 className="text-2xl font-display font-extrabold tracking-tighter text-white mt-1">{workspace.name}</h1>
+      {/* ─── Cinematic Bento Header ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="relative z-10">
+            <Link href="/client/workspace" className="text-sm text-[#c39bff] hover:underline mb-2 inline-block">
+              &larr; Back to Workspaces
+            </Link>
+            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Workspace</span>
+            <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white mb-1">{workspace.name}</h1>
+            <p className="text-white/40 text-sm">Manage events, bookings, and team for this workspace</p>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Link
-            href={`/client/workspace/${workspaceId}/team`}
-            className="text-sm bg-nocturne-surface border border-nocturne-border-subtle text-nocturne-text-secondary px-3 py-1.5 rounded-lg hover:bg-nocturne-base transition-colors font-medium"
-          >
-            Team
-          </Link>
-          <Link
-            href={`/client/workspace/${workspaceId}/analytics`}
-            className="text-sm bg-nocturne-surface border border-nocturne-border-subtle text-nocturne-text-secondary px-3 py-1.5 rounded-lg hover:bg-nocturne-base transition-colors font-medium"
-          >
-            Analytics
-          </Link>
-          <Link
-            href={`/client/workspace/${workspaceId}/presentations`}
-            className="text-sm bg-nocturne-surface border border-nocturne-border-subtle text-nocturne-text-secondary px-3 py-1.5 rounded-lg hover:bg-nocturne-base transition-colors font-medium"
-          >
-            Presentations
-          </Link>
-          <Link
-            href={`/client/workspace/${workspaceId}/settings`}
-            className="text-sm bg-nocturne-surface border border-nocturne-border-subtle text-nocturne-text-secondary px-3 py-1.5 rounded-lg hover:bg-nocturne-base transition-colors font-medium"
-          >
-            Settings
-          </Link>
+        <div className="md:col-span-4 glass-card rounded-xl p-6 border border-white/5 flex flex-col justify-between">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-white/40 mb-4">Quick Links</h3>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { href: `/client/workspace/${workspaceId}/team`, label: 'Team' },
+              { href: `/client/workspace/${workspaceId}/analytics`, label: 'Analytics' },
+              { href: `/client/workspace/${workspaceId}/presentations`, label: 'Presentations' },
+              { href: `/client/workspace/${workspaceId}/settings`, label: 'Settings' },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-xs glass-card bg-white/5 border border-white/5 text-white/60 px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all text-center font-medium"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <nav className="flex gap-1 border-b border-nocturne-border-subtle">
+      <nav className="flex gap-1 border-b border-white/5">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-all ${
               activeTab === tab.key
-                ? 'border-primary-500 text-nocturne-accent'
-                : 'border-transparent text-nocturne-text-tertiary hover:text-nocturne-text-secondary'
-            }`}
+                ? 'border-[#c39bff] text-[#a1faff] bg-white/5'
+                : 'border-transparent text-white/40 hover:text-white/70 hover:bg-white/5'
+            } rounded-t-lg`}
           >
             {tab.label}
           </button>
