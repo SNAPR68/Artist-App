@@ -78,12 +78,24 @@ export default function IntelligenceHubPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-display font-bold text-nocturne-text-primary">Career Intelligence</h1>
-          <p className="text-nocturne-text-secondary text-sm mt-1">Data-driven insights about your performance</p>
+      {/* ─── Bento Hero ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="relative z-10">
+            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">AI Insights</span>
+            <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white mb-1">Career Intelligence</h1>
+            <p className="text-white/40 text-sm">Data-driven insights about your performance and growth</p>
+          </div>
         </div>
-        <Brain className="text-nocturne-accent opacity-50" size={32} />
+        <div className="md:col-span-4 glass-card rounded-xl p-6 border border-white/5 flex flex-col justify-center">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-3 h-3 rounded-full bg-[#a1faff] animate-pulse shadow-[0_0_12px_rgba(161,250,255,0.5)]" />
+            <h3 className="text-sm font-extrabold uppercase tracking-widest text-[#a1faff]">Backstage AI</h3>
+          </div>
+          <p className="text-sm text-white/40 italic">&ldquo;Your booking velocity is trending up. Keep accepting gigs in your top cities to maintain momentum.&rdquo;</p>
+          <Brain className="w-5 h-5 text-[#c39bff] mt-4 opacity-50" />
+        </div>
       </div>
 
       {/* Core Metrics */}

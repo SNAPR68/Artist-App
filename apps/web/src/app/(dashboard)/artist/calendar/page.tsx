@@ -135,13 +135,17 @@ export default function CalendarPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-display font-bold text-nocturne-text-primary">Availability Calendar</h1>
-          <p className="text-nocturne-text-secondary text-sm mt-1">Manage your booking availability</p>
+      <section className="relative">
+        <div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Schedule</span>
+            <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white">Availability Calendar</h1>
+            <p className="text-white/40 text-sm mt-1">Block dates, set availability, manage your schedule</p>
+          </div>
+          <Calendar className="text-[#c39bff] opacity-50" size={32} />
         </div>
-        <Calendar className="text-nocturne-accent opacity-50" size={32} />
-      </div>
+      </section>
 
       {/* Legend */}
       <div className="glass-card p-4 space-y-3">

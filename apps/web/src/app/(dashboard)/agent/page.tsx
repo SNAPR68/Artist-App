@@ -84,19 +84,31 @@ export default function AgentDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 space-y-8 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-gradient-nocturne">{profile.agency_name}</h1>
-          <p className="text-nocturne-text-secondary mt-2">{profile.contact_person} · {profile.city}</p>
+      {/* ─── Bento Hero ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="relative z-10">
+            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Agent Dashboard</span>
+            <h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white mb-1">{profile.agency_name}</h1>
+            <p className="text-white/40 text-sm">{profile.contact_person} · {profile.city}</p>
+          </div>
         </div>
-        <Link
-          href="/agent/roster"
-          className="glass-card px-6 py-3 rounded-full text-sm font-semibold text-nocturne-text-primary hover:hover-glow transition-all flex items-center gap-2"
-        >
-          <Users size={18} />
-          Manage Roster
-        </Link>
+        <div className="md:col-span-4 glass-card rounded-xl p-6 border border-white/5 flex flex-col justify-center items-center gap-4">
+          <Link
+            href="/agent/roster"
+            className="w-full py-3 bg-gradient-to-br from-[#c39bff] to-[#8A2BE2] text-white rounded-xl text-sm font-bold text-center hover:shadow-[0_0_20px_rgba(195,155,255,0.3)] transition-all flex items-center justify-center gap-2"
+          >
+            <Users size={18} />
+            Manage Roster
+          </Link>
+          <Link
+            href="/agent/bookings"
+            className="w-full py-3 border border-white/10 text-white/60 rounded-xl text-sm font-medium text-center hover:bg-white/5 transition-all"
+          >
+            View Bookings
+          </Link>
+        </div>
       </div>
 
       {/* Stats Grid */}

@@ -60,17 +60,34 @@ export default function ClientBookingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between animate-fade-in-up">
-        <div>
-          <h1 className="text-3xl font-bold text-gradient-nocturne font-display">My Bookings</h1>
-          <p className="text-nocturne-text-tertiary text-sm mt-1">Track and manage all your artist bookings</p>
+      {/* ─── Bento Hero ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-fade-in-up">
+        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="relative z-10">
+            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Bookings</span>
+            <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white mb-1">My Bookings</h1>
+            <p className="text-white/40 text-sm">Track and manage all your artist bookings</p>
+            <div className="flex gap-6 mt-4">
+              <div>
+                <p className="text-white/40 text-xs">Total</p>
+                <p className="text-xl font-bold text-white">{bookings.length}</p>
+              </div>
+              <div>
+                <p className="text-white/40 text-xs">Confirmed</p>
+                <p className="text-xl font-bold text-green-400">{bookings.filter(b => b.status === 'confirmed').length}</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <Link
-          href="/search"
-          className="px-4 py-2.5 bg-gradient-to-r from-nocturne-primary to-accent-magenta text-white rounded-full text-sm font-medium hover-glow shadow-nocturne-glow-sm transition-all"
-        >
-          Book an Artist
-        </Link>
+        <div className="md:col-span-4 glass-card rounded-xl p-6 border border-white/5 flex items-center justify-center">
+          <Link
+            href="/search"
+            className="w-full py-3 bg-gradient-to-br from-[#c39bff] to-[#8A2BE2] text-white rounded-xl text-sm font-bold text-center hover:shadow-[0_0_20px_rgba(195,155,255,0.3)] transition-all"
+          >
+            Book an Artist
+          </Link>
+        </div>
       </div>
 
       {/* Filter Pills */}

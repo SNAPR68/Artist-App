@@ -84,14 +84,34 @@ export default function ClientDashboardPage() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Welcome Header */}
-      <div>
-        <h1 className="text-4xl font-display font-bold text-nocturne-text-primary mb-2">
-          {profile?.company_name ? `Welcome, ${profile.company_name}` : 'Client Dashboard'}
-        </h1>
-        <p className="text-nocturne-text-secondary text-lg">
-          Find and book premium artists for your events
-        </p>
+      {/* ─── Bento Hero ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="relative z-10">
+            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Dashboard</span>
+            <h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white mb-1">
+              {profile?.company_name ? `Welcome, ${profile.company_name}` : 'Client Dashboard'}
+            </h1>
+            <p className="text-white/40 text-sm">Find and book artists for your upcoming events</p>
+          </div>
+        </div>
+        <div className="md:col-span-4 glass-card rounded-xl p-6 border border-white/5 flex flex-col justify-center">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-3 h-3 rounded-full bg-[#a1faff] animate-pulse shadow-[0_0_12px_rgba(161,250,255,0.5)]" />
+            <h3 className="text-sm font-extrabold uppercase tracking-widest text-[#a1faff]">Quick Stats</h3>
+          </div>
+          <div className="space-y-3">
+            <div className="flex justify-between">
+              <span className="text-xs text-white/40">Shortlists</span>
+              <span className="text-sm font-bold text-white">{shortlists.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-xs text-white/40">City</span>
+              <span className="text-sm font-bold text-white">{profile?.city ?? '—'}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats Grid */}
