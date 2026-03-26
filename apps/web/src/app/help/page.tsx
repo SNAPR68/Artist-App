@@ -95,7 +95,7 @@ export default function HelpPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
+    <div className="max-w-3xl mx-auto px-4 py-12 min-h-screen bg-[#0e0e0f]">
       <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white mb-2">Help & FAQ</h1>
       <p className="text-nocturne-text-tertiary mb-8">
         Find answers to common questions about using ArtistBooking.
@@ -104,7 +104,7 @@ export default function HelpPage() {
       {FAQ_SECTIONS.map((section, si) => (
         <div key={section.title} className="mb-8">
           <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">{section.title}</h2>
-          <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle divide-y divide-gray-100">
+          <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle divide-y divide-white/5">
             {section.items.map((item, ii) => {
               const key = `${si}-${ii}`;
               const isOpen = openIndex === key;

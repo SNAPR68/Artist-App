@@ -226,7 +226,7 @@ export default function WorkspaceCommissionPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-white/5">
                 {sortedBookings.map((b) => (
                   <tr key={b.workspace_event_booking_id} className="hover:bg-nocturne-base">
                     <td className="px-5 py-3 font-medium text-nocturne-text-primary">{b.artist_name ?? 'Unknown'}</td>

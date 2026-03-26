@@ -290,7 +290,7 @@ export default function WorkspaceTeamPage() {
                   <th className="px-5 py-3 text-right font-medium text-nocturne-text-secondary">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-white/5">
                 {members.map((member) => (
                   <tr key={member.id} className="hover:bg-nocturne-base">
                     <td className="px-5 py-3">

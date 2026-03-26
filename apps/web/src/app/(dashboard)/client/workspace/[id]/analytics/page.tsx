@@ -203,7 +203,7 @@ export default function WorkspaceAnalyticsPage() {
                   <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Total Spend</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-white/5">
                 {analytics.monthly_revenue.map((m) => (
                   <tr key={m.month} className="hover:bg-nocturne-base">
                     <td className="px-4 py-2 text-nocturne-text-primary">{formatMonth(m.month)}</td>
@@ -238,7 +238,7 @@ export default function WorkspaceAnalyticsPage() {
                   <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Avg per Booking</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-white/5">
                 {analytics.top_artists.map((a, idx) => (
                   <tr key={a.artist_id} className="hover:bg-nocturne-base">
                     <td className="px-4 py-2 text-nocturne-text-tertiary">{idx + 1}</td>
