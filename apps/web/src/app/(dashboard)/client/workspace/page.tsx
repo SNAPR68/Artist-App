@@ -73,7 +73,7 @@ export default function WorkspaceListPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-nocturne-text-primary">Workspaces</h1>
+          <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Workspaces</h1></section>
           <p className="text-nocturne-text-secondary mt-1">Manage your event organizing spaces and teams</p>
         </div>
         <button

@@ -211,7 +211,7 @@ export default function WorkspaceDetailPage() {
           <Link href="/client/workspace" className="text-sm text-primary-500 hover:underline">
             &larr; Back to Workspaces
           </Link>
-          <h1 className="text-2xl font-bold text-nocturne-text-primary mt-1">{workspace.name}</h1>
+          <h1 className="text-2xl font-display font-extrabold tracking-tighter text-white mt-1">{workspace.name}</h1>
         </div>
         <div className="flex gap-2">
           <Link

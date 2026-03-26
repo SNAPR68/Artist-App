@@ -222,13 +222,16 @@ export default function AdminDashboardPage() {
   return (
     <ErrorBoundary>
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-nocturne-text-primary flex items-center gap-2">
-          <Shield size={32} className="text-nocturne-accent" />
-          Admin Dashboard
-        </h1>
-        <p className="text-nocturne-text-secondary mt-1">Platform oversight and management tools</p>
-      </div>
+      <section className="relative">
+        <div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
+        <div className="relative z-10 flex items-center gap-4">
+          <Shield size={32} className="text-[#c39bff]" />
+          <div>
+            <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white">Admin Dashboard</h1>
+            <p className="text-white/40 text-sm mt-1">Platform oversight and management tools</p>
+          </div>
+        </div>
+      </section>
 
       {/* Tab Navigation */}
       <div className="glass-card border-nocturne-border rounded-xl p-1 w-fit">
