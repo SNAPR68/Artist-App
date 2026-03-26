@@ -26,11 +26,11 @@ export function ArtistReviews({ reviews }: ArtistReviewsProps) {
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-heading font-semibold text-text-primary">Reviews</h2>
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-pill bg-glass-light border border-glass-border">
+          <h2 className="text-lg font-display font-semibold text-nocturne-text-primary">Reviews</h2>
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-nocturne-surface border border-nocturne-border">
             <Star size={12} className="text-amber-400 fill-amber-400" />
-            <span className="text-sm font-medium text-text-primary">{avgRating}</span>
-            <span className="text-xs text-text-muted">({reviews.length})</span>
+            <span className="text-sm font-medium text-nocturne-text-primary">{avgRating}</span>
+            <span className="text-xs text-nocturne-text-secondary">({reviews.length})</span>
           </div>
         </div>
       </div>
@@ -45,16 +45,16 @@ export function ArtistReviews({ reviews }: ArtistReviewsProps) {
                     <Star
                       key={j}
                       size={12}
-                      className={j < review.overall_rating ? 'text-amber-400 fill-amber-400' : 'text-surface-elevated'}
+                      className={j < review.overall_rating ? 'text-amber-400 fill-amber-400' : 'text-nocturne-surface-2'}
                     />
                   ))}
                 </div>
-                <span className="text-xs text-text-muted">
+                <span className="text-xs text-nocturne-text-secondary">
                   {new Date(review.created_at).toLocaleDateString('en-IN')}
                 </span>
               </div>
               {review.comment && (
-                <p className="text-sm text-text-secondary leading-relaxed">{review.comment}</p>
+                <p className="text-sm text-nocturne-text-secondary leading-relaxed">{review.comment}</p>
               )}
             </div>
           </AnimatedSection>
@@ -64,7 +64,7 @@ export function ArtistReviews({ reviews }: ArtistReviewsProps) {
       {reviews.length > 3 && (
         <button
           onClick={() => setShowAll(!showAll)}
-          className="mt-3 text-sm text-primary-400 hover:text-primary-300 font-medium transition-colors"
+          className="mt-3 text-sm text-nocturne-accent hover:text-nocturne-accent font-medium transition-colors"
         >
           {showAll ? 'Show less' : `See all ${reviews.length} reviews`}
         </button>

@@ -96,19 +96,19 @@ export default function GamificationPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Gamification</h1>
+      <h1 className="text-2xl font-bold text-nocturne-text-primary">Gamification</h1>
 
       {/* Level Progress */}
-      <div className="bg-white rounded-lg p-6 border border-gray-200">
+      <div className="bg-nocturne-surface rounded-lg p-6 border border-nocturne-border-subtle">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <span className={`inline-block px-3 py-1 rounded-full text-white text-sm font-semibold capitalize ${LEVEL_COLORS[profile?.level ?? 'bronze'] ?? 'bg-gray-400'}`}>
+            <span className={`inline-block px-3 py-1 rounded-full text-white text-sm font-semibold capitalize ${LEVEL_COLORS[profile?.level ?? 'bronze'] ?? 'bg-nocturne-text-tertiary'}`}>
               {profile?.level ?? 'Bronze'}
             </span>
-            <span className="ml-3 text-lg font-bold text-gray-900">{profile?.points ?? 0} points</span>
+            <span className="ml-3 text-lg font-bold text-nocturne-text-primary">{profile?.points ?? 0} points</span>
           </div>
           {profile?.next_level_at && (
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-nocturne-text-tertiary">
               {profile.points}/{profile.next_level_at} to{' '}
               {(() => {
                 const levels = ['bronze', 'silver', 'gold', 'platinum'];
@@ -118,27 +118,27 @@ export default function GamificationPage() {
             </span>
           )}
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
+        <div className="w-full bg-nocturne-surface-2 rounded-full h-3">
           <div
-            className={`h-3 rounded-full transition-all ${LEVEL_COLORS[profile?.level ?? 'bronze'] ?? 'bg-gray-400'}`}
+            className={`h-3 rounded-full transition-all ${LEVEL_COLORS[profile?.level ?? 'bronze'] ?? 'bg-nocturne-text-tertiary'}`}
             style={{ width: `${progressPercent}%` }}
           />
         </div>
       </div>
 
       {/* Streak Counter */}
-      <div className="bg-white rounded-lg p-4 border border-gray-200 flex items-center gap-3">
+      <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle flex items-center gap-3">
         <span className="text-2xl">&#128293;</span>
         <div>
-          <p className="text-lg font-bold text-gray-900">{profile?.streak_days ?? 0}-day streak</p>
-          <p className="text-sm text-gray-500">Keep your streak alive by staying active daily</p>
+          <p className="text-lg font-bold text-nocturne-text-primary">{profile?.streak_days ?? 0}-day streak</p>
+          <p className="text-sm text-nocturne-text-tertiary">Keep your streak alive by staying active daily</p>
         </div>
       </div>
 
       {/* Badge Gallery */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Badges</h2>
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
+        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+          <h2 className="text-lg font-semibold text-nocturne-text-primary">Badges</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
           {Object.entries(BADGE_INFO).map(([type, info]) => {
@@ -149,8 +149,8 @@ export default function GamificationPage() {
                 key={type}
                 className={`rounded-lg p-4 border text-center ${
                   earned
-                    ? 'border-primary-200 bg-primary-50'
-                    : 'border-gray-200 bg-gray-50 opacity-50'
+                    ? 'border-nocturne-primary-light bg-nocturne-primary-light'
+                    : 'border-nocturne-border-subtle bg-nocturne-surface-2 opacity-50'
                 }`}
               >
                 <div className={`text-3xl mb-2 ${earned ? '' : 'grayscale'}`}>
@@ -161,9 +161,9 @@ export default function GamificationPage() {
                   {type === 'early_bird' && '\uD83D\uDC26'}
                   {type === 'crowd_favorite' && '\uD83C\uDF89'}
                 </div>
-                <p className="font-semibold text-gray-900 text-sm">{info.label}</p>
+                <p className="font-semibold text-nocturne-text-primary text-sm">{info.label}</p>
                 {earned && badge ? (
-                  <p className="text-xs text-green-600 mt-1">
+                  <p className="text-xs text-nocturne-success mt-1">
                     Earned {new Date(badge.earned_at).toLocaleDateString('en-IN', {
                       day: 'numeric',
                       month: 'short',
@@ -171,7 +171,7 @@ export default function GamificationPage() {
                     })}
                   </p>
                 ) : (
-                  <p className="text-xs text-gray-400 mt-1">{info.requirement}</p>
+                  <p className="text-xs text-nocturne-text-tertiary mt-1">{info.requirement}</p>
                 )}
               </div>
             );
@@ -181,9 +181,9 @@ export default function GamificationPage() {
 
       {/* Level Distribution */}
       {leaderboard && leaderboard.total > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Platform Level Distribution</h2>
+        <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
+          <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+            <h2 className="text-lg font-semibold text-nocturne-text-primary">Platform Level Distribution</h2>
           </div>
           <div className="p-4 space-y-3">
             {(['platinum', 'gold', 'silver', 'bronze'] as const).map((level) => {
@@ -191,14 +191,14 @@ export default function GamificationPage() {
               const pct = Math.round((count / leaderboard.total) * 100);
               return (
                 <div key={level} className="flex items-center gap-3">
-                  <span className="w-20 text-sm font-medium text-gray-700 capitalize">{level}</span>
-                  <div className="flex-1 bg-gray-200 rounded-full h-4">
+                  <span className="w-20 text-sm font-medium text-nocturne-text-secondary capitalize">{level}</span>
+                  <div className="flex-1 bg-nocturne-surface-2 rounded-full h-4">
                     <div
                       className={`h-4 rounded-full ${LEVEL_COLORS[level]}`}
                       style={{ width: `${Math.max(pct, 2)}%` }}
                     />
                   </div>
-                  <span className="w-12 text-sm text-gray-500 text-right">{pct}%</span>
+                  <span className="w-12 text-sm text-nocturne-text-tertiary text-right">{pct}%</span>
                 </div>
               );
             })}
@@ -207,21 +207,21 @@ export default function GamificationPage() {
       )}
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
+        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+          <h2 className="text-lg font-semibold text-nocturne-text-primary">Recent Activity</h2>
         </div>
         {transactions.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No activity yet. Start earning points!</div>
+          <div className="p-8 text-center text-nocturne-text-tertiary">No activity yet. Start earning points!</div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-nocturne-border-subtle">
             {transactions.map((txn) => (
               <div key={txn.id} className="px-4 py-3 flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-nocturne-text-primary">
                     {ACTION_LABELS[txn.action_type] ?? txn.action_type}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-nocturne-text-tertiary">
                     {new Date(txn.created_at).toLocaleDateString('en-IN', {
                       day: 'numeric',
                       month: 'short',
@@ -229,7 +229,7 @@ export default function GamificationPage() {
                     })}
                   </p>
                 </div>
-                <span className="text-sm font-bold text-green-600">+{txn.points} pts</span>
+                <span className="text-sm font-bold text-nocturne-success">+{txn.points} pts</span>
               </div>
             ))}
           </div>

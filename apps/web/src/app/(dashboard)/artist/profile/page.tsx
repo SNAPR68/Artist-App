@@ -81,28 +81,28 @@ export default function ArtistProfilePage() {
     );
   }
 
-  if (!profile) return <p className="text-gray-500 text-center py-10">Profile not found.</p>;
+  if (!profile) return <p className="text-nocturne-text-tertiary text-center py-10">Profile not found.</p>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
+        <h1 className="text-2xl font-bold text-nocturne-text-primary">My Profile</h1>
         {!editing ? (
           <button
             onClick={() => setEditing(true)}
-            className="text-sm text-primary-500 hover:text-primary-600 font-medium"
+            className="text-sm text-nocturne-accent hover:text-nocturne-primary font-medium"
           >
             Edit
           </button>
         ) : (
           <div className="flex gap-2">
-            <button onClick={() => setEditing(false)} className="text-sm text-gray-500 hover:text-gray-700">
+            <button onClick={() => setEditing(false)} className="text-sm text-nocturne-text-tertiary hover:text-nocturne-text-secondary">
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={saving}
-              className="text-sm bg-primary-500 text-white px-4 py-1.5 rounded-lg hover:bg-primary-600 disabled:opacity-50"
+              className="text-sm bg-nocturne-accent text-white px-4 py-1.5 rounded-lg hover:bg-nocturne-primary disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save'}
             </button>
@@ -111,55 +111,55 @@ export default function ArtistProfilePage() {
       </div>
 
       {/* Basic Info */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Basic Info</h2>
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 space-y-4">
+        <h2 className="text-sm font-semibold text-nocturne-text-secondary uppercase tracking-wide">Basic Info</h2>
 
         {editing ? (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Stage Name</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Stage Name</label>
               <input
                 value={stageName}
                 onChange={(e) => setStageName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border-subtle rounded-lg focus:ring-2 focus:ring-nocturne-accent bg-nocturne-surface-2 text-nocturne-text-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Bio</label>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border-subtle rounded-lg focus:ring-2 focus:ring-nocturne-accent bg-nocturne-surface-2 text-nocturne-text-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Base City</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Base City</label>
               <input
                 value={baseCity}
                 onChange={(e) => setBaseCity(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border-subtle rounded-lg focus:ring-2 focus:ring-nocturne-accent bg-nocturne-surface-2 text-nocturne-text-primary"
               />
             </div>
           </>
         ) : (
           <>
             <div>
-              <p className="text-sm text-gray-500">Stage Name</p>
-              <p className="text-gray-900 font-medium">{profile.stage_name}</p>
+              <p className="text-sm text-nocturne-text-tertiary">Stage Name</p>
+              <p className="text-nocturne-text-primary font-medium">{profile.stage_name}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Bio</p>
-              <p className="text-gray-900">{profile.bio || 'Not set'}</p>
+              <p className="text-sm text-nocturne-text-tertiary">Bio</p>
+              <p className="text-nocturne-text-primary">{profile.bio || 'Not set'}</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Base City</p>
-                <p className="text-gray-900">{profile.base_city}</p>
+                <p className="text-sm text-nocturne-text-tertiary">Base City</p>
+                <p className="text-nocturne-text-primary">{profile.base_city}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Travel Radius</p>
-                <p className="text-gray-900">{profile.travel_radius_km} km</p>
+                <p className="text-sm text-nocturne-text-tertiary">Travel Radius</p>
+                <p className="text-nocturne-text-primary">{profile.travel_radius_km} km</p>
               </div>
             </div>
           </>
@@ -167,33 +167,33 @@ export default function ArtistProfilePage() {
       </div>
 
       {/* Performance Details */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-3">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Performance</h2>
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 space-y-3">
+        <h2 className="text-sm font-semibold text-nocturne-text-secondary uppercase tracking-wide">Performance</h2>
         <div>
-          <p className="text-sm text-gray-500">Genres</p>
+          <p className="text-sm text-nocturne-text-tertiary">Genres</p>
           <div className="flex flex-wrap gap-1 mt-1">
             {profile.genres.map((g) => (
-              <span key={g} className="bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-full">{g}</span>
+              <span key={g} className="bg-nocturne-primary-light text-nocturne-primary text-xs px-2 py-1 rounded-full">{g}</span>
             ))}
           </div>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Languages</p>
+          <p className="text-sm text-nocturne-text-tertiary">Languages</p>
           <div className="flex flex-wrap gap-1 mt-1">
             {profile.languages.map((l) => (
-              <span key={l} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">{l}</span>
+              <span key={l} className="bg-nocturne-surface-2 text-nocturne-text-secondary text-xs px-2 py-1 rounded-full">{l}</span>
             ))}
           </div>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Duration</p>
-          <p className="text-gray-900">{profile.performance_duration_min}–{profile.performance_duration_max} minutes</p>
+          <p className="text-sm text-nocturne-text-tertiary">Duration</p>
+          <p className="text-nocturne-text-primary">{profile.performance_duration_min}–{profile.performance_duration_max} minutes</p>
         </div>
       </div>
 
       {/* Media */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Media</h2>
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6">
+        <h2 className="text-sm font-semibold text-nocturne-text-secondary uppercase tracking-wide mb-4">Media</h2>
         <MediaUploader media={profile.media} onUpdate={loadProfile} />
       </div>
     </div>

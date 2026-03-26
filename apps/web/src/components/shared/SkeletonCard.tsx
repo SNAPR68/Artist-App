@@ -2,7 +2,7 @@
 
 export function SkeletonCard() {
   return (
-    <div className="rounded-xl overflow-hidden border border-glass-border bg-surface-card">
+    <div className="rounded-xl overflow-hidden border border-nocturne-border bg-nocturne-surface">
       <div className="skeleton-image" />
       <div className="p-4 space-y-3">
         <div className="skeleton-heading" />

@@ -126,7 +126,7 @@ export default function WorkspaceSettingsPage() {
         >
           &larr; Back to Workspace
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900 mt-1">Settings</h1>
+        <h1 className="text-2xl font-bold text-nocturne-text-primary mt-1">Settings</h1>
       </div>
 
       {/* Toast */}
@@ -134,8 +134,8 @@ export default function WorkspaceSettingsPage() {
         <div
           className={`rounded-lg px-4 py-3 text-sm font-medium ${
             toast.type === 'success'
-              ? 'bg-green-50 text-green-700 border border-green-200'
-              : 'bg-red-50 text-red-700 border border-red-200'
+              ? 'bg-nocturne-success/15 text-nocturne-success border border-green-200'
+              : 'bg-nocturne-error/15 text-nocturne-error border border-red-200'
           }`}
         >
           {toast.message}
@@ -143,38 +143,38 @@ export default function WorkspaceSettingsPage() {
       )}
 
       {/* Workspace Info */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 space-y-4">
+        <h2 className="text-sm font-semibold text-nocturne-text-tertiary uppercase tracking-wide">
           Workspace Info
         </h2>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Name *</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="Workspace name"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Description</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="Brief description of your workspace"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Company Type</label>
+          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Company Type</label>
           <select
             value={companyType}
             onChange={(e) => setCompanyType(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
+            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-nocturne-surface"
           >
             {COMPANY_TYPES.map((ct) => (
               <option key={ct.value} value={ct.value}>
@@ -185,38 +185,38 @@ export default function WorkspaceSettingsPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">City</label>
           <input
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="e.g. Mumbai"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Website URL</label>
+          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Website URL</label>
           <input
             value={website}
             onChange={(e) => setWebsite(e.target.value)}
             type="url"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="https://example.com"
           />
         </div>
       </div>
 
       {/* Branding */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Branding</h2>
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 space-y-4">
+        <h2 className="text-sm font-semibold text-nocturne-text-tertiary uppercase tracking-wide">Branding</h2>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL</label>
+          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Logo URL</label>
           <input
             value={logoUrl}
             onChange={(e) => setLogoUrl(e.target.value)}
             type="url"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="https://example.com/logo.png"
           />
           {logoUrl && (
@@ -226,25 +226,25 @@ export default function WorkspaceSettingsPage() {
                 alt="Logo preview"
                 width={48}
                 height={48}
-                className="object-contain rounded border border-gray-200"
+                className="object-contain rounded border border-nocturne-border-subtle"
               />
             </div>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Brand Color</label>
+          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Brand Color</label>
           <div className="flex items-center gap-3">
             <input
               value={brandColor}
               onChange={(e) => setBrandColor(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="flex-1 px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="#FF5733"
               maxLength={7}
             />
             {brandColor && /^#[0-9A-Fa-f]{6}$/.test(brandColor) && (
               <div
-                className="w-10 h-10 rounded-lg border border-gray-200 flex-shrink-0"
+                className="w-10 h-10 rounded-lg border border-nocturne-border-subtle flex-shrink-0"
                 style={{ backgroundColor: brandColor }}
                 title={brandColor}
               />
@@ -258,18 +258,18 @@ export default function WorkspaceSettingsPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="bg-primary-500 text-white px-6 py-2.5 rounded-lg hover:bg-primary-600 disabled:opacity-50 font-medium text-sm transition-colors"
+          className="bg-nocturne-primary text-white px-6 py-2.5 rounded-lg hover:bg-nocturne-primary disabled:opacity-50 font-medium text-sm transition-colors"
         >
           {saving ? 'Saving...' : 'Save Settings'}
         </button>
       </div>
 
       {/* Danger Zone */}
-      <div className="bg-white rounded-lg border border-red-200 p-6">
-        <h2 className="text-sm font-semibold text-red-600 uppercase tracking-wide mb-3">
+      <div className="bg-nocturne-surface rounded-lg border border-red-200 p-6">
+        <h2 className="text-sm font-semibold text-nocturne-error uppercase tracking-wide mb-3">
           Danger Zone
         </h2>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-nocturne-text-secondary mb-4">
           Permanently delete this workspace and all associated data. This action cannot be undone.
         </p>
         <div className="relative group inline-block">

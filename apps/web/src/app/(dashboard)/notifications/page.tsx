@@ -73,19 +73,19 @@ export default function NotificationsPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-heading font-bold text-gradient mb-1">Notifications</h1>
+          <h1 className="text-4xl font-display font-bold text-gradient-nocturne mb-1">Notifications</h1>
           {unreadCount > 0 && (
-            <p className="text-sm text-text-muted">{unreadCount} unread</p>
+            <p className="text-sm text-nocturne-text-secondary">{unreadCount} unread</p>
           )}
         </div>
         <div className="flex items-center gap-4 flex-wrap justify-end">
-          <div className="flex gap-2 bg-surface-elevated/50 rounded-pill p-1 border border-glass-border backdrop-blur-sm">
+          <div className="flex gap-2 bg-nocturne-surface-2/50 rounded-full p-1 border border-nocturne-border backdrop-blur-3xl">
             {(['all', 'unread'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-4 py-2 text-sm rounded-lg capitalize font-medium transition-all duration-200 ${
-                  filter === f ? 'bg-gradient-accent text-white shadow-glow-sm' : 'text-text-muted hover:text-text-primary'
+                  filter === f ? 'bg-gradient-nocturne text-white shadow-nocturne-glow-sm' : 'text-nocturne-text-secondary hover:text-nocturne-text-primary'
                 }`}
               >
                 {f}
@@ -95,7 +95,7 @@ export default function NotificationsPage() {
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
-              className="px-4 py-2 text-sm font-medium text-primary-300 hover:text-primary-200 bg-primary-500/20 border border-primary-500/30 rounded-pill transition-all hover:bg-primary-500/30"
+              className="px-4 py-2 text-sm font-medium text-nocturne-accent hover:text-nocturne-accent bg-nocturne-primary-light border border-nocturne-border rounded-full transition-all hover:bg-nocturne-primary-light"
             >
               Mark all read
             </button>
@@ -105,40 +105,40 @@ export default function NotificationsPage() {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary-500/20 border-t-primary-500" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-nocturne-primary/20 border-t-nocturne-primary" />
         </div>
       ) : notifications.length === 0 ? (
-        <div className="glass-card border glass-border p-12 text-center space-y-3">
-          <Bell className="w-12 h-12 text-text-muted mx-auto opacity-50" />
-          <p className="text-text-primary text-lg font-semibold">No notifications</p>
-          <p className="text-sm text-text-muted">You&apos;re all caught up!</p>
+        <div className="glass-card border border-nocturne-border p-12 text-center space-y-3">
+          <Bell className="w-12 h-12 text-nocturne-text-secondary mx-auto opacity-50" />
+          <p className="text-nocturne-text-primary text-lg font-semibold">No notifications</p>
+          <p className="text-sm text-nocturne-text-secondary">You&apos;re all caught up!</p>
         </div>
       ) : (
         <div className="space-y-3">
           {notifications.map((n) => (
             <div
               key={n.id}
-              className={`glass-card border glass-border px-6 py-4 flex items-start gap-4 transition-all duration-300 hover:border-primary-500/50 hover:shadow-glow-sm ${
+              className={`glass-card border border-nocturne-border px-6 py-4 flex items-start gap-4 transition-all duration-300 hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm ${
                 n.read_at ? 'opacity-75' : 'opacity-100'
               }`}
             >
-              <div className={`flex-shrink-0 p-2.5 rounded-lg ${n.read_at ? 'bg-slate-500/20 text-slate-300' : 'bg-gradient-accent/20 text-primary-300'}`}>
+              <div className={`flex-shrink-0 p-2.5 rounded-lg ${n.read_at ? 'bg-slate-500/20 text-slate-300' : 'bg-gradient-nocturne/20 text-nocturne-accent'}`}>
                 {TYPE_ICONS[n.type] ?? <Bell className="w-5 h-5" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-semibold ${n.read_at ? 'text-text-secondary' : 'text-text-primary'}`}>
+                <p className={`text-sm font-semibold ${n.read_at ? 'text-nocturne-text-secondary' : 'text-nocturne-text-primary'}`}>
                   {n.title}
                 </p>
-                {n.body && <p className="text-sm text-text-secondary mt-1 line-clamp-2">{n.body}</p>}
-                <p className="text-xs text-text-muted mt-2">{timeAgo(n.created_at)}</p>
+                {n.body && <p className="text-sm text-nocturne-text-secondary mt-1 line-clamp-2">{n.body}</p>}
+                <p className="text-xs text-nocturne-text-secondary mt-2">{timeAgo(n.created_at)}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 {!n.read_at && (
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-gradient-accent animate-pulse" />
+                    <div className="w-2 h-2 rounded-full bg-gradient-nocturne animate-pulse" />
                     <button
                       onClick={() => handleMarkRead(n.id)}
-                      className="text-xs text-primary-300 hover:text-primary-200 whitespace-nowrap font-medium transition-colors"
+                      className="text-xs text-nocturne-accent hover:text-nocturne-accent whitespace-nowrap font-medium transition-colors"
                     >
                       Mark read
                     </button>

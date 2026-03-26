@@ -56,18 +56,16 @@ const TestimonialCard = ({ testimonial, index }: { testimonial: typeof TESTIMONI
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="h-full rounded-2xl bg-neutral-50 border border-neutral-100 p-8 flex flex-col shadow-sm hover:shadow-md transition-all duration-300 relative"
+      className="h-full glass-card rounded-4xl p-8 flex flex-col hover:shadow-nocturne-card-hover transition-all duration-300 relative"
     >
-      {/* Quote Mark Decoration */}
       <motion.div
-        className="absolute top-4 left-6 text-violet-100 text-6xl font-serif leading-none pointer-events-none"
+        className="absolute top-4 left-6 text-nocturne-primary/20 text-6xl font-serif leading-none pointer-events-none"
         animate={{ opacity: [0.15, 0.25, 0.15] }}
         transition={{ duration: 4, repeat: Infinity }}
       >
-        "
+        &ldquo;
       </motion.div>
 
-      {/* Rating */}
       <div className="flex gap-1 mb-6 relative z-10">
         {Array.from({ length: 5 }).map((_, j) => (
           <motion.div
@@ -79,31 +77,28 @@ const TestimonialCard = ({ testimonial, index }: { testimonial: typeof TESTIMONI
           >
             <Star
               size={16}
-              className={j < testimonial.rating ? 'text-amber-400 fill-amber-400' : 'text-neutral-200'}
+              className={j < testimonial.rating ? 'text-nocturne-gold fill-nocturne-gold' : 'text-nocturne-surface-2'}
             />
           </motion.div>
         ))}
       </div>
 
-      {/* Quote text */}
-      <p className="text-base text-neutral-700 leading-relaxed flex-1 mb-6 italic">
+      <p className="text-base text-nocturne-text-secondary leading-relaxed flex-1 mb-6 italic">
         &ldquo;{testimonial.quote}&rdquo;
       </p>
 
-      {/* Divider */}
-      <motion.div className="w-full h-px bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 mb-5" />
+      <motion.div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.1] to-transparent mb-5" />
 
-      {/* Author */}
       <div className="flex items-center gap-3">
         <motion.div
           whileHover={{ scale: 1.1 }}
-          className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-violet-700 flex items-center justify-center text-white text-xs font-bold shrink-0"
+          className="w-10 h-10 rounded-full bg-gradient-nocturne flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-nocturne-glow-sm"
         >
           {testimonial.initials}
         </motion.div>
         <div>
-          <p className="text-sm font-medium text-neutral-900">{testimonial.name}</p>
-          <p className="text-xs text-neutral-500">{testimonial.event}</p>
+          <p className="text-sm font-medium text-white">{testimonial.name}</p>
+          <p className="text-xs text-nocturne-text-tertiary">{testimonial.event}</p>
         </div>
       </div>
     </motion.div>
@@ -120,9 +115,8 @@ export function Testimonials() {
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
-    <section className="py-24 px-6 bg-white">
+    <section className="py-24 px-6 bg-nocturne-base">
       <div className="max-w-section mx-auto">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-14">
           <div>
             <motion.div
@@ -130,31 +124,30 @@ export function Testimonials() {
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200 mb-4"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-nocturne-primary-light border border-nocturne-primary/30 mb-4"
             >
-              <span className="text-xs font-semibold text-violet-700 uppercase tracking-widest">
+              <span className="text-xs font-semibold text-nocturne-accent uppercase tracking-widest">
                 Testimonials
               </span>
             </motion.div>
             <FadeIn direction="up" delay={0.1} duration={0.7}>
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-neutral-900">
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
                 What People Say
               </h2>
             </FadeIn>
             <FadeIn direction="up" delay={0.2} duration={0.7}>
-              <p className="text-sm text-neutral-500 mt-2">
+              <p className="text-sm text-nocturne-text-secondary mt-2">
                 Join thousands of happy customers and artists
               </p>
             </FadeIn>
           </div>
 
-          {/* Nav Buttons */}
           <div className="flex gap-2 shrink-0">
             <motion.button
               onClick={scrollPrev}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="w-10 h-10 rounded-lg bg-white border border-neutral-200 flex items-center justify-center text-neutral-500 hover:text-violet-600 hover:border-violet-300 transition-colors"
+              className="w-10 h-10 rounded-lg glass-panel flex items-center justify-center text-nocturne-text-secondary hover:text-nocturne-accent transition-colors"
               aria-label="Previous testimonial"
             >
               <ChevronLeft size={18} />
@@ -163,7 +156,7 @@ export function Testimonials() {
               onClick={scrollNext}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="w-10 h-10 rounded-lg bg-white border border-neutral-200 flex items-center justify-center text-neutral-500 hover:text-violet-600 hover:border-violet-300 transition-colors"
+              className="w-10 h-10 rounded-lg glass-panel flex items-center justify-center text-nocturne-text-secondary hover:text-nocturne-accent transition-colors"
               aria-label="Next testimonial"
             >
               <ChevronRight size={18} />
@@ -171,7 +164,6 @@ export function Testimonials() {
           </div>
         </div>
 
-        {/* Carousel */}
         <div ref={emblaRef} className="overflow-hidden">
           <div className="flex gap-5">
             {TESTIMONIALS.map((t, i) => (

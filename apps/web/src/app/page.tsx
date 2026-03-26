@@ -44,7 +44,7 @@ export default function HomePage() {
   }, [mounted, _initialized, isAuthenticated, user, router]);
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-nocturne-base">
       <ScrollProgress />
       <Navbar />
       <Hero />

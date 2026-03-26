@@ -68,11 +68,11 @@ export function PushNotificationPrompt() {
       <div className="glass-card p-4 border border-primary-500/30 shadow-glow-sm">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-full bg-primary-500/20 flex items-center justify-center shrink-0">
-            <Bell size={18} className="text-primary-400" />
+            <Bell size={18} className="text-nocturne-accent" />
           </div>
           <div className="flex-1">
-            <h4 className="text-sm font-semibold text-text-primary">Enable Notifications</h4>
-            <p className="text-xs text-text-muted mt-1">
+            <h4 className="text-sm font-semibold text-nocturne-text-primary">Enable Notifications</h4>
+            <p className="text-xs text-nocturne-text-secondary mt-1">
               Get instant updates on bookings, payments, and messages.
             </p>
             <div className="flex gap-2 mt-3">
@@ -85,13 +85,13 @@ export function PushNotificationPrompt() {
               </button>
               <button
                 onClick={() => setShowPrompt(false)}
-                className="px-3 py-1.5 bg-glass-medium border border-glass-border text-text-muted text-xs rounded-lg hover:bg-glass-heavy"
+                className="px-3 py-1.5 bg-nocturne-surface-2 border border-nocturne-border text-nocturne-text-secondary text-xs rounded-lg hover:bg-nocturne-surface-2"
               >
                 Not now
               </button>
             </div>
           </div>
-          <button onClick={() => setShowPrompt(false)} className="text-text-muted hover:text-text-primary">
+          <button onClick={() => setShowPrompt(false)} className="text-nocturne-text-secondary hover:text-nocturne-text-primary">
             <X size={14} />
           </button>
         </div>

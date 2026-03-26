@@ -69,11 +69,11 @@ export default function AgentDashboard() {
     return (
       <div className="max-w-2xl mx-auto py-16 text-center">
         <div className="glass-card p-12 rounded-3xl">
-          <h1 className="text-3xl font-bold text-gradient mb-4">Welcome, Agent!</h1>
-          <p className="text-text-muted mb-8">Set up your agency profile to start managing artists.</p>
+          <h1 className="text-3xl font-bold text-gradient-nocturne mb-4">Welcome, Agent!</h1>
+          <p className="text-nocturne-text-secondary mb-8">Set up your agency profile to start managing artists.</p>
           <Link
             href="/agent/onboarding"
-            className="inline-block bg-gradient-accent text-white px-8 py-3 rounded-full font-semibold hover:shadow-glow-sm transition-all"
+            className="inline-block bg-gradient-nocturne text-white px-8 py-3 rounded-full font-semibold hover:shadow-nocturne-glow-sm transition-all"
           >
             Create Agency Profile
           </Link>
@@ -87,12 +87,12 @@ export default function AgentDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-gradient">{profile.agency_name}</h1>
-          <p className="text-text-muted mt-2">{profile.contact_person} · {profile.city}</p>
+          <h1 className="text-4xl font-bold text-gradient-nocturne">{profile.agency_name}</h1>
+          <p className="text-nocturne-text-secondary mt-2">{profile.contact_person} · {profile.city}</p>
         </div>
         <Link
           href="/agent/roster"
-          className="glass-card px-6 py-3 rounded-full text-sm font-semibold text-text-primary hover:hover-glow transition-all flex items-center gap-2"
+          className="glass-card px-6 py-3 rounded-full text-sm font-semibold text-nocturne-text-primary hover:hover-glow transition-all flex items-center gap-2"
         >
           <Users size={18} />
           Manage Roster
@@ -114,11 +114,11 @@ export default function AgentDashboard() {
             <div className="glass-card p-6 rounded-2xl hover:hover-glow transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-text-muted text-sm font-semibold uppercase tracking-wider">Artists</p>
-                  <p className="text-3xl font-bold text-gradient mt-2">{roster.length}</p>
+                  <p className="text-nocturne-text-secondary text-sm font-semibold uppercase tracking-wider">Artists</p>
+                  <p className="text-3xl font-bold text-gradient-nocturne mt-2">{roster.length}</p>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center">
-                  <Users size={24} className="text-primary-400" />
+                  <Users size={24} className="text-nocturne-accent" />
                 </div>
               </div>
             </div>
@@ -126,11 +126,11 @@ export default function AgentDashboard() {
             <div className="glass-card p-6 rounded-2xl hover:hover-glow transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-text-muted text-sm font-semibold uppercase tracking-wider">Commission</p>
-                  <p className="text-3xl font-bold text-gradient mt-2">{profile.commission_pct}%</p>
+                  <p className="text-nocturne-text-secondary text-sm font-semibold uppercase tracking-wider">Commission</p>
+                  <p className="text-3xl font-bold text-gradient-nocturne mt-2">{profile.commission_pct}%</p>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center">
-                  <TrendingUp size={24} className="text-primary-400" />
+                  <TrendingUp size={24} className="text-nocturne-accent" />
                 </div>
               </div>
             </div>
@@ -140,7 +140,7 @@ export default function AgentDashboard() {
                 <div className="glass-card p-6 rounded-2xl hover:hover-glow transition-all">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-text-muted text-sm font-semibold uppercase tracking-wider">Earned</p>
+                      <p className="text-nocturne-text-secondary text-sm font-semibold uppercase tracking-wider">Earned</p>
                       <p className="text-2xl font-bold text-emerald-400 mt-2">₹{(commissions.total_commission_earned_paise / 100).toLocaleString('en-IN')}</p>
                     </div>
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 flex items-center justify-center">
@@ -152,7 +152,7 @@ export default function AgentDashboard() {
                 <div className="glass-card p-6 rounded-2xl hover:hover-glow transition-all">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-text-muted text-sm font-semibold uppercase tracking-wider">Pending</p>
+                      <p className="text-nocturne-text-secondary text-sm font-semibold uppercase tracking-wider">Pending</p>
                       <p className="text-2xl font-bold text-amber-400 mt-2">₹{(commissions.total_commission_pending_paise / 100).toLocaleString('en-IN')}</p>
                     </div>
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400/20 to-amber-600/20 flex items-center justify-center">
@@ -164,7 +164,7 @@ export default function AgentDashboard() {
                 <div className="glass-card p-6 rounded-2xl hover:hover-glow transition-all">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-text-muted text-sm font-semibold uppercase tracking-wider">Paid</p>
+                      <p className="text-nocturne-text-secondary text-sm font-semibold uppercase tracking-wider">Paid</p>
                       <p className="text-2xl font-bold text-blue-400 mt-2">₹{(commissions.total_commission_paid_paise / 100).toLocaleString('en-IN')}</p>
                     </div>
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400/20 to-blue-600/20 flex items-center justify-center">
@@ -180,7 +180,7 @@ export default function AgentDashboard() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-nocturne-text-primary mb-4 flex items-center gap-2">
           <div className="w-1 h-6 bg-gradient-accent rounded-full" />
           Quick Actions
         </h2>
@@ -188,11 +188,11 @@ export default function AgentDashboard() {
           <Link href="/agent/bookings" className="group glass-card rounded-2xl p-6 hover:hover-glow transition-all">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Clipboard size={24} className="text-primary-400" />
+                <Clipboard size={24} className="text-nocturne-accent" />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-text-primary">Booking Pipeline</p>
-                <p className="text-text-muted text-sm mt-1">Manage and track all bookings</p>
+                <p className="font-semibold text-nocturne-text-primary">Booking Pipeline</p>
+                <p className="text-nocturne-text-secondary text-sm mt-1">Manage and track all bookings</p>
               </div>
             </div>
           </Link>
@@ -200,11 +200,11 @@ export default function AgentDashboard() {
           <Link href="/agent/commissions" className="group glass-card rounded-2xl p-6 hover:hover-glow transition-all">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Wallet size={24} className="text-primary-400" />
+                <Wallet size={24} className="text-nocturne-accent" />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-text-primary">Commission Dashboard</p>
-                <p className="text-text-muted text-sm mt-1">Track earnings and payouts</p>
+                <p className="font-semibold text-nocturne-text-primary">Commission Dashboard</p>
+                <p className="text-nocturne-text-secondary text-sm mt-1">Track earnings and payouts</p>
               </div>
             </div>
           </Link>
@@ -212,11 +212,11 @@ export default function AgentDashboard() {
           <Link href="/agent/roster" className="group glass-card rounded-2xl p-6 hover:hover-glow transition-all">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Users size={24} className="text-primary-400" />
+                <Users size={24} className="text-nocturne-accent" />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-text-primary">Manage Roster</p>
-                <p className="text-text-muted text-sm mt-1">Add and manage your artists</p>
+                <p className="font-semibold text-nocturne-text-primary">Manage Roster</p>
+                <p className="text-nocturne-text-secondary text-sm mt-1">Add and manage your artists</p>
               </div>
             </div>
           </Link>
@@ -224,11 +224,11 @@ export default function AgentDashboard() {
           <Link href="/agent/recommendations" className="group glass-card rounded-2xl p-6 hover:hover-glow transition-all">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/20 to-primary-600/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <TrendingUp size={24} className="text-primary-400" />
+                <TrendingUp size={24} className="text-nocturne-accent" />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-text-primary">AI Recommendations</p>
-                <p className="text-text-muted text-sm mt-1">Get booking suggestions</p>
+                <p className="font-semibold text-nocturne-text-primary">AI Recommendations</p>
+                <p className="text-nocturne-text-secondary text-sm mt-1">Get booking suggestions</p>
               </div>
             </div>
           </Link>
@@ -237,15 +237,15 @@ export default function AgentDashboard() {
 
       {/* Roster Preview */}
       <div>
-        <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-nocturne-text-primary mb-4 flex items-center gap-2">
           <div className="w-1 h-6 bg-gradient-accent rounded-full" />
           Your Artists
         </h2>
         {roster.length === 0 ? (
           <div className="glass-card rounded-2xl p-12 text-center">
-            <Users size={48} className="mx-auto text-text-muted/40 mb-4" />
-            <p className="text-text-muted mb-4">No artists in your roster yet.</p>
-            <Link href="/agent/roster" className="text-primary-400 text-sm font-semibold hover:text-primary-300 transition-colors">
+            <Users size={48} className="mx-auto text-nocturne-text-secondary/40 mb-4" />
+            <p className="text-nocturne-text-secondary mb-4">No artists in your roster yet.</p>
+            <Link href="/agent/roster" className="text-nocturne-accent text-sm font-semibold hover:text-nocturne-accent transition-colors">
               Add artists to your roster
             </Link>
           </div>
@@ -255,8 +255,8 @@ export default function AgentDashboard() {
               <div key={artist.artist_id} className="glass-card rounded-2xl p-6 hover:hover-glow transition-all group">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-text-primary group-hover:text-primary-300 transition-colors">{artist.stage_name}</h3>
-                    <p className="text-text-muted text-sm mt-1">{artist.base_city}</p>
+                    <h3 className="font-semibold text-nocturne-text-primary group-hover:text-nocturne-accent transition-colors">{artist.stage_name}</h3>
+                    <p className="text-nocturne-text-secondary text-sm mt-1">{artist.base_city}</p>
                   </div>
                   {artist.is_verified && (
                     <div className="flex-shrink-0 bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 rounded-full p-2">
@@ -266,7 +266,7 @@ export default function AgentDashboard() {
                 </div>
                 <div className="flex flex-wrap gap-2 mt-4">
                   {artist.genres.slice(0, 3).map((g) => (
-                    <span key={g} className="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-primary-400/20 to-primary-600/20 text-primary-300">
+                    <span key={g} className="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-primary-400/20 to-primary-600/20 text-nocturne-accent">
                       {g}
                     </span>
                   ))}
@@ -276,7 +276,7 @@ export default function AgentDashboard() {
           </div>
         )}
         {roster.length > 6 && (
-          <Link href="/agent/roster" className="text-primary-400 text-sm font-semibold mt-4 inline-block hover:text-primary-300 transition-colors">
+          <Link href="/agent/roster" className="text-nocturne-accent text-sm font-semibold mt-4 inline-block hover:text-nocturne-accent transition-colors">
             View all {roster.length} artists →
           </Link>
         )}

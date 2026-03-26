@@ -42,17 +42,17 @@ function LoginContent() {
         </div>
 
         <div className="text-center mb-8 animate-fade-in-up" style={{ animationDelay: '0.28s' }}>
-          <h1 className="text-h3 font-heading font-bold text-text-primary mb-2">{t('auth.welcome')}</h1>
-          <p className="text-sm text-text-muted">{t('auth.enterPhone')}</p>
+          <h1 className="text-h3 font-display font-bold text-nocturne-text-primary mb-2">{t('auth.welcome')}</h1>
+          <p className="text-sm text-nocturne-text-secondary">{t('auth.enterPhone')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in-up" style={{ animationDelay: '0.36s' }}>
           <div className="flex items-center gap-2">
-            <div className="flex items-center h-12 px-3 rounded-xl bg-glass-light border border-glass-border text-text-muted text-sm">
+            <div className="flex items-center h-12 px-3 rounded-xl bg-nocturne-surface border border-nocturne-border text-nocturne-text-secondary text-sm">
               +91
             </div>
             <div className="flex-1 relative">
-              <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+              <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-nocturne-text-secondary" />
               <input
                 type="tel"
                 placeholder={t('auth.phonePlaceholder')}
@@ -65,7 +65,7 @@ function LoginContent() {
                 autoFocus
                 inputMode="numeric"
                 autoComplete="tel"
-                className="w-full pl-10 pr-4 py-3 bg-glass-light border border-glass-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/20 transition-all"
+                className="w-full pl-10 pr-4 py-3 bg-nocturne-surface border border-nocturne-border rounded-xl text-sm text-nocturne-text-primary placeholder:text-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
               />
             </div>
           </div>
@@ -79,13 +79,13 @@ function LoginContent() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-gradient-accent hover:bg-gradient-accent-hover disabled:opacity-50 text-white font-semibold rounded-xl transition-all hover-glow hover:scale-[1.01] active:scale-[0.99]"
+            className="w-full py-3 bg-gradient-nocturne disabled:opacity-50 text-white font-semibold rounded-xl transition-all hover:shadow-nocturne-glow-sm hover:scale-[1.01] active:scale-[0.99]"
           >
             {isLoading ? 'Sending...' : t('auth.sendOtp')}
           </button>
         </form>
 
-        <p className="text-[10px] text-text-muted text-center mt-6 leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.44s' }}>
+        <p className="text-[10px] text-nocturne-text-secondary text-center mt-6 leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.44s' }}>
           {t('auth.termsNotice')}
         </p>
       </div>

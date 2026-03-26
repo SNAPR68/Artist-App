@@ -41,23 +41,23 @@ export function AvailabilityCalendar({ availability }: AvailabilityCalendarProps
 
   return (
     <div className="mb-8">
-      <h2 className="text-lg font-heading font-semibold text-text-primary mb-4">Availability</h2>
+      <h2 className="text-lg font-display font-semibold text-nocturne-text-primary mb-4">Availability</h2>
 
       <div className="glass-card p-4">
         {/* Month Nav */}
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-            className="p-1.5 rounded-lg hover:bg-glass-light text-text-muted transition-colors"
+            className="p-1.5 rounded-lg hover:bg-nocturne-surface text-nocturne-text-secondary transition-colors"
           >
             <ChevronLeft size={16} />
           </button>
-          <h3 className="text-sm font-semibold text-text-primary">
+          <h3 className="text-sm font-semibold text-nocturne-text-primary">
             {format(currentMonth, 'MMMM yyyy')}
           </h3>
           <button
             onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-            className="p-1.5 rounded-lg hover:bg-glass-light text-text-muted transition-colors"
+            className="p-1.5 rounded-lg hover:bg-nocturne-surface text-nocturne-text-secondary transition-colors"
           >
             <ChevronRight size={16} />
           </button>
@@ -66,7 +66,7 @@ export function AvailabilityCalendar({ availability }: AvailabilityCalendarProps
         {/* Day headers */}
         <div className="grid grid-cols-7 gap-1 mb-1">
           {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => (
-            <div key={d} className="text-center text-[10px] font-medium text-text-muted uppercase py-1">
+            <div key={d} className="text-center text-[10px] font-medium text-nocturne-text-secondary uppercase py-1">
               {d}
             </div>
           ))}
@@ -88,7 +88,7 @@ export function AvailabilityCalendar({ availability }: AvailabilityCalendarProps
                     ? 'bg-green-500/15 text-green-400 border border-green-500/20'
                     : status === 'unavailable'
                     ? 'bg-red-500/10 text-red-400/60'
-                    : 'text-text-muted'
+                    : 'text-nocturne-text-secondary'
                 } ${isToday(day) ? 'ring-1 ring-primary-500/50' : ''}`}
                 title={status ? `${format(day, 'MMM d')}: ${status}` : undefined}
               >
@@ -99,14 +99,14 @@ export function AvailabilityCalendar({ availability }: AvailabilityCalendarProps
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-4 mt-4 pt-3 border-t border-glass-border">
+        <div className="flex items-center gap-4 mt-4 pt-3 border-t border-nocturne-border">
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded bg-green-500/15 border border-green-500/20" />
-            <span className="text-[10px] text-text-muted">Available</span>
+            <span className="text-[10px] text-nocturne-text-secondary">Available</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded bg-red-500/10" />
-            <span className="text-[10px] text-text-muted">Booked</span>
+            <span className="text-[10px] text-nocturne-text-secondary">Booked</span>
           </div>
         </div>
       </div>

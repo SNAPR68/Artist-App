@@ -105,10 +105,10 @@ export default function FinancialCenterPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-heading font-bold text-text-primary">Financial Center</h1>
-          <p className="text-text-muted text-sm mt-1">Track earnings, forecasts, and taxes</p>
+          <h1 className="text-3xl font-display font-bold text-nocturne-text-primary">Financial Center</h1>
+          <p className="text-nocturne-text-secondary text-sm mt-1">Track earnings, forecasts, and taxes</p>
         </div>
-        <Wallet className="text-primary-400 opacity-50" size={32} />
+        <Wallet className="text-nocturne-accent opacity-50" size={32} />
       </div>
 
       {/* Balance Cards */}
@@ -116,10 +116,10 @@ export default function FinancialCenterPage() {
         {/* Available Balance */}
         <div className="glass-card bg-gradient-to-br from-green-500/10 to-transparent p-6 border-green-400/30 group hover-glow">
           <div className="flex items-start justify-between mb-3">
-            <p className="text-sm font-heading font-semibold text-text-muted">Available Balance</p>
+            <p className="text-sm font-display font-semibold text-nocturne-text-secondary">Available Balance</p>
             <TrendingUp size={18} className="text-green-400 opacity-60" />
           </div>
-          <p className="text-3xl font-heading font-bold text-gradient">
+          <p className="text-3xl font-display font-bold text-gradient-nocturne">
             {'\u20B9'}{formatINR(dashboard?.available_balance_paise ?? null)}
           </p>
           <p className="text-xs text-green-300/70 mt-2">Ready to withdraw</p>
@@ -128,22 +128,22 @@ export default function FinancialCenterPage() {
         {/* In Escrow */}
         <div className="glass-card bg-gradient-to-br from-primary-500/10 to-transparent p-6 border-primary-400/30 group hover-glow">
           <div className="flex items-start justify-between mb-3">
-            <p className="text-sm font-heading font-semibold text-text-muted">In Escrow</p>
-            <FileText size={18} className="text-primary-400 opacity-60" />
+            <p className="text-sm font-display font-semibold text-nocturne-text-secondary">In Escrow</p>
+            <FileText size={18} className="text-nocturne-accent opacity-60" />
           </div>
-          <p className="text-3xl font-heading font-bold text-primary-300">
+          <p className="text-3xl font-display font-bold text-nocturne-accent">
             {'\u20B9'}{formatINR(dashboard?.in_escrow_paise ?? null)}
           </p>
-          <p className="text-xs text-primary-300/70 mt-2">Held in reserve</p>
+          <p className="text-xs text-nocturne-accent/70 mt-2">Held in reserve</p>
         </div>
 
         {/* Pending Settlement */}
         <div className="glass-card bg-gradient-to-br from-yellow-500/10 to-transparent p-6 border-yellow-400/30 group hover-glow">
           <div className="flex items-start justify-between mb-3">
-            <p className="text-sm font-heading font-semibold text-text-muted">Pending Settlement</p>
+            <p className="text-sm font-display font-semibold text-nocturne-text-secondary">Pending Settlement</p>
             <TrendingDown size={18} className="text-yellow-400 opacity-60" />
           </div>
-          <p className="text-3xl font-heading font-bold text-yellow-300">
+          <p className="text-3xl font-display font-bold text-yellow-300">
             {'\u20B9'}{formatINR(dashboard?.pending_settlement_paise ?? null)}
           </p>
           <p className="text-xs text-yellow-300/70 mt-2">Processing soon</p>
@@ -153,24 +153,24 @@ export default function FinancialCenterPage() {
       {/* Cash Flow Forecast */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-heading font-semibold text-text-primary">Cash Flow Forecast</h2>
-          <TrendingUp size={20} className="text-primary-400 opacity-60" />
+          <h2 className="text-lg font-display font-semibold text-nocturne-text-primary">Cash Flow Forecast</h2>
+          <TrendingUp size={20} className="text-nocturne-accent opacity-60" />
         </div>
         {forecast.length === 0 ? (
           <div className="glass-card p-8 text-center space-y-3">
-            <p className="text-text-muted">No forecast data available yet</p>
-            <p className="text-text-secondary text-sm">As you book more gigs, forecasts will appear here</p>
+            <p className="text-nocturne-text-secondary">No forecast data available yet</p>
+            <p className="text-nocturne-text-secondary text-sm">As you book more gigs, forecasts will appear here</p>
           </div>
         ) : (
           <>
             {lightMonths.length > 0 && (
-              <div className="glass-card bg-gradient-to-br from-yellow-500/10 to-transparent p-4 border-yellow-400/30 space-y-2">
+              <div className="glass-card bg-gradient-to-br from-yellow-500/10 to-transparent p-4 border border-yellow-400/30 space-y-2">
                 <div className="flex items-start gap-2">
                   <AlertTriangle size={18} className="text-yellow-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-heading font-semibold text-yellow-300">Heads up: Lighter period ahead</p>
+                    <p className="text-sm font-display font-semibold text-yellow-300">Heads up: Lighter period ahead</p>
                     {lightMonths.map((lm) => (
-                      <p key={lm.period} className="text-sm text-text-secondary mt-1">
+                      <p key={lm.period} className="text-sm text-nocturne-text-secondary mt-1">
                         {lm.advisory || `${lm.label} looks lighter than usual — a great time to pick up new opportunities.`}
                       </p>
                     ))}
@@ -182,35 +182,35 @@ export default function FinancialCenterPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-glass-border">
-                      <th className="px-4 py-4 text-left text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">
+                    <tr className="border-b border-nocturne-border">
+                      <th className="px-4 py-4 text-left text-xs font-display font-semibold text-nocturne-text-secondary uppercase tracking-wider">
                         Period
                       </th>
-                      <th className="px-4 py-4 text-right text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">
+                      <th className="px-4 py-4 text-right text-xs font-display font-semibold text-nocturne-text-secondary uppercase tracking-wider">
                         Confirmed
                       </th>
-                      <th className="px-4 py-4 text-right text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">
+                      <th className="px-4 py-4 text-right text-xs font-display font-semibold text-nocturne-text-secondary uppercase tracking-wider">
                         Probable
                       </th>
-                      <th className="px-4 py-4 text-right text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">
+                      <th className="px-4 py-4 text-right text-xs font-display font-semibold text-nocturne-text-secondary uppercase tracking-wider">
                         Net Forecast
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-glass-border">
+                  <tbody className="divide-y divide-nocturne-border">
                     {forecast.map((row) => (
                       <tr
                         key={row.period}
-                        className={`${row.is_light_month ? 'bg-yellow-500/5' : 'hover:bg-glass-medium/50'} transition-colors duration-200`}
+                        className={`${row.is_light_month ? 'bg-yellow-500/5' : 'hover:bg-nocturne-surface-2/50'} transition-colors duration-200`}
                       >
-                        <td className="px-4 py-3 text-sm font-heading font-semibold text-text-primary">{row.label}</td>
+                        <td className="px-4 py-3 text-sm font-display font-semibold text-nocturne-text-primary">{row.label}</td>
                         <td className="px-4 py-3 text-sm text-right text-green-300 font-medium">
                           {'\u20B9'}{formatINR(row.confirmed_paise)}
                         </td>
-                        <td className="px-4 py-3 text-sm text-right text-text-secondary">
+                        <td className="px-4 py-3 text-sm text-right text-nocturne-text-secondary">
                           {'\u20B9'}{formatINR(row.probable_paise)}
                         </td>
-                        <td className="px-4 py-3 text-sm text-right font-heading font-bold text-gradient">
+                        <td className="px-4 py-3 text-sm text-right font-display font-bold text-gradient-nocturne">
                           {'\u20B9'}{formatINR(row.net_forecast_paise)}
                         </td>
                       </tr>
@@ -226,70 +226,70 @@ export default function FinancialCenterPage() {
       {/* Tax Summary */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-heading font-semibold text-text-primary">Tax Summary ({fy.label})</h2>
-          <IndianRupee size={20} className="text-primary-400 opacity-60" />
+          <h2 className="text-lg font-display font-semibold text-nocturne-text-primary">Tax Summary ({fy.label})</h2>
+          <IndianRupee size={20} className="text-nocturne-accent opacity-60" />
         </div>
         {!tax ? (
           <div className="glass-card p-8 text-center space-y-3">
-            <p className="text-text-muted">No tax data available for this financial year yet</p>
+            <p className="text-nocturne-text-secondary">No tax data available for this financial year yet</p>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {/* Gross Earnings */}
               <div className="glass-card bg-gradient-to-br from-primary-500/10 to-transparent p-5 border-primary-400/30 hover-glow">
-                <p className="text-xs font-heading font-semibold text-text-muted mb-2 uppercase tracking-wider">Gross Earnings</p>
-                <p className="text-2xl font-heading font-bold text-primary-300">{'\u20B9'}{formatINR(tax.gross_earnings_paise)}</p>
+                <p className="text-xs font-display font-semibold text-nocturne-text-secondary mb-2 uppercase tracking-wider">Gross Earnings</p>
+                <p className="text-2xl font-display font-bold text-nocturne-accent">{'\u20B9'}{formatINR(tax.gross_earnings_paise)}</p>
               </div>
 
               {/* TDS Deducted */}
               <div className="glass-card bg-gradient-to-br from-red-500/10 to-transparent p-5 border-red-400/30 hover-glow">
-                <p className="text-xs font-heading font-semibold text-text-muted mb-2 uppercase tracking-wider">TDS Deducted</p>
-                <p className="text-2xl font-heading font-bold text-red-300">-{'\u20B9'}{formatINR(tax.tds_deducted_paise)}</p>
+                <p className="text-xs font-display font-semibold text-nocturne-text-secondary mb-2 uppercase tracking-wider">TDS Deducted</p>
+                <p className="text-2xl font-display font-bold text-red-300">-{'\u20B9'}{formatINR(tax.tds_deducted_paise)}</p>
               </div>
 
               {/* GST Paid */}
               <div className="glass-card bg-gradient-to-br from-yellow-500/10 to-transparent p-5 border-yellow-400/30 hover-glow">
-                <p className="text-xs font-heading font-semibold text-text-muted mb-2 uppercase tracking-wider">GST Paid</p>
-                <p className="text-2xl font-heading font-bold text-yellow-300">-{'\u20B9'}{formatINR(tax.gst_paid_paise)}</p>
+                <p className="text-xs font-display font-semibold text-nocturne-text-secondary mb-2 uppercase tracking-wider">GST Paid</p>
+                <p className="text-2xl font-display font-bold text-yellow-300">-{'\u20B9'}{formatINR(tax.gst_paid_paise)}</p>
               </div>
 
               {/* Net Income */}
               <div className="glass-card bg-gradient-to-br from-green-500/10 to-transparent p-5 border-green-400/30 hover-glow">
-                <p className="text-xs font-heading font-semibold text-text-muted mb-2 uppercase tracking-wider">Net Income</p>
-                <p className="text-2xl font-heading font-bold text-green-300">{'\u20B9'}{formatINR(tax.net_income_paise)}</p>
+                <p className="text-xs font-display font-semibold text-nocturne-text-secondary mb-2 uppercase tracking-wider">Net Income</p>
+                <p className="text-2xl font-display font-bold text-green-300">{'\u20B9'}{formatINR(tax.net_income_paise)}</p>
               </div>
             </div>
 
             {/* Quarterly Breakdown */}
             {tax.quarterly_breakdown && tax.quarterly_breakdown.length > 0 && (
               <div className="glass-card overflow-hidden">
-                <div className="px-6 py-4 border-b border-glass-border">
-                  <h3 className="text-sm font-heading font-semibold text-text-primary">Quarterly Breakdown</h3>
+                <div className="px-6 py-4 border-b border-nocturne-border">
+                  <h3 className="text-sm font-display font-semibold text-nocturne-text-primary">Quarterly Breakdown</h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-glass-border">
-                        <th className="px-6 py-3 text-left text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">
+                      <tr className="border-b border-nocturne-border">
+                        <th className="px-6 py-3 text-left text-xs font-display font-semibold text-nocturne-text-secondary uppercase tracking-wider">
                           Quarter
                         </th>
-                        <th className="px-6 py-3 text-right text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">
+                        <th className="px-6 py-3 text-right text-xs font-display font-semibold text-nocturne-text-secondary uppercase tracking-wider">
                           Gross
                         </th>
-                        <th className="px-6 py-3 text-right text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">
+                        <th className="px-6 py-3 text-right text-xs font-display font-semibold text-nocturne-text-secondary uppercase tracking-wider">
                           TDS
                         </th>
-                        <th className="px-6 py-3 text-right text-xs font-heading font-semibold text-text-muted uppercase tracking-wider">
+                        <th className="px-6 py-3 text-right text-xs font-display font-semibold text-nocturne-text-secondary uppercase tracking-wider">
                           GST
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-glass-border">
+                    <tbody className="divide-y divide-nocturne-border">
                       {tax.quarterly_breakdown.map((q) => (
-                        <tr key={q.quarter} className="hover:bg-glass-medium/50 transition-colors duration-200">
-                          <td className="px-6 py-3 text-sm font-heading font-semibold text-text-primary">{q.quarter}</td>
-                          <td className="px-6 py-3 text-sm text-right text-primary-300 font-medium">
+                        <tr key={q.quarter} className="hover:bg-nocturne-surface-2/50 transition-colors duration-200">
+                          <td className="px-6 py-3 text-sm font-display font-semibold text-nocturne-text-primary">{q.quarter}</td>
+                          <td className="px-6 py-3 text-sm text-right text-nocturne-accent font-medium">
                             {'\u20B9'}{formatINR(q.gross_paise)}
                           </td>
                           <td className="px-6 py-3 text-sm text-right text-red-300 font-medium">
@@ -311,9 +311,9 @@ export default function FinancialCenterPage() {
 
       {/* Income Certificate Placeholder */}
       <div className="glass-card bg-gradient-to-br from-primary-500/5 to-transparent border-dashed border-primary-400/20 p-6 text-center space-y-2">
-        <FileText className="mx-auto text-primary-400/60" size={28} />
-        <p className="text-sm font-heading font-semibold text-text-muted">Income Certificate Requests</p>
-        <p className="text-xs text-text-secondary">Coming soon — Generate income certificates for visa and loan applications</p>
+        <FileText className="mx-auto text-nocturne-accent/60" size={28} />
+        <p className="text-sm font-display font-semibold text-nocturne-text-secondary">Income Certificate Requests</p>
+        <p className="text-xs text-nocturne-text-secondary">Coming soon — Generate income certificates for visa and loan applications</p>
       </div>
     </div>
   );

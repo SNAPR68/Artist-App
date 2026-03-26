@@ -536,7 +536,7 @@ export function VoiceAssistant() {
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-modal md:w-[400px] md:h-[600px] md:rounded-2xl flex flex-col overflow-hidden bg-nocturne-base/95 backdrop-blur-[80px] border-0 md:border md:border-glass-border md:shadow-glass animate-scale-in">
+          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-modal md:w-[400px] md:h-[600px] md:rounded-2xl flex flex-col overflow-hidden bg-nocturne-base/95 backdrop-blur-[80px] border-0 md:border md:border-nocturne-border md:shadow-nocturne-glow-sm animate-scale-in">
             {/* ─── Header ─── */}
             <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-gradient-to-r from-primary-600 to-accent-violet">
               <div className="flex items-center gap-2.5">
@@ -601,7 +601,7 @@ export function VoiceAssistant() {
                           <button
                             key={q}
                             onClick={() => sendQueryCb(q)}
-                            className="text-xs badge-nocturne rounded-pill px-3 py-1.5 transition-all"
+                            className="text-xs badge-nocturne rounded-full px-3 py-1.5 transition-all"
                           >
                             {q}
                           </button>
@@ -658,7 +658,7 @@ export function VoiceAssistant() {
                           <button
                             key={j}
                             onClick={() => handleSuggestionClick(s)}
-                            className="text-xs badge-nocturne rounded-pill px-2.5 py-1 transition-all"
+                            className="text-xs badge-nocturne rounded-full px-2.5 py-1 transition-all"
                           >
                             {s}
                           </button>
@@ -673,16 +673,16 @@ export function VoiceAssistant() {
 
             {/* ─── Status Bar ─── */}
             {state === 'listening' && (
-              <div className="shrink-0 px-4 py-2 text-center border-t border-glass-border bg-surface-card/60">
+              <div className="shrink-0 px-4 py-2 text-center border-t border-nocturne-border bg-nocturne-surface/60">
                 <VoiceWaveform isActive={true} />
                 {interimTranscript && (
                   <p className="text-xs text-nocturne-text-secondary italic mt-1">{interimTranscript}</p>
                 )}
-                <p className="text-xs text-primary-400 mt-1">Listening...</p>
+                <p className="text-xs text-nocturne-accent mt-1">Listening...</p>
               </div>
             )}
             {state === 'processing' && (
-              <div className="shrink-0 px-4 py-2 text-center border-t border-glass-border bg-surface-card/60">
+              <div className="shrink-0 px-4 py-2 text-center border-t border-nocturne-border bg-nocturne-surface/60">
                 <div className="flex items-center justify-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
                   <span className="w-1.5 h-1.5 rounded-full bg-accent-violet animate-pulse [animation-delay:0.2s]" />
@@ -692,13 +692,13 @@ export function VoiceAssistant() {
               </div>
             )}
             {state === 'responding' && (
-              <div className="shrink-0 px-4 py-2 text-center border-t border-glass-border bg-surface-card/60">
+              <div className="shrink-0 px-4 py-2 text-center border-t border-nocturne-border bg-nocturne-surface/60">
                 <p className="text-xs text-nocturne-text-primary animate-pulse">Speaking...</p>
               </div>
             )}
 
             {/* ─── Input Area ─── */}
-            <div className="shrink-0 px-3 py-3 border-t border-glass-border bg-surface-card/80 backdrop-blur-glass flex items-center gap-2 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
+            <div className="shrink-0 px-3 py-3 border-t border-nocturne-border bg-nocturne-surface/80 backdrop-blur-3xl flex items-center gap-2 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
               {/* Mic button */}
               <button
                 onClick={handleMicClick}
@@ -706,7 +706,7 @@ export function VoiceAssistant() {
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shrink-0 ${
                   state === 'listening'
                     ? 'bg-red-500/90 text-white animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.4)]'
-                    : 'glass-card text-nocturne-text-primary hover:bg-glass-heavy'
+                    : 'glass-card text-nocturne-text-primary hover:bg-nocturne-surface-2'
                 } disabled:opacity-40 disabled:cursor-not-allowed`}
                 aria-label={state === 'listening' ? 'Stop listening' : 'Start voice input'}
               >
@@ -724,13 +724,13 @@ export function VoiceAssistant() {
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
                   placeholder="Ask anything — search, navigate, book..."
-                  className="flex-1 input-nocturne rounded-pill px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
+                  className="flex-1 input-nocturne rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                   disabled={state !== 'idle'}
                 />
                 <button
                   type="submit"
                   disabled={!textInput.trim() || state !== 'idle'}
-                  className="text-primary-400 hover:text-primary-300 font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
+                  className="text-nocturne-accent hover:text-nocturne-accent font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m22 2-7 20-4-9-9-4z" />

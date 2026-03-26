@@ -20,7 +20,7 @@ export function ArtistPricingCards({ pricing }: ArtistPricingCardsProps) {
 
   return (
     <div className="mb-8">
-      <h2 className="text-lg font-heading font-semibold text-text-primary mb-4">Pricing</h2>
+      <h2 className="text-lg font-display font-semibold text-nocturne-text-primary mb-4">Pricing</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {pricing.map((p, i) => (
           <AnimatedSection key={i} delay={i * 0.05}>
@@ -28,19 +28,19 @@ export function ArtistPricingCards({ pricing }: ArtistPricingCardsProps) {
               className="glass-card p-4 relative overflow-hidden transition-transform duration-200 hover:-translate-y-0.5"
             >
               {i === 0 && (
-                <span className="absolute top-2 right-2 px-2 py-0.5 rounded-pill bg-gradient-accent text-white text-[9px] font-bold uppercase tracking-wider">
+                <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-gradient-accent text-white text-[9px] font-bold uppercase tracking-wider">
                   Popular
                 </span>
               )}
-              <p className="text-sm font-semibold text-text-primary mb-1">
+              <p className="text-sm font-semibold text-nocturne-text-primary mb-1">
                 {p.event_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
               </p>
-              <p className="text-xs text-text-muted capitalize mb-3">
+              <p className="text-xs text-nocturne-text-secondary capitalize mb-3">
                 {p.city_tier?.replace('_', ' ')}
               </p>
-              <p className="text-lg font-heading font-bold text-text-primary">
+              <p className="text-lg font-display font-bold text-nocturne-text-primary">
                 ₹{((p.min_price ?? p.min_paise ?? 0) / 100).toLocaleString('en-IN')}
-                <span className="text-text-muted font-normal text-sm"> – ₹{((p.max_price ?? p.max_paise ?? 0) / 100).toLocaleString('en-IN')}</span>
+                <span className="text-nocturne-text-secondary font-normal text-sm"> – ₹{((p.max_price ?? p.max_paise ?? 0) / 100).toLocaleString('en-IN')}</span>
               </p>
             </div>
           </AnimatedSection>

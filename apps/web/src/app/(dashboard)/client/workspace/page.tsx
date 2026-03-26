@@ -73,12 +73,12 @@ export default function WorkspaceListPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary">Workspaces</h1>
-          <p className="text-text-muted mt-1">Manage your event organizing spaces and teams</p>
+          <h1 className="text-3xl font-bold text-nocturne-text-primary">Workspaces</h1>
+          <p className="text-nocturne-text-secondary mt-1">Manage your event organizing spaces and teams</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="glass-card border border-primary-500/30 hover-glow px-4 py-2 rounded-lg text-sm font-medium text-primary-300 flex items-center gap-2 transition-all"
+          className="glass-card border border-nocturne-border-strong hover-glow px-4 py-2 rounded-lg text-sm font-medium text-nocturne-accent flex items-center gap-2 transition-all"
         >
           <Plus size={16} />
           {showForm ? 'Cancel' : 'New Workspace'}
@@ -86,24 +86,24 @@ export default function WorkspaceListPage() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} className="glass-card glass-border rounded-xl p-6 space-y-4 animate-fade-in-up">
+        <form onSubmit={handleCreate} className="glass-card border-nocturne-border rounded-xl p-6 space-y-4 animate-fade-in-up">
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">Workspace Name</label>
+            <label className="block text-sm font-medium text-nocturne-text-primary mb-2">Workspace Name</label>
             <input
               type="text"
               value={formName}
               onChange={(e) => setFormName(e.target.value)}
               placeholder="e.g. My Events Company"
-              className="w-full px-4 py-2.5 bg-surface-bg border glass-border rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+              className="w-full px-4 py-2.5 bg-nocturne-base border border-nocturne-border rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">Company Type</label>
+            <label className="block text-sm font-medium text-nocturne-text-primary mb-2">Company Type</label>
             <select
               value={formType}
               onChange={(e) => setFormType(e.target.value)}
-              className="w-full px-4 py-2.5 bg-surface-bg border glass-border rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+              className="w-full px-4 py-2.5 bg-nocturne-base border border-nocturne-border rounded-lg text-sm text-nocturne-text-primary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
             >
               <option value="corporate">Corporate</option>
               <option value="wedding_planner">Wedding Planner</option>
@@ -124,7 +124,7 @@ export default function WorkspaceListPage() {
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="px-4 py-2.5 bg-surface-base text-text-muted rounded-lg text-sm font-medium hover:bg-surface-card transition-colors"
+              className="px-4 py-2.5 bg-nocturne-base text-nocturne-text-secondary rounded-lg text-sm font-medium hover:bg-nocturne-surface transition-colors"
             >
               Cancel
             </button>
@@ -133,14 +133,14 @@ export default function WorkspaceListPage() {
       )}
 
       {workspaces.length === 0 && !showForm ? (
-        <div className="glass-card glass-border rounded-xl p-8 text-center animate-fade-in">
-          <Building2 size={48} className="mx-auto mb-4 text-primary-400/50" />
-          <p className="text-text-muted mb-4">
+        <div className="glass-card border-nocturne-border rounded-xl p-8 text-center animate-fade-in">
+          <Building2 size={48} className="mx-auto mb-4 text-nocturne-accent/50" />
+          <p className="text-nocturne-text-secondary mb-4">
             Create your first workspace to manage events, team members, and booking pipelines.
           </p>
           <button
             onClick={() => setShowForm(true)}
-            className="text-primary-300 text-sm font-medium hover:text-primary-200 transition-colors"
+            className="text-nocturne-accent text-sm font-medium hover:text-nocturne-accent transition-colors"
           >
             Get Started →
           </button>
@@ -151,27 +151,27 @@ export default function WorkspaceListPage() {
             <Link
               key={ws.id}
               href={`/client/workspace/${ws.id}`}
-              className="group glass-card glass-border rounded-xl p-6 hover-glow transition-all duration-300 animate-fade-in"
+              className="group glass-card border-nocturne-border rounded-xl p-6 hover-glow transition-all duration-300 animate-fade-in"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h3 className="font-heading text-lg text-text-primary group-hover:text-primary-300 transition-colors">{ws.name}</h3>
-                  <p className="text-xs text-text-muted mt-1">/{ws.slug}</p>
+                  <h3 className="font-display text-lg text-nocturne-text-primary group-hover:text-nocturne-accent transition-colors">{ws.name}</h3>
+                  <p className="text-xs text-nocturne-text-secondary mt-1">/{ws.slug}</p>
                 </div>
                 <span
-                  className={`text-xs font-semibold px-3 py-1 rounded-pill ${COMPANY_TYPE_COLORS[ws.company_type] ?? 'bg-gray-100/10 border border-gray-400/20 text-gray-300'}`}
+                  className={`text-xs font-semibold px-3 py-1 rounded-full ${COMPANY_TYPE_COLORS[ws.company_type] ?? 'bg-nocturne-surface/10 border border-nocturne-border text-nocturne-text-secondary'}`}
                 >
                   {ws.company_type.replace(/_/g, ' ')}
                 </span>
               </div>
 
               <div className="flex gap-4 text-sm">
-                <div className="flex items-center gap-2 text-text-secondary">
-                  <Users size={16} className="text-primary-400" />
+                <div className="flex items-center gap-2 text-nocturne-text-secondary">
+                  <Users size={16} className="text-nocturne-accent" />
                   <span>{ws.member_count} member{ws.member_count !== 1 ? 's' : ''}</span>
                 </div>
-                <div className="flex items-center gap-2 text-text-secondary">
-                  <Calendar size={16} className="text-primary-400" />
+                <div className="flex items-center gap-2 text-nocturne-text-secondary">
+                  <Calendar size={16} className="text-nocturne-accent" />
                   <span>{ws.event_count} event{ws.event_count !== 1 ? 's' : ''}</span>
                 </div>
               </div>

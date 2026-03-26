@@ -163,7 +163,7 @@ function SearchPageContent() {
                 { label: city, onClear: () => { setCity(''); setPage(1); } },
                 { label: eventType, onClear: () => { setEventType(''); setPage(1); } },
               ].filter(f => f.label).map((f) => (
-                <span key={f.label} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-pill badge-nocturne text-xs font-medium text-nocturne-text-primary transition-colors animate-fade-in-up">
+                <span key={f.label} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full badge-nocturne text-xs font-medium text-nocturne-text-primary transition-colors animate-fade-in-up">
                   <span className="inline-block w-2 h-2 rounded-full bg-nocturne-accent"></span>
                   {f.label}
                   <button onClick={f.onClear} className="hover:text-nocturne-accent transition-colors">

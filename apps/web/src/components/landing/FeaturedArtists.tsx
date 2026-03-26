@@ -23,8 +23,8 @@ interface ArtistData {
 
 const SkeletonCard = ({ index }: { index: number }) => (
   <motion.div
-    className="shrink-0 w-[280px] md:w-[300px] h-[420px] rounded-2xl bg-neutral-200"
-    animate={{ opacity: [0.5, 1, 0.5] }}
+    className="shrink-0 w-[280px] md:w-[300px] h-[420px] rounded-4xl bg-nocturne-surface-2"
+    animate={{ opacity: [0.3, 0.6, 0.3] }}
     transition={{
       duration: 2,
       repeat: Infinity,
@@ -82,7 +82,7 @@ export function FeaturedArtists() {
 
   if (loading) {
     return (
-      <section className="py-20 px-6 bg-white">
+      <section className="py-20 px-6 bg-nocturne-base">
         <div className="max-w-section mx-auto">
           <div className="flex gap-6 overflow-hidden pb-4">
             {[...Array(4)].map((_, i) => (
@@ -96,19 +96,19 @@ export function FeaturedArtists() {
 
   if (error === 'warming_up') {
     return (
-      <section className="py-20 px-6 bg-white">
+      <section className="py-20 px-6 bg-nocturne-base">
         <div className="max-w-section mx-auto px-6 text-center">
           <motion.div
-            className="inline-flex items-center gap-3 px-5 py-3 rounded-xl bg-violet-50 border border-violet-200"
+            className="inline-flex items-center gap-3 px-5 py-3 rounded-xl glass-card"
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
             <motion.div
-              className="w-4 h-4 border-2 border-violet-600 border-t-transparent rounded-full"
+              className="w-4 h-4 border-2 border-nocturne-primary border-t-transparent rounded-full"
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
             />
-            <p className="text-sm text-violet-700 font-medium">Loading artists...</p>
+            <p className="text-sm text-nocturne-accent font-medium">Loading artists...</p>
           </motion.div>
         </div>
       </section>
@@ -120,9 +120,8 @@ export function FeaturedArtists() {
   }
 
   return (
-    <section className="py-20 px-6 bg-white">
+    <section className="py-20 px-6 bg-nocturne-base">
       <div className="relative max-w-section mx-auto">
-        {/* Header */}
         <FadeIn direction="down" delay={0.1} once={true}>
           <div className="flex items-end justify-between mb-12">
             <div>
@@ -133,17 +132,17 @@ export function FeaturedArtists() {
                 viewport={{ once: true, amount: 0.5 }}
                 transition={{ duration: 0.5 }}
               >
-                <span className="bg-violet-50 text-violet-700 rounded-full px-4 py-2 text-xs font-semibold">
+                <span className="bg-nocturne-primary-light text-nocturne-accent rounded-full px-4 py-2 text-xs font-semibold">
                   Featured Artists
                 </span>
               </motion.div>
-              <h2 className="text-4xl md:text-5xl font-bold text-neutral-900">
+              <h2 className="text-4xl md:text-5xl font-bold text-white">
                 Top Rated Artists
               </h2>
             </div>
             <Link
               href="/search"
-              className="group hidden sm:flex items-center gap-2 text-sm font-medium text-violet-600 hover:text-violet-700 transition-colors"
+              className="group hidden sm:flex items-center gap-2 text-sm font-medium text-nocturne-accent hover:text-white transition-colors"
             >
               <span>View all</span>
               <motion.div
@@ -156,17 +155,16 @@ export function FeaturedArtists() {
           </div>
         </FadeIn>
 
-        {/* Scroll container */}
         <div className="relative">
           <motion.div
-            className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-20 pointer-events-none"
+            className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-nocturne-base to-transparent z-20 pointer-events-none"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.5 }}
           />
           <motion.div
-            className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-20 pointer-events-none"
+            className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-nocturne-base to-transparent z-20 pointer-events-none"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -195,11 +193,11 @@ export function FeaturedArtists() {
                   className="group block"
                 >
                   <motion.div
-                    className="min-w-[280px] md:min-w-[300px] rounded-2xl overflow-hidden bg-white border border-neutral-200 shadow-sm h-full flex flex-col"
+                    className="min-w-[280px] md:min-w-[300px] rounded-4xl overflow-hidden glass-card h-full flex flex-col"
                     whileHover={{
                       y: -8,
                       scale: 1.02,
-                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+                      boxShadow: '0 20px 50px -10px rgba(0, 0, 0, 0.5), 0 0 30px -5px rgba(138, 43, 226, 0.3)',
                     }}
                     transition={{
                       type: 'spring',
@@ -207,8 +205,7 @@ export function FeaturedArtists() {
                       stiffness: 200,
                     }}
                   >
-                    {/* Image Container */}
-                    <div className="relative w-full aspect-[3/4] overflow-hidden bg-neutral-100">
+                    <div className="relative w-full aspect-[3/4] overflow-hidden bg-nocturne-surface-2">
                       {artist.thumbnail_url ? (
                         <motion.div
                           className="relative w-full h-full overflow-hidden"
@@ -224,22 +221,20 @@ export function FeaturedArtists() {
                           />
                         </motion.div>
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-violet-100 to-violet-50">
-                          <span className="text-6xl font-bold text-violet-200">
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-nocturne-primary/20 to-nocturne-surface">
+                          <span className="text-6xl font-bold text-nocturne-primary/30">
                             {artist.stage_name.charAt(0)}
                           </span>
                         </div>
                       )}
 
-                      {/* Gradient Overlay on Hover */}
                       <motion.div
-                        className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
+                        className="absolute inset-0 bg-gradient-to-t from-nocturne-base/80 to-transparent"
                         initial={{ opacity: 0 }}
                         whileHover={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
                       />
 
-                      {/* Info Overlay */}
                       <motion.div
                         className="absolute inset-0 flex flex-col justify-end p-4 text-white"
                         initial={{ opacity: 0 }}
@@ -250,20 +245,19 @@ export function FeaturedArtists() {
                           <h4 className="text-sm font-bold line-clamp-1">
                             {artist.stage_name}
                           </h4>
-                          <p className="text-xs text-white/80">
+                          <p className="text-xs text-nocturne-text-secondary">
                             {artist.genres?.[0] ?? 'Artist'}
                           </p>
                         </div>
                         <div className="flex items-center gap-1.5 text-xs font-semibold">
-                          <Star size={14} className="text-amber-300 fill-amber-300" />
+                          <Star size={14} className="text-nocturne-gold fill-nocturne-gold" />
                           <span>{parseFloat(String(artist.trust_score)).toFixed(1)}</span>
                         </div>
                       </motion.div>
 
-                      {/* Verified Badge */}
                       {artist.is_verified && (
                         <motion.div
-                          className="absolute top-3 right-3 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-violet-600 backdrop-blur-md shadow-lg"
+                          className="absolute top-3 right-3 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-nocturne-primary/90 backdrop-blur-md shadow-nocturne-glow-sm"
                           initial={{ scale: 0, rotate: -180 }}
                           whileInView={{ scale: 1, rotate: 0 }}
                           viewport={{ once: true }}
@@ -282,10 +276,9 @@ export function FeaturedArtists() {
                       )}
                     </div>
 
-                    {/* Content */}
                     <motion.div className="flex-1 p-4 flex flex-col">
                       <motion.h3
-                        className="text-sm font-semibold text-neutral-900 line-clamp-1 group-hover:text-violet-600 transition-colors"
+                        className="text-sm font-semibold text-white line-clamp-1 group-hover:text-nocturne-accent transition-colors"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
@@ -295,7 +288,7 @@ export function FeaturedArtists() {
                       </motion.h3>
 
                       <motion.p
-                        className="text-xs text-neutral-500 mt-1"
+                        className="text-xs text-nocturne-text-tertiary mt-1"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
@@ -304,9 +297,8 @@ export function FeaturedArtists() {
                         {artist.genres?.[0] ?? 'Artist'}
                       </motion.p>
 
-                      {/* Location */}
                       <motion.div
-                        className="flex items-center gap-1.5 text-xs text-neutral-500 mt-2 mb-4"
+                        className="flex items-center gap-1.5 text-xs text-nocturne-text-tertiary mt-2 mb-4"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
@@ -316,23 +308,22 @@ export function FeaturedArtists() {
                         <span className="line-clamp-1">{artist.base_city}</span>
                       </motion.div>
 
-                      {/* Footer */}
                       <motion.div
-                        className="mt-auto pt-4 border-t border-neutral-100 flex items-center justify-between"
+                        className="mt-auto pt-4 border-t border-white/[0.08] flex items-center justify-between"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.4, delay: idx * 0.1 + 0.35 }}
                       >
                         <div className="flex items-center gap-1.5">
-                          <Star size={14} className="text-amber-400 fill-amber-400" />
-                          <span className="text-sm font-semibold text-neutral-900 tabular-nums">
+                          <Star size={14} className="text-nocturne-gold fill-nocturne-gold" />
+                          <span className="text-sm font-semibold text-white tabular-nums">
                             {parseFloat(String(artist.trust_score)).toFixed(1)}
                           </span>
                         </div>
 
                         <motion.span
-                          className="text-sm font-bold text-violet-600"
+                          className="text-sm font-bold text-nocturne-accent"
                           whileHover={{ scale: 1.1 }}
                           transition={{ type: 'spring', damping: 20 }}
                         >
@@ -348,7 +339,7 @@ export function FeaturedArtists() {
         </div>
 
         <motion.p
-          className="text-xs text-neutral-500 text-center mt-6 md:hidden"
+          className="text-xs text-nocturne-text-tertiary text-center mt-6 md:hidden"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}

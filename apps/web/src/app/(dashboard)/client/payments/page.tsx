@@ -30,13 +30,13 @@ function getStatusBadge(status: string) {
   switch (status.toLowerCase()) {
     case 'completed':
     case 'success':
-      return `${baseClasses} bg-green-100 text-green-700`;
+      return `${baseClasses} bg-nocturne-success/15 text-nocturne-success`;
     case 'pending':
-      return `${baseClasses} bg-yellow-100 text-yellow-700`;
+      return `${baseClasses} bg-nocturne-warning/15 text-nocturne-warning`;
     case 'failed':
-      return `${baseClasses} bg-red-100 text-red-700`;
+      return `${baseClasses} bg-nocturne-error/15 text-nocturne-error`;
     default:
-      return `${baseClasses} bg-gray-100 text-gray-700`;
+      return `${baseClasses} bg-nocturne-surface-2 text-nocturne-text-secondary`;
   }
 }
 
@@ -98,40 +98,40 @@ export default function PaymentHistoryPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Payment History</h1>
-        <p className="text-gray-600 mt-1">View and manage all your booking payments</p>
+        <h1 className="text-2xl font-bold text-nocturne-text-primary">Payment History</h1>
+        <p className="text-nocturne-text-secondary mt-1">View and manage all your booking payments</p>
       </div>
 
       {payments.length === 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <p className="text-gray-500">No payments yet</p>
-          <p className="text-sm text-gray-400 mt-1">Your payment history will appear here</p>
+        <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-12 text-center">
+          <p className="text-nocturne-text-tertiary">No payments yet</p>
+          <p className="text-sm text-nocturne-text-tertiary mt-1">Your payment history will appear here</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Artist</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Method</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase">Actions</th>
+                <tr className="bg-nocturne-surface-2 border-b border-nocturne-border-subtle">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Artist</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Method</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Status</th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-nocturne-text-secondary uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {payments.map((payment) => (
-                  <tr key={payment.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                  <tr key={payment.id} className="border-b border-nocturne-border-subtle hover:bg-nocturne-glass-panel transition-colors">
+                    <td className="px-6 py-4 text-sm text-nocturne-text-primary">
                       {new Date(payment.confirmed_at).toLocaleDateString('en-IN')}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{payment.artist_name || 'N/A'}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                    <td className="px-6 py-4 text-sm text-nocturne-text-primary">{payment.artist_name || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-nocturne-text-primary">
                       ₹{formatINR(payment.amount_paise)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 capitalize">
+                    <td className="px-6 py-4 text-sm text-nocturne-text-secondary capitalize">
                       {payment.payment_method || 'N/A'}
                     </td>
                     <td className="px-6 py-4 text-sm">
@@ -142,7 +142,7 @@ export default function PaymentHistoryPage() {
                     <td className="px-6 py-4 text-right space-x-2 flex items-center justify-end">
                       <button
                         onClick={() => router.push(`/client/bookings/${payment.booking_id}`)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-nocturne-accent hover:bg-nocturne-glass-panel rounded-lg transition-colors"
                         title="View booking details"
                       >
                         <Eye size={14} />
@@ -151,7 +151,7 @@ export default function PaymentHistoryPage() {
                       <button
                         onClick={() => handleDownloadInvoice(payment.id)}
                         disabled={downloading === payment.id}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-nocturne-accent hover:bg-nocturne-glass-panel rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Download invoice"
                       >
                         {downloading === payment.id ? (

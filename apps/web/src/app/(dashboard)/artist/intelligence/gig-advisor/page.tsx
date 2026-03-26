@@ -46,23 +46,23 @@ function formatINR(paise: number): string {
 function recommendationBadge(rec: string) {
   // CRITICAL: Never say "decline" — use "Consider Later"
   if (rec === 'ACCEPT') {
-    return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">Accept</span>;
+    return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-nocturne-success/15 text-nocturne-success">Accept</span>;
   }
   if (rec === 'HOLD') {
-    return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Hold</span>;
+    return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-nocturne-warning/15 text-nocturne-warning">Hold</span>;
   }
   // DECLINE → "Consider Later"
-  return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Consider Later</span>;
+  return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-nocturne-surface-2 text-nocturne-text-secondary">Consider Later</span>;
 }
 
 function demandBadge(level: string) {
   if (level === 'Peak') {
-    return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-100 text-red-700">Peak</span>;
+    return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-nocturne-error/15 text-nocturne-error">Peak</span>;
   }
   if (level === 'High') {
-    return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">High</span>;
+    return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-nocturne-warning/15 text-nocturne-warning">High</span>;
   }
-  return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Moderate</span>;
+  return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-nocturne-info/15 text-nocturne-info">Moderate</span>;
 }
 
 export default function GigAdvisorPage() {
@@ -106,26 +106,26 @@ export default function GigAdvisorPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Gig Advisor</h1>
+      <h1 className="text-2xl font-bold text-nocturne-text-primary">Gig Advisor</h1>
 
       {/* Active Inquiries */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Active Inquiries</h2>
+        <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">Active Inquiries</h2>
         {inquiries.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
-            <p className="text-gray-500">No active inquiries to compare right now.</p>
-            <p className="text-sm text-gray-400 mt-1">When you receive new booking inquiries, our advisor will help you evaluate them.</p>
+          <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 text-center">
+            <p className="text-nocturne-text-tertiary">No active inquiries to compare right now.</p>
+            <p className="text-sm text-nocturne-text-tertiary mt-1">When you receive new booking inquiries, our advisor will help you evaluate them.</p>
           </div>
         ) : (
           <div className="space-y-3">
             {inquiries.map((inq) => (
-              <div key={inq.inquiry_id} className="bg-white rounded-lg border border-gray-200 p-4">
+              <div key={inq.inquiry_id} className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4">
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-nocturne-text-primary">
                       {inq.event_type} &middot; {inq.city}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-nocturne-text-tertiary">
                       {new Date(inq.event_date).toLocaleDateString('en-IN', {
                         day: 'numeric',
                         month: 'short',
@@ -138,20 +138,20 @@ export default function GigAdvisorPage() {
                 </div>
                 <div className="grid grid-cols-3 gap-3 mt-3">
                   <div>
-                    <p className="text-xs text-gray-400">Expected Value</p>
-                    <p className="text-sm font-semibold text-gray-900">\u20B9{formatINR(inq.expected_value_paise)}</p>
+                    <p className="text-xs text-nocturne-text-tertiary">Expected Value</p>
+                    <p className="text-sm font-semibold text-nocturne-text-primary">\u20B9{formatINR(inq.expected_value_paise)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400">Conversion</p>
-                    <p className="text-sm font-semibold text-gray-900">{inq.conversion_probability}%</p>
+                    <p className="text-xs text-nocturne-text-tertiary">Conversion</p>
+                    <p className="text-sm font-semibold text-nocturne-text-primary">{inq.conversion_probability}%</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400">Travel Cost</p>
-                    <p className="text-sm font-semibold text-gray-900">\u20B9{formatINR(inq.travel_cost_paise)}</p>
+                    <p className="text-xs text-nocturne-text-tertiary">Travel Cost</p>
+                    <p className="text-sm font-semibold text-nocturne-text-primary">\u20B9{formatINR(inq.travel_cost_paise)}</p>
                   </div>
                 </div>
                 {inq.reasoning && (
-                  <p className="text-sm text-gray-600 mt-3 bg-gray-50 rounded p-2">{inq.reasoning}</p>
+                  <p className="text-sm text-nocturne-text-secondary mt-3 bg-nocturne-surface-2 rounded p-2">{inq.reasoning}</p>
                 )}
               </div>
             ))}
@@ -161,41 +161,41 @@ export default function GigAdvisorPage() {
 
       {/* Opportunities Near You */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Opportunities Near You</h2>
+        <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">Opportunities Near You</h2>
         {opportunities.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
-            <p className="text-gray-500">No new opportunities detected right now.</p>
-            <p className="text-sm text-gray-400 mt-1">We scan demand patterns regularly and will show matches here.</p>
+          <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 text-center">
+            <p className="text-nocturne-text-tertiary">No new opportunities detected right now.</p>
+            <p className="text-sm text-nocturne-text-tertiary mt-1">We scan demand patterns regularly and will show matches here.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {opportunities.map((opp) => (
-              <div key={opp.id} className="bg-white rounded-lg border border-gray-200 p-4">
+              <div key={opp.id} className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="font-medium text-gray-900">{opp.city}</p>
+                  <p className="font-medium text-nocturne-text-primary">{opp.city}</p>
                   {demandBadge(opp.demand_level)}
                 </div>
-                <p className="text-sm text-gray-500">{opp.event_type}</p>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-sm text-nocturne-text-tertiary">{opp.event_type}</p>
+                <p className="text-xs text-nocturne-text-tertiary mt-1">
                   {new Date(opp.date_range_start).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                   {' \u2013 '}
                   {new Date(opp.date_range_end).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </p>
                 {/* Opportunity Score Bar */}
                 <div className="mt-3">
-                  <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                  <div className="flex items-center justify-between text-xs text-nocturne-text-tertiary mb-1">
                     <span>Opportunity Score</span>
                     <span>{opp.opportunity_score}/100</span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div className="w-full bg-nocturne-surface-2 rounded-full h-2">
                     <div
-                      className="bg-primary-500 h-2 rounded-full transition-all"
+                      className="bg-nocturne-accent h-2 rounded-full transition-all"
                       style={{ width: `${Math.min(opp.opportunity_score, 100)}%` }}
                     />
                   </div>
                 </div>
                 {opp.rationale && (
-                  <p className="text-sm text-gray-600 mt-3">{opp.rationale}</p>
+                  <p className="text-sm text-nocturne-text-secondary mt-3">{opp.rationale}</p>
                 )}
               </div>
             ))}

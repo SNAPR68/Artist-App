@@ -31,7 +31,7 @@ export function ArtistGallery({ media, artistName }: ArtistGalleryProps) {
           <button
             key={item.id}
             onClick={() => setLightboxIndex(i)}
-            className={`relative bg-surface-elevated overflow-hidden group ${
+            className={`relative bg-nocturne-surface-2 overflow-hidden group ${
               i === 0 ? 'col-span-2 row-span-2 aspect-[4/3]' : 'aspect-video'
             }`}
           >
@@ -44,7 +44,7 @@ export function ArtistGallery({ media, artistName }: ArtistGalleryProps) {
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
             ) : (
-              <div className="w-full h-full bg-surface-card flex items-center justify-center">
+              <div className="w-full h-full bg-nocturne-surface flex items-center justify-center">
                 <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                   <Play size={20} className="text-white ml-0.5" />
                 </div>

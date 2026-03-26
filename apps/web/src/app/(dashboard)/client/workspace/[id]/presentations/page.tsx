@@ -201,14 +201,14 @@ export default function WorkspacePresentationsPage() {
           >
             &larr; Back to Workspace
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-1">Presentations</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h1 className="text-2xl font-bold text-nocturne-text-primary mt-1">Presentations</h1>
+          <p className="text-sm text-nocturne-text-tertiary mt-0.5">
             Create branded artist lineups to share with your clients
           </p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+          className="bg-nocturne-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-nocturne-primary transition-colors"
         >
           {showForm ? 'Cancel' : 'Create Presentation'}
         </button>
@@ -216,7 +216,7 @@ export default function WorkspacePresentationsPage() {
 
       {/* Error */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm">
+        <div className="bg-nocturne-error/15 border border-red-200 text-nocturne-error rounded-lg px-4 py-3 text-sm">
           {error}
           <button onClick={() => setError('')} className="ml-2 underline">Dismiss</button>
         </div>
@@ -224,44 +224,44 @@ export default function WorkspacePresentationsPage() {
 
       {/* ── Create Form ──────────────────────────────────────── */}
       {showForm && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-5">
-          <h2 className="text-lg font-semibold text-gray-900">New Presentation</h2>
+        <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-6 space-y-5">
+          <h2 className="text-lg font-semibold text-nocturne-text-primary">New Presentation</h2>
 
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Title *</label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="e.g., Artist Lineup for Wedding Reception"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             />
           </div>
 
           {/* Select Artists */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-2">
               Select Artists * ({form.artist_ids.length} selected)
             </label>
             {artists.length === 0 ? (
-              <p className="text-sm text-gray-500 bg-gray-50 rounded-lg p-4 text-center">
+              <p className="text-sm text-nocturne-text-tertiary bg-nocturne-base rounded-lg p-4 text-center">
                 No artists found in workspace pipeline. Add bookings first.
               </p>
             ) : (
-              <div className="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-3">
+              <div className="space-y-2 max-h-60 overflow-y-auto border border-nocturne-border-subtle rounded-lg p-3">
                 {artists.map((a) => {
                   const isSelected = form.artist_ids.includes(a.artist_id);
                   return (
                     <div key={a.artist_id}>
-                      <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
+                      <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-nocturne-base">
                         <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => toggleArtist(a.artist_id)}
-                          className="h-4 w-4 text-primary-500 rounded border-gray-300"
+                          className="h-4 w-4 text-primary-500 rounded border-nocturne-border"
                         />
-                        <span className="text-sm text-gray-900">{a.artist_name}</span>
+                        <span className="text-sm text-nocturne-text-primary">{a.artist_name}</span>
                       </label>
 
                       {/* Notes for selected artist */}
@@ -272,7 +272,7 @@ export default function WorkspacePresentationsPage() {
                             onChange={(e) => updateNote(a.artist_id, e.target.value)}
                             placeholder={`Note about ${a.artist_name} (optional)`}
                             rows={2}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
+                            className="w-full border border-nocturne-border-subtle rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
                           />
                         </div>
                       )}
@@ -290,52 +290,52 @@ export default function WorkspacePresentationsPage() {
                 type="checkbox"
                 checked={form.include_pricing}
                 onChange={(e) => setForm({ ...form, include_pricing: e.target.checked })}
-                className="h-4 w-4 text-primary-500 rounded border-gray-300"
+                className="h-4 w-4 text-primary-500 rounded border-nocturne-border"
               />
-              <span className="text-sm text-gray-700">Include Pricing</span>
+              <span className="text-sm text-nocturne-text-secondary">Include Pricing</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.include_media}
                 onChange={(e) => setForm({ ...form, include_media: e.target.checked })}
-                className="h-4 w-4 text-primary-500 rounded border-gray-300"
+                className="h-4 w-4 text-primary-500 rounded border-nocturne-border"
               />
-              <span className="text-sm text-gray-700">Include Media</span>
+              <span className="text-sm text-nocturne-text-secondary">Include Media</span>
             </label>
           </div>
 
           {/* Optional Fields */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Custom Header Text</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Custom Header Text</label>
             <textarea
               value={form.custom_header}
               onChange={(e) => setForm({ ...form, custom_header: e.target.value })}
               placeholder="Introductory message shown at the top of the presentation"
               rows={2}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
+              className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Custom Footer Text</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Custom Footer Text</label>
             <textarea
               value={form.custom_footer}
               onChange={(e) => setForm({ ...form, custom_footer: e.target.value })}
               placeholder="Closing message or terms shown at the bottom"
               rows={2}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
+              className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date (optional)</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Expiry Date (optional)</label>
             <input
               type="date"
               value={form.expires_at}
               onChange={(e) => setForm({ ...form, expires_at: e.target.value })}
               min={new Date().toISOString().split('T')[0]}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             />
           </div>
 
@@ -343,14 +343,14 @@ export default function WorkspacePresentationsPage() {
           <div className="flex justify-end gap-3 pt-2">
             <button
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-nocturne-text-secondary border border-nocturne-border rounded-lg hover:bg-nocturne-base transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleCreate}
               disabled={creating || !form.title.trim() || form.artist_ids.length === 0}
-              className="bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-nocturne-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-nocturne-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {creating ? 'Creating...' : 'Create Presentation'}
             </button>
@@ -360,10 +360,10 @@ export default function WorkspacePresentationsPage() {
 
       {/* ── Presentations List ───────────────────────────────── */}
       {presentations.length === 0 && !showForm ? (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
+        <div className="bg-nocturne-base border border-nocturne-border-subtle rounded-lg p-12 text-center">
           <div className="text-4xl mb-3">📋</div>
-          <p className="text-gray-500 mb-1">No presentations yet</p>
-          <p className="text-sm text-gray-400">
+          <p className="text-nocturne-text-tertiary mb-1">No presentations yet</p>
+          <p className="text-sm text-nocturne-text-tertiary">
             Create a branded artist lineup to share with your clients.
           </p>
         </div>
@@ -381,19 +381,19 @@ export default function WorkspacePresentationsPage() {
             return (
               <div
                 key={pres.id}
-                className={`bg-white border rounded-lg p-4 ${isExpired ? 'border-red-200 bg-red-50/30' : 'border-gray-200'}`}
+                className={`bg-nocturne-surface border rounded-lg p-4 ${isExpired ? 'border-red-200 bg-nocturne-error/15/30' : 'border-nocturne-border-subtle'}`}
               >
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-gray-900">{pres.title}</h3>
+                      <h3 className="font-medium text-nocturne-text-primary">{pres.title}</h3>
                       {isExpired && (
-                        <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                        <span className="text-xs bg-red-100 text-nocturne-error px-2 py-0.5 rounded-full">
                           Expired
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                    <div className="flex items-center gap-3 mt-1 text-xs text-nocturne-text-tertiary">
                       <span>{artistCount} artist{artistCount !== 1 ? 's' : ''}</span>
                       <span className="flex items-center gap-1">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -420,8 +420,8 @@ export default function WorkspacePresentationsPage() {
                       onClick={() => copyLink(pres.slug, pres.id)}
                       className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
                         copiedId === pres.id
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? 'bg-green-100 text-nocturne-success'
+                          : 'bg-nocturne-surface text-nocturne-text-secondary hover:bg-nocturne-surface-2'
                       }`}
                     >
                       {copiedId === pres.id ? 'Copied!' : 'Copy Link'}
@@ -430,7 +430,7 @@ export default function WorkspacePresentationsPage() {
                       href={`${API_BASE_URL}/v1/presentations/${pres.slug}/pdf`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center gap-1"
+                      className="text-xs bg-nocturne-surface text-nocturne-text-secondary px-3 py-1.5 rounded-lg font-medium hover:bg-nocturne-surface-2 transition-colors flex items-center gap-1"
                     >
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -442,7 +442,7 @@ export default function WorkspacePresentationsPage() {
                       href={getPublicUrl(pres.slug)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs bg-primary-50 text-primary-700 px-3 py-1.5 rounded-lg font-medium hover:bg-primary-100 transition-colors"
+                      className="text-xs bg-nocturne-primary-light text-nocturne-primary px-3 py-1.5 rounded-lg font-medium hover:bg-nocturne-primary-light transition-colors"
                     >
                       View
                     </a>

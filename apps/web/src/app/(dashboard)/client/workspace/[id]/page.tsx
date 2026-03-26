@@ -85,16 +85,16 @@ const PIPELINE_COLUMNS: { key: string; label: string; color: string }[] = [
 ];
 
 const EVENT_STATUS_COLORS: Record<string, string> = {
-  planning: 'bg-blue-100 text-blue-700',
-  confirmed: 'bg-green-100 text-green-700',
+  planning: 'bg-blue-100 text-nocturne-info',
+  confirmed: 'bg-green-100 text-nocturne-success',
   completed: 'bg-teal-100 text-teal-700',
-  cancelled: 'bg-red-100 text-red-700',
+  cancelled: 'bg-red-100 text-nocturne-error',
 };
 
 const ROLE_COLORS: Record<string, string> = {
-  owner: 'bg-yellow-100 text-yellow-700',
-  manager: 'bg-blue-100 text-blue-700',
-  coordinator: 'bg-gray-100 text-gray-700',
+  owner: 'bg-yellow-100 text-nocturne-warning',
+  manager: 'bg-blue-100 text-nocturne-info',
+  coordinator: 'bg-nocturne-surface text-nocturne-text-secondary',
 };
 
 export default function WorkspaceDetailPage() {
@@ -147,7 +147,7 @@ export default function WorkspaceDetailPage() {
   }
 
   if (!workspace) {
-    return <p className="text-center py-10 text-gray-500">Workspace not found</p>;
+    return <p className="text-center py-10 text-nocturne-text-tertiary">Workspace not found</p>;
   }
 
   const tabs: { key: TabKey; label: string }[] = [
@@ -211,30 +211,30 @@ export default function WorkspaceDetailPage() {
           <Link href="/client/workspace" className="text-sm text-primary-500 hover:underline">
             &larr; Back to Workspaces
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-1">{workspace.name}</h1>
+          <h1 className="text-2xl font-bold text-nocturne-text-primary mt-1">{workspace.name}</h1>
         </div>
         <div className="flex gap-2">
           <Link
             href={`/client/workspace/${workspaceId}/team`}
-            className="text-sm bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="text-sm bg-nocturne-surface border border-nocturne-border-subtle text-nocturne-text-secondary px-3 py-1.5 rounded-lg hover:bg-nocturne-base transition-colors font-medium"
           >
             Team
           </Link>
           <Link
             href={`/client/workspace/${workspaceId}/analytics`}
-            className="text-sm bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="text-sm bg-nocturne-surface border border-nocturne-border-subtle text-nocturne-text-secondary px-3 py-1.5 rounded-lg hover:bg-nocturne-base transition-colors font-medium"
           >
             Analytics
           </Link>
           <Link
             href={`/client/workspace/${workspaceId}/presentations`}
-            className="text-sm bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="text-sm bg-nocturne-surface border border-nocturne-border-subtle text-nocturne-text-secondary px-3 py-1.5 rounded-lg hover:bg-nocturne-base transition-colors font-medium"
           >
             Presentations
           </Link>
           <Link
             href={`/client/workspace/${workspaceId}/settings`}
-            className="text-sm bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="text-sm bg-nocturne-surface border border-nocturne-border-subtle text-nocturne-text-secondary px-3 py-1.5 rounded-lg hover:bg-nocturne-base transition-colors font-medium"
           >
             Settings
           </Link>
@@ -242,15 +242,15 @@ export default function WorkspaceDetailPage() {
       </div>
 
       {/* Tabs */}
-      <nav className="flex gap-1 border-b border-gray-200">
+      <nav className="flex gap-1 border-b border-nocturne-border-subtle">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === tab.key
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-primary-500 text-nocturne-accent'
+                : 'border-transparent text-nocturne-text-tertiary hover:text-nocturne-text-secondary'
             }`}
           >
             {tab.label}
@@ -270,28 +270,28 @@ export default function WorkspaceDetailPage() {
               <div className="flex gap-4 min-w-max pb-4">
                 {PIPELINE_COLUMNS.map((col) => (
                   <div key={col.key} className="w-64 flex-shrink-0">
-                    <div className={`rounded-t-lg px-3 py-2 text-sm font-semibold text-gray-700 ${col.color}`}>
+                    <div className={`rounded-t-lg px-3 py-2 text-sm font-semibold text-nocturne-text-secondary ${col.color}`}>
                       {col.label}
-                      <span className="ml-1 text-xs text-gray-500">({groupedPipeline[col.key].length})</span>
+                      <span className="ml-1 text-xs text-nocturne-text-tertiary">({groupedPipeline[col.key].length})</span>
                     </div>
                     <div className="space-y-2 mt-2">
                       {groupedPipeline[col.key].length === 0 ? (
-                        <p className="text-xs text-gray-400 text-center py-4">No bookings</p>
+                        <p className="text-xs text-nocturne-text-tertiary text-center py-4">No bookings</p>
                       ) : (
                         groupedPipeline[col.key].map((b) => (
                           <Link
                             key={b.id}
                             href={`/client/bookings/${b.id}`}
-                            className="block bg-white border border-gray-200 rounded-lg p-3 hover:border-primary-300 transition-colors"
+                            className="block bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-3 hover:border-primary-300 transition-colors"
                           >
-                            <p className="font-medium text-sm text-gray-900">{b.artist_name}</p>
-                            <p className="text-xs text-gray-500 mt-1">{b.event_type}</p>
+                            <p className="font-medium text-sm text-nocturne-text-primary">{b.artist_name}</p>
+                            <p className="text-xs text-nocturne-text-tertiary mt-1">{b.event_type}</p>
                             <div className="flex items-center justify-between mt-2">
-                              <span className="text-xs text-gray-400">
+                              <span className="text-xs text-nocturne-text-tertiary">
                                 {new Date(b.event_date).toLocaleDateString('en-IN')}
                               </span>
                               {(b.final_amount_paise ?? b.quoted_amount_paise) && (
-                                <span className="text-xs font-medium text-gray-700">
+                                <span className="text-xs font-medium text-nocturne-text-secondary">
                                   ₹{((b.final_amount_paise ?? b.quoted_amount_paise ?? 0) / 100).toLocaleString('en-IN')}
                                 </span>
                               )}
@@ -312,7 +312,7 @@ export default function WorkspaceDetailPage() {
               <div className="flex justify-end">
                 <button
                   onClick={() => setShowCreateEvent(true)}
-                  className="bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+                  className="bg-nocturne-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-nocturne-primary transition-colors"
                 >
                   + Add Event
                 </button>
@@ -321,43 +321,43 @@ export default function WorkspaceDetailPage() {
               {/* Create Event Modal */}
               {showCreateEvent && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                  <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-                    <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-                      <h2 className="text-lg font-semibold text-gray-900">Create New Event</h2>
-                      <button onClick={() => setShowCreateEvent(false)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+                  <div className="bg-nocturne-surface rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-nocturne-border-subtle">
+                      <h2 className="text-lg font-semibold text-nocturne-text-primary">Create New Event</h2>
+                      <button onClick={() => setShowCreateEvent(false)} className="text-nocturne-text-tertiary hover:text-nocturne-text-secondary text-xl">&times;</button>
                     </div>
                     <form onSubmit={handleCreateEvent} className="p-5 space-y-4">
                       {createError && (
-                        <div className="bg-red-50 text-red-700 text-sm p-3 rounded-lg">{createError}</div>
+                        <div className="bg-nocturne-error/15 text-nocturne-error text-sm p-3 rounded-lg">{createError}</div>
                       )}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Event Name *</label>
+                        <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Event Name *</label>
                         <input
                           required
                           value={eventForm.name}
                           onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                          className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                           placeholder="e.g., Sharma Wedding Reception"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Event Date *</label>
+                          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Event Date *</label>
                           <input
                             required
                             type="date"
                             value={eventForm.event_date}
                             onChange={(e) => setEventForm({ ...eventForm, event_date: e.target.value })}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Event Type *</label>
+                          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Event Type *</label>
                           <select
                             required
                             value={eventForm.event_type}
                             onChange={(e) => setEventForm({ ...eventForm, event_type: e.target.value })}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none capitalize"
+                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none capitalize"
                           >
                             {EVENT_TYPES.map((t) => (
                               <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
@@ -367,78 +367,78 @@ export default function WorkspaceDetailPage() {
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">City *</label>
                           <input
                             required
                             value={eventForm.event_city}
                             onChange={(e) => setEventForm({ ...eventForm, event_city: e.target.value })}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="Mumbai"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Venue</label>
+                          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Venue</label>
                           <input
                             value={eventForm.venue}
                             onChange={(e) => setEventForm({ ...eventForm, venue: e.target.value })}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="Taj Palace"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Guest Count</label>
+                          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Guest Count</label>
                           <input
                             type="number"
                             min="1"
                             value={eventForm.guest_count}
                             onChange={(e) => setEventForm({ ...eventForm, guest_count: e.target.value })}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="200"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Client Name</label>
+                          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Client Name</label>
                           <input
                             value={eventForm.client_name}
                             onChange={(e) => setEventForm({ ...eventForm, client_name: e.target.value })}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="Mr. Sharma"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Budget Min (₹)</label>
+                          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Budget Min (₹)</label>
                           <input
                             type="number"
                             min="0"
                             value={eventForm.budget_min}
                             onChange={(e) => setEventForm({ ...eventForm, budget_min: e.target.value })}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="50000"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Budget Max (₹)</label>
+                          <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Budget Max (₹)</label>
                           <input
                             type="number"
                             min="0"
                             value={eventForm.budget_max}
                             onChange={(e) => setEventForm({ ...eventForm, budget_max: e.target.value })}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="200000"
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Notes</label>
                         <textarea
                           rows={2}
                           value={eventForm.notes}
                           onChange={(e) => setEventForm({ ...eventForm, notes: e.target.value })}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none resize-none"
+                          className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none resize-none"
                           placeholder="Any special requirements..."
                         />
                       </div>
@@ -446,14 +446,14 @@ export default function WorkspaceDetailPage() {
                         <button
                           type="button"
                           onClick={() => setShowCreateEvent(false)}
-                          className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                          className="px-4 py-2 text-sm text-nocturne-text-secondary bg-nocturne-surface rounded-lg hover:bg-nocturne-surface-2 transition-colors"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={creatingEvent}
-                          className="px-4 py-2 text-sm text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
+                          className="px-4 py-2 text-sm text-white bg-nocturne-primary rounded-lg hover:bg-nocturne-primary transition-colors disabled:opacity-50"
                         >
                           {creatingEvent ? 'Creating...' : 'Create Event'}
                         </button>
@@ -464,29 +464,29 @@ export default function WorkspaceDetailPage() {
               )}
 
               {events.length === 0 ? (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-                  <p className="text-gray-500">No events in this workspace yet.</p>
-                  <p className="text-sm text-gray-400 mt-1">Click &quot;Add Event&quot; to create your first event.</p>
+                <div className="bg-nocturne-base border border-nocturne-border-subtle rounded-lg p-8 text-center">
+                  <p className="text-nocturne-text-tertiary">No events in this workspace yet.</p>
+                  <p className="text-sm text-nocturne-text-tertiary mt-1">Click &quot;Add Event&quot; to create your first event.</p>
                 </div>
               ) : (
                 events.map((evt) => (
-                  <div key={evt.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div key={evt.id} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <h3 className="font-medium text-gray-900">{evt.name}</h3>
-                        <p className="text-sm text-gray-500">
+                        <h3 className="font-medium text-nocturne-text-primary">{evt.name}</h3>
+                        <p className="text-sm text-nocturne-text-tertiary">
                           {new Date(evt.event_date).toLocaleDateString('en-IN')} &middot; {evt.event_city || evt.city || ''}
                           {evt.venue && ` · ${evt.venue}`}
                           {evt.event_type && ` · ${evt.event_type}`}
                         </p>
                       </div>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${EVENT_STATUS_COLORS[evt.status] ?? 'bg-gray-100 text-gray-700'}`}
+                        className={`text-xs px-2 py-0.5 rounded-full ${EVENT_STATUS_COLORS[evt.status] ?? 'bg-nocturne-surface text-nocturne-text-secondary'}`}
                       >
                         {evt.status}
                       </span>
                     </div>
-                    <div className="flex gap-4 text-xs text-gray-500 mt-2">
+                    <div className="flex gap-4 text-xs text-nocturne-text-tertiary mt-2">
                       {evt.guest_count != null && <span>{evt.guest_count} guests</span>}
                       {evt.budget_min_paise != null && evt.budget_max_paise != null && (
                         <span>
@@ -506,22 +506,22 @@ export default function WorkspaceDetailPage() {
           {activeTab === 'team' && (
             <div className="space-y-3">
               {members.length === 0 ? (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-                  <p className="text-gray-500">No team members yet.</p>
+                <div className="bg-nocturne-base border border-nocturne-border-subtle rounded-lg p-8 text-center">
+                  <p className="text-nocturne-text-tertiary">No team members yet.</p>
                 </div>
               ) : (
                 members.map((m) => (
-                  <div key={m.id} className="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between">
+                  <div key={m.id} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4 flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{m.name || m.role || 'Team Member'}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${ROLE_COLORS[m.role] ?? 'bg-gray-100 text-gray-700'}`}>
+                        <span className="font-medium text-nocturne-text-primary">{m.name || m.role || 'Team Member'}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${ROLE_COLORS[m.role] ?? 'bg-nocturne-surface text-nocturne-text-secondary'}`}>
                           {m.role}
                         </span>
                       </div>
-                      {m.phone && <p className="text-sm text-gray-500 mt-0.5">{m.phone}</p>}
+                      {m.phone && <p className="text-sm text-nocturne-text-tertiary mt-0.5">{m.phone}</p>}
                     </div>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-nocturne-text-tertiary">
                       Joined {new Date(m.joined_at).toLocaleDateString('en-IN')}
                     </span>
                   </div>

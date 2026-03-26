@@ -64,8 +64,8 @@ export default function ArtistBookingsPage() {
   return (
     <div className="space-y-6">
       <div className="animate-fade-in-up">
-        <h1 className="text-3xl font-bold text-gradient font-heading">Bookings</h1>
-        <p className="text-text-muted text-sm mt-1">Manage inquiries and confirmed performances</p>
+        <h1 className="text-3xl font-bold text-gradient font-display">Bookings</h1>
+        <p className="text-nocturne-text-tertiary text-sm mt-1">Manage inquiries and confirmed performances</p>
       </div>
 
       {/* Filter Pills */}
@@ -74,10 +74,10 @@ export default function ArtistBookingsPage() {
           <button
             key={s}
             onClick={() => { setFilter(s); setLoading(true); }}
-            className={`px-4 py-2 text-sm rounded-pill whitespace-nowrap transition-all font-medium ${
+            className={`px-4 py-2 text-sm rounded-full whitespace-nowrap transition-all font-medium ${
               filter === s
-                ? 'glass-medium bg-gradient-accent text-white shadow-glow-sm'
-                : 'glass-card text-text-secondary hover:glass-medium'
+                ? 'bg-nocturne-surface-2 bg-gradient-nocturne text-white shadow-nocturne-glow-sm'
+                : 'glass-card text-nocturne-text-secondary hover:bg-nocturne-surface-2'
             }`}
           >
             {s ? STATUS_COLORS[s]?.text ?? s : 'All'}
@@ -93,9 +93,9 @@ export default function ArtistBookingsPage() {
         </div>
       ) : bookings.length === 0 ? (
         <div className="text-center py-16 glass-card rounded-2xl animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-          <Music className="w-12 h-12 text-text-muted mx-auto mb-3 opacity-50" />
-          <p className="text-lg font-medium text-text-primary mb-1">No bookings</p>
-          <p className="text-text-muted text-sm">New inquiries will appear here</p>
+          <Music className="w-12 h-12 text-nocturne-text-tertiary mx-auto mb-3 opacity-50" />
+          <p className="text-lg font-medium text-nocturne-text-primary mb-1">No bookings</p>
+          <p className="text-nocturne-text-tertiary text-sm">New inquiries will appear here</p>
         </div>
       ) : (
         <div className="space-y-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
@@ -106,20 +106,20 @@ export default function ArtistBookingsPage() {
               <Link
                 key={b.id}
                 href={`/artist/bookings/${b.id}`}
-                className={`glass-card group hover:glass-medium backdrop-blur-xl rounded-xl p-5 transition-all duration-300 hover-glow shadow-glow-sm cursor-pointer block animate-fade-in-up ${
+                className={`glass-card group hover:bg-nocturne-surface-2 backdrop-blur-xl rounded-xl p-5 transition-all duration-300 hover-glow shadow-nocturne-glow-sm cursor-pointer block animate-fade-in-up ${
                   isNew
                     ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-2 border-gradient-accent shadow-lg shadow-blue-500/20'
-                    : 'bg-white/5 border glass-border hover:border-white/20'
+                    : 'bg-white/5 border border-nocturne-border hover:border-white/20'
                 }`}
                 style={{ animationDelay: `${50 + idx * 25}ms` }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-semibold text-text-primary group-hover:text-white transition-colors">{b.client_name ?? 'Client'}</h3>
+                      <h3 className="text-lg font-semibold text-nocturne-text-primary group-hover:text-white transition-colors">{b.client_name ?? 'Client'}</h3>
                       {isNew && <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />}
                     </div>
-                    <p className="text-text-muted text-sm">{b.event_type}</p>
+                    <p className="text-nocturne-text-tertiary text-sm">{b.event_type}</p>
                   </div>
                   <span className={`text-xs px-3 py-1 rounded-full font-semibold ${statusInfo.badge} whitespace-nowrap ml-2`}>
                     {statusInfo.text}
@@ -127,16 +127,16 @@ export default function ArtistBookingsPage() {
                 </div>
 
                 <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-text-secondary">
-                    <Calendar className="w-4 h-4 text-primary-400" />
+                  <div className="flex items-center gap-2 text-nocturne-text-secondary">
+                    <Calendar className="w-4 h-4 text-nocturne-accent" />
                     <span>{new Date(b.event_date).toLocaleDateString('en-IN')}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-text-secondary">
-                    <MapPin className="w-4 h-4 text-primary-400" />
+                  <div className="flex items-center gap-2 text-nocturne-text-secondary">
+                    <MapPin className="w-4 h-4 text-nocturne-accent" />
                     <span>{b.event_city}</span>
                   </div>
                   {b.quoted_amount_paise && (
-                    <div className="flex items-center gap-2 text-text-primary font-semibold pt-1">
+                    <div className="flex items-center gap-2 text-nocturne-text-primary font-semibold pt-1">
                       <IndianRupee className="w-4 h-4 text-accent-magenta" />
                       <span>₹{(b.quoted_amount_paise / 100).toLocaleString('en-IN')}</span>
                     </div>

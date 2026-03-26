@@ -37,7 +37,7 @@ const COMPLETED_STATUSES = ['completed', 'settled'];
 const CANCELLED_STATUSES = ['cancelled'];
 
 const BookingSkeleton = () => (
-  <div className="glass-card rounded-2xl p-6 animate-pulse border glass-border">
+  <div className="bg-nocturne-surface rounded-2xl p-6 animate-pulse border border-nocturne-border">
     <div className="flex gap-4">
       <div className="flex-1">
         <div className="h-4 bg-gradient-to-r from-primary-400/20 to-transparent rounded w-48 mb-3" />
@@ -126,16 +126,16 @@ export default function AgentBookingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-gradient">Booking Pipeline</h1>
-          <p className="text-text-muted mt-2 flex gap-4">
-            <span><span className="text-primary-300 font-semibold">{stats.active}</span> active</span>
+          <h1 className="text-4xl font-bold text-gradient-nocturne">Booking Pipeline</h1>
+          <p className="text-nocturne-text-secondary mt-2 flex gap-4">
+            <span><span className="text-nocturne-accent font-semibold">{stats.active}</span> active</span>
             <span><span className="text-emerald-300 font-semibold">{stats.completed}</span> completed</span>
-            <span><span className="text-text-secondary font-semibold">{stats.total}</span> total</span>
+            <span><span className="text-nocturne-text-secondary font-semibold">{stats.total}</span> total</span>
           </p>
         </div>
         <button
           onClick={() => setShowConcierge(!showConcierge)}
-          className="glass-card px-6 py-3 rounded-full text-sm font-semibold text-text-primary hover:hover-glow transition-all flex items-center gap-2 border glass-border"
+          className="bg-nocturne-surface px-6 py-3 rounded-full text-sm font-semibold text-nocturne-text-primary hover:hover-glow transition-all flex items-center gap-2 border border-nocturne-border"
         >
           <Plus size={18} />
           New Booking
@@ -144,31 +144,31 @@ export default function AgentBookingsPage() {
 
       {/* Concierge Booking Form */}
       {showConcierge && (
-        <div className="glass-card rounded-2xl p-8 border glass-border animate-fade-in">
-          <h2 className="text-2xl font-bold text-gradient mb-6">Create New Booking</h2>
+        <div className="bg-nocturne-surface rounded-2xl p-8 border border-nocturne-border animate-fade-in">
+          <h2 className="text-2xl font-bold text-gradient-nocturne mb-6">Create New Booking</h2>
           <form onSubmit={handleConciergeBook} className="space-y-6">
             {/* Row 1 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-text-primary mb-2">Artist ID *</label>
+                <label className="block text-sm font-semibold text-nocturne-text-primary mb-2">Artist ID *</label>
                 <input
                   type="text"
                   required
                   value={conciergeForm.artist_id}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, artist_id: e.target.value })}
                   placeholder="Enter artist ID"
-                  className="w-full glass-card bg-surface-card border glass-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-400/50 transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-text-primary mb-2">Client Name *</label>
+                <label className="block text-sm font-semibold text-nocturne-text-primary mb-2">Client Name *</label>
                 <input
                   type="text"
                   required
                   value={conciergeForm.client_name}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, client_name: e.target.value })}
                   placeholder="Client name"
-                  className="w-full glass-card bg-surface-card border glass-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-400/50 transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
             </div>
@@ -176,23 +176,23 @@ export default function AgentBookingsPage() {
             {/* Row 2 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-text-primary mb-2">Event Type</label>
+                <label className="block text-sm font-semibold text-nocturne-text-primary mb-2">Event Type</label>
                 <input
                   type="text"
                   value={conciergeForm.event_type}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, event_type: e.target.value })}
                   placeholder="e.g., Wedding, Corporate"
-                  className="w-full glass-card bg-surface-card border glass-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-400/50 transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-text-primary mb-2">Event City</label>
+                <label className="block text-sm font-semibold text-nocturne-text-primary mb-2">Event City</label>
                 <input
                   type="text"
                   value={conciergeForm.event_city}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, event_city: e.target.value })}
                   placeholder="City name"
-                  className="w-full glass-card bg-surface-card border glass-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-400/50 transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
             </div>
@@ -200,33 +200,33 @@ export default function AgentBookingsPage() {
             {/* Row 3 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-text-primary mb-2">Event Date</label>
+                <label className="block text-sm font-semibold text-nocturne-text-primary mb-2">Event Date</label>
                 <input
                   type="date"
                   value={conciergeForm.event_date}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, event_date: e.target.value })}
-                  className="w-full glass-card bg-surface-card border glass-border rounded-xl px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-400/50 transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-text-primary mb-2">Duration (hours)</label>
+                <label className="block text-sm font-semibold text-nocturne-text-primary mb-2">Duration (hours)</label>
                 <input
                   type="number"
                   min="1"
                   value={conciergeForm.event_duration_hours}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, event_duration_hours: Number(e.target.value) })}
-                  className="w-full glass-card bg-surface-card border glass-border rounded-xl px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-400/50 transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-text-primary mb-2">Budget (₹)</label>
+                <label className="block text-sm font-semibold text-nocturne-text-primary mb-2">Budget (₹)</label>
                 <input
                   type="number"
                   min="0"
                   value={conciergeForm.budget_paise / 100}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, budget_paise: Number(e.target.value) * 100 })}
                   placeholder="0"
-                  className="w-full glass-card bg-surface-card border glass-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-400/50 transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
             </div>
@@ -236,7 +236,7 @@ export default function AgentBookingsPage() {
               <button
                 type="submit"
                 disabled={conciergeLoading}
-                className="flex-1 bg-gradient-accent text-white py-3 rounded-xl text-sm font-semibold hover:shadow-glow-sm disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                className="flex-1 bg-gradient-nocturne text-white py-3 rounded-xl text-sm font-semibold hover:shadow-nocturne-glow-sm disabled:opacity-50 transition-all flex items-center justify-center gap-2"
               >
                 <Plus size={18} />
                 {conciergeLoading ? 'Creating...' : 'Create Booking'}
@@ -244,7 +244,7 @@ export default function AgentBookingsPage() {
               <button
                 type="button"
                 onClick={() => setShowConcierge(false)}
-                className="flex-1 glass-card px-6 py-3 rounded-xl text-sm font-semibold text-text-primary border glass-border hover:hover-glow transition-all"
+                className="flex-1 bg-nocturne-surface px-6 py-3 rounded-xl text-sm font-semibold text-nocturne-text-primary border border-nocturne-border hover:hover-glow transition-all"
               >
                 Cancel
               </button>
@@ -270,12 +270,12 @@ export default function AgentBookingsPage() {
               onClick={() => setFilter(f.key)}
               className={`px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
                 filter === f.key
-                  ? 'glass-card bg-gradient-accent text-white border border-primary-400/50'
-                  : 'glass-card text-text-primary border glass-border hover:hover-glow'
+                  ? 'bg-gradient-nocturne text-white border border-primary-400/50'
+                  : 'bg-nocturne-surface text-nocturne-text-primary border border-nocturne-border hover:hover-glow'
               }`}
             >
               {f.label}
-              <span className={`text-xs ml-2 ${filter === f.key ? 'text-white/80' : 'text-text-muted'}`}>
+              <span className={`text-xs ml-2 ${filter === f.key ? 'text-white/80' : 'text-nocturne-text-secondary'}`}>
                 ({count})
               </span>
             </button>
@@ -291,9 +291,9 @@ export default function AgentBookingsPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="glass-card rounded-2xl p-12 text-center border glass-border">
-          <Calendar size={48} className="mx-auto text-text-muted/40 mb-4" />
-          <p className="text-text-muted">No bookings in this status.</p>
+        <div className="bg-nocturne-surface rounded-2xl p-12 text-center border border-nocturne-border">
+          <Calendar size={48} className="mx-auto text-nocturne-text-secondary/40 mb-4" />
+          <p className="text-nocturne-text-secondary">No bookings in this status.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -304,36 +304,36 @@ export default function AgentBookingsPage() {
               <Link
                 key={b.id}
                 href={`/agent/bookings/${b.id}`}
-                className="glass-card rounded-2xl p-6 border glass-border hover:hover-glow transition-all group"
+                className="bg-nocturne-surface rounded-2xl p-6 border border-nocturne-border hover:hover-glow transition-all group"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     {/* Artist & Client */}
                     <div className="flex items-center gap-3 mb-3">
                       <div className={`w-2 h-2 rounded-full ${statusStyle.dot} flex-shrink-0`} />
-                      <h3 className="font-semibold text-text-primary truncate group-hover:text-primary-300 transition-colors">
+                      <h3 className="font-semibold text-nocturne-text-primary truncate group-hover:text-nocturne-accent transition-colors">
                         {b.artist_name}
                       </h3>
-                      <span className="text-text-muted">·</span>
-                      <span className="text-text-muted text-sm truncate">{b.client_name}</span>
+                      <span className="text-nocturne-text-secondary">·</span>
+                      <span className="text-nocturne-text-secondary text-sm truncate">{b.client_name}</span>
                     </div>
 
                     {/* Event Details */}
-                    <div className="flex flex-wrap gap-3 text-sm text-text-muted">
+                    <div className="flex flex-wrap gap-3 text-sm text-nocturne-text-secondary">
                       {b.event_type && (
                         <div className="flex items-center gap-1.5">
-                          <User size={16} className="text-text-muted/60" />
+                          <User size={16} className="text-nocturne-text-secondary/60" />
                           {b.event_type}
                         </div>
                       )}
                       {b.event_city && (
                         <div className="flex items-center gap-1.5">
-                          <MapPin size={16} className="text-text-muted/60" />
+                          <MapPin size={16} className="text-nocturne-text-secondary/60" />
                           {b.event_city}
                         </div>
                       )}
                       <div className="flex items-center gap-1.5">
-                        <Calendar size={16} className="text-text-muted/60" />
+                        <Calendar size={16} className="text-nocturne-text-secondary/60" />
                         {new Date(b.event_date).toLocaleDateString('en-IN', {
                           month: 'short',
                           day: 'numeric',
@@ -349,7 +349,7 @@ export default function AgentBookingsPage() {
                       {b.status.replace(/_/g, ' ')}
                     </span>
                     {amount != null && (
-                      <div className="flex items-center gap-2 text-primary-300 font-semibold">
+                      <div className="flex items-center gap-2 text-nocturne-accent font-semibold">
                         <IndianRupee size={16} />
                         {(amount / 100).toLocaleString('en-IN')}
                       </div>

@@ -53,8 +53,8 @@ function Toggle({
       role="switch"
       aria-checked={enabled}
       onClick={() => onChange(!enabled)}
-      className={`relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border border-glass-border transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-slate-900 ${
-        enabled ? 'bg-gradient-accent shadow-glow-sm' : 'bg-surface-elevated/50 backdrop-blur-sm'
+      className={`relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border border-nocturne-border transition-all duration-300 ease-in-out focus:outline-none focus:ring-1 focus:ring-nocturne-primary ${
+        enabled ? 'bg-gradient-accent shadow-nocturne-glow-sm' : 'bg-nocturne-surface-2/50 backdrop-blur-sm'
       }`}
     >
       <span
@@ -125,8 +125,8 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="space-y-2">
-        <h1 className="text-4xl font-heading font-bold text-gradient">Settings</h1>
-        <p className="text-text-muted">Manage your notification preferences</p>
+        <h1 className="text-4xl font-display font-bold text-gradient-nocturne">Settings</h1>
+        <p className="text-nocturne-text-secondary">Manage your notification preferences</p>
       </div>
 
       {/* Feedback Banner */}
@@ -143,22 +143,22 @@ export default function SettingsPage() {
       )}
 
       {/* Notification Channels */}
-      <div className="glass-card border glass-border p-8 space-y-6">
+      <div className="glass-card border border-nocturne-border p-8 space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-primary-500/20 border border-primary-500/30">
-            <MessageSquare className="w-5 h-5 text-primary-300" />
+          <div className="p-2.5 rounded-lg bg-nocturne-primary-light border border-nocturne-border">
+            <MessageSquare className="w-5 h-5 text-nocturne-accent" />
           </div>
           <div>
-            <h2 className="text-xl font-heading font-bold text-text-primary">Notification Channels</h2>
-            <p className="text-sm text-text-muted mt-0.5">Choose how you want to receive notifications</p>
+            <h2 className="text-xl font-display font-bold text-nocturne-text-primary">Notification Channels</h2>
+            <p className="text-sm text-nocturne-text-secondary mt-0.5">Choose how you want to receive notifications</p>
           </div>
         </div>
-        <div className="space-y-4 border-t border-glass-border pt-6">
+        <div className="space-y-4 border-t border-nocturne-border pt-6">
           {CHANNEL_OPTIONS.map((option) => (
-            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-surface-elevated/50 border border-glass-border hover:border-primary-500/30 transition-all">
+            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-nocturne-surface-2/50 border border-nocturne-border hover:border-nocturne-border-strong transition-all">
               <div className="flex-1">
-                <p className="text-sm font-semibold text-text-primary">{option.label}</p>
-                <p className="text-xs text-text-muted mt-1">{option.description}</p>
+                <p className="text-sm font-semibold text-nocturne-text-primary">{option.label}</p>
+                <p className="text-xs text-nocturne-text-secondary mt-1">{option.description}</p>
               </div>
               <Toggle
                 enabled={prefs[option.key]}
@@ -170,22 +170,22 @@ export default function SettingsPage() {
       </div>
 
       {/* Notification Categories */}
-      <div className="glass-card border glass-border p-8 space-y-6">
+      <div className="glass-card border border-nocturne-border p-8 space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-gradient-accent/20 border border-gradient-accent/30">
-            <Bell className="w-5 h-5 text-gradient-accent" />
+          <div className="p-2.5 rounded-lg bg-gradient-nocturne/20 border border-nocturne-accent/30">
+            <Bell className="w-5 h-5 text-nocturne-accent" />
           </div>
           <div>
-            <h2 className="text-xl font-heading font-bold text-text-primary">Notification Categories</h2>
-            <p className="text-sm text-text-muted mt-0.5">Choose what you want to be notified about</p>
+            <h2 className="text-xl font-display font-bold text-nocturne-text-primary">Notification Categories</h2>
+            <p className="text-sm text-nocturne-text-secondary mt-0.5">Choose what you want to be notified about</p>
           </div>
         </div>
-        <div className="space-y-4 border-t border-glass-border pt-6">
+        <div className="space-y-4 border-t border-nocturne-border pt-6">
           {CATEGORY_OPTIONS.map((option) => (
-            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-surface-elevated/50 border border-glass-border hover:border-primary-500/30 transition-all">
+            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-nocturne-surface-2/50 border border-nocturne-border hover:border-nocturne-border-strong transition-all">
               <div className="flex-1">
-                <p className="text-sm font-semibold text-text-primary">{option.label}</p>
-                <p className="text-xs text-text-muted mt-1">{option.description}</p>
+                <p className="text-sm font-semibold text-nocturne-text-primary">{option.label}</p>
+                <p className="text-xs text-nocturne-text-secondary mt-1">{option.description}</p>
               </div>
               <Toggle
                 enabled={prefs[option.key]}
@@ -201,7 +201,7 @@ export default function SettingsPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="bg-gradient-accent hover-glow text-white px-8 py-4 rounded-pill font-heading font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 flex items-center gap-2"
+          className="bg-gradient-nocturne hover-glow text-white px-8 py-4 rounded-full font-display font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 flex items-center gap-2"
         >
           {saving && <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />}
           <span>{saving ? 'Saving...' : 'Save Preferences'}</span>

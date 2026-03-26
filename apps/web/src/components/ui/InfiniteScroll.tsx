@@ -76,7 +76,7 @@ export function InfiniteScroll({
       {/* End of list message */}
       {!hasMore && !isLoading && (
         <div className="text-center py-8">
-          <p className="text-text-secondary">You've reached the end</p>
+          <p className="text-nocturne-text-secondary">You've reached the end</p>
         </div>
       )}
 

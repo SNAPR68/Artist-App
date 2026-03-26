@@ -74,16 +74,16 @@ export default function EarningsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Earnings</h1>
-        <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+        <h1 className="text-2xl font-bold text-nocturne-text-primary">Earnings</h1>
+        <div className="flex gap-1 bg-nocturne-surface rounded-lg p-1">
           {(['current', '1m', '3m', '6m'] as const).map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
               className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
                 period === p
-                  ? 'bg-white text-primary-600 font-medium shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'bg-nocturne-surface text-nocturne-accent font-medium shadow-sm'
+                  : 'text-nocturne-text-secondary hover:text-white'
               }`}
             >
               {p === 'current' ? 'This Month' : p === '1m' ? 'Last Month' : p === '3m' ? '3 Months' : '6 Months'}
@@ -94,43 +94,43 @@ export default function EarningsPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">Gross Earnings</p>
-          <p className="text-xl font-bold text-gray-900">₹{formatINR(summary?.gross_total ?? null)}</p>
+        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+          <p className="text-sm text-nocturne-text-tertiary">Gross Earnings</p>
+          <p className="text-xl font-bold text-nocturne-text-primary">₹{formatINR(summary?.gross_total ?? null)}</p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">TDS Deducted</p>
-          <p className="text-xl font-bold text-red-600">-₹{formatINR(summary?.total_tds ?? null)}</p>
+        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+          <p className="text-sm text-nocturne-text-tertiary">TDS Deducted</p>
+          <p className="text-xl font-bold text-nocturne-error">-₹{formatINR(summary?.total_tds ?? null)}</p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">Platform Fee</p>
-          <p className="text-xl font-bold text-gray-500">-₹{formatINR(summary?.total_platform_fee ?? null)}</p>
+        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+          <p className="text-sm text-nocturne-text-tertiary">Platform Fee</p>
+          <p className="text-xl font-bold text-nocturne-text-tertiary">-₹{formatINR(summary?.total_platform_fee ?? null)}</p>
         </div>
-        <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-          <p className="text-sm text-green-700">Net Payout</p>
-          <p className="text-xl font-bold text-green-700">₹{formatINR(summary?.net_total ?? null)}</p>
+        <div className="bg-nocturne-success/15 rounded-lg p-4 border border-nocturne-success">
+          <p className="text-sm text-nocturne-success">Net Payout</p>
+          <p className="text-xl font-bold text-nocturne-success">₹{formatINR(summary?.net_total ?? null)}</p>
         </div>
       </div>
 
       {/* Transaction Count */}
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-nocturne-text-tertiary">
         {summary?.transaction_count ?? 0} settled transaction{(summary?.transaction_count ?? 0) !== 1 ? 's' : ''} in this period
       </div>
 
       {/* Transaction List */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Payment History</h2>
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
+        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+          <h2 className="text-lg font-semibold text-nocturne-text-primary">Payment History</h2>
         </div>
         {transactions.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No transactions yet</div>
+          <div className="p-8 text-center text-nocturne-text-tertiary">No transactions yet</div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-nocturne-border-subtle">
             {transactions.map((txn) => (
               <div key={txn.id} className="px-4 py-3 flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">{txn.event_type}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="font-medium text-nocturne-text-primary">{txn.event_type}</p>
+                  <p className="text-sm text-nocturne-text-tertiary">
                     {txn.event_city} &middot; {new Date(txn.event_date).toLocaleDateString('en-IN', {
                       day: 'numeric',
                       month: 'short',
@@ -140,12 +140,12 @@ export default function EarningsPage() {
                 </div>
                 <div className="text-right flex items-center gap-2">
                   <div>
-                    <p className="font-medium text-gray-900">₹{formatINR(txn.artist_payout_paise)}</p>
+                    <p className="font-medium text-nocturne-text-primary">₹{formatINR(txn.artist_payout_paise)}</p>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      txn.status === 'settled' ? 'bg-green-100 text-green-700' :
-                      txn.status === 'captured' ? 'bg-blue-100 text-blue-700' :
-                      txn.status === 'refund_initiated' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-gray-100 text-gray-600'
+                      txn.status === 'settled' ? 'bg-nocturne-success/15 text-nocturne-success' :
+                      txn.status === 'captured' ? 'bg-nocturne-info/15 text-nocturne-info' :
+                      txn.status === 'refund_initiated' ? 'bg-nocturne-warning/15 text-nocturne-warning' :
+                      'bg-nocturne-surface-2 text-nocturne-text-secondary'
                     }`}>
                       {txn.status}
                     </span>

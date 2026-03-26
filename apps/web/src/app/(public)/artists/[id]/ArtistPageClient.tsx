@@ -114,7 +114,7 @@ export default function PublicArtistPage() {
         {/* Bio */}
         {profile.bio && (
           <AnimatedSection>
-            <div className="glass-card p-8 mb-8">
+            <div className="glass-card p-8 mb-8 border border-nocturne-border">
               <h2 className="text-lg font-display font-semibold text-nocturne-text-primary mb-2">About</h2>
               <p className="text-sm text-nocturne-text-secondary leading-relaxed">{profile.bio}</p>
             </div>
@@ -123,12 +123,12 @@ export default function PublicArtistPage() {
 
         {/* Details Grid */}
         <AnimatedSection delay={0.1}>
-          <div className="glass-card p-8 grid grid-cols-2 gap-6 mb-8">
+          <div className="glass-card p-8 grid grid-cols-2 gap-6 mb-8 border border-nocturne-border">
             <div>
               <h3 className="text-xs font-semibold text-nocturne-text-secondary uppercase tracking-wider mb-2">Genres</h3>
               <div className="flex flex-wrap gap-1.5">
                 {profile.genres.map((g) => (
-                  <span key={g} className="badge-nocturne px-2.5 py-1 rounded-pill text-nocturne-accent text-xs">
+                  <span key={g} className="badge-nocturne px-2.5 py-1 rounded-full text-nocturne-accent text-xs">
                     {g}
                   </span>
                 ))}
@@ -138,7 +138,7 @@ export default function PublicArtistPage() {
               <h3 className="text-xs font-semibold text-nocturne-text-secondary uppercase tracking-wider mb-2">Event Types</h3>
               <div className="flex flex-wrap gap-1.5">
                 {profile.event_types.map((t) => (
-                  <span key={t} className="badge-nocturne px-2.5 py-1 rounded-pill text-nocturne-accent text-xs">
+                  <span key={t} className="badge-nocturne px-2.5 py-1 rounded-full text-nocturne-accent text-xs">
                     {t}
                   </span>
                 ))}
@@ -164,7 +164,7 @@ export default function PublicArtistPage() {
               { label: 'Response', value: `${profile.avg_response_time_hours ?? '-'}h` },
               { label: 'Profile', value: `${profile.profile_completion_pct}%` },
             ].map((stat) => (
-              <div key={stat.label} className="glass-card p-3 text-center">
+              <div key={stat.label} className="glass-card p-3 text-center border border-nocturne-border">
                 <p className="text-lg font-display font-bold text-nocturne-text-primary">{stat.value}</p>
                 <p className="text-[10px] text-nocturne-text-secondary uppercase tracking-wider">{stat.label}</p>
               </div>

@@ -22,20 +22,20 @@ interface BookingRecord {
 const STATUS_CONFIG: Record<string, { icon: any; bgGlass: string; textColor: string; label: string }> = {
   available: {
     icon: Check,
-    bgGlass: 'glass-medium bg-gradient-to-br from-green-500/10 to-transparent border-green-400/30',
+    bgGlass: 'bg-nocturne-surface-2 bg-gradient-to-br from-green-500/10 to-transparent border-green-400/30',
     textColor: 'text-green-300',
     label: 'Available',
   },
   held: {
     icon: Lock,
-    bgGlass: 'glass-medium bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-400/30',
+    bgGlass: 'bg-nocturne-surface-2 bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-400/30',
     textColor: 'text-yellow-300',
     label: 'Blocked',
   },
   booked: {
     icon: Calendar,
-    bgGlass: 'glass-medium bg-gradient-to-br from-primary-500/10 to-transparent border-primary-400/30',
-    textColor: 'text-primary-300',
+    bgGlass: 'bg-nocturne-surface-2 bg-gradient-to-br from-primary-500/10 to-transparent border-primary-400/30',
+    textColor: 'text-nocturne-accent',
     label: 'Booked',
   },
 };
@@ -137,15 +137,15 @@ export default function CalendarPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-heading font-bold text-text-primary">Availability Calendar</h1>
-          <p className="text-text-muted text-sm mt-1">Manage your booking availability</p>
+          <h1 className="text-3xl font-display font-bold text-nocturne-text-primary">Availability Calendar</h1>
+          <p className="text-nocturne-text-secondary text-sm mt-1">Manage your booking availability</p>
         </div>
-        <Calendar className="text-primary-400 opacity-50" size={32} />
+        <Calendar className="text-nocturne-accent opacity-50" size={32} />
       </div>
 
       {/* Legend */}
       <div className="glass-card p-4 space-y-3">
-        <p className="text-sm font-heading font-semibold text-text-primary">Calendar Legend</p>
+        <p className="text-sm font-display font-semibold text-nocturne-text-primary">Calendar Legend</p>
         <div className="grid grid-cols-3 gap-3">
           {Object.entries(STATUS_CONFIG).map(([status, config]) => {
             const Icon = config.icon;
@@ -154,7 +154,7 @@ export default function CalendarPage() {
                 <div className={`w-8 h-8 rounded-lg ${config.bgGlass} flex items-center justify-center`}>
                   <Icon size={16} className={config.textColor} />
                 </div>
-                <span className="text-text-secondary text-sm">{config.label}</span>
+                <span className="text-nocturne-text-secondary text-sm">{config.label}</span>
               </div>
             );
           })}
@@ -167,14 +167,14 @@ export default function CalendarPage() {
         <div className="flex items-center justify-between">
           <button
             onClick={prevMonth}
-            className="p-2 rounded-lg glass-medium border border-glass-border hover:bg-glass-heavy transition-all duration-300 hover-glow text-text-primary"
+            className="p-2 rounded-lg bg-nocturne-surface-2 border border-nocturne-border hover:bg-nocturne-surface-2 transition-all duration-300 hover-glow text-nocturne-text-primary"
           >
             <ChevronLeft size={20} />
           </button>
-          <h2 className="text-xl font-heading font-bold text-gradient">{monthName}</h2>
+          <h2 className="text-xl font-display font-bold text-gradient">{monthName}</h2>
           <button
             onClick={nextMonth}
-            className="p-2 rounded-lg glass-medium border border-glass-border hover:bg-glass-heavy transition-all duration-300 hover-glow text-text-primary"
+            className="p-2 rounded-lg bg-nocturne-surface-2 border border-nocturne-border hover:bg-nocturne-surface-2 transition-all duration-300 hover-glow text-nocturne-text-primary"
           >
             <ChevronRight size={20} />
           </button>
@@ -184,7 +184,7 @@ export default function CalendarPage() {
         <div className={`${saving ? 'opacity-50 pointer-events-none' : ''} transition-opacity duration-300`}>
           <div className="grid grid-cols-7 gap-2 mb-2">
             {DAYS.map((d) => (
-              <div key={d} className="text-center text-xs font-heading font-semibold text-text-muted py-2">
+              <div key={d} className="text-center text-xs font-display font-semibold text-nocturne-text-secondary py-2">
                 {d}
               </div>
             ))}
@@ -209,16 +209,16 @@ export default function CalendarPage() {
                   key={day}
                   onClick={() => !isPast && toggleDate(day)}
                   disabled={isPast || isBooked || loading}
-                  className={`aspect-square flex flex-col items-center justify-center rounded-lg border transition-all duration-300 text-sm font-heading font-bold group ${
+                  className={`aspect-square flex flex-col items-center justify-center rounded-lg border transition-all duration-300 text-sm font-display font-bold group ${
                     config
                       ? `${config.bgGlass} ${config.textColor}`
-                      : 'glass-medium border-glass-border text-text-secondary hover:bg-glass-heavy'
+                      : 'bg-nocturne-surface-2 border-nocturne-border text-nocturne-text-secondary hover:bg-nocturne-surface-2'
                   } ${
                     isPast
                       ? 'opacity-30 cursor-not-allowed'
                       : isBooked
                         ? 'cursor-not-allowed'
-                        : 'cursor-pointer hover:shadow-glow-sm hover-glow'
+                        : 'cursor-pointer hover:shadow-nocturne-glow-sm hover-glow'
                   }`}
                   title={entry?.notes || (isPast ? 'Past date' : 'Click to toggle')}
                 >
@@ -237,8 +237,8 @@ export default function CalendarPage() {
         </div>
 
         {/* Helper Text */}
-        <div className="border-t border-glass-border pt-4">
-          <p className="text-xs text-text-muted text-center">
+        <div className="border-t border-nocturne-border pt-4">
+          <p className="text-xs text-nocturne-text-secondary text-center">
             Tap a date to toggle between available and blocked. Booked dates cannot be changed.
           </p>
         </div>

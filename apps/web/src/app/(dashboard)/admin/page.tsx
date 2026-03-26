@@ -102,21 +102,21 @@ function formatINR(paise: number | null): string {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  inquiry: 'bg-blue-100 text-blue-700',
-  quoted: 'bg-indigo-100 text-indigo-700',
-  negotiating: 'bg-purple-100 text-purple-700',
-  confirmed: 'bg-cyan-100 text-cyan-700',
-  pre_event: 'bg-teal-100 text-teal-700',
-  event_day: 'bg-amber-100 text-amber-700',
-  completed: 'bg-green-100 text-green-700',
-  settled: 'bg-emerald-100 text-emerald-700',
-  cancelled: 'bg-red-100 text-red-700',
-  expired: 'bg-gray-100 text-gray-600',
-  disputed: 'bg-orange-100 text-orange-700',
-  captured: 'bg-green-100 text-green-700',
-  created: 'bg-blue-100 text-blue-700',
-  refunded: 'bg-orange-100 text-orange-700',
-  failed: 'bg-red-100 text-red-700',
+  inquiry: 'bg-nocturne-info/15 text-nocturne-info',
+  quoted: 'bg-nocturne-primary-light/20 text-nocturne-accent',
+  negotiating: 'bg-nocturne-primary-light/20 text-nocturne-accent',
+  confirmed: 'bg-nocturne-info/15 text-nocturne-info',
+  pre_event: 'bg-nocturne-success/15 text-nocturne-success',
+  event_day: 'bg-nocturne-warning/15 text-nocturne-warning',
+  completed: 'bg-nocturne-success/15 text-nocturne-success',
+  settled: 'bg-nocturne-success/15 text-nocturne-success',
+  cancelled: 'bg-nocturne-error/15 text-nocturne-error',
+  expired: 'bg-nocturne-surface/50 text-nocturne-text-secondary',
+  disputed: 'bg-nocturne-warning/15 text-nocturne-warning',
+  captured: 'bg-nocturne-success/15 text-nocturne-success',
+  created: 'bg-nocturne-info/15 text-nocturne-info',
+  refunded: 'bg-nocturne-warning/15 text-nocturne-warning',
+  failed: 'bg-nocturne-error/15 text-nocturne-error',
 };
 
 export default function AdminDashboardPage() {
@@ -213,8 +213,8 @@ export default function AdminDashboardPage() {
   if (user && user.role !== 'admin') {
     return (
       <div className="text-center py-20">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Admin Access Required</h1>
-        <p className="text-gray-500">You are logged in as <span className="font-medium">{user.role}</span>. This dashboard is only available to administrators.</p>
+        <h1 className="text-2xl font-bold text-nocturne-text-primary mb-2">Admin Access Required</h1>
+        <p className="text-nocturne-text-secondary">You are logged in as <span className="font-medium">{user.role}</span>. This dashboard is only available to administrators.</p>
       </div>
     );
   }
@@ -290,7 +290,7 @@ export default function AdminDashboardPage() {
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1.5 text-xs rounded-pill font-medium transition-all ${
+                className={`px-3 py-1.5 text-xs rounded-full font-medium transition-all ${
                   statusFilter === s
                     ? 'bg-nocturne-primary-light text-nocturne-accent shadow-nocturne-glow-sm'
                     : 'glass-card border-nocturne-border text-nocturne-text-secondary hover:text-nocturne-text-primary'
@@ -327,7 +327,7 @@ export default function AdminDashboardPage() {
                         <td className="px-4 py-3 text-nocturne-text-secondary">{new Date(b.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
                         <td className="px-4 py-3 text-nocturne-text-primary font-semibold">{b.final_amount_paise ? `₹${formatINR(b.final_amount_paise)}` : '-'}</td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-3 py-1 rounded-pill font-medium ${STATUS_COLORS[b.status] ?? 'bg-gray-100/20 text-gray-400 border border-gray-400/30'}`}>
+                          <span className={`text-xs px-3 py-1 rounded-full font-medium ${STATUS_COLORS[b.status] ?? 'bg-gray-100/20 text-gray-400 border border-gray-400/30'}`}>
                             {b.status.replace('_', ' ')}
                           </span>
                         </td>
@@ -349,7 +349,7 @@ export default function AdminDashboardPage() {
               <button
                 key={r}
                 onClick={() => setRoleFilter(r)}
-                className={`px-3 py-1.5 text-xs rounded-pill font-medium transition-all ${
+                className={`px-3 py-1.5 text-xs rounded-full font-medium transition-all ${
                   roleFilter === r
                     ? 'bg-nocturne-primary-light text-nocturne-accent shadow-nocturne-glow-sm'
                     : 'glass-card border-nocturne-border text-nocturne-text-secondary hover:text-nocturne-text-primary'
@@ -382,10 +382,10 @@ export default function AdminDashboardPage() {
                       <tr key={u.id} className="hover:bg-nocturne-surface/5 transition-colors">
                         <td className="px-4 py-3 text-nocturne-text-primary font-medium">
                           {u.stage_name || u.company_name || u.id.slice(0, 8)}
-                          {u.is_verified && <span className="ml-2 text-xs px-2 py-1 rounded-pill bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Verified</span>}
+                          {u.is_verified && <span className="ml-2 text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Verified</span>}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-xs px-2 py-1 rounded-pill bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium capitalize">
+                          <span className="text-xs px-2 py-1 rounded-full bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium capitalize">
                             {u.role?.replace('_', ' ')}
                           </span>
                         </td>
@@ -394,7 +394,7 @@ export default function AdminDashboardPage() {
                           {u.role === 'artist' ? `${u.trust_score ?? 0}% / ${u.total_bookings ?? 0}` : '-'}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-3 py-1 rounded-pill font-medium ${u.is_active ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-rose-500/20 text-rose-300 border border-rose-400/30'}`}>
+                          <span className={`text-xs px-3 py-1 rounded-full font-medium ${u.is_active ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-rose-500/20 text-rose-300 border border-rose-400/30'}`}>
                             {u.is_active ? 'Active' : 'Suspended'}
                           </span>
                         </td>
@@ -515,7 +515,7 @@ export default function AdminDashboardPage() {
                         <td className="px-4 py-3 text-right text-nocturne-text-primary font-semibold">₹{formatINR(p.amount_paise)}</td>
                         <td className="px-4 py-3 text-right text-emerald-300 font-semibold">₹{formatINR(p.platform_fee_paise)}</td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-3 py-1 rounded-pill font-medium ${STATUS_COLORS[p.status] ?? 'bg-gray-100/20 text-gray-400 border border-gray-400/30'}`}>
+                          <span className={`text-xs px-3 py-1 rounded-full font-medium ${STATUS_COLORS[p.status] ?? 'bg-gray-100/20 text-gray-400 border border-gray-400/30'}`}>
                             {p.status}
                           </span>
                         </td>
@@ -556,7 +556,7 @@ export default function AdminDashboardPage() {
                           {d.reason.length > 100 ? `${d.reason.slice(0, 100)}...` : d.reason}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-3 py-1 rounded-pill font-medium ${
+                          <span className={`text-xs px-3 py-1 rounded-full font-medium ${
                             d.status === 'submitted' ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :
                             d.status === 'under_review' ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30' :
                             d.status === 'upheld' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' :
@@ -572,11 +572,11 @@ export default function AdminDashboardPage() {
                         </td>
                         <td className="px-4 py-3">
                           {resolvingDispute === d.id ? (
-                            <div className="space-y-2 bg-surface-bg p-3 rounded-lg border border-nocturne-border">
+                            <div className="space-y-2 bg-nocturne-base p-3 rounded-lg border border-nocturne-border">
                               <select
                                 value={resolveForm.resolution}
                                 onChange={(e) => setResolveForm((f) => ({ ...f, resolution: e.target.value }))}
-                                className="block w-full text-xs bg-surface-card border border-nocturne-border rounded px-2 py-1.5 text-nocturne-text-primary"
+                                className="block w-full text-xs bg-nocturne-surface border border-nocturne-border rounded px-2 py-1.5 text-nocturne-text-primary"
                               >
                                 <option value="upheld">Upheld</option>
                                 <option value="overturned">Overturned</option>
@@ -586,7 +586,7 @@ export default function AdminDashboardPage() {
                                 value={resolveForm.admin_notes}
                                 onChange={(e) => setResolveForm((f) => ({ ...f, admin_notes: e.target.value }))}
                                 placeholder="Admin notes..."
-                                className="block w-full text-xs bg-surface-card border border-nocturne-border rounded px-2 py-1.5 h-16 resize-none text-nocturne-text-primary placeholder-text-muted"
+                                className="block w-full text-xs bg-nocturne-surface border border-nocturne-border rounded px-2 py-1.5 h-16 resize-none text-nocturne-text-primary placeholder-nocturne-text-secondary"
                               />
                               <div className="flex gap-2">
                                 <button
@@ -660,7 +660,7 @@ export default function AdminDashboardPage() {
                           <td className="px-4 py-3 text-nocturne-text-primary font-medium">{v.name}</td>
                           <td className="px-4 py-3 text-nocturne-text-secondary">{v.city}</td>
                           <td className="px-4 py-3">
-                            <span className="text-xs px-2 py-1 rounded-pill bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium">
+                            <span className="text-xs px-2 py-1 rounded-full bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium">
                               {v.venue_type?.replace('_', ' ') ?? '-'}
                             </span>
                           </td>
@@ -696,11 +696,11 @@ export default function AdminDashboardPage() {
                                     <div key={issue.id} className="flex items-start justify-between glass-card border-nocturne-border rounded-lg p-3">
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <span className="text-xs px-2 py-1 rounded-pill bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium">
+                                          <span className="text-xs px-2 py-1 rounded-full bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium">
                                             {issue.issue_type.replace('_', ' ')}
                                           </span>
                                           {issue.is_verified && (
-                                            <span className="text-xs px-2 py-1 rounded-pill bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-medium">Verified</span>
+                                            <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-medium">Verified</span>
                                           )}
                                         </div>
                                         <p className="text-sm text-nocturne-text-primary">{issue.description ?? 'No description'}</p>
@@ -773,7 +773,7 @@ export default function AdminDashboardPage() {
                           {new Date(2024, c.month - 1).toLocaleString('en-IN', { month: 'long' })}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-3 py-1 rounded-pill font-medium ${
+                          <span className={`text-xs px-3 py-1 rounded-full font-medium ${
                             c.demand_classification === 'peak' ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30' :
                             c.demand_classification === 'high' ? 'bg-orange-500/20 text-orange-300 border border-orange-400/30' :
                             c.demand_classification === 'moderate' ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :

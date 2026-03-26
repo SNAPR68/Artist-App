@@ -105,10 +105,10 @@ function VerifyContent() {
         </div>
 
         <div className="text-center mb-8 animate-fade-in-up" style={{ animationDelay: '0.28s' }}>
-          <h1 className="text-h3 font-heading font-bold text-text-primary mb-2">
+          <h1 className="text-h3 font-display font-bold text-nocturne-text-primary mb-2">
             {isNewUser ? t('auth.selectRole') : t('auth.verifyOtp')}
           </h1>
-          <p className="text-sm text-text-muted">
+          <p className="text-sm text-nocturne-text-secondary">
             {isNewUser ? (
               <span className="flex items-center justify-center gap-1.5">
                 <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-500/20 text-green-400">✓</span>
@@ -117,7 +117,7 @@ function VerifyContent() {
             ) : (
               <>
                 {t('auth.enterOtp')}{' '}
-                <span className="font-medium text-text-secondary">+91 {maskedPhone}</span>
+                <span className="font-medium text-nocturne-text-secondary">+91 {maskedPhone}</span>
               </>
             )}
           </p>
@@ -125,7 +125,7 @@ function VerifyContent() {
 
         {isNewUser && (
           <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.36s' }}>
-            <p className="text-sm font-medium text-text-secondary mb-3">{t('auth.selectRole')}</p>
+            <p className="text-sm font-medium text-nocturne-text-secondary mb-3">{t('auth.selectRole')}</p>
             <div className="grid grid-cols-2 gap-2">
               {roles.map((role) => (
                 <button
@@ -133,13 +133,13 @@ function VerifyContent() {
                   onClick={() => { setSelectedRole(role.value); setError(''); }}
                   className={`p-3 rounded-xl border-2 text-left transition-all active:scale-[0.98] ${
                     selectedRole === role.value
-                      ? 'border-primary-500 bg-primary-500/10 shadow-glow-sm'
-                      : 'border-glass-border hover:border-primary-500/30 bg-glass-light'
+                      ? 'border-nocturne-border bg-nocturne-primary-light shadow-nocturne-glow-sm'
+                      : 'border-nocturne-border hover:border-nocturne-border bg-nocturne-surface'
                   }`}
                 >
-                  <role.icon size={18} className={selectedRole === role.value ? 'text-primary-400 mb-1' : 'text-text-muted mb-1'} />
-                  <p className="text-sm font-medium text-text-primary">{t(role.labelKey)}</p>
-                  <p className="text-[10px] text-text-muted">{t(role.descKey)}</p>
+                  <role.icon size={18} className={selectedRole === role.value ? 'text-nocturne-accent mb-1' : 'text-nocturne-text-secondary mb-1'} />
+                  <p className="text-sm font-medium text-nocturne-text-primary">{t(role.labelKey)}</p>
+                  <p className="text-[10px] text-nocturne-text-secondary">{t(role.descKey)}</p>
                 </button>
               ))}
             </div>
@@ -153,7 +153,7 @@ function VerifyContent() {
                 <button
                   onClick={() => handleOTPComplete(lastOtp)}
                   disabled={isLoading}
-                  className="w-full py-3 px-6 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition-all active:scale-[0.98] disabled:opacity-50 shadow-glow-sm"
+                  className="w-full py-3 px-6 bg-gradient-nocturne text-white rounded-xl font-medium transition-all active:scale-[0.98] disabled:opacity-50 shadow-nocturne-glow-sm"
                 >
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
@@ -182,13 +182,13 @@ function VerifyContent() {
                   <button
                     onClick={handleResend}
                     disabled={isLoading}
-                    className="text-sm text-primary-400 hover:text-primary-300 font-medium transition-colors disabled:opacity-50"
+                    className="text-sm text-nocturne-accent hover:text-nocturne-accent font-medium transition-colors disabled:opacity-50"
                   >
                     {t('auth.resendOtp')}
                   </button>
                 ) : (
-                  <p className="text-sm text-text-muted">
-                    {t('auth.resendIn')} <span className="text-text-secondary font-medium">{countdown}s</span>
+                  <p className="text-sm text-nocturne-text-secondary">
+                    {t('auth.resendIn')} <span className="text-nocturne-text-secondary font-medium">{countdown}s</span>
                   </p>
                 )}
               </div>
@@ -197,7 +197,7 @@ function VerifyContent() {
 
           <button
             onClick={() => router.push('/login')}
-            className="text-sm text-text-muted hover:text-text-secondary transition-colors"
+            className="text-sm text-nocturne-text-secondary hover:text-nocturne-text-primary transition-colors"
           >
             {t('auth.changePhone')}
           </button>

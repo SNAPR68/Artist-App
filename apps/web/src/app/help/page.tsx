@@ -96,15 +96,15 @@ export default function HelpPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">Help & FAQ</h1>
-      <p className="text-gray-500 mb-8">
+      <h1 className="text-3xl font-bold text-nocturne-text-primary mb-2">Help & FAQ</h1>
+      <p className="text-nocturne-text-tertiary mb-8">
         Find answers to common questions about using ArtistBooking.
       </p>
 
       {FAQ_SECTIONS.map((section, si) => (
         <div key={section.title} className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">{section.title}</h2>
-          <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+          <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">{section.title}</h2>
+          <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle divide-y divide-gray-100">
             {section.items.map((item, ii) => {
               const key = `${si}-${ii}`;
               const isOpen = openIndex === key;
@@ -114,10 +114,10 @@ export default function HelpPage() {
                     onClick={() => toggle(key)}
                     className="w-full px-4 py-3 flex items-center justify-between text-left"
                   >
-                    <span className="text-sm font-medium text-gray-900">{item.q}</span>
+                    <span className="text-sm font-medium text-nocturne-text-primary">{item.q}</span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                      className={`h-4 w-4 text-nocturne-text-tertiary transition-transform ${isOpen ? 'rotate-180' : ''}`}
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -125,7 +125,7 @@ export default function HelpPage() {
                     </svg>
                   </button>
                   {isOpen && (
-                    <div className="px-4 pb-3 text-sm text-gray-600 leading-relaxed">
+                    <div className="px-4 pb-3 text-sm text-nocturne-text-secondary leading-relaxed">
                       {item.a}
                     </div>
                   )}
@@ -136,22 +136,22 @@ export default function HelpPage() {
         </div>
       ))}
 
-      <div className="bg-primary-50 rounded-lg p-6 text-center">
-        <h3 className="font-semibold text-gray-900 mb-2">Still need help?</h3>
-        <p className="text-sm text-gray-600 mb-4">
+      <div className="bg-nocturne-primary-light rounded-lg p-6 text-center">
+        <h3 className="font-semibold text-nocturne-text-primary mb-2">Still need help?</h3>
+        <p className="text-sm text-nocturne-text-secondary mb-4">
           Our support team is here to assist you.
         </p>
         <a
           href="mailto:support@artistbooking.in"
-          className="inline-block bg-primary-500 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+          className="inline-block bg-nocturne-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-nocturne-primary transition-colors"
         >
           Contact Support
         </a>
       </div>
 
-      <div className="mt-8 text-center text-sm text-gray-400 space-x-4">
-        <Link href="/terms" className="hover:text-gray-600">Terms of Service</Link>
-        <Link href="/privacy" className="hover:text-gray-600">Privacy Policy</Link>
+      <div className="mt-8 text-center text-sm text-nocturne-text-tertiary space-x-4">
+        <Link href="/terms" className="hover:text-nocturne-text-secondary">Terms of Service</Link>
+        <Link href="/privacy" className="hover:text-nocturne-text-secondary">Privacy Policy</Link>
       </div>
     </div>
   );

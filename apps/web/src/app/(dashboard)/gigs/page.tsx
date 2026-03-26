@@ -55,19 +55,19 @@ interface Pagination {
 // ─── Helpers ────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, string> = {
-  open: 'bg-green-100 text-green-700',
-  closed: 'bg-gray-100 text-gray-600',
-  filled: 'bg-blue-100 text-blue-700',
-  expired: 'bg-gray-100 text-gray-500',
-  cancelled: 'bg-red-100 text-red-600',
+  open: 'bg-green-100 text-nocturne-success',
+  closed: 'bg-nocturne-surface text-nocturne-text-secondary',
+  filled: 'bg-blue-100 text-nocturne-info',
+  expired: 'bg-nocturne-surface text-nocturne-text-tertiary',
+  cancelled: 'bg-red-100 text-nocturne-error',
 };
 
 const APP_STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-700',
-  shortlisted: 'bg-blue-100 text-blue-700',
-  accepted: 'bg-green-100 text-green-700',
-  rejected: 'bg-red-100 text-red-600',
-  withdrawn: 'bg-gray-100 text-gray-500',
+  pending: 'bg-yellow-100 text-nocturne-warning',
+  shortlisted: 'bg-blue-100 text-nocturne-info',
+  accepted: 'bg-green-100 text-nocturne-success',
+  rejected: 'bg-red-100 text-nocturne-error',
+  withdrawn: 'bg-nocturne-surface text-nocturne-text-tertiary',
 };
 
 function formatPaise(paise: number): string {
@@ -100,7 +100,7 @@ export default function GigsPage() {
   if (isClient) return <ClientGigsView />;
 
   return (
-    <div className="text-center py-16 text-gray-400">
+    <div className="text-center py-16 text-nocturne-text-tertiary">
       <p>Gig marketplace is available for artists and clients.</p>
     </div>
   );
@@ -147,19 +147,19 @@ function ArtistGigsView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gig Marketplace</h1>
+        <h1 className="text-2xl font-bold text-nocturne-text-primary">Gig Marketplace</h1>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200">
+      <div className="flex gap-2 border-b border-nocturne-border-subtle">
         {(['matching', 'browse', 'applications'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               tab === t
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-primary-500 text-nocturne-accent'
+                : 'border-transparent text-nocturne-text-tertiary hover:text-nocturne-text-secondary'
             }`}
           >
             {t === 'matching' ? 'Matching Gigs' : t === 'browse' ? 'Browse All' : 'My Applications'}
@@ -174,12 +174,12 @@ function ArtistGigsView() {
             placeholder="Filter by city..."
             value={cityFilter}
             onChange={(e) => setCityFilter(e.target.value)}
-            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="px-3 py-1.5 text-sm border border-nocturne-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500"
           />
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="px-3 py-1.5 text-sm border border-nocturne-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             <option value="">All Event Types</option>
             {EVENT_TYPES.map((t) => (
@@ -195,7 +195,7 @@ function ArtistGigsView() {
         </div>
       ) : tab === 'applications' ? (
         applications.length === 0 ? (
-          <div className="text-center py-16 text-gray-400">
+          <div className="text-center py-16 text-nocturne-text-tertiary">
             <p className="text-lg mb-1">No applications yet</p>
             <p className="text-sm">Browse gigs and apply to start receiving opportunities</p>
           </div>
@@ -205,29 +205,29 @@ function ArtistGigsView() {
               <Link
                 key={app.id}
                 href={`/gigs/${app.gig_post_id}`}
-                className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-primary-300 transition-colors"
+                className="block bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4 hover:border-primary-300 transition-colors"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-gray-900">{app.gig_title}</h3>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${APP_STATUS_COLORS[app.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                  <h3 className="font-medium text-nocturne-text-primary">{app.gig_title}</h3>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${APP_STATUS_COLORS[app.status] ?? 'bg-nocturne-surface text-nocturne-text-secondary'}`}>
                     {app.status}
                   </span>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
+                <div className="flex items-center gap-4 text-sm text-nocturne-text-tertiary">
                   <span>{app.event_type.replace(/_/g, ' ')}</span>
                   <span>{new Date(app.event_date).toLocaleDateString('en-IN')}</span>
                   <span>{app.event_city}</span>
                   <span>{formatPaise(app.gig_budget_min_paise)} - {formatPaise(app.gig_budget_max_paise)}</span>
                 </div>
                 {app.proposed_amount_paise && (
-                  <p className="text-sm text-gray-600 mt-1">Your bid: {formatPaise(app.proposed_amount_paise)}</p>
+                  <p className="text-sm text-nocturne-text-secondary mt-1">Your bid: {formatPaise(app.proposed_amount_paise)}</p>
                 )}
               </Link>
             ))}
           </div>
         )
       ) : gigs.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-nocturne-text-tertiary">
           <p className="text-lg mb-1">No gigs found</p>
           <p className="text-sm">Try adjusting your filters or check back later</p>
         </div>
@@ -239,7 +239,7 @@ function ArtistGigsView() {
             ))}
           </div>
           {pagination && pagination.total_pages > 1 && (
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-center text-sm text-nocturne-text-tertiary">
               Page {pagination.page} of {pagination.total_pages} ({pagination.total} gigs)
             </div>
           )}
@@ -315,38 +315,38 @@ function ClientGigsView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">My Gig Posts</h1>
+        <h1 className="text-2xl font-bold text-nocturne-text-primary">My Gig Posts</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="text-sm bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600"
+          className="text-sm bg-nocturne-primary text-white px-4 py-2 rounded-lg hover:bg-nocturne-primary"
         >
           {showForm ? 'Cancel' : 'Post a Gig'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900">Post a New Gig</h2>
+        <form onSubmit={handleSubmit} className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-nocturne-text-primary">Post a New Gig</h2>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Title *</label>
               <input
                 type="text"
                 required
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="e.g., 3-piece band for Jaipur wedding"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Event Type *</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Event Type *</label>
               <select
                 required
                 value={form.event_type}
                 onChange={(e) => setForm({ ...form, event_type: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               >
                 {EVENT_TYPES.map((t) => (
                   <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
@@ -354,109 +354,109 @@ function ClientGigsView() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Event Date *</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Event Date *</label>
               <input
                 type="date"
                 required
                 value={form.event_date}
                 onChange={(e) => setForm({ ...form, event_date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">City *</label>
               <input
                 type="text"
                 required
                 value={form.event_city}
                 onChange={(e) => setForm({ ...form, event_city: e.target.value })}
                 placeholder="e.g., Jaipur"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Genres Needed * (comma-separated)</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Genres Needed * (comma-separated)</label>
               <input
                 type="text"
                 required
                 value={form.genres_needed}
                 onChange={(e) => setForm({ ...form, genres_needed: e.target.value })}
                 placeholder="e.g., Bollywood, Sufi, Folk"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Guest Count</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Guest Count</label>
               <input
                 type="number"
                 value={form.guest_count}
                 onChange={(e) => setForm({ ...form, guest_count: e.target.value })}
                 placeholder="e.g., 500"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Min Budget (₹) *</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Min Budget (₹) *</label>
               <input
                 type="number"
                 required
                 value={form.budget_min}
                 onChange={(e) => setForm({ ...form, budget_min: e.target.value })}
                 placeholder="e.g., 100000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Max Budget (₹) *</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Max Budget (₹) *</label>
               <input
                 type="number"
                 required
                 value={form.budget_max}
                 onChange={(e) => setForm({ ...form, budget_max: e.target.value })}
                 placeholder="e.g., 200000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Duration (hours)</label>
+              <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Duration (hours)</label>
               <input
                 type="number"
                 step="0.5"
                 value={form.duration_hours}
                 onChange={(e) => setForm({ ...form, duration_hours: e.target.value })}
                 placeholder="e.g., 3"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Description *</label>
             <textarea
               required
               rows={3}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="Describe what you're looking for..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Requirements</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Requirements</label>
             <textarea
               rows={2}
               value={form.requirements}
               onChange={(e) => setForm({ ...form, requirements: e.target.value })}
               placeholder="Any specific requirements (sound setup, outfits, etc.)"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="bg-primary-500 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 disabled:opacity-50"
+            className="bg-nocturne-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-nocturne-primary disabled:opacity-50"
           >
             {submitting ? 'Posting...' : 'Post Gig'}
           </button>
@@ -468,7 +468,7 @@ function ClientGigsView() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
         </div>
       ) : myPosts.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-nocturne-text-tertiary">
           <p className="text-lg mb-1">No gig posts yet</p>
           <p className="text-sm">Post a gig to find artists for your events</p>
         </div>
@@ -478,22 +478,22 @@ function ClientGigsView() {
             <Link
               key={gig.id}
               href={`/gigs/${gig.id}`}
-              className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-primary-300 transition-colors"
+              className="block bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4 hover:border-primary-300 transition-colors"
             >
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium text-gray-900">{gig.title}</h3>
+                <h3 className="font-medium text-nocturne-text-primary">{gig.title}</h3>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500">{gig.application_count} applications</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[gig.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                  <span className="text-xs text-nocturne-text-tertiary">{gig.application_count} applications</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[gig.status] ?? 'bg-nocturne-surface text-nocturne-text-secondary'}`}>
                     {gig.status}
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-sm text-gray-500">
+              <div className="flex items-center gap-4 text-sm text-nocturne-text-tertiary">
                 <span>{gig.event_type.replace(/_/g, ' ')}</span>
                 <span>{new Date(gig.event_date).toLocaleDateString('en-IN')}</span>
                 <span>{gig.event_city}</span>
-                <span className="font-medium text-gray-700">
+                <span className="font-medium text-nocturne-text-secondary">
                   {formatPaise(gig.budget_min_paise)} - {formatPaise(gig.budget_max_paise)}
                 </span>
               </div>
@@ -516,17 +516,17 @@ function GigCard({ gig, showMatchScore }: { gig: GigPost; showMatchScore?: boole
   return (
     <Link
       href={`/gigs/${gig.id}`}
-      className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-primary-300 hover:shadow-sm transition-all"
+      className="block bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4 hover:border-primary-300 hover:shadow-sm transition-all"
     >
       <div className="flex items-start justify-between mb-2">
-        <h3 className="font-medium text-gray-900 leading-tight">{gig.title}</h3>
-        <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ml-2 ${STATUS_COLORS[gig.status] ?? 'bg-gray-100 text-gray-600'}`}>
+        <h3 className="font-medium text-nocturne-text-primary leading-tight">{gig.title}</h3>
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ml-2 ${STATUS_COLORS[gig.status] ?? 'bg-nocturne-surface text-nocturne-text-secondary'}`}>
           {gig.status}
         </span>
       </div>
 
-      <div className="flex items-center gap-3 text-sm text-gray-500 mb-2">
-        <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">{gig.event_type.replace(/_/g, ' ')}</span>
+      <div className="flex items-center gap-3 text-sm text-nocturne-text-tertiary mb-2">
+        <span className="bg-nocturne-surface text-nocturne-text-secondary px-2 py-0.5 rounded text-xs">{gig.event_type.replace(/_/g, ' ')}</span>
         <span>{gig.event_city}</span>
         <span>{new Date(gig.event_date).toLocaleDateString('en-IN')}</span>
       </div>
@@ -538,16 +538,16 @@ function GigCard({ gig, showMatchScore }: { gig: GigPost; showMatchScore?: boole
       </div>
 
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-gray-700">
+        <span className="font-medium text-nocturne-text-secondary">
           {formatPaise(gig.budget_min_paise)} - {formatPaise(gig.budget_max_paise)}
         </span>
         <div className="flex items-center gap-3">
           {showMatchScore && gig.genre_match_count !== undefined && gig.total_genres_needed !== undefined && (
-            <span className="text-xs text-green-600 font-medium">
+            <span className="text-xs text-nocturne-success font-medium">
               {gig.genre_match_count}/{gig.total_genres_needed} genres match
             </span>
           )}
-          <span className="text-xs text-gray-400">{gig.application_count} applied</span>
+          <span className="text-xs text-nocturne-text-tertiary">{gig.application_count} applied</span>
         </div>
       </div>
     </Link>

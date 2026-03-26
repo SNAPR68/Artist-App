@@ -61,25 +61,25 @@ export default function BackupPreferencesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Backup Artist Preferences</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-nocturne-text-primary">Backup Artist Preferences</h1>
+        <p className="text-sm text-nocturne-text-tertiary mt-1">
           Opt in to receive last-minute booking opportunities when another artist cancels.
         </p>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 space-y-6">
         {/* Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium text-gray-900 text-sm">Available as backup artist</p>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="font-medium text-nocturne-text-primary text-sm">Available as backup artist</p>
+            <p className="text-xs text-nocturne-text-tertiary mt-0.5">
               You&apos;ll be notified when short-notice gigs match your profile.
             </p>
           </div>
           <button
             onClick={() => setPrefs((p) => ({ ...p, is_reliable_backup: !p.is_reliable_backup }))}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              prefs.is_reliable_backup ? 'bg-primary-500' : 'bg-gray-300'
+              prefs.is_reliable_backup ? 'bg-nocturne-accent' : 'bg-nocturne-surface-2'
             }`}
           >
             <span
@@ -93,7 +93,7 @@ export default function BackupPreferencesPage() {
         {/* Premium Input */}
         {prefs.is_reliable_backup && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">
               Premium for short notice (%)
             </label>
             <input
@@ -107,9 +107,9 @@ export default function BackupPreferencesPage() {
                   backup_premium_pct: Math.max(0, Math.min(100, Number(e.target.value) || 0)),
                 }))
               }
-              className="w-32 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="w-32 border border-nocturne-border-subtle rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-nocturne-accent focus:border-nocturne-accent outline-none bg-nocturne-surface-2 text-nocturne-text-primary"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-nocturne-text-tertiary mt-1">
               You&apos;ll earn {prefs.backup_premium_pct}% more than the original booking amount for
               accepting short-notice gigs.
             </p>
@@ -121,14 +121,14 @@ export default function BackupPreferencesPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-primary-500 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
+            className="bg-nocturne-accent text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-nocturne-primary transition-colors disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save Preferences'}
           </button>
           {success && (
-            <span className="text-sm text-green-600 font-medium">Preferences saved!</span>
+            <span className="text-sm text-nocturne-success font-medium">Preferences saved!</span>
           )}
-          {error && <span className="text-sm text-red-600">{error}</span>}
+          {error && <span className="text-sm text-nocturne-error">{error}</span>}
         </div>
       </div>
     </div>

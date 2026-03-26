@@ -52,7 +52,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${plusJakarta.variable} ${manrope.variable}`}>
+    <html lang="en" className={`${inter.variable} ${plusJakarta.variable} ${manrope.variable} theme-nocturne`}>
       {/* Inline auth loading skeleton — prevents white flash while JS boots.
           The AuthInitializer component removes this class once auth state resolves. */}
       <head>
@@ -62,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             position: fixed;
             inset: 0;
             z-index: 9999;
-            background: #FFFFFF;
+            background: #0E0E0F;
             transition: opacity 0.3s ease;
           }
           .auth-loading body::after {
@@ -74,8 +74,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             width: 2rem;
             height: 2rem;
             margin: -1rem 0 0 -1rem;
-            border: 2px solid #E4E4E7;
-            border-top-color: #8B5CF6;
+            border: 2px solid #242428;
+            border-top-color: #8A2BE2;
             border-radius: 50%;
             animation: auth-spin 0.6s linear infinite;
           }

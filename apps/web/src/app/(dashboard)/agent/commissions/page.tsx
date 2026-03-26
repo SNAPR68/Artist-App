@@ -63,35 +63,35 @@ export default function AgentCommissionDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Commission Dashboard</h1>
-        <p className="text-gray-500 mt-1">Track your earnings and commission history</p>
+        <h1 className="text-2xl font-bold text-nocturne-text-primary">Commission Dashboard</h1>
+        <p className="text-nocturne-text-tertiary mt-1">Track your earnings and commission history</p>
       </div>
 
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Total Earned</p>
-            <p className="text-3xl font-bold text-green-600 mt-2">
+          <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-6">
+            <p className="text-sm font-medium text-nocturne-text-secondary uppercase tracking-wide">Total Earned</p>
+            <p className="text-3xl font-bold text-nocturne-success mt-2">
               ₹{(stats.total_commission_earned_paise / 100).toLocaleString('en-IN')}
             </p>
-            <p className="text-xs text-gray-500 mt-2">All time earnings</p>
+            <p className="text-xs text-nocturne-text-tertiary mt-2">All time earnings</p>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Pending Payment</p>
-            <p className="text-3xl font-bold text-yellow-600 mt-2">
+          <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-6">
+            <p className="text-sm font-medium text-nocturne-text-secondary uppercase tracking-wide">Pending Payment</p>
+            <p className="text-3xl font-bold text-nocturne-warning mt-2">
               ₹{(stats.total_commission_pending_paise / 100).toLocaleString('en-IN')}
             </p>
-            <p className="text-xs text-gray-500 mt-2">Awaiting settlement</p>
+            <p className="text-xs text-nocturne-text-tertiary mt-2">Awaiting settlement</p>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Already Paid</p>
-            <p className="text-3xl font-bold text-blue-600 mt-2">
+          <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-6">
+            <p className="text-sm font-medium text-nocturne-text-secondary uppercase tracking-wide">Already Paid</p>
+            <p className="text-3xl font-bold text-nocturne-info mt-2">
               ₹{(stats.total_commission_paid_paise / 100).toLocaleString('en-IN')}
             </p>
-            <p className="text-xs text-gray-500 mt-2">Successfully settled</p>
+            <p className="text-xs text-nocturne-text-tertiary mt-2">Successfully settled</p>
           </div>
         </div>
       )}
@@ -99,23 +99,23 @@ export default function AgentCommissionDashboard() {
       {/* Commission History */}
       <div className="space-y-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Commission History</h2>
+          <h2 className="text-lg font-semibold text-nocturne-text-primary">Commission History</h2>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 border-b border-gray-200">
+        <div className="flex gap-2 border-b border-nocturne-border-subtle">
           {filters.map((f) => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 filter === f.key
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-nocturne-accent text-nocturne-accent'
+                  : 'border-transparent text-nocturne-text-tertiary hover:text-nocturne-text-secondary'
               }`}
             >
               {f.label}
-              <span className="text-xs text-gray-400 ml-1">
+              <span className="text-xs text-nocturne-text-tertiary ml-1">
                 ({history.filter((h) => {
                   if (f.key === 'all') return true;
                   if (f.key === 'pending') return h.payment_status === 'pending' || h.payment_status === 'processing';
@@ -129,50 +129,50 @@ export default function AgentCommissionDashboard() {
 
         {/* Commission Table */}
         {filtered.length === 0 ? (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-            <p className="text-gray-500">No commissions in this category.</p>
+          <div className="bg-nocturne-surface-2 border border-nocturne-border-subtle rounded-lg p-8 text-center">
+            <p className="text-nocturne-text-tertiary">No commissions in this category.</p>
           </div>
         ) : (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-nocturne-surface-2 border-b border-nocturne-border-subtle">
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Artist</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Event Date</th>
-                    <th className="text-right px-4 py-3 font-medium text-gray-600">Booking Amount</th>
-                    <th className="text-right px-4 py-3 font-medium text-gray-600">Commission</th>
-                    <th className="text-center px-4 py-3 font-medium text-gray-600">Rate</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Settled Date</th>
+                    <th className="text-left px-4 py-3 font-medium text-nocturne-text-secondary">Artist</th>
+                    <th className="text-left px-4 py-3 font-medium text-nocturne-text-secondary">Event Date</th>
+                    <th className="text-right px-4 py-3 font-medium text-nocturne-text-secondary">Booking Amount</th>
+                    <th className="text-right px-4 py-3 font-medium text-nocturne-text-secondary">Commission</th>
+                    <th className="text-center px-4 py-3 font-medium text-nocturne-text-secondary">Rate</th>
+                    <th className="text-left px-4 py-3 font-medium text-nocturne-text-secondary">Status</th>
+                    <th className="text-left px-4 py-3 font-medium text-nocturne-text-secondary">Settled Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-nocturne-border-subtle">
                   {filtered.map((c) => (
-                    <tr key={c.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-gray-900 font-medium">{c.artist_stage_name}</td>
-                      <td className="px-4 py-3 text-gray-700">
+                    <tr key={c.id} className="hover:bg-nocturne-glass-panel">
+                      <td className="px-4 py-3 text-nocturne-text-primary font-medium">{c.artist_stage_name}</td>
+                      <td className="px-4 py-3 text-nocturne-text-secondary">
                         {new Date(c.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
-                      <td className="px-4 py-3 text-right text-gray-900">
+                      <td className="px-4 py-3 text-right text-nocturne-text-primary">
                         ₹{(c.booking_amount_paise / 100).toLocaleString('en-IN')}
                       </td>
-                      <td className="px-4 py-3 text-right font-medium text-green-600">
+                      <td className="px-4 py-3 text-right font-medium text-nocturne-success">
                         ₹{(c.commission_amount_paise / 100).toLocaleString('en-IN')}
                       </td>
-                      <td className="px-4 py-3 text-center text-gray-700">{c.commission_pct}%</td>
+                      <td className="px-4 py-3 text-center text-nocturne-text-secondary">{c.commission_pct}%</td>
                       <td className="px-4 py-3">
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           c.payment_status === 'paid'
-                            ? 'bg-green-100 text-green-700'
+                            ? 'bg-nocturne-success/15 text-nocturne-success'
                             : c.payment_status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : 'bg-blue-100 text-blue-700'
+                            ? 'bg-nocturne-warning/15 text-nocturne-warning'
+                            : 'bg-nocturne-info/15 text-nocturne-info'
                         }`}>
                           {c.payment_status.replace('_', ' ')}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
+                      <td className="px-4 py-3 text-nocturne-text-secondary">
                         {c.settled_at
                           ? new Date(c.settled_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
                           : '-'}

@@ -31,15 +31,13 @@ export function HowItWorks() {
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
 
   return (
-    <section className="bg-neutral-50 py-24 px-6">
+    <section className="bg-nocturne-surface py-24 px-6">
       <div className="max-w-section mx-auto">
-        {/* Header */}
         <div className="mb-16 text-center">
-          {/* Badge */}
           <FadeIn direction="down" delay={0.1} once={true}>
             <div className="inline-block mb-4">
               <motion.span
-                className="bg-violet-50 text-violet-700 rounded-full px-4 py-2 text-xs font-semibold inline-block"
+                className="bg-nocturne-primary-light text-nocturne-accent rounded-full px-4 py-2 text-xs font-semibold inline-block"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
               >
@@ -49,21 +47,19 @@ export function HowItWorks() {
           </FadeIn>
 
           <FadeIn direction="up" delay={0.2} duration={0.7} once={true}>
-            <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Three Simple Steps
             </h2>
           </FadeIn>
 
           <FadeIn direction="up" delay={0.3} duration={0.7} once={true}>
-            <p className="text-neutral-500 max-w-md mx-auto text-base">
+            <p className="text-nocturne-text-secondary max-w-md mx-auto text-base">
               Connect with the perfect artist for your event in just three steps
             </p>
           </FadeIn>
         </div>
 
-        {/* Steps Container */}
         <div className="relative" ref={containerRef}>
-          {/* Animated Connecting Line (desktop only) */}
           <svg
             className="hidden md:block absolute top-14 left-[16.67%] right-[16.67%] w-2/3 h-px z-0"
             preserveAspectRatio="none"
@@ -71,7 +67,7 @@ export function HowItWorks() {
           >
             <motion.path
               d="M 0 1 L 100 1"
-              stroke="rgb(168, 85, 247)"
+              stroke="rgba(138, 43, 226, 0.5)"
               strokeWidth="2"
               strokeDasharray="8,4"
               fill="none"
@@ -86,33 +82,29 @@ export function HowItWorks() {
               {steps.map((s) => (
                 <StaggerItem key={s.step}>
                   <div className="flex flex-col items-center text-center">
-                    {/* Step Header with Number Circle */}
                     <div className="flex flex-col items-center gap-4 mb-6">
-                      {/* Numbered Circle */}
                       <motion.div
-                        className="w-14 h-14 rounded-2xl bg-violet-600 text-white font-bold flex items-center justify-center text-xl shadow-lg"
-                        whileHover={{ scale: 1.1, rotate: 5, boxShadow: '0 20px 40px rgba(168, 85, 247, 0.3)' }}
+                        className="w-14 h-14 rounded-2xl bg-gradient-nocturne text-white font-bold flex items-center justify-center text-xl shadow-nocturne-glow-purple"
+                        whileHover={{ scale: 1.1, rotate: 5, boxShadow: '0 0 40px -5px rgba(138, 43, 226, 0.6)' }}
                         transition={{ type: 'spring', damping: 15, stiffness: 300 }}
                       >
                         {s.step}
                       </motion.div>
 
-                      {/* Icon Circle */}
                       <motion.div
-                        className="w-16 h-16 rounded-2xl bg-violet-100 flex items-center justify-center"
+                        className="w-16 h-16 rounded-2xl bg-nocturne-primary-light flex items-center justify-center"
                         initial={{ opacity: 0, scale: 0.8 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true, amount: 0.3 }}
                         transition={{ duration: 0.5, delay: 0.1 }}
                       >
-                        <s.icon size={32} className="text-violet-600" />
+                        <s.icon size={32} className="text-nocturne-accent" />
                       </motion.div>
                     </div>
 
-                    {/* Connector arrow (mobile) */}
                     {steps.length > steps.indexOf(s) + 1 && (
                       <motion.div
-                        className="md:hidden mb-6 text-violet-200"
+                        className="md:hidden mb-6 text-nocturne-primary/40"
                         animate={{ y: [0, 6, 0] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
                       >
@@ -120,19 +112,18 @@ export function HowItWorks() {
                       </motion.div>
                     )}
 
-                    {/* Text Content */}
                     <motion.div
-                      className="bg-white rounded-2xl p-8 border border-neutral-100 shadow-sm w-full"
+                      className="glass-card rounded-4xl p-8 w-full"
                       whileHover={{
                         y: -8,
-                        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+                        boxShadow: '0 20px 50px -10px rgba(0, 0, 0, 0.5), 0 0 30px -5px rgba(138, 43, 226, 0.2)',
                       }}
                       transition={{ type: 'spring', damping: 20, stiffness: 300 }}
                     >
-                      <h3 className="text-xl font-semibold text-neutral-900 mb-3">
+                      <h3 className="text-xl font-semibold text-white mb-3">
                         {s.title}
                       </h3>
-                      <p className="text-sm text-neutral-500 leading-relaxed">
+                      <p className="text-sm text-nocturne-text-secondary leading-relaxed">
                         {s.desc}
                       </p>
                     </motion.div>

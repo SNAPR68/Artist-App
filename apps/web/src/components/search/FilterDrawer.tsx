@@ -61,23 +61,23 @@ export function FilterDrawer({
         onClick={onClose}
       />
       <div
-        className={`fixed inset-x-0 bottom-0 z-[49] desktop:hidden bg-surface-base border-t border-glass-border rounded-t-2xl max-h-[80vh] overflow-y-auto transition-transform duration-300 ease-out ${
+        className={`fixed inset-x-0 bottom-0 z-[49] desktop:hidden bg-nocturne-base border-t border-nocturne-border rounded-t-2xl max-h-[80vh] overflow-y-auto transition-transform duration-300 ease-out ${
           mounted ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <SlidersHorizontal size={16} className="text-text-muted" />
-              <h3 className="font-semibold text-text-primary">Filters</h3>
+              <SlidersHorizontal size={16} className="text-nocturne-text-secondary" />
+              <h3 className="font-semibold text-nocturne-text-primary">Filters</h3>
             </div>
             <div className="flex items-center gap-3">
               {hasFilters && (
-                <button onClick={onClearAll} className="text-xs text-primary-400">
+                <button onClick={onClearAll} className="text-xs text-nocturne-accent">
                   Clear all
                 </button>
               )}
-              <button onClick={onClose} className="text-text-muted p-1">
+              <button onClick={onClose} className="text-nocturne-text-secondary p-1">
                 <X size={20} />
               </button>
             </div>
@@ -116,16 +116,16 @@ function MobileFilterGroup({
 
   return (
     <div>
-      <h4 className="text-xs font-medium text-text-muted uppercase tracking-wider mb-2">{title}</h4>
+      <h4 className="text-xs font-medium text-nocturne-text-secondary uppercase tracking-wider mb-2">{title}</h4>
       <div className="flex flex-wrap gap-2">
         {items.map((f) => (
           <button
             key={f.value}
             onClick={() => onSelect(selected === f.value ? '' : f.value)}
-            className={`text-sm px-3 py-1.5 rounded-pill border transition-colors ${
+            className={`text-sm px-3 py-1.5 rounded-full border transition-colors ${
               selected === f.value
-                ? 'bg-primary-500/15 text-primary-300 border-primary-500/30'
-                : 'text-text-secondary border-glass-border hover:border-primary-500/20'
+                ? 'bg-nocturne-primary-light text-nocturne-accent border-nocturne-border'
+                : 'text-nocturne-text-secondary border-nocturne-border hover:border-primary-500/20'
             }`}
           >
             {f.value}

@@ -34,11 +34,10 @@ const TrustBadge = ({ signal, index }: { signal: typeof signals[0]; index: numbe
     viewport={{ once: true, amount: 0.5 }}
     whileHover={{
       scale: 1.05,
-      boxShadow: '0 8px 25px rgba(124, 58, 237, 0.15)',
+      boxShadow: '0 0 30px -5px rgba(138, 43, 226, 0.3)',
     }}
-    className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-neutral-200 bg-white shadow-sm hover:border-violet-300 transition-all duration-300"
+    className="inline-flex items-center gap-3 px-6 py-3 rounded-full glass-card hover:shadow-nocturne-glow-sm transition-all duration-300"
   >
-    {/* Icon */}
     <motion.div
       animate={{ y: [0, -2, 0] }}
       transition={{
@@ -47,11 +46,10 @@ const TrustBadge = ({ signal, index }: { signal: typeof signals[0]; index: numbe
         repeat: Infinity,
       }}
     >
-      <signal.icon size={18} className="text-violet-600 shrink-0" />
+      <signal.icon size={18} className="text-nocturne-accent shrink-0" />
     </motion.div>
 
-    {/* Label */}
-    <span className="text-sm font-medium text-neutral-700 whitespace-nowrap">
+    <span className="text-sm font-medium text-nocturne-text-secondary whitespace-nowrap">
       {signal.label}
     </span>
   </motion.div>
@@ -59,7 +57,7 @@ const TrustBadge = ({ signal, index }: { signal: typeof signals[0]; index: numbe
 
 export function TrustSignals() {
   return (
-    <section className="py-16 px-6 bg-neutral-50">
+    <section className="py-16 px-6 bg-nocturne-surface">
       <div className="max-w-section mx-auto">
         <motion.div
           className="flex flex-col items-center"
@@ -68,7 +66,6 @@ export function TrustSignals() {
           transition={{ duration: 0.4 }}
           viewport={{ once: true }}
         >
-          {/* Centered badges */}
           <motion.div
             className="flex flex-wrap justify-center gap-6"
             initial="hidden"

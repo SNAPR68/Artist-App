@@ -52,9 +52,9 @@ export function Navbar() {
       >
         <motion.div
           animate={{
-            backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0)',
-            borderBottomColor: isScrolled ? 'rgba(229, 231, 235, 0.5)' : 'rgba(229, 231, 235, 0)',
-            boxShadow: isScrolled ? '0 1px 2px rgba(0, 0, 0, 0.05)' : '0 0 0 rgba(0, 0, 0, 0)',
+            backgroundColor: isScrolled ? 'rgba(14, 14, 15, 0.85)' : 'rgba(14, 14, 15, 0)',
+            borderBottomColor: isScrolled ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0)',
+            boxShadow: isScrolled ? '0 8px 32px rgba(0, 0, 0, 0.4)' : '0 0 0 rgba(0, 0, 0, 0)',
           }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
           className="border-b backdrop-blur-xl"
@@ -71,12 +71,12 @@ export function Navbar() {
             transition={{ type: 'spring', damping: 15, stiffness: 300 }}
           >
             <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-              <div className="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center flex-shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-nocturne-primary flex items-center justify-center flex-shrink-0 shadow-nocturne-glow-sm">
                 <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
                 </svg>
               </div>
-              <span className="text-base font-heading font-bold text-neutral-900 tracking-tight">
+              <span className="text-base font-display font-bold text-white tracking-tight">
                 ArtistBook
               </span>
             </Link>
@@ -92,7 +92,7 @@ export function Navbar() {
             </NavLink>
 
             <motion.div
-              className="w-px h-5 bg-neutral-200 mx-3"
+              className="w-px h-5 bg-white/15 mx-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.15, duration: 0.4 }}
@@ -107,13 +107,13 @@ export function Navbar() {
               >
                 <Link
                   href={getDashboardHref(user.role)}
-                  className="text-[13px] font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 px-3.5 py-2 rounded-lg transition-all duration-200 min-h-11 flex items-center"
+                  className="text-[13px] font-medium text-nocturne-text-secondary hover:text-white hover:bg-white/[0.06] px-3.5 py-2 rounded-lg transition-all duration-200 min-h-11 flex items-center"
                 >
                   Dashboard
                 </Link>
                 <button
                   onClick={() => logout()}
-                  className="text-[13px] text-neutral-600 hover:text-neutral-900 px-2.5 py-2 transition-colors duration-200 min-h-11 flex items-center"
+                  className="text-[13px] text-nocturne-text-secondary hover:text-white px-2.5 py-2 transition-colors duration-200 min-h-11 flex items-center"
                 >
                   Logout
                 </button>
@@ -121,10 +121,10 @@ export function Navbar() {
             ) : (
               <motion.a
                 href="/login"
-                whileHover={{ scale: 1.03, boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)' }}
+                whileHover={{ scale: 1.03, boxShadow: '0 0 30px -5px rgba(138, 43, 226, 0.5)' }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', damping: 15, stiffness: 300 }}
-                className="text-[13px] font-semibold text-white bg-neutral-900 px-5 py-2 rounded-full transition-all duration-200 min-h-11 flex items-center cursor-pointer"
+                className="text-[13px] font-semibold text-white bg-gradient-nocturne px-5 py-2 rounded-full transition-all duration-200 min-h-11 flex items-center cursor-pointer"
               >
                 Get Started
               </motion.a>
@@ -136,7 +136,7 @@ export function Navbar() {
             onClick={() => mobileOpen ? handleCloseDrawer() : setMobileOpen(true)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="md:hidden text-neutral-600 hover:text-neutral-900 p-2 rounded-lg hover:bg-neutral-100 transition-all duration-200 min-h-11 min-w-11 flex items-center justify-center"
+            className="md:hidden text-nocturne-text-secondary hover:text-white p-2 rounded-lg hover:bg-white/[0.06] transition-all duration-200 min-h-11 min-w-11 flex items-center justify-center"
             aria-label="Toggle menu"
           >
             <AnimatePresence mode="wait">
@@ -177,7 +177,7 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/20 z-[48] md:hidden"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[48] md:hidden"
               onClick={handleCloseDrawer}
             />
             <motion.div
@@ -185,22 +185,22 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed top-0 right-0 bottom-0 w-72 bg-white border-l border-neutral-200 z-[49] md:hidden flex flex-col"
+              className="fixed top-0 right-0 bottom-0 w-72 bg-nocturne-surface/95 backdrop-blur-xl border-l border-white/[0.08] z-[49] md:hidden flex flex-col"
             >
-              <div className="p-5 border-b border-neutral-200 flex items-center justify-between min-h-16">
+              <div className="p-5 border-b border-white/[0.08] flex items-center justify-between min-h-16">
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <div className="w-6 h-6 rounded-lg bg-violet-600 flex items-center justify-center flex-shrink-0">
+                  <div className="w-6 h-6 rounded-lg bg-nocturne-primary flex items-center justify-center flex-shrink-0">
                     <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
                     </svg>
                   </div>
-                  <span className="text-sm font-heading font-bold text-neutral-900">ArtistBook</span>
+                  <span className="text-sm font-display font-bold text-white">ArtistBook</span>
                 </div>
                 <motion.button
                   onClick={handleCloseDrawer}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="text-neutral-600 hover:text-neutral-900 p-1 transition-colors duration-200 min-h-11 min-w-11 flex items-center justify-center"
+                  className="text-nocturne-text-secondary hover:text-white p-1 transition-colors duration-200 min-h-11 min-w-11 flex items-center justify-center"
                 >
                   <X size={18} />
                 </motion.button>
@@ -221,20 +221,20 @@ export function Navbar() {
                     <Link
                       href={item.href}
                       onClick={handleCloseDrawer}
-                      className="flex items-center justify-between px-3 py-3 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-all duration-200 min-h-11"
+                      className="flex items-center justify-between px-3 py-3 rounded-lg text-nocturne-text-secondary hover:text-white hover:bg-white/[0.06] transition-all duration-200 min-h-11"
                     >
                       <span className="flex items-center gap-3">
-                        <item.icon size={16} className="text-neutral-400" />
+                        <item.icon size={16} className="text-nocturne-text-tertiary" />
                         <span className="text-[13px] font-medium">{item.label}</span>
                       </span>
-                      <ChevronRight size={14} className="text-neutral-400" />
+                      <ChevronRight size={14} className="text-nocturne-text-tertiary" />
                     </Link>
                   </motion.div>
                 ))}
               </motion.div>
 
               <motion.div
-                className="p-4 border-t border-neutral-200"
+                className="p-4 border-t border-white/[0.08]"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.15, duration: 0.3 }}
@@ -244,13 +244,13 @@ export function Navbar() {
                     <Link
                       href={getDashboardHref(user.role)}
                       onClick={handleCloseDrawer}
-                      className="block w-full text-center text-[13px] font-semibold text-white bg-neutral-900 px-4 py-2.5 rounded-full transition-all duration-200 min-h-11 flex items-center justify-center"
+                      className="block w-full text-center text-[13px] font-semibold text-white bg-gradient-nocturne px-4 py-2.5 rounded-full transition-all duration-200 min-h-11 flex items-center justify-center shadow-nocturne-glow-sm"
                     >
                       Dashboard
                     </Link>
                     <button
                       onClick={() => { logout(); handleCloseDrawer(); }}
-                      className="block w-full text-center text-[13px] text-neutral-600 hover:text-neutral-900 py-2 transition-colors duration-200 min-h-11 flex items-center justify-center"
+                      className="block w-full text-center text-[13px] text-nocturne-text-secondary hover:text-white py-2 transition-colors duration-200 min-h-11 flex items-center justify-center"
                     >
                       Logout
                     </button>
@@ -259,7 +259,7 @@ export function Navbar() {
                   <Link
                     href="/login"
                     onClick={handleCloseDrawer}
-                    className="block w-full text-center text-[13px] font-semibold text-white bg-neutral-900 px-4 py-2.5 rounded-full transition-all duration-200 min-h-11 flex items-center justify-center"
+                    className="block w-full text-center text-[13px] font-semibold text-white bg-gradient-nocturne px-4 py-2.5 rounded-full transition-all duration-200 min-h-11 flex items-center justify-center shadow-nocturne-glow-sm"
                   >
                     Get Started
                   </Link>
@@ -294,13 +294,13 @@ function NavLink({
     >
       <Link
         href={href}
-        className="text-[13px] text-neutral-600 hover:text-neutral-900 px-3 py-2 rounded-lg hover:bg-neutral-100 transition-colors duration-200 font-medium min-h-11 flex items-center relative"
+        className="text-[13px] text-nocturne-text-secondary hover:text-white px-3 py-2 rounded-lg hover:bg-white/[0.06] transition-colors duration-200 font-medium min-h-11 flex items-center relative"
       >
         {children}
         {isActive && (
           <motion.span
             layoutId="navUnderline"
-            className="absolute bottom-0 left-3 right-3 h-0.5 bg-violet-600 rounded-full"
+            className="absolute bottom-0 left-3 right-3 h-0.5 bg-nocturne-primary rounded-full"
             initial={false}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           />

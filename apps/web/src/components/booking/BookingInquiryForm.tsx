@@ -118,7 +118,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
           <div className="w-14 h-14 bg-nocturne-success/15 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check size={28} className="text-nocturne-success" />
           </div>
-          <h3 className="text-lg font-heading font-semibold text-nocturne-text-primary mb-1">Inquiry Sent!</h3>
+          <h3 className="text-lg font-display font-semibold text-nocturne-text-primary mb-1">Inquiry Sent!</h3>
           <p className="text-sm text-nocturne-text-secondary mb-3">
             Your booking inquiry for <strong className="text-nocturne-text-primary">{artistName}</strong> has been submitted.
           </p>
@@ -148,7 +148,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
   if (!isAuthenticated) {
     return (
       <div className="glass-card p-6">
-        <h3 className="text-lg font-heading font-semibold text-nocturne-text-primary mb-2">Book This Artist</h3>
+        <h3 className="text-lg font-display font-semibold text-nocturne-text-primary mb-2">Book This Artist</h3>
         <p className="text-sm text-nocturne-text-secondary mb-4">
           Sign in to send a booking inquiry to {artistName}.
         </p>
@@ -165,7 +165,7 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
   // --- Multi-step Inquiry form ---
   return (
     <div className="glass-card p-6">
-      <h3 className="text-lg font-heading font-semibold text-nocturne-text-primary mb-4">Book This Artist</h3>
+      <h3 className="text-lg font-display font-semibold text-nocturne-text-primary mb-4">Book This Artist</h3>
 
       <BookingStepIndicator currentStep={currentStep} totalSteps={3} labels={STEP_LABELS} />
 

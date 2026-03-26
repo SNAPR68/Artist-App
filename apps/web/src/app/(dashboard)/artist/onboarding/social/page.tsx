@@ -80,8 +80,8 @@ export default function SocialAnalyzerPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Social Media Profile Analyzer</h1>
-      <p className="text-sm text-gray-500 mb-6">
+      <h1 className="text-2xl font-bold text-nocturne-text-primary mb-2">Social Media Profile Analyzer</h1>
+      <p className="text-sm text-nocturne-text-tertiary mb-6">
         Import your profile data from Instagram or YouTube to pre-fill your artist onboarding.
       </p>
 
@@ -89,20 +89,20 @@ export default function SocialAnalyzerPage() {
       {!result && (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">
               Social Media Profile URL
             </label>
             <input
               type="url"
               value={profileUrl}
               onChange={(e) => setProfileUrl(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="https://instagram.com/yourprofile or https://youtube.com/@yourchannel"
             />
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-nocturne-error/15 border border-red-200 text-nocturne-error px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -110,7 +110,7 @@ export default function SocialAnalyzerPage() {
           <button
             onClick={handleAnalyze}
             disabled={isAnalyzing || !profileUrl.trim()}
-            className="w-full px-6 py-2.5 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full px-6 py-2.5 text-sm font-medium text-white bg-nocturne-primary rounded-lg hover:bg-nocturne-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isAnalyzing ? (
               <>
@@ -128,7 +128,7 @@ export default function SocialAnalyzerPage() {
           <div className="text-center">
             <button
               onClick={() => router.push('/artist/onboarding')}
-              className="text-sm text-gray-500 hover:text-gray-700 underline"
+              className="text-sm text-nocturne-text-tertiary hover:text-nocturne-text-secondary underline"
             >
               Skip — go to onboarding directly
             </button>
@@ -145,11 +145,11 @@ export default function SocialAnalyzerPage() {
           </div>
 
           {/* Profile Summary */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
+          <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-6 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">{profileData.display_name}</h2>
-                <p className="text-sm text-gray-500">@{profileData.username}</p>
+                <h2 className="text-lg font-semibold text-nocturne-text-primary">{profileData.display_name}</h2>
+                <p className="text-sm text-nocturne-text-tertiary">@{profileData.username}</p>
               </div>
               <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 capitalize">
                 {result.platform}
@@ -157,19 +157,19 @@ export default function SocialAnalyzerPage() {
             </div>
 
             <div>
-              <p className="text-sm text-gray-500 mb-1">Followers</p>
-              <p className="text-xl font-bold text-gray-900">
+              <p className="text-sm text-nocturne-text-tertiary mb-1">Followers</p>
+              <p className="text-xl font-bold text-nocturne-text-primary">
                 {profileData.follower_count.toLocaleString('en-IN')}
               </p>
             </div>
 
             <div>
-              <p className="text-sm text-gray-500 mb-2">Suggested Genres</p>
+              <p className="text-sm text-nocturne-text-tertiary mb-2">Suggested Genres</p>
               <div className="flex flex-wrap gap-2">
                 {profileData.suggested_genres.map((genre) => (
                   <span
                     key={genre}
-                    className="px-3 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-700 border border-primary-200"
+                    className="px-3 py-1 rounded-full text-xs font-medium bg-nocturne-primary-light text-nocturne-primary border border-primary-200"
                   >
                     {genre}
                   </span>
@@ -178,18 +178,18 @@ export default function SocialAnalyzerPage() {
             </div>
 
             <div>
-              <p className="text-sm text-gray-500 mb-1">Suggested Bio</p>
-              <p className="text-sm text-gray-700">{profileData.suggested_bio}</p>
+              <p className="text-sm text-nocturne-text-tertiary mb-1">Suggested Bio</p>
+              <p className="text-sm text-nocturne-text-secondary">{profileData.suggested_bio}</p>
             </div>
 
             {profileData.top_content && profileData.top_content.length > 0 && (
               <div>
-                <p className="text-sm text-gray-500 mb-2">Top Content</p>
+                <p className="text-sm text-nocturne-text-tertiary mb-2">Top Content</p>
                 <ul className="space-y-1">
                   {profileData.top_content.map((item, i) => (
                     <li key={i} className="flex justify-between text-sm">
-                      <span className="text-gray-700 truncate mr-4">{item.title}</span>
-                      <span className="text-gray-500 whitespace-nowrap">
+                      <span className="text-nocturne-text-secondary truncate mr-4">{item.title}</span>
+                      <span className="text-nocturne-text-tertiary whitespace-nowrap">
                         {item.views.toLocaleString('en-IN')} views
                       </span>
                     </li>
@@ -203,13 +203,13 @@ export default function SocialAnalyzerPage() {
           <div className="flex gap-3">
             <button
               onClick={handleUseData}
-              className="flex-1 px-6 py-2.5 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600"
+              className="flex-1 px-6 py-2.5 text-sm font-medium text-white bg-nocturne-primary rounded-lg hover:bg-nocturne-primary"
             >
               Use This Data
             </button>
             <button
               onClick={() => router.push('/artist/onboarding')}
-              className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-6 py-2.5 text-sm font-medium text-nocturne-text-secondary bg-nocturne-surface border border-nocturne-border rounded-lg hover:bg-nocturne-base"
             >
               Skip
             </button>

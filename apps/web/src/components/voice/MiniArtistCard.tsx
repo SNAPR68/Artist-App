@@ -52,7 +52,7 @@ export function MiniArtistCard({
   return (
     <Link
       href={`/artists/${id}`}
-      className="group w-44 shrink-0 snap-start rounded-lg overflow-hidden border border-glass-border bg-surface-card hover:border-primary-500/40 transition-all duration-200"
+      className="group w-44 shrink-0 snap-start rounded-lg overflow-hidden border border-nocturne-border bg-nocturne-surface hover:border-primary-500/40 transition-all duration-200"
     >
       {/* Thumbnail */}
       <div className="relative h-24 w-full overflow-hidden bg-gradient-to-br from-primary-900/40 to-secondary-900/40">
@@ -70,10 +70,10 @@ export function MiniArtistCard({
           </div>
         )}
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-surface-card/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-nocturne-surface/80 to-transparent" />
         {/* Verified badge */}
         {is_verified && (
-          <span className="absolute top-1.5 left-1.5 flex items-center gap-0.5 rounded-pill bg-primary-600/90 px-1.5 py-0.5 text-[9px] font-semibold text-white">
+          <span className="absolute top-1.5 left-1.5 flex items-center gap-0.5 rounded-full bg-primary-600/90 px-1.5 py-0.5 text-[9px] font-semibold text-white">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6 9 17l-5-5" />
             </svg>
@@ -86,7 +86,7 @@ export function MiniArtistCard({
       <div className="p-2.5 space-y-1">
         {/* Name + Rating */}
         <div className="flex items-center justify-between gap-1">
-          <h4 className="text-xs font-semibold text-text-primary truncate">
+          <h4 className="text-xs font-semibold text-nocturne-text-primary truncate">
             {stage_name}
           </h4>
           {trust_score != null && (
@@ -100,7 +100,7 @@ export function MiniArtistCard({
         </div>
 
         {/* City + Bookings */}
-        <div className="flex items-center gap-1 text-[10px] text-text-muted">
+        <div className="flex items-center gap-1 text-[10px] text-nocturne-text-secondary">
           {base_city && (
             <>
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -124,27 +124,27 @@ export function MiniArtistCard({
             {genres.slice(0, 2).map((g) => (
               <span
                 key={g}
-                className="rounded-pill bg-glass-light border border-glass-border px-1.5 py-0.5 text-[9px] text-text-muted"
+                className="rounded-full bg-nocturne-surface border border-nocturne-border px-1.5 py-0.5 text-[9px] text-nocturne-text-secondary"
               >
                 {g}
               </span>
             ))}
             {genres.length > 2 && (
-              <span className="text-[9px] text-text-muted">+{genres.length - 2}</span>
+              <span className="text-[9px] text-nocturne-text-secondary">+{genres.length - 2}</span>
             )}
           </div>
         )}
 
         {/* Price */}
         {displayPrice != null && displayPrice > 0 && (
-          <p className="text-[10px] font-semibold text-primary-400">
+          <p className="text-[10px] font-semibold text-nocturne-accent">
             From &#8377;{(displayPrice / 100).toLocaleString('en-IN')}
           </p>
         )}
 
         {/* View Profile CTA */}
         <div className="pt-0.5">
-          <span className="text-[10px] font-medium text-accent-violet group-hover:text-primary-300 transition-colors">
+          <span className="text-[10px] font-medium text-accent-violet group-hover:text-nocturne-accent transition-colors">
             View Profile &rarr;
           </span>
         </div>

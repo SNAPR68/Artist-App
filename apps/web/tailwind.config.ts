@@ -121,6 +121,19 @@ const config: Config = {
             secondary: 'rgba(255, 255, 255, 0.65)',
             tertiary: 'rgba(255, 255, 255, 0.4)',
           },
+          // Extended palette (Stitch PRD tokens)
+          violet: '#CA98FF',
+          'violet-deep': '#8523DD',
+          cyan: '#98F1F6',
+          rose: '#FF8B9A',
+          // Surface container tiers
+          container: {
+            lowest: '#000000',
+            low: '#131313',
+            DEFAULT: '#1A1919',
+            high: '#201F1F',
+            highest: '#262626',
+          },
         },
         // Booking states
         bookingStates: {
@@ -205,6 +218,9 @@ const config: Config = {
       backdropBlur: {
         'glass': '8px',
         'glass-lg': '16px',
+        'glass-sm': '32px',
+        'glass-md': '64px',
+        'glass-xl': '80px',
         '3xl': '64px',
         '4xl': '80px',
       },
@@ -254,6 +270,9 @@ const config: Config = {
         'gradient-nocturne-accent': 'linear-gradient(135deg, #8A2BE2, #A1FAFF)',
         'gradient-nocturne-hero': 'radial-gradient(ellipse at 30% 20%, rgba(138,43,226,0.25) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(161,250,255,0.1) 0%, transparent 50%), #0E0E0F',
         'gradient-nocturne-card': 'linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)',
+        'gradient-nocturne-mesh': 'conic-gradient(from 180deg at 50% 50%, #8A2BE2 0deg, #0E0E0F 120deg, #A1FAFF 240deg, #8A2BE2 360deg)',
+        'stage-glow-violet': 'radial-gradient(circle, rgba(138,43,226,0.15) 0%, transparent 70%)',
+        'stage-glow-cyan': 'radial-gradient(circle, rgba(161,250,255,0.1) 0%, transparent 70%)',
       },
 
       // ─── Z-Index ────────────────────────────────────────

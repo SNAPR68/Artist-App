@@ -123,7 +123,7 @@ export default function WorkspaceAnalyticsPage() {
   }
 
   if (!analytics) {
-    return <p className="text-center py-10 text-gray-500">Failed to load analytics.</p>;
+    return <p className="text-center py-10 text-nocturne-text-tertiary">Failed to load analytics.</p>;
   }
 
   const avgBookingValue =
@@ -143,19 +143,19 @@ export default function WorkspaceAnalyticsPage() {
           >
             &larr; Back to Workspace
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-1">Analytics</h1>
+          <h1 className="text-2xl font-bold text-nocturne-text-primary mt-1">Analytics</h1>
         </div>
 
         {/* Date Range Filter */}
-        <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+        <div className="flex gap-1 bg-nocturne-surface rounded-lg p-1">
           {(Object.keys(DATE_RANGE_LABELS) as DateRangeKey[]).map((key) => (
             <button
               key={key}
               onClick={() => setRange(key)}
               className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
                 range === key
-                  ? 'bg-white text-primary-600 font-medium shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'bg-nocturne-surface text-nocturne-accent font-medium shadow-sm'
+                  : 'text-nocturne-text-secondary hover:text-nocturne-text-primary'
               }`}
             >
               {DATE_RANGE_LABELS[key]}
@@ -166,49 +166,49 @@ export default function WorkspaceAnalyticsPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">Total Spend</p>
-          <p className="text-xl font-bold text-gray-900">
+        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+          <p className="text-sm text-nocturne-text-tertiary">Total Spend</p>
+          <p className="text-xl font-bold text-nocturne-text-primary">
             ₹{formatINR(analytics.total_spend_paise)}
           </p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">Total Bookings</p>
-          <p className="text-xl font-bold text-gray-900">{analytics.booking_count}</p>
+        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+          <p className="text-sm text-nocturne-text-tertiary">Total Bookings</p>
+          <p className="text-xl font-bold text-nocturne-text-primary">{analytics.booking_count}</p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <p className="text-sm text-gray-500">Avg Booking Value</p>
-          <p className="text-xl font-bold text-gray-900">₹{formatINR(avgBookingValue)}</p>
+        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+          <p className="text-sm text-nocturne-text-tertiary">Avg Booking Value</p>
+          <p className="text-xl font-bold text-nocturne-text-primary">₹{formatINR(avgBookingValue)}</p>
         </div>
-        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-          <p className="text-sm text-blue-700">Active Events</p>
-          <p className="text-xl font-bold text-blue-700">{activeEvents}</p>
+        <div className="bg-nocturne-info/15 rounded-lg p-4 border border-blue-200">
+          <p className="text-sm text-nocturne-info">Active Events</p>
+          <p className="text-xl font-bold text-nocturne-info">{activeEvents}</p>
         </div>
       </div>
 
       {/* Spend by Month */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Spend by Month</h2>
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
+        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+          <h2 className="text-lg font-semibold text-nocturne-text-primary">Spend by Month</h2>
         </div>
         {analytics.monthly_revenue.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No monthly data available</div>
+          <div className="p-8 text-center text-nocturne-text-tertiary">No monthly data available</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 text-left">
-                  <th className="px-4 py-2 font-medium text-gray-500">Month</th>
-                  <th className="px-4 py-2 font-medium text-gray-500 text-right">Bookings</th>
-                  <th className="px-4 py-2 font-medium text-gray-500 text-right">Total Spend</th>
+                  <th className="px-4 py-2 font-medium text-nocturne-text-tertiary">Month</th>
+                  <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Bookings</th>
+                  <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Total Spend</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {analytics.monthly_revenue.map((m) => (
-                  <tr key={m.month} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 text-gray-900">{formatMonth(m.month)}</td>
-                    <td className="px-4 py-2 text-gray-900 text-right">{m.booking_count}</td>
-                    <td className="px-4 py-2 text-gray-900 text-right font-medium">
+                  <tr key={m.month} className="hover:bg-nocturne-base">
+                    <td className="px-4 py-2 text-nocturne-text-primary">{formatMonth(m.month)}</td>
+                    <td className="px-4 py-2 text-nocturne-text-primary text-right">{m.booking_count}</td>
+                    <td className="px-4 py-2 text-nocturne-text-primary text-right font-medium">
                       ₹{formatINR(m.revenue_paise)}
                     </td>
                   </tr>
@@ -220,34 +220,34 @@ export default function WorkspaceAnalyticsPage() {
       </div>
 
       {/* Top Artists */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Top Artists</h2>
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
+        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+          <h2 className="text-lg font-semibold text-nocturne-text-primary">Top Artists</h2>
         </div>
         {analytics.top_artists.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No artist data yet</div>
+          <div className="p-8 text-center text-nocturne-text-tertiary">No artist data yet</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 text-left">
-                  <th className="px-4 py-2 font-medium text-gray-500">#</th>
-                  <th className="px-4 py-2 font-medium text-gray-500">Artist</th>
-                  <th className="px-4 py-2 font-medium text-gray-500 text-right">Bookings</th>
-                  <th className="px-4 py-2 font-medium text-gray-500 text-right">Total Spend</th>
-                  <th className="px-4 py-2 font-medium text-gray-500 text-right">Avg per Booking</th>
+                  <th className="px-4 py-2 font-medium text-nocturne-text-tertiary">#</th>
+                  <th className="px-4 py-2 font-medium text-nocturne-text-tertiary">Artist</th>
+                  <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Bookings</th>
+                  <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Total Spend</th>
+                  <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Avg per Booking</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {analytics.top_artists.map((a, idx) => (
-                  <tr key={a.artist_id} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 text-gray-400">{idx + 1}</td>
-                    <td className="px-4 py-2 text-gray-900 font-medium">{a.stage_name}</td>
-                    <td className="px-4 py-2 text-gray-900 text-right">{a.booking_count}</td>
-                    <td className="px-4 py-2 text-gray-900 text-right">
+                  <tr key={a.artist_id} className="hover:bg-nocturne-base">
+                    <td className="px-4 py-2 text-nocturne-text-tertiary">{idx + 1}</td>
+                    <td className="px-4 py-2 text-nocturne-text-primary font-medium">{a.stage_name}</td>
+                    <td className="px-4 py-2 text-nocturne-text-primary text-right">{a.booking_count}</td>
+                    <td className="px-4 py-2 text-nocturne-text-primary text-right">
                       ₹{formatINR(a.total_revenue_paise)}
                     </td>
-                    <td className="px-4 py-2 text-gray-900 text-right">
+                    <td className="px-4 py-2 text-nocturne-text-primary text-right">
                       ₹{formatINR(a.booking_count > 0 ? Math.round(a.total_revenue_paise / a.booking_count) : 0)}
                     </td>
                   </tr>
@@ -259,12 +259,12 @@ export default function WorkspaceAnalyticsPage() {
       </div>
 
       {/* Event Type Breakdown */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Event Type Breakdown</h2>
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
+        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+          <h2 className="text-lg font-semibold text-nocturne-text-primary">Event Type Breakdown</h2>
         </div>
         {Object.keys(eventTypeBreakdown).length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No event data yet</div>
+          <div className="p-8 text-center text-nocturne-text-tertiary">No event data yet</div>
         ) : (
           <div className="p-4 space-y-3">
             {Object.entries(eventTypeBreakdown)
@@ -275,16 +275,16 @@ export default function WorkspaceAnalyticsPage() {
                 return (
                   <div key={type}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-gray-900 capitalize">
+                      <span className="text-sm text-nocturne-text-primary capitalize">
                         {type.replace(/_/g, ' ')}
                       </span>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-nocturne-text-tertiary">
                         {count} ({pct}%)
                       </span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div className="w-full bg-nocturne-surface rounded-full h-2">
                       <div
-                        className="bg-primary-500 h-2 rounded-full transition-all"
+                        className="bg-nocturne-primary h-2 rounded-full transition-all"
                         style={{ width: `${pct}%` }}
                       />
                     </div>

@@ -26,17 +26,17 @@ interface SubstitutionRequest {
 }
 
 const URGENCY_COLORS: Record<string, string> = {
-  critical: 'bg-red-100 text-red-700',
+  critical: 'bg-red-100 text-nocturne-error',
   urgent: 'bg-orange-100 text-orange-700',
-  standard: 'bg-blue-100 text-blue-700',
+  standard: 'bg-blue-100 text-nocturne-info',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-gray-100 text-gray-600',
-  matching: 'bg-blue-100 text-blue-700',
-  notified: 'bg-yellow-100 text-yellow-700',
-  accepted: 'bg-green-100 text-green-700',
-  expired: 'bg-red-100 text-red-700',
+  pending: 'bg-nocturne-surface text-nocturne-text-secondary',
+  matching: 'bg-blue-100 text-nocturne-info',
+  notified: 'bg-yellow-100 text-nocturne-warning',
+  accepted: 'bg-green-100 text-nocturne-success',
+  expired: 'bg-red-100 text-nocturne-error',
 };
 
 export default function SubstitutionsPage() {
@@ -99,10 +99,10 @@ export default function SubstitutionsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Emergency Replacements</h1>
+        <h1 className="text-2xl font-bold text-nocturne-text-primary">Emergency Replacements</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-primary-500 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors"
+          className="bg-nocturne-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-nocturne-primary transition-colors"
         >
           {showForm ? 'Cancel' : 'Request Replacement'}
         </button>
@@ -110,35 +110,35 @@ export default function SubstitutionsPage() {
 
       {/* Inline Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Booking ID</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Booking ID</label>
             <input
               type="text"
               required
               value={formBookingId}
               onChange={(e) => setFormBookingId(e.target.value)}
               placeholder="e.g. bk_abc123"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Urgency</label>
+            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Urgency</label>
             <select
               value={formUrgency}
               onChange={(e) => setFormUrgency(e.target.value as 'critical' | 'urgent' | 'standard')}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             >
               <option value="critical">Critical</option>
               <option value="urgent">Urgent</option>
               <option value="standard">Standard</option>
             </select>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-nocturne-error">{error}</p>}
           <button
             type="submit"
             disabled={submitting}
-            className="bg-primary-500 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
+            className="bg-nocturne-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-nocturne-primary transition-colors disabled:opacity-50"
           >
             {submitting ? 'Submitting...' : 'Submit Request'}
           </button>
@@ -147,23 +147,23 @@ export default function SubstitutionsPage() {
 
       {/* Requests List */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">My Requests</h2>
+        <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">My Requests</h2>
         {requests.length === 0 ? (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-            <p className="text-gray-500 text-sm">
+          <div className="bg-nocturne-base border border-nocturne-border-subtle rounded-lg p-6 text-center">
+            <p className="text-nocturne-text-tertiary text-sm">
               No replacement requests. When an artist cancels, you can find a replacement here.
             </p>
           </div>
         ) : (
           <div className="space-y-3">
             {requests.map((req) => (
-              <div key={req.id} className="bg-white border border-gray-200 rounded-lg p-4">
+              <div key={req.id} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-medium text-gray-900 text-sm">
+                    <p className="font-medium text-nocturne-text-primary text-sm">
                       {req.original_artist_name} &middot; {req.event_type}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-nocturne-text-tertiary mt-0.5">
                       {req.event_city} &middot;{' '}
                       {new Date(req.event_date).toLocaleDateString('en-IN', {
                         day: 'numeric',
@@ -183,8 +183,8 @@ export default function SubstitutionsPage() {
                 </div>
 
                 {req.status === 'accepted' && req.replacement_artist_name && (
-                  <div className="mt-3 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                    <p className="text-sm text-green-700">
+                  <div className="mt-3 bg-nocturne-success/15 border border-green-200 rounded-lg px-3 py-2">
+                    <p className="text-sm text-nocturne-success">
                       Replacement: <span className="font-medium">{req.replacement_artist_name}</span>
                     </p>
                   </div>
@@ -192,19 +192,19 @@ export default function SubstitutionsPage() {
 
                 {req.status === 'notified' && req.candidates.length > 0 && (
                   <div className="mt-3 space-y-1.5">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Candidates</p>
+                    <p className="text-xs font-medium text-nocturne-text-tertiary uppercase tracking-wide">Candidates</p>
                     {req.candidates.map((c) => (
-                      <div key={c.artist_id} className="flex items-center justify-between bg-gray-50 rounded px-3 py-1.5">
-                        <span className="text-sm text-gray-900">{c.stage_name}</span>
+                      <div key={c.artist_id} className="flex items-center justify-between bg-nocturne-base rounded px-3 py-1.5">
+                        <span className="text-sm text-nocturne-text-primary">{c.stage_name}</span>
                         <div className="flex items-center gap-3 text-xs">
-                          <span className="text-gray-500">{c.similarity_score}% match</span>
+                          <span className="text-nocturne-text-tertiary">{c.similarity_score}% match</span>
                           <span
                             className={
                               c.response_status === 'accepted'
-                                ? 'text-green-600 font-medium'
+                                ? 'text-nocturne-success font-medium'
                                 : c.response_status === 'declined'
-                                  ? 'text-red-600'
-                                  : 'text-gray-400'
+                                  ? 'text-nocturne-error'
+                                  : 'text-nocturne-text-tertiary'
                             }
                           >
                             {c.response_status}
@@ -215,7 +215,7 @@ export default function SubstitutionsPage() {
                   </div>
                 )}
 
-                <p className="text-xs text-gray-400 mt-3">
+                <p className="text-xs text-nocturne-text-tertiary mt-3">
                   Expires:{' '}
                   {new Date(req.expires_at).toLocaleString('en-IN', {
                     day: 'numeric',

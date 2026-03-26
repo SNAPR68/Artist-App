@@ -42,7 +42,7 @@ export function StatsBar() {
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
 
   return (
-    <section className="bg-white py-20 px-6">
+    <section className="bg-nocturne-base py-20 px-6">
       <div className="max-w-section mx-auto">
         <motion.div
           ref={containerRef}
@@ -64,32 +64,22 @@ export function StatsBar() {
               }}
               className="group relative"
             >
-              <div className="flex flex-col items-start p-6 rounded-2xl bg-neutral-50 border border-neutral-100 transition-all duration-300 hover:border-violet-200 hover:shadow-lg h-full">
-                {/* Icon Circle */}
+              <div className="glass-card flex flex-col items-start p-6 rounded-4xl transition-all duration-300 hover:shadow-nocturne-card-hover h-full">
                 <motion.div
-                  className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center mb-4"
+                  className="w-12 h-12 rounded-xl bg-nocturne-primary-light flex items-center justify-center mb-4"
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15 }}
                 >
-                  <stat.icon size={24} className="text-violet-600" />
+                  <stat.icon size={24} className="text-nocturne-accent" />
                 </motion.div>
 
-                {/* Stats Value */}
                 <div className="mb-2">
-                  <p className="text-3xl font-bold text-neutral-900">
+                  <p className="text-3xl font-bold text-white">
                     <CountUpMotion target={stat.value} suffix={stat.suffix} />
                   </p>
                 </div>
 
-                {/* Label */}
-                <p className="text-sm text-neutral-500 font-medium">{stat.label}</p>
-
-                {/* Animated background glow on hover */}
-                <motion.div
-                  className="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-50 to-transparent opacity-0 pointer-events-none"
-                  whileHover={{ opacity: 0.5 }}
-                  transition={{ duration: 0.3 }}
-                />
+                <p className="text-sm text-nocturne-text-secondary font-medium">{stat.label}</p>
               </div>
             </motion.div>
           ))}

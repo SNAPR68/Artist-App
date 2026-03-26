@@ -116,7 +116,7 @@ export default function EventCompanyOnboarding() {
                   value={companyName}
                   onChange={(e) => { setCompanyName(e.target.value); setError(''); }}
                   placeholder="e.g., Stellar Events Pvt Ltd"
-                  className="w-full px-4 py-3 bg-nocturne-surface-2 border border-nocturne-border rounded-lg text-nocturne-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-nocturne-primary/50"
+                  className="w-full px-4 py-3 bg-nocturne-surface-2 border border-nocturne-border rounded-lg text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
                 />
               </div>
 
@@ -132,7 +132,7 @@ export default function EventCompanyOnboarding() {
                       className={`p-3 rounded-lg border text-left transition-all ${
                         companyType === ct.value
                           ? 'border-nocturne-primary bg-nocturne-primary/10 shadow-nocturne-glow-sm'
-                          : 'border-border-nocturne-border bg-nocturne-surface hover:border-nocturne-accent'
+                          : 'border-nocturne-border bg-nocturne-surface hover:border-nocturne-accent'
                       }`}
                     >
                       <span className="text-lg">{ct.emoji}</span>

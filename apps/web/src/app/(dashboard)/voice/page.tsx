@@ -119,15 +119,15 @@ export default function VoicePage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Voice Assistant</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-nocturne-text-primary">Voice Assistant</h1>
+          <p className="text-sm text-nocturne-text-tertiary mt-1">
             Ask anything about bookings, earnings, demand, or artist search.
           </p>
         </div>
         {messages.length > 0 && (
           <button
             onClick={handleNewSession}
-            className="text-sm text-gray-500 hover:text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5"
+            className="text-sm text-nocturne-text-tertiary hover:text-nocturne-text-secondary border border-nocturne-border-subtle rounded-lg px-3 py-1.5"
           >
             New Chat
           </button>
@@ -135,11 +135,11 @@ export default function VoicePage() {
       </div>
 
       {/* Chat Container */}
-      <div className="bg-white rounded-lg border border-gray-200 min-h-[400px] flex flex-col">
+      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle min-h-[400px] flex flex-col">
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {messages.length === 0 && (
-            <div className="flex items-center justify-center h-full text-gray-400 text-sm py-20">
+            <div className="flex items-center justify-center h-full text-nocturne-text-tertiary text-sm py-20">
               Start a conversation...
             </div>
           )}
@@ -148,12 +148,12 @@ export default function VoicePage() {
               <div
                 className={`max-w-[80%] rounded-lg px-4 py-2.5 text-sm ${
                   msg.role === 'user'
-                    ? 'bg-primary-100 text-primary-900'
-                    : 'bg-gray-100 text-gray-900'
+                    ? 'bg-nocturne-primary-light text-primary-900'
+                    : 'bg-nocturne-surface text-nocturne-text-primary'
                 }`}
               >
                 {msg.intent && (
-                  <span className="inline-block text-xs px-1.5 py-0.5 rounded bg-primary-200 text-primary-700 mb-1 mr-1">
+                  <span className="inline-block text-xs px-1.5 py-0.5 rounded bg-primary-200 text-nocturne-primary mb-1 mr-1">
                     {msg.intent}
                   </span>
                 )}
@@ -161,7 +161,7 @@ export default function VoicePage() {
                 {msg.action?.type === 'navigate' && msg.action.route && (
                   <button
                     onClick={() => router.push(msg.action!.route!)}
-                    className="mt-2 text-xs bg-primary-50 text-primary-700 border border-primary-200 rounded-lg px-3 py-1.5 hover:bg-primary-100 transition-colors"
+                    className="mt-2 text-xs bg-nocturne-primary-light text-nocturne-primary border border-primary-200 rounded-lg px-3 py-1.5 hover:bg-nocturne-primary-light transition-colors"
                   >
                     Go to page &rarr;
                   </button>
@@ -171,7 +171,7 @@ export default function VoicePage() {
           ))}
           {sending && (
             <div className="flex justify-start">
-              <div className="bg-gray-100 rounded-lg px-4 py-2.5">
+              <div className="bg-nocturne-surface rounded-lg px-4 py-2.5">
                 <div className="flex gap-1">
                   <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                   <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -191,7 +191,7 @@ export default function VoicePage() {
                 key={idx}
                 onClick={() => handleSend(s)}
                 disabled={sending}
-                className="text-xs bg-primary-50 text-primary-700 px-3 py-1.5 rounded-full hover:bg-primary-100 transition-colors disabled:opacity-50"
+                className="text-xs bg-nocturne-primary-light text-nocturne-primary px-3 py-1.5 rounded-full hover:bg-nocturne-primary-light transition-colors disabled:opacity-50"
               >
                 {s}
               </button>
@@ -200,19 +200,19 @@ export default function VoicePage() {
         )}
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="border-t border-gray-200 p-3 flex gap-2">
+        <form onSubmit={handleSubmit} className="border-t border-nocturne-border-subtle p-3 flex gap-2">
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Ask me anything... e.g. 'band chahiye Jaipur mein'"
             disabled={sending}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none disabled:opacity-50"
+            className="flex-1 border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={sending || !inputText.trim()}
-            className="bg-primary-500 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
+            className="bg-nocturne-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-nocturne-primary transition-colors disabled:opacity-50"
           >
             Send
           </button>
@@ -222,10 +222,10 @@ export default function VoicePage() {
       {/* Past Sessions */}
       {sessions.length > 0 && (
         <section>
-          <h2 className="text-sm font-medium text-gray-500 mb-2">Past Sessions</h2>
+          <h2 className="text-sm font-medium text-nocturne-text-tertiary mb-2">Past Sessions</h2>
           <div className="space-y-1">
             {sessions.slice(0, 5).map((s) => (
-              <div key={s.id} className="text-xs text-gray-500 flex items-center gap-2">
+              <div key={s.id} className="text-xs text-nocturne-text-tertiary flex items-center gap-2">
                 <span>
                   {new Date(s.created_at).toLocaleDateString('en-IN', {
                     day: 'numeric',

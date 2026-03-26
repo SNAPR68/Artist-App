@@ -77,14 +77,13 @@ export function Categories() {
   const [activeGenre, setActiveGenre] = useState('All');
 
   return (
-    <section className="bg-white py-20 px-6">
+    <section className="bg-nocturne-base py-20 px-6">
       <div className="max-w-section mx-auto">
-        {/* Header */}
         <FadeIn>
           <div className="flex items-center justify-center mb-12">
             <div className="text-center">
               <motion.span
-                className="inline-block mb-4 px-3 py-1 rounded-full bg-violet-50 text-violet-600 text-xs font-semibold uppercase tracking-wider"
+                className="inline-block mb-4 px-3 py-1 rounded-full bg-nocturne-primary-light text-nocturne-accent text-xs font-semibold uppercase tracking-wider"
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, amount: 0.3 }}
@@ -92,10 +91,10 @@ export function Categories() {
               >
                 Categories
               </motion.span>
-              <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-3">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
                 Browse by Category
               </h2>
-              <p className="text-neutral-500 text-base">
+              <p className="text-nocturne-text-secondary text-base">
                 Explore a wide range of artists and entertainers
               </p>
             </div>
@@ -128,13 +127,13 @@ export function Categories() {
                       className={`flex items-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 shrink-0 relative ${
                         g.active || activeGenre === g.name
                           ? 'text-white'
-                          : 'border border-neutral-200 text-neutral-600 hover:border-violet-300 hover:text-violet-600'
+                          : 'border border-white/[0.15] text-nocturne-text-secondary hover:border-nocturne-primary hover:text-white'
                       }`}
                     >
                       {(g.active || activeGenre === g.name) && (
                         <motion.div
                           layoutId="activeGenre"
-                          className="absolute inset-0 bg-violet-600 rounded-full -z-10"
+                          className="absolute inset-0 bg-gradient-nocturne rounded-full -z-10 shadow-nocturne-glow-sm"
                           transition={{ type: 'spring', damping: 20, stiffness: 100 }}
                         />
                       )}
@@ -166,7 +165,7 @@ export function Categories() {
                 transition={{ type: 'spring', damping: 20, stiffness: 100 }}
               >
                 <Link href={event.href}>
-                  <div className="group relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer">
+                  <div className="group relative w-full aspect-[4/3] rounded-4xl overflow-hidden shadow-nocturne-card hover:shadow-nocturne-card-hover transition-shadow duration-300 cursor-pointer">
                     <Image
                       src={event.image}
                       alt={event.name}
@@ -174,14 +173,12 @@ export function Categories() {
                       sizes="(max-width: 768px) 160px, 220px"
                       className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                     />
-                    {/* Overlay gradient */}
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"
-                      initial={{ opacity: 0.6 }}
-                      whileHover={{ opacity: 0.8 }}
+                      className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"
+                      initial={{ opacity: 0.7 }}
+                      whileHover={{ opacity: 0.9 }}
                       transition={{ duration: 0.3 }}
                     />
-                    {/* Content */}
                     <motion.div
                       className="absolute inset-x-0 bottom-0 p-4"
                       initial={{ y: 8, opacity: 0 }}
@@ -191,8 +188,8 @@ export function Categories() {
                     >
                       <h3 className="text-white text-sm font-semibold">{event.name}</h3>
                       <motion.p
-                        className="text-white/70 text-xs mt-1"
-                        whileHover={{ color: 'rgba(255, 255, 255, 1)' }}
+                        className="text-nocturne-accent/70 text-xs mt-1"
+                        whileHover={{ color: 'rgba(161, 250, 255, 1)' }}
                       >
                         {event.count} bookings
                       </motion.p>

@@ -321,6 +321,123 @@
     background-clip: text;
   }
 
+  /* ── Nocturne Floating Glass (tooltips, dropdowns) */
+  .glass-floating {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(80px);
+    -webkit-backdrop-filter: blur(80px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  /* ── Nocturne Navigation Items ────────────── */
+  .nocturne-nav-item {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl
+           text-sm font-medium
+           transition-all duration-200 ease-out;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .nocturne-nav-item:hover {
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .nocturne-nav-item-active {
+    @apply nocturne-nav-item;
+    color: #A1FAFF;
+    background: rgba(138, 43, 226, 0.15);
+    border-left: 3px solid #8A2BE2;
+  }
+
+  /* ── Stage Lighting Glows ─────────────────── */
+  .stage-glow-violet {
+    background: radial-gradient(circle, rgba(138, 43, 226, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .stage-glow-cyan {
+    background: radial-gradient(circle, rgba(161, 250, 255, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── Inner Glow Status Indicator ──────────── */
+  .inner-glow-status {
+    box-shadow: inset 0 0 12px rgba(202, 152, 255, 0.2);
+  }
+  .inner-glow-success {
+    box-shadow: inset 0 0 12px rgba(0, 230, 118, 0.2);
+  }
+  .inner-glow-warning {
+    box-shadow: inset 0 0 12px rgba(255, 215, 64, 0.2);
+  }
+  .inner-glow-error {
+    box-shadow: inset 0 0 12px rgba(255, 82, 82, 0.2);
+  }
+
+  /* ── Nocturne Chip ────────────────────────── */
+  .nocturne-chip {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-pill
+           text-caption font-medium;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.85);
+    transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .nocturne-chip:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #FFFFFF;
+  }
+  .nocturne-chip-active {
+    background: rgba(138, 43, 226, 0.2);
+    color: #A1FAFF;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+  }
+
+  /* ── Nocturne Divider (No-Line Rule) ──────── */
+  .nocturne-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+  }
+
+  /* ── Nocturne Skeleton Loader ─────────────── */
+  .nocturne-skeleton {
+    background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.04) 25%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.04) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 16px;
+  }
+
+  /* ── Nocturne Table ───────────────────────── */
+  .nocturne-table {
+    @apply w-full text-sm;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .nocturne-table th {
+    @apply px-4 py-3 text-left font-medium;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .nocturne-table td {
+    @apply px-4 py-3;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  .nocturne-table tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  /* ── Nocturne Modal Overlay ───────────────── */
+  .nocturne-overlay {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
   /* ── Voice Waveform Bars ─────────────────── */
   .voice-bar {
     width: 3px;
