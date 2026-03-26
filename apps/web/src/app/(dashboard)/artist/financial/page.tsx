@@ -103,23 +103,49 @@ export default function FinancialCenterPage() {
 
   return (
     <div className="space-y-6">
-      {/* ─── Bento Hero ─── */}
+      {/* ─── Bento Hero: 7+5 Escrow Wallet ─── */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden">
+        {/* Main Balance Card */}
+        <div className="md:col-span-7 glass-card rounded-xl p-10 border border-white/5 relative overflow-hidden group">
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="absolute top-8 right-8">
+            <Wallet className="w-10 h-10 text-[#c39bff] opacity-20 group-hover:opacity-100 transition-opacity duration-500" />
+          </div>
           <div className="relative z-10">
-            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Finance</span>
-            <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white mb-1">Financial Center</h1>
-            <p className="text-white/40 text-sm">Track earnings, forecasts, and taxes — {fy.label}</p>
+            <p className="text-white/50 text-sm font-medium tracking-[0.1em] uppercase mb-1">Total Escrow Value</p>
+            <h3 className="text-5xl md:text-6xl font-extrabold text-white tracking-tighter">
+              ₹{formatINR(dashboard?.in_escrow_paise ?? null)}
+              <span className="text-[#c39bff] text-2xl">.00</span>
+            </h3>
+          </div>
+          <div className="mt-10 flex items-center gap-8">
+            <div className="flex flex-col">
+              <span className="text-[10px] text-[#a1faff] tracking-widest uppercase mb-1 font-bold">Available</span>
+              <span className="text-2xl font-bold text-white">₹{formatINR(dashboard?.available_balance_paise ?? null)}</span>
+            </div>
+            <div className="h-10 w-px bg-white/10" />
+            <div className="flex flex-col">
+              <span className="text-[10px] text-[#ffbf00] tracking-widest uppercase mb-1 font-bold">Pending</span>
+              <span className="text-2xl font-bold text-white">₹{formatINR(dashboard?.pending_settlement_paise ?? null)}</span>
+            </div>
           </div>
         </div>
-        <div className="md:col-span-4 glass-card rounded-xl p-6 border border-white/5 border-l-4 border-l-green-400 flex flex-col justify-center">
-          <div className="flex justify-between items-start mb-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-white/40">Available</h3>
-            <Wallet className="w-5 h-5 text-green-400" />
+        {/* Animated Bar Chart */}
+        <div className="md:col-span-5 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#c39bff]/5 to-transparent pointer-events-none" />
+          <p className="text-white/50 text-xs uppercase tracking-widest mb-6 font-bold relative z-10">Earnings Trend</p>
+          <div className="h-48 w-full flex items-end justify-between gap-2 relative z-10">
+            {[40, 70, 55, 85, 45, 65, 90].map((h, i) => (
+              <div
+                key={i}
+                className={`w-full rounded-t-lg transition-all duration-700 ${i % 2 === 0 ? 'bg-white/5' : i === 3 || i === 6 ? 'bg-[#a1faff]/20' : 'bg-[#c39bff]/20'}`}
+                style={{ height: `${h}%`, transitionDelay: `${i * 100}ms` }}
+              />
+            ))}
           </div>
-          <p className="text-3xl font-extrabold text-white">₹{formatINR(dashboard?.available_balance_paise ?? null)}</p>
-          <p className="text-xs text-white/40 mt-1">Ready to withdraw</p>
+          <div className="mt-4 flex justify-between text-[10px] text-white/30 font-bold uppercase tracking-widest relative z-10">
+            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span>
+          </div>
         </div>
       </div>
 
