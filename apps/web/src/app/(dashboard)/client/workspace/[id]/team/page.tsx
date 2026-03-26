@@ -282,7 +282,7 @@ export default function WorkspaceTeamPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 bg-nocturne-base">
+                <tr className="border-b border-white/5 bg-nocturne-base">
                   <th className="px-5 py-3 text-left font-medium text-nocturne-text-secondary">Name / Email</th>
                   <th className="px-5 py-3 text-left font-medium text-nocturne-text-secondary">Role</th>
                   <th className="px-5 py-3 text-left font-medium text-nocturne-text-secondary">Status</th>

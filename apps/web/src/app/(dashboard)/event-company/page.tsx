@@ -8,14 +8,14 @@ import {
   Calendar,
   Users,
   Building2,
-  Mic,
   ArrowRight,
   Briefcase,
   DollarSign,
   AlertTriangle,
-  Sparkles,
   FolderKanban,
   Presentation,
+  TrendingUp,
+  Mic,
 } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 
@@ -43,6 +43,7 @@ export default function EventCompanyDashboard() {
         return;
       }
       if (wsRes.success) setWorkspaces(wsRes.data || []);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (bookRes.success) setBookingCount((bookRes.data as any)?.meta?.total ?? 0);
     }).catch(() => {}).finally(() => setLoading(false));
   }, [router]);
@@ -50,22 +51,14 @@ export default function EventCompanyDashboard() {
   if (loading) {
     return (
       <div className="space-y-8">
-        <div className="h-10 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded-lg w-2/3 animate-pulse" />
-        <div className="animate-pulse grid grid-cols-1 sm:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="glass-card p-6 rounded-xl">
-              <div className="h-4 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-3/4 mb-3" />
-              <div className="h-8 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-1/2" />
-            </div>
-          ))}
+        <div className="h-10 nocturne-skeleton w-2/3 rounded-lg" />
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <div className="md:col-span-8 nocturne-skeleton h-[300px] rounded-xl" />
+          <div className="md:col-span-4 nocturne-skeleton h-[300px] rounded-xl" />
         </div>
-        <div className="animate-pulse grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="glass-card p-6 rounded-xl">
-              <div className="w-12 h-12 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded-lg mb-3" />
-              <div className="h-4 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-4/5 mb-2" />
-              <div className="h-3 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-3/4" />
-            </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="nocturne-skeleton h-28 rounded-xl" />
           ))}
         </div>
       </div>
@@ -77,147 +70,133 @@ export default function EventCompanyDashboard() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Welcome Header */}
-      <div>
-        <h1 className="text-4xl font-display font-bold text-nocturne-text-primary mb-2">
-          Event Company HQ
-        </h1>
-        <p className="text-nocturne-text-secondary text-lg">
-          Manage events, book artists, and create presentations — all from one place
-        </p>
-      </div>
+      {/* ─── Hero ─── */}
+      <section className="relative">
+        <div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
+        <div className="relative z-10">
+          <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white leading-tight mb-2">
+            Your events, <span className="text-[#c39bff] italic">sorted</span>
+          </h1>
+          <p className="text-white/50 text-lg max-w-xl">
+            Find artists, manage bookings, create proposals — everything for your next event.
+          </p>
+        </div>
+      </section>
 
-      {/* Voice Command Tip */}
-      <div className="glass-panel rounded-4xl p-6 border border-nocturne-border">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-violet-600 flex items-center justify-center flex-shrink-0">
-            <Mic className="w-5 h-5 text-white" />
+      {/* ─── Bento Grid: Voice + Insights ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* Backstage AI Card */}
+        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden min-h-[280px] flex flex-col">
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="text-xl font-display font-bold text-white mb-1">Backstage AI</h3>
+              <p className="text-white/40 text-sm">&ldquo;Find me a singer for a corporate event in Delhi next month&rdquo;</p>
+            </div>
+            <div className="w-10 h-10 bg-[#c39bff]/20 rounded-full flex items-center justify-center border border-[#c39bff]/30 animate-pulse">
+              <Mic className="w-5 h-5 text-[#c39bff]" />
+            </div>
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-nocturne-text-primary">Voice Commands Available</p>
-            <p className="text-xs text-nocturne-text-secondary">
-              Try: &quot;Find DJs in Mumbai&quot; · &quot;Go to my bookings&quot; · &quot;Create a presentation&quot; · &quot;Show my pipeline&quot;
-            </p>
+          <div className="flex-1 flex items-center justify-center gap-2 mt-6">
+            {[40, 60, 80, 50, 90, 40, 70, 30, 60, 85, 40, 20].map((h, i) => (
+              <div
+                key={i}
+                className={`w-2 rounded-full transition-all duration-500 ${i % 2 === 0 ? 'bg-[#c39bff]' : 'bg-[#a1faff]'}`}
+                style={{
+                  height: `${h}%`,
+                  animation: `voiceBar 0.8s ease-in-out infinite alternate`,
+                  animationDelay: `${i * 0.1}s`,
+                }}
+              />
+            ))}
+          </div>
+          <div className="mt-auto pt-4 flex gap-3 overflow-x-auto scrollbar-hide">
+            <Link href="/search" className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-white/60 whitespace-nowrap hover:bg-white/10 transition-colors">
+              Find artists
+            </Link>
+            <Link href="/client/workspace" className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-white/60 whitespace-nowrap hover:bg-white/10 transition-colors">
+              Open workspace
+            </Link>
+            <Link href="/client/bookings" className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-white/60 whitespace-nowrap hover:bg-white/10 transition-colors">
+              Check bookings
+            </Link>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="md:col-span-4 glass-card rounded-xl p-8 border border-white/5 flex flex-col justify-between">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-display font-bold text-white">Overview</h3>
+            <TrendingUp className="w-5 h-5 text-[#a1faff]" />
+          </div>
+          <div className="space-y-5">
+            <div className="flex justify-between items-end border-b border-white/5 pb-4">
+              <div>
+                <p className="text-xs text-white/40 uppercase tracking-widest">Workspaces</p>
+                <p className="text-2xl font-bold text-white">{workspaces.length}</p>
+              </div>
+              <Building2 className="w-5 h-5 text-[#c39bff]" />
+            </div>
+            <div className="flex justify-between items-end border-b border-white/5 pb-4">
+              <div>
+                <p className="text-xs text-white/40 uppercase tracking-widest">Bookings</p>
+                <p className="text-2xl font-bold text-white">{bookingCount}</p>
+              </div>
+              <Calendar className="w-5 h-5 text-[#a1faff]" />
+            </div>
+            <div className="flex justify-between items-end border-b border-white/5 pb-4">
+              <div>
+                <p className="text-xs text-white/40 uppercase tracking-widest">Team</p>
+                <p className="text-2xl font-bold text-white">{totalMembers}</p>
+              </div>
+              <Users className="w-5 h-5 text-green-400" />
+            </div>
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="text-xs text-white/40 uppercase tracking-widest">Events</p>
+                <p className="text-2xl font-bold text-white">{totalEvents}</p>
+              </div>
+              <Briefcase className="w-5 h-5 text-yellow-400" />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <StatCard
-          label="Workspaces"
-          value={workspaces.length}
-          subtitle="Active CRMs"
-          icon={Building2}
-          iconColor="text-nocturne-accent"
-        />
-        <StatCard
-          label="Total Bookings"
-          value={bookingCount}
-          subtitle="All time"
-          icon={Calendar}
-          iconColor="text-accent-magenta"
-        />
-        <StatCard
-          label="Team Members"
-          value={totalMembers}
-          subtitle="Across workspaces"
-          icon={Users}
-          iconColor="text-success"
-        />
-        <StatCard
-          label="Events Managed"
-          value={totalEvents}
-          subtitle="This year"
-          icon={Sparkles}
-          iconColor="text-warning"
-        />
-      </div>
-
-      {/* Quick Actions */}
+      {/* ─── Quick Actions Bento ─── */}
       <div>
-        <h2 className="text-xl font-display font-bold text-nocturne-text-primary mb-4">Quick Actions</h2>
+        <h2 className="text-xl font-display font-bold text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <QuickActionCard
-            href="/search"
-            icon={Search}
-            title="Find Artists"
-            description="Search by genre, city, budget"
-            gradientFrom="from-primary-500"
-            gradientTo="to-primary-600"
-            isPrimary
-          />
-          <QuickActionCard
-            href="/client/workspace"
-            icon={FolderKanban}
-            title="Workspace CRM"
-            description="Pipeline & team"
-            gradientFrom="from-blue-500"
-            gradientTo="to-cyan-600"
-          />
-          <QuickActionCard
-            href="/client/bookings"
-            icon={Calendar}
-            title="All Bookings"
-            description="Track & manage"
-            gradientFrom="from-accent-magenta"
-            gradientTo="to-pink-600"
-          />
-          <QuickActionCard
-            href="/client/workspace"
-            icon={Presentation}
-            title="Presentations"
-            description="Create artist proposals"
-            gradientFrom="from-violet-500"
-            gradientTo="to-purple-600"
-          />
-          <QuickActionCard
-            href="/client/payments"
-            icon={DollarSign}
-            title="Payments"
-            description="Invoices & contracts"
-            gradientFrom="from-emerald-500"
-            gradientTo="to-green-600"
-          />
-          <QuickActionCard
-            href="/client/substitutions"
-            icon={AlertTriangle}
-            title="Emergency Sub"
-            description="Last-minute replacements"
-            gradientFrom="from-orange-500"
-            gradientTo="to-red-600"
-          />
+          <ActionCard href="/search" icon={Search} title="Find Artists" desc="Search by genre, city, budget" accent />
+          <ActionCard href="/client/workspace" icon={FolderKanban} title="Workspace CRM" desc="Pipeline & team management" />
+          <ActionCard href="/client/bookings" icon={Calendar} title="All Bookings" desc="Track & manage bookings" />
+          <ActionCard href="/client/workspace" icon={Presentation} title="Presentations" desc="Create artist proposals" />
+          <ActionCard href="/client/payments" icon={DollarSign} title="Payments" desc="Invoices & escrow" />
+          <ActionCard href="/client/substitutions" icon={AlertTriangle} title="Emergency Sub" desc="Last-minute replacements" />
         </div>
       </div>
 
-      {/* Active Workspaces */}
+      {/* ─── Active Workspaces ─── */}
       {workspaces.length > 0 ? (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-display font-bold text-nocturne-text-primary">Your Workspaces</h2>
-            <Link
-              href="/client/workspace"
-              className="text-sm font-medium text-nocturne-accent hover:text-nocturne-accent transition-colors flex items-center gap-1"
-            >
-              Manage all <ArrowRight className="w-4 h-4" />
+            <h2 className="text-xl font-display font-bold text-white">Your Workspaces</h2>
+            <Link href="/client/workspace" className="text-sm font-medium text-[#c39bff] hover:text-[#a1faff] transition-colors flex items-center gap-1">
+              View all <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {workspaces.slice(0, 4).map((ws) => (
               <Link key={ws.id} href={`/client/workspace/${ws.id}`}>
-                <div className="glass-card rounded-xl p-5 border border-nocturne-border hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm transition-all group cursor-pointer">
+                <div className="glass-card rounded-xl p-5 border border-white/5 hover:border-white/15 transition-all group cursor-pointer">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="font-semibold text-nocturne-text-primary group-hover:text-nocturne-accent transition-colors">
-                        {ws.name}
-                      </h3>
-                      <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-nocturne-primary-light text-nocturne-accent mt-1">
+                      <h3 className="font-semibold text-white group-hover:text-[#c39bff] transition-colors">{ws.name}</h3>
+                      <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-[#c39bff]/15 text-[#a1faff] mt-1">
                         {ws.company_type?.replace(/_/g, ' ') || 'general'}
                       </span>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-nocturne-text-secondary group-hover:text-nocturne-accent group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-5 h-5 text-white/30 group-hover:text-[#c39bff] group-hover:translate-x-1 transition-all" />
                   </div>
-                  <div className="flex items-center gap-4 mt-3 text-xs text-nocturne-text-secondary">
+                  <div className="flex items-center gap-4 mt-3 text-xs text-white/40">
                     <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {ws.member_count || 0} members</span>
                     <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {ws.event_count || 0} events</span>
                   </div>
@@ -227,13 +206,13 @@ export default function EventCompanyDashboard() {
           </div>
         </div>
       ) : (
-        <div className="glass-card rounded-xl p-8 border border-nocturne-border text-center">
-          <Building2 className="w-12 h-12 text-nocturne-text-secondary mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-nocturne-text-primary mb-2">No workspaces yet</h3>
-          <p className="text-nocturne-text-secondary text-sm mb-4">Create your first workspace to start managing events and booking artists</p>
+        <div className="glass-card rounded-xl p-8 border border-white/5 text-center">
+          <Building2 className="w-12 h-12 text-white/30 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-white mb-2">No workspaces yet</h3>
+          <p className="text-white/50 text-sm mb-4">Create your first workspace to start managing events and booking artists</p>
           <Link
             href="/client/workspace"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-accent text-white rounded-lg font-medium hover-glow transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-br from-[#c39bff] to-[#8A2BE2] text-white rounded-lg font-medium hover:shadow-[0_0_20px_rgba(195,155,255,0.3)] transition-all"
           >
             <Building2 className="w-4 h-4" /> Create Workspace
           </Link>
@@ -243,44 +222,23 @@ export default function EventCompanyDashboard() {
   );
 }
 
-function StatCard({ label, value, subtitle, icon: Icon, iconColor }: {
-  label: string; value: number; subtitle: string; icon: React.ComponentType<{ className?: string }>; iconColor: string;
-}) {
-  return (
-    <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all group">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-sm text-nocturne-text-secondary font-medium">{label}</p>
-        <Icon className={`w-5 h-5 ${iconColor} group-hover:scale-110 transition-transform`} />
-      </div>
-      <p className="text-3xl font-bold text-nocturne-text-primary">{value}</p>
-      <p className="text-xs text-nocturne-text-secondary mt-2">{subtitle}</p>
-    </div>
-  );
-}
-
-function QuickActionCard({ href, icon: Icon, title, description, gradientFrom, gradientTo, isPrimary = false }: {
-  href: string; icon: React.ComponentType<{ className?: string }>; title: string; description: string;
-  gradientFrom: string; gradientTo: string; isPrimary?: boolean;
+function ActionCard({ href, icon: Icon, title, desc, accent = false }: {
+  href: string; icon: React.ComponentType<{ className?: string }>; title: string; desc: string; accent?: boolean;
 }) {
   return (
     <Link href={href}>
-      <div className={`rounded-xl p-6 border transition-all duration-300 h-full group cursor-pointer ${
-        isPrimary
-          ? `bg-gradient-to-br ${gradientFrom} ${gradientTo} border-nocturne-border hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm`
-          : `glass-card border-nocturne-border hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm`
-      }`}>
-        <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${
-          isPrimary ? 'bg-white/20' : `bg-gradient-to-br ${gradientFrom} ${gradientTo}`
+      <div className={`rounded-xl p-6 border transition-all h-full group cursor-pointer ${
+        accent
+          ? 'bg-gradient-to-br from-[#c39bff]/20 to-[#8A2BE2]/10 border-[#c39bff]/20 hover:border-[#c39bff]/40'
+          : 'glass-card border-white/5 hover:border-white/15'
+      } hover:shadow-[0_0_20px_rgba(195,155,255,0.15)]`}>
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${
+          accent ? 'bg-[#c39bff]/30' : 'bg-white/5'
         }`}>
-          <Icon className="w-6 h-6 text-white" />
+          <Icon className={`w-5 h-5 ${accent ? 'text-[#c39bff]' : 'text-white/60'}`} />
         </div>
-        <h3 className={`font-semibold mb-1 transition-all ${isPrimary ? 'text-white' : 'text-nocturne-text-primary group-hover:text-nocturne-accent'}`}>
-          {title}
-        </h3>
-        <p className={`text-sm mb-3 ${isPrimary ? 'text-white/80' : 'text-nocturne-text-secondary'}`}>{description}</p>
-        <div className={`flex items-center text-xs font-medium group-hover:translate-x-1 transition-transform ${isPrimary ? 'text-white/70' : 'text-nocturne-accent'}`}>
-          Explore <ArrowRight className="ml-1 w-3 h-3" />
-        </div>
+        <h3 className="font-semibold text-white text-sm mb-1 group-hover:text-[#c39bff] transition-colors">{title}</h3>
+        <p className="text-xs text-white/40">{desc}</p>
       </div>
     </Link>
   );

@@ -327,7 +327,7 @@ export default function AdminDashboardPage() {
                         <td className="px-4 py-3 text-nocturne-text-secondary">{new Date(b.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
                         <td className="px-4 py-3 text-nocturne-text-primary font-semibold">{b.final_amount_paise ? `₹${formatINR(b.final_amount_paise)}` : '-'}</td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-3 py-1 rounded-full font-medium ${STATUS_COLORS[b.status] ?? 'bg-gray-100/20 text-gray-400 border border-gray-400/30'}`}>
+                          <span className={`text-xs px-3 py-1 rounded-full font-medium ${STATUS_COLORS[b.status] ?? 'bg-white/10 text-white/40 border border-white/10'}`}>
                             {b.status.replace('_', ' ')}
                           </span>
                         </td>
@@ -515,7 +515,7 @@ export default function AdminDashboardPage() {
                         <td className="px-4 py-3 text-right text-nocturne-text-primary font-semibold">₹{formatINR(p.amount_paise)}</td>
                         <td className="px-4 py-3 text-right text-emerald-300 font-semibold">₹{formatINR(p.platform_fee_paise)}</td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs px-3 py-1 rounded-full font-medium ${STATUS_COLORS[p.status] ?? 'bg-gray-100/20 text-gray-400 border border-gray-400/30'}`}>
+                          <span className={`text-xs px-3 py-1 rounded-full font-medium ${STATUS_COLORS[p.status] ?? 'bg-white/10 text-white/40 border border-white/10'}`}>
                             {p.status}
                           </span>
                         </td>
@@ -561,8 +561,8 @@ export default function AdminDashboardPage() {
                             d.status === 'under_review' ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30' :
                             d.status === 'upheld' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' :
                             d.status === 'overturned' ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30' :
-                            d.status === 'dismissed' ? 'bg-gray-400/20 text-gray-300 border border-gray-400/30' :
-                            'bg-gray-400/20 text-gray-300 border border-gray-400/30'
+                            d.status === 'dismissed' ? 'bg-white/10 text-white/40 border border-white/10' :
+                            'bg-white/10 text-white/40 border border-white/10'
                           }`}>
                             {d.status.replace('_', ' ')}
                           </span>
@@ -778,7 +778,7 @@ export default function AdminDashboardPage() {
                             c.demand_classification === 'high' ? 'bg-orange-500/20 text-orange-300 border border-orange-400/30' :
                             c.demand_classification === 'moderate' ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :
                             c.demand_classification === 'low' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' :
-                            'bg-gray-400/20 text-gray-300 border border-gray-400/30'
+                            'bg-white/10 text-white/40 border border-white/10'
                           }`}>
                             {c.demand_classification}
                           </span>

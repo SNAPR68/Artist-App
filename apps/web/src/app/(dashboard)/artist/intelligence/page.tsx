@@ -71,7 +71,7 @@ export default function IntelligenceHubPage() {
   if (error || !data) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-500">Unable to load intelligence data right now. Please try again later.</p>
+        <p className="text-white/40">Unable to load intelligence data right now. Please try again later.</p>
       </div>
     );
   }

@@ -186,7 +186,7 @@ export default function WorkspaceCommissionPage() {
 
       {/* Bookings Table */}
       <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg overflow-hidden">
-        <div className="px-5 py-3 border-b border-gray-100">
+        <div className="px-5 py-3 border-b border-white/5">
           <h2 className="text-sm font-semibold text-nocturne-text-secondary">Bookings</h2>
         </div>
 
@@ -198,7 +198,7 @@ export default function WorkspaceCommissionPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs text-nocturne-text-tertiary uppercase tracking-wide border-b border-gray-100">
+                <tr className="text-left text-xs text-nocturne-text-tertiary uppercase tracking-wide border-b border-white/5">
                   <th
                     className="px-5 py-3 cursor-pointer hover:text-nocturne-text-secondary"
                     onClick={() => handleSort('artist_name')}

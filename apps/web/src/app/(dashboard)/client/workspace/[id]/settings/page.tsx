@@ -280,7 +280,7 @@ export default function WorkspaceSettingsPage() {
             Delete Workspace
           </button>
           <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block">
-            <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
+            <div className="bg-nocturne-surface text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
               Contact support to delete a workspace
             </div>
           </div>

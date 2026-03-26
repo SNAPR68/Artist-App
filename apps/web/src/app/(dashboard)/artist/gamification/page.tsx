@@ -44,7 +44,7 @@ const BADGE_INFO: Record<string, { label: string; requirement: string }> = {
 
 const LEVEL_COLORS: Record<string, string> = {
   bronze: 'bg-amber-600',
-  silver: 'bg-gray-400',
+  silver: 'bg-white/40',
   gold: 'bg-yellow-400',
   platinum: 'bg-indigo-500',
 };

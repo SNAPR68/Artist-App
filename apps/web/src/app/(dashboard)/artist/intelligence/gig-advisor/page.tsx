@@ -99,7 +99,7 @@ export default function GigAdvisorPage() {
   if (error) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-500">Unable to load gig advisor data. Please try again later.</p>
+        <p className="text-white/40">Unable to load gig advisor data. Please try again later.</p>
       </div>
     );
   }

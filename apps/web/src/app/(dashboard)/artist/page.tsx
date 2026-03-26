@@ -17,6 +17,7 @@ import {
   Shield,
   IndianRupee,
   ArrowRight,
+  Mic,
 } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
@@ -32,33 +33,6 @@ interface ArtistProfile {
   profile_views?: number;
   earnings_this_month?: number;
 }
-
-const StatsSkeleton = () => (
-  <div className="animate-pulse space-y-4">
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {[...Array(4)].map((_, i) => (
-        <div key={i} className="glass-card p-6 rounded-xl">
-          <div className="h-4 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-3/4 mb-3" />
-          <div className="h-8 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-1/2" />
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-const QuickActionsSkeleton = () => (
-  <div className="animate-pulse">
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      {[...Array(9)].map((_, i) => (
-        <div key={i} className="glass-card p-6 rounded-xl">
-          <div className="w-12 h-12 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded-lg mb-3" />
-          <div className="h-4 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-4/5 mb-2" />
-          <div className="h-3 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded w-3/4" />
-        </div>
-      ))}
-    </div>
-  </div>
-);
 
 export default function ArtistHomePage() {
   const [profile, setProfile] = useState<ArtistProfile | null>(null);
@@ -81,9 +55,14 @@ export default function ArtistHomePage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="h-10 bg-gradient-to-r from-nocturne-surface via-nocturne-surface-2 to-nocturne-surface rounded-lg w-1/3 animate-pulse" />
-        <StatsSkeleton />
-        <QuickActionsSkeleton />
+        <div className="h-10 nocturne-skeleton w-1/3 rounded-lg" />
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <div className="md:col-span-8 nocturne-skeleton h-[280px] rounded-xl" />
+          <div className="md:col-span-4 nocturne-skeleton h-[280px] rounded-xl" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => <div key={i} className="nocturne-skeleton h-28 rounded-xl" />)}
+        </div>
       </div>
     );
   }
@@ -91,19 +70,16 @@ export default function ArtistHomePage() {
   if (noProfile) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="glass-card rounded-2xl p-12 text-center max-w-md">
-          <h1 className="text-3xl font-display font-bold text-nocturne-text-primary mb-4">
-            Welcome to ArtistBooking!
-          </h1>
-          <p className="text-nocturne-text-secondary mb-8 leading-relaxed">
-            Complete your artist profile to start receiving premium booking opportunities.
+        <div className="glass-card rounded-2xl p-12 text-center max-w-md border border-white/5">
+          <h1 className="text-3xl font-display font-bold text-white mb-4">Welcome to ArtistBook!</h1>
+          <p className="text-white/50 mb-8 leading-relaxed">
+            Complete your profile to start receiving booking opportunities from event companies across India.
           </p>
           <Link
             href="/artist/onboarding"
-            className="inline-flex items-center justify-center bg-gradient-accent hover-glow px-6 py-3 rounded-lg font-semibold text-white transition-all duration-300"
+            className="inline-flex items-center justify-center bg-gradient-to-br from-[#c39bff] to-[#8A2BE2] px-6 py-3 rounded-lg font-semibold text-white transition-all hover:shadow-[0_0_20px_rgba(195,155,255,0.3)]"
           >
-            Create Your Profile
-            <ArrowRight className="ml-2 w-5 h-5" />
+            Create Your Profile <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>
       </div>
@@ -113,182 +89,109 @@ export default function ArtistHomePage() {
   return (
     <ErrorBoundary>
     <div className="space-y-8 animate-fade-in">
-      {/* Welcome Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-4xl font-display font-bold text-nocturne-text-primary">
-              {profile?.stage_name}
-            </h1>
-            {profile?.is_verified && (
-              <BadgeCheck className="w-8 h-8 text-accent-magenta animate-fade-in" />
-            )}
+      {/* ─── Hero Header ─── */}
+      <section className="relative">
+        <div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white">
+                {profile?.stage_name}
+              </h1>
+              {profile?.is_verified && <BadgeCheck className="w-7 h-7 text-[#c39bff]" />}
+            </div>
+            <p className="text-white/50 text-lg">Welcome back. Here&apos;s your overview.</p>
           </div>
-          <p className="text-nocturne-text-secondary text-lg">
-            Welcome back! Keep your momentum going this month.
-          </p>
+          {/* Escrow Balance */}
+          <div className="flex items-center gap-4 glass-card px-6 py-4 rounded-xl border border-white/5">
+            <div>
+              <span className="text-[10px] uppercase tracking-widest text-[#a1faff] font-bold">Earnings This Month</span>
+              <p className="text-2xl font-extrabold text-white">₹{(profile?.earnings_this_month ?? 0).toLocaleString('en-IN')}</p>
+            </div>
+            <div className="w-[1px] h-10 bg-white/10" />
+            <Wallet className="w-7 h-7 text-[#c39bff]" />
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Profile Completion */}
+      {/* ─── Profile Completion ─── */}
       {(profile?.profile_completion_pct ?? 0) < 100 && (
-        <div className="glass-card rounded-xl p-6 border border-nocturne-border">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-nocturne-text-primary">Profile Completion</h3>
-            <span className="text-sm font-bold text-gradient">
-              {profile?.profile_completion_pct}%
-            </span>
+        <div className="glass-card rounded-xl p-5 border border-white/5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-white text-sm">Profile Completion</h3>
+            <span className="text-sm font-bold text-[#c39bff]">{profile?.profile_completion_pct}%</span>
           </div>
-          <div className="w-full bg-nocturne-surface-2 rounded-full h-2 overflow-hidden mb-4">
+          <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden mb-3">
             <div
-              className="h-full bg-gradient-to-r from-primary-500 to-accent-magenta transition-all duration-500"
+              className="h-full bg-gradient-to-r from-[#c39bff] to-[#a1faff] rounded-full transition-all duration-500"
               style={{ width: `${profile?.profile_completion_pct}%` }}
             />
           </div>
-          <Link
-            href="/artist/profile"
-            className="inline-flex items-center text-sm font-medium text-nocturne-accent hover:text-nocturne-accent transition-colors"
-          >
-            Complete your profile to unlock more opportunities
-            <ArrowRight className="ml-2 w-4 h-4" />
+          <Link href="/artist/profile" className="text-xs font-medium text-[#a1faff] hover:text-white transition-colors flex items-center gap-1">
+            Complete to unlock more bookings <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
       )}
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all group">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-nocturne-text-secondary font-medium">Total Bookings</p>
-            <Calendar className="w-5 h-5 text-nocturne-accent group-hover:scale-110 transition-transform" />
-          </div>
-          <p className="text-3xl font-bold text-nocturne-text-primary mb-2">
-            {profile?.total_bookings ?? 0}
-          </p>
-          <div className="flex items-center text-xs text-success">
-            <span>↑ 12% this month</span>
-          </div>
-        </div>
-
-        <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all group">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-nocturne-text-secondary font-medium">Trust Score</p>
-            <Shield className="w-5 h-5 text-accent-magenta group-hover:scale-110 transition-transform" />
-          </div>
-          <p className="text-3xl font-bold text-nocturne-text-primary mb-2">
-            {profile?.trust_score ?? 0}%
-          </p>
-          <div className="w-full bg-nocturne-surface-2 rounded-full h-1.5">
-            <div
-              className="h-full bg-gradient-to-r from-primary-500 to-accent-magenta rounded-full"
-              style={{ width: `${(profile?.trust_score ?? 0)}%` }}
-            />
+      {/* ─── Bento Grid: Next Booking + AI ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* Main Card */}
+        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative group overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#c39bff]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <div className="relative z-10">
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <span className="bg-[#c39bff]/15 text-[#c39bff] px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[#c39bff]/20">
+                  Dashboard
+                </span>
+                <h2 className="text-2xl font-bold mt-3 text-white">Your Performance</h2>
+                <p className="text-white/40 mt-1">Keep your momentum going this month</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <StatMini label="Bookings" value={String(profile?.total_bookings ?? 0)} icon={Calendar} color="text-[#a1faff]" />
+              <StatMini label="Trust Score" value={`${profile?.trust_score ?? 0}%`} icon={Shield} color="text-[#c39bff]" />
+              <StatMini label="Profile Views" value={String(profile?.profile_views ?? 0)} icon={Eye} color="text-[#a1faff]" />
+              <StatMini label="Earnings" value={`₹${(profile?.earnings_this_month ?? 0).toLocaleString('en-IN')}`} icon={IndianRupee} color="text-green-400" highlight />
+            </div>
           </div>
         </div>
 
-        <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all group">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-nocturne-text-secondary font-medium">Earnings This Month</p>
-            <IndianRupee className="w-5 h-5 text-success group-hover:scale-110 transition-transform" />
+        {/* AI Insights Panel */}
+        <div className="md:col-span-4 glass-card rounded-xl p-8 border border-white/5 flex flex-col gap-5">
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 rounded-full bg-[#a1faff] animate-pulse shadow-[0_0_12px_rgba(161,250,255,0.5)]" />
+            <h3 className="text-sm font-extrabold uppercase tracking-widest text-[#a1faff]">Backstage AI</h3>
           </div>
-          <p className="text-3xl font-bold text-nocturne-text-primary mb-2">
-            ₹{(profile?.earnings_this_month ?? 0).toLocaleString('en-IN')}
-          </p>
-          <div className="flex items-center text-xs text-success">
-            <span>✓ Payment pending</span>
+          <div className="space-y-4">
+            <ProgressBar label="Trust Score" value={profile?.trust_score ?? 0} color="bg-[#a1faff]" />
+            <ProgressBar label="Profile Completion" value={profile?.profile_completion_pct ?? 0} color="bg-[#c39bff]" />
           </div>
-        </div>
-
-        <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all group">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-nocturne-text-secondary font-medium">Profile Views</p>
-            <Eye className="w-5 h-5 text-nocturne-accent group-hover:scale-110 transition-transform" />
+          <div className="mt-2 p-4 rounded-xl bg-white/3 border border-white/5 italic text-sm text-white/40">
+            &ldquo;Keep accepting bookings to boost your trust score and unlock premium visibility.&rdquo;
           </div>
-          <p className="text-3xl font-bold text-nocturne-text-primary mb-2">
-            {profile?.profile_views ?? 0}
-          </p>
-          <div className="flex items-center text-xs text-nocturne-accent">
-            <span>This week</span>
-          </div>
+          <Link
+            href="/artist/intelligence"
+            className="mt-auto w-full py-3 rounded-xl border border-[#a1faff]/20 text-[#a1faff] text-xs font-bold uppercase tracking-widest hover:bg-[#a1faff]/5 transition-all flex items-center justify-center gap-2"
+          >
+            <Brain className="w-4 h-4" /> View Insights
+          </Link>
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* ─── Quick Actions ─── */}
       <div>
-        <h2 className="text-xl font-display font-bold text-nocturne-text-primary mb-4">Quick Actions</h2>
+        <h2 className="text-xl font-display font-bold text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <QuickActionCard
-            href="/artist/calendar"
-            icon={CalendarDays}
-            title="Calendar"
-            description="Set your availability"
-            gradientFrom="from-primary-500"
-            gradientTo="to-primary-600"
-          />
-          <QuickActionCard
-            href="/artist/bookings"
-            icon={Calendar}
-            title="Bookings"
-            description="Manage your gigs"
-            gradientFrom="from-accent-magenta"
-            gradientTo="to-pink-600"
-          />
-          <QuickActionCard
-            href="/artist/earnings"
-            icon={Wallet}
-            title="Earnings"
-            description="Payment history"
-            gradientFrom="from-success"
-            gradientTo="to-emerald-600"
-          />
-          <QuickActionCard
-            href="/artist/financial"
-            icon={BarChart3}
-            title="Financial Center"
-            description="Escrow, tax, forecast"
-            gradientFrom="from-blue-500"
-            gradientTo="to-cyan-600"
-          />
-          <QuickActionCard
-            href="/artist/intelligence"
-            icon={Brain}
-            title="Career Intelligence"
-            description="Insights & trends"
-            gradientFrom="from-purple-500"
-            gradientTo="to-indigo-600"
-          />
-          <QuickActionCard
-            href="/artist/intelligence"
-            icon={TrendingUp}
-            title="Seasonal Demand"
-            description="Peak & valley alerts"
-            gradientFrom="from-orange-500"
-            gradientTo="to-red-600"
-          />
-          <QuickActionCard
-            href="/gigs"
-            icon={Target}
-            title="Gig Marketplace"
-            description="Browse opportunities"
-            gradientFrom="from-teal-500"
-            gradientTo="to-cyan-600"
-          />
-          <QuickActionCard
-            href="/artist/gamification"
-            icon={Trophy}
-            title="Achievements"
-            description="Badges & streaks"
-            gradientFrom="from-yellow-500"
-            gradientTo="to-amber-600"
-          />
-          <QuickActionCard
-            href="/artist/onboarding"
-            icon={UserCog}
-            title="Edit Profile"
-            description="Photos, bio, pricing"
-            gradientFrom="from-rose-500"
-            gradientTo="to-pink-600"
-          />
+          <ActionCard href="/artist/calendar" icon={CalendarDays} title="Calendar" desc="Set your availability" />
+          <ActionCard href="/artist/bookings" icon={Calendar} title="Bookings" desc="Manage your gigs" />
+          <ActionCard href="/artist/earnings" icon={Wallet} title="Earnings" desc="Payment history" />
+          <ActionCard href="/artist/financial" icon={BarChart3} title="Financial" desc="Escrow & payouts" />
+          <ActionCard href="/artist/intelligence" icon={Brain} title="Intelligence" desc="Career insights" />
+          <ActionCard href="/artist/seasonal" icon={TrendingUp} title="Demand" desc="Seasonal trends" />
+          <ActionCard href="/gigs" icon={Target} title="Gig Market" desc="Browse opportunities" />
+          <ActionCard href="/artist/gamification" icon={Trophy} title="Achievements" desc="Badges & streaks" />
+          <ActionCard href="/artist/profile" icon={UserCog} title="Edit Profile" desc="Photos, bio, pricing" />
         </div>
       </div>
     </div>
@@ -296,38 +199,45 @@ export default function ArtistHomePage() {
   );
 }
 
-interface QuickActionCardProps {
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
-  gradientFrom: string;
-  gradientTo: string;
+function StatMini({ label, value, icon: Icon, color, highlight = false }: {
+  label: string; value: string; icon: React.ComponentType<{ className?: string }>; color: string; highlight?: boolean;
+}) {
+  return (
+    <div className={`bg-white/5 p-4 rounded-lg ${highlight ? 'border border-[#c39bff]/20' : ''}`}>
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">{label}</p>
+        <Icon className={`w-4 h-4 ${color}`} />
+      </div>
+      <p className={`text-lg font-bold ${highlight ? 'text-[#c39bff]' : 'text-white'}`}>{value}</p>
+    </div>
+  );
 }
 
-function QuickActionCard({
-  href,
-  icon: Icon,
-  title,
-  description,
-  gradientFrom,
-  gradientTo,
-}: QuickActionCardProps) {
+function ProgressBar({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-1.5">
+        <span className="text-xs font-medium text-white">{label}</span>
+        <span className={`text-xs ${color === 'bg-[#a1faff]' ? 'text-[#a1faff]' : 'text-[#c39bff]'}`}>{value}%</span>
+      </div>
+      <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+        <div className={`h-full ${color} rounded-full shadow-[0_0_8px_rgba(161,250,255,0.3)]`} style={{ width: `${value}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function ActionCard({ href, icon: Icon, title, desc }: {
+  href: string; icon: React.ComponentType<{ className?: string }>; title: string; desc: string;
+}) {
   return (
     <Link href={href}>
-      <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all duration-300 h-full hover:shadow-nocturne-glow-sm group cursor-pointer">
-        <div
-          className={`w-12 h-12 rounded-lg bg-gradient-to-br ${gradientFrom} ${gradientTo} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
-        >
-          <Icon className="w-6 h-6 text-white" />
+      <div className="glass-card rounded-xl p-5 border border-white/5 hover:border-white/15 transition-all h-full group cursor-pointer hover:shadow-[0_0_20px_rgba(195,155,255,0.1)]">
+        <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center mb-3 group-hover:bg-[#c39bff]/10 transition-colors">
+          <Icon className="w-5 h-5 text-white/50 group-hover:text-[#c39bff] transition-colors" />
         </div>
-        <h3 className="font-semibold text-nocturne-text-primary mb-1 group-hover:text-nocturne-accent transition-colors">
-          {title}
-        </h3>
-        <p className="text-sm text-nocturne-text-secondary mb-3">{description}</p>
-        <div className="flex items-center text-nocturne-accent text-xs font-medium group-hover:translate-x-1 transition-transform">
-          Explore <ArrowRight className="ml-1 w-3 h-3" />
-        </div>
+        <h3 className="font-semibold text-white text-sm mb-0.5 group-hover:text-[#c39bff] transition-colors">{title}</h3>
+        <p className="text-xs text-white/40">{desc}</p>
       </div>
     </Link>
   );

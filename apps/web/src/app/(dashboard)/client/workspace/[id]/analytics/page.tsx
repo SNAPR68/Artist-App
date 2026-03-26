@@ -197,7 +197,7 @@ export default function WorkspaceAnalyticsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 text-left">
+                <tr className="border-b border-white/5 text-left">
                   <th className="px-4 py-2 font-medium text-nocturne-text-tertiary">Month</th>
                   <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Bookings</th>
                   <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Total Spend</th>
@@ -230,7 +230,7 @@ export default function WorkspaceAnalyticsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 text-left">
+                <tr className="border-b border-white/5 text-left">
                   <th className="px-4 py-2 font-medium text-nocturne-text-tertiary">#</th>
                   <th className="px-4 py-2 font-medium text-nocturne-text-tertiary">Artist</th>
                   <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Bookings</th>

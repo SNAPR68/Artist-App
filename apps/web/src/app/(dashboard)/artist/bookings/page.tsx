@@ -26,7 +26,7 @@ const STATUS_COLORS: Record<string, { badge: string; text: string }> = {
   completed: { badge: 'bg-purple-500/20 text-purple-300', text: 'Completed' },
   settled: { badge: 'bg-green-500/20 text-green-300', text: 'Settled' },
   cancelled: { badge: 'bg-red-500/20 text-red-300', text: 'Cancelled' },
-  expired: { badge: 'bg-gray-500/20 text-gray-400', text: 'Expired' },
+  expired: { badge: 'bg-white/10 text-white/40', text: 'Expired' },
 };
 
 function SkeletonCard() {
@@ -100,7 +100,7 @@ export default function ArtistBookingsPage() {
       ) : (
         <div className="space-y-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
           {bookings.map((b, idx) => {
-            const statusInfo = STATUS_COLORS[b.status] ?? { badge: 'bg-gray-500/20 text-gray-400', text: b.status };
+            const statusInfo = STATUS_COLORS[b.status] ?? { badge: 'bg-white/10 text-white/40', text: b.status };
             const isNew = b.status === 'inquiry';
             return (
               <Link
