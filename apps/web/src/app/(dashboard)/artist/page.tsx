@@ -17,7 +17,6 @@ import {
   Shield,
   IndianRupee,
   ArrowRight,
-  Mic,
 } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';

@@ -1,12 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, ArrowRight } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
-const CITIES = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Kolkata', 'Jaipur'];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -98,25 +95,11 @@ function AIVisualizer() {
 
 export function Hero() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCity, setSelectedCity] = useState('All Cities');
-  const [isSearching, setIsSearching] = useState(false);
   const containerRef = useRef(null);
   const { scrollY } = useScroll();
 
   const violetOrbY = useTransform(scrollY, [0, 500], [0, 150]);
   const cyanOrbY = useTransform(scrollY, [0, 500], [0, -100]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSearching(true);
-    const params = new URLSearchParams();
-    if (searchQuery) params.append('q', searchQuery);
-    if (selectedCity !== 'All Cities') params.append('city', selectedCity);
-    setTimeout(() => {
-      router.push(`/search?${params.toString()}`);
-    }, 100);
-  };
 
   return (
     <section

@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import { SlidersHorizontal, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 import { ArtistCard } from '../../../components/search/ArtistCard';
-import { SearchBar } from '../../../components/search/SearchBar';
 import { FilterSidebar } from '../../../components/search/FilterSidebar';
 import { FilterDrawer } from '../../../components/search/FilterDrawer';
 import { SkeletonCard } from '../../../components/shared/SkeletonCard';
@@ -159,7 +158,7 @@ function SearchPageContent() {
           </div>
           {/* Genre Quick Filters */}
           <div className="flex flex-wrap gap-3 mt-6">
-            {['Bollywood', 'EDM', 'Live Band', 'Comedy', 'Classical', 'Sufi', 'Rock', 'Hip-Hop'].map((g, i) => (
+            {['Bollywood', 'EDM', 'Live Band', 'Comedy', 'Classical', 'Sufi', 'Rock', 'Hip-Hop'].map((g) => (
               <button
                 key={g}
                 onClick={() => { setGenre(genre === g ? '' : g); setPage(1); }}

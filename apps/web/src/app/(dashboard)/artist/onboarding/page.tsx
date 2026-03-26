@@ -489,11 +489,11 @@ export default function OnboardingPage() {
         )}
       </div>
 
-              </div>{/* end relative z-10 */}
-            </div>{/* end glass card */}
-          </div>{/* end lg:col-span-7 */}
-        </div>{/* end grid */}
-      </div>{/* end max-w-6xl */}
-    </div>{/* end bg-[#0e0e0f] */}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

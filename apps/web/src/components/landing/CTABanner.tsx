@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
-export function CTABanner({ variant }: { variant?: 'artist' | 'company' }) {
+export function CTABanner({ variant: _variant }: { variant?: 'artist' | 'company' }) {
   const router = useRouter();
 
   return (

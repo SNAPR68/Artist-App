@@ -202,5 +202,6 @@ export default function PublicArtistPage() {
         </div>
       </aside>
     </div>
+    </div>
   );
 }

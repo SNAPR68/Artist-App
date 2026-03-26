@@ -25,7 +25,7 @@ export function ArtistCard({
   genres,
   base_city,
   trust_score,
-  total_bookings,
+  total_bookings: _total_bookings,
   is_verified,
   thumbnail_url,
   pricing,
