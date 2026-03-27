@@ -131,17 +131,16 @@ export function Hero() {
 
           {/* Headline */}
           <motion.h1 variants={itemVariants} className="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[0.9] max-w-4xl mx-auto text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
-            Book the{' '}
+            Live entertainment,{' '}
             <span className="bg-gradient-to-r from-[#c39bff] via-[#b68cf6] to-[#a1faff] bg-clip-text text-transparent italic">
-              perfect artist
-            </span>{' '}
-            for your event
+              reinvented.
+            </span>
           </motion.h1>
 
           {/* Subtitle */}
           <motion.p variants={itemVariants} className="text-white/70 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
-            DJs, singers, bands, comedians — 5,000+ verified artists across India.
-            Browse, compare, book, and pay. All in one place.
+            The entertainment OS for India. 5,000+ verified artists.
+            Browse, compare, book, and pay — all in one place.
           </motion.p>
 
           {/* ─── 3 CTA Buttons ─── */}
