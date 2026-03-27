@@ -70,22 +70,27 @@ export function VoiceAssistant() {
   const [selectedVoiceURI, setSelectedVoiceURI] = useState<string>('');
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
 
-  // Load available TTS voices
+  // Load available TTS voices — pick best English + Hindi only
   useEffect(() => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
     const loadVoices = () => {
       const available = window.speechSynthesis.getVoices();
       if (available.length > 0) {
-        setVoices(available);
-        // Default: pick a good English voice (prefer Indian English, then UK, then US)
-        if (!selectedVoiceURI) {
-          const preferred = available.find(v => v.lang === 'en-IN')
-            || available.find(v => v.name.includes('Samantha'))
-            || available.find(v => v.name.includes('Karen'))
-            || available.find(v => v.name.includes('Daniel'))
-            || available.find(v => v.lang.startsWith('en-') && v.localService)
-            || available.find(v => v.lang.startsWith('en-'));
-          if (preferred) setSelectedVoiceURI(preferred.voiceURI);
+        // Curate: pick the single best English and Hindi voice
+        const bestEnglish = available.find(v => v.lang === 'en-IN' && !v.name.includes('(Natural)') === false)
+          || available.find(v => v.lang === 'en-IN')
+          || available.find(v => v.name.includes('Samantha'))
+          || available.find(v => v.name.includes('Karen'))
+          || available.find(v => v.name.includes('Daniel'))
+          || available.find(v => v.lang.startsWith('en-') && v.localService)
+          || available.find(v => v.lang.startsWith('en-'));
+        const bestHindi = available.find(v => v.lang === 'hi-IN' && !v.localService)
+          || available.find(v => v.lang === 'hi-IN')
+          || available.find(v => v.lang.startsWith('hi'));
+        const curated = [bestEnglish, bestHindi].filter(Boolean) as SpeechSynthesisVoice[];
+        setVoices(curated);
+        if (!selectedVoiceURI && bestEnglish) {
+          setSelectedVoiceURI(bestEnglish.voiceURI);
         }
       }
     };
@@ -626,62 +631,36 @@ export function VoiceAssistant() {
               </div>
             </div>
 
-            {/* ─── Voice Settings Panel ─── */}
+            {/* ─── Voice Settings: Simple EN/HI Toggle ─── */}
             {showVoiceSettings && (
-              <div className="shrink-0 px-4 py-3 border-b border-white/10 bg-white/5 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-white/70 uppercase tracking-wider">Voice</span>
+              <div className="shrink-0 px-4 py-3 border-b border-white/10 bg-white/5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-white/50 mr-auto">Voice</span>
+                  {voices.map(v => {
+                    const isEnglish = v.lang.startsWith('en');
+                    const label = isEnglish ? 'English' : 'Hindi';
+                    const isActive = selectedVoiceURI === v.voiceURI;
+                    return (
+                      <button
+                        key={v.voiceURI}
+                        onClick={() => setSelectedVoiceURI(v.voiceURI)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                          isActive
+                            ? 'bg-[#c39bff]/20 text-[#c39bff] border border-[#c39bff]/30'
+                            : 'bg-white/5 text-white/50 border border-white/10 hover:text-white hover:bg-white/10'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
                   <button
-                    onClick={() => {
-                      // Preview current voice
-                      speakResponse('Hello! I am Backstage AI. How can I help you today?');
-                    }}
-                    className="text-[10px] text-[#a1faff] hover:text-white transition-colors px-2 py-1 rounded bg-white/5 hover:bg-white/10"
+                    onClick={() => speakResponse('Hello! I am Backstage AI. How can I help you?')}
+                    className="text-[10px] text-[#a1faff] hover:text-white transition-colors px-2 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10"
                   >
-                    Preview
+                    Test
                   </button>
                 </div>
-                <select
-                  value={selectedVoiceURI}
-                  onChange={(e) => setSelectedVoiceURI(e.target.value)}
-                  className="w-full text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#8A2BE2] appearance-none cursor-pointer"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ffffff' opacity='0.4' d='M1 1l5 5 5-5'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 12px center',
-                    paddingRight: '28px',
-                  }}
-                >
-                  {voices.filter(v => v.lang.startsWith('en')).length > 0 ? (
-                    <>
-                      <optgroup label="English voices">
-                        {voices
-                          .filter(v => v.lang.startsWith('en'))
-                          .map(v => (
-                            <option key={v.voiceURI} value={v.voiceURI}>
-                              {v.name} ({v.lang}){v.localService ? '' : ' ☁️'}
-                            </option>
-                          ))}
-                      </optgroup>
-                      {voices.filter(v => v.lang.startsWith('hi')).length > 0 && (
-                        <optgroup label="Hindi voices">
-                          {voices
-                            .filter(v => v.lang.startsWith('hi'))
-                            .map(v => (
-                              <option key={v.voiceURI} value={v.voiceURI}>
-                                {v.name} ({v.lang}){v.localService ? '' : ' ☁️'}
-                              </option>
-                            ))}
-                        </optgroup>
-                      )}
-                    </>
-                  ) : (
-                    <option>Loading voices...</option>
-                  )}
-                </select>
-                <p className="text-[10px] text-white/30">
-                  {voices.filter(v => v.lang.startsWith('en')).length} English + {voices.filter(v => v.lang.startsWith('hi')).length} Hindi voices
-                </p>
               </div>
             )}
 
