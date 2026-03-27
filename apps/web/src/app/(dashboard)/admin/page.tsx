@@ -787,12 +787,12 @@ export default function AdminDashboardPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right text-nocturne-text-primary font-semibold">
-                          {((c.avg_fill_rate ?? 0) * 100).toFixed(1)}%
+                          {(Number(c.avg_fill_rate ?? 0) * 100).toFixed(1)}%
                         </td>
                         <td className="px-4 py-3 text-right font-semibold">
                           {c.yoy_trend_pct !== null ? (
                             <span className={c.yoy_trend_pct >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
-                              {(c.yoy_trend_pct ?? 0) >= 0 ? '↑' : '↓'} {Math.abs(c.yoy_trend_pct ?? 0).toFixed(1)}%
+                              {Number(c.yoy_trend_pct ?? 0) >= 0 ? '↑' : '↓'} {Math.abs(Number(c.yoy_trend_pct ?? 0)).toFixed(1)}%
                             </span>
                           ) : (
                             <span className="text-nocturne-text-secondary">-</span>

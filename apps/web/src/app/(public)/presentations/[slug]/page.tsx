@@ -63,7 +63,7 @@ function TrustStars({ score }: { score: number }) {
           ★
         </span>
       ))}
-      <span className="ml-1 text-xs text-gray-500">{(score ?? 0).toFixed(1)}</span>
+      <span className="ml-1 text-xs text-gray-500">{Number(score ?? 0).toFixed(1)}</span>
     </div>
   );
 }

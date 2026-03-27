@@ -110,7 +110,7 @@ export default function SeasonalInsightsPage() {
                         {c.demand_level}
                       </span>
                     </div>
-                    <p className="text-xs text-white/50">Fill Rate: {((c.fill_rate ?? 0) * 100).toFixed(0)}%</p>
+                    <p className="text-xs text-white/50">Fill Rate: {(Number(c.fill_rate ?? 0) * 100).toFixed(0)}%</p>
                   </div>
                   {c.yoy_change_pct && (
                     <span className={`text-xs font-black ${c.yoy_change_pct >= 0 ? 'text-green-400' : 'text-[#ff8b9a]'}`}>

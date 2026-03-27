@@ -96,7 +96,7 @@ export function ArtistCard({
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1">
                 <Star size={12} className="text-[#ffbf00] fill-[#ffbf00]" />
-                <span className="text-xs font-bold text-white">{(trust_score ?? 0).toFixed(1)}</span>
+                <span className="text-xs font-bold text-white">{Number(trust_score ?? 0).toFixed(1)}</span>
               </div>
               <div className="flex items-center gap-1">
                 <MapPin size={12} className="text-white/40" />

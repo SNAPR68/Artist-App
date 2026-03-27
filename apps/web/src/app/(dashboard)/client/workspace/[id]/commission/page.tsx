@@ -112,7 +112,7 @@ export default function WorkspaceCommissionPage() {
 
   const effectiveRate =
     summary.total_booking_value_paise > 0
-      ? ((summary.total_commission_paise / summary.total_booking_value_paise) * 100).toFixed(2)
+      ? (Number(summary.total_commission_paise) / Number(summary.total_booking_value_paise) * 100).toFixed(2)
       : '0.00';
 
   const sortedBookings = [...summary.bookings].sort((a, b) => {
