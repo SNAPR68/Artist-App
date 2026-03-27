@@ -131,19 +131,25 @@ export function VoiceAssistant() {
     }
 
     // Detect genre/category — values must match API facet values
+    // Genre values MUST match DB values: Bollywood, Classical, Rock, Jazz, Electronic, Folk, Pop, Hip-Hop, Fusion, Sufi
     const genres: Record<string, string> = {
-      'dj': 'EDM', 'edm': 'EDM', 'electronic': 'Electronic',
+      'dj': 'Electronic', 'edm': 'Electronic', 'electronic': 'Electronic', 'techno': 'Electronic', 'house': 'Electronic',
       'singer': 'Bollywood', 'vocalist': 'Bollywood', 'bollywood': 'Bollywood',
-      'band': 'Live Band', 'live band': 'Live Band',
-      'comedian': 'Comedy', 'comedy': 'Comedy', 'standup': 'Comedy',
-      'dancer': 'Folk', 'dance': 'Folk',
-      'classical': 'Classical', 'ghazal': 'Ghazal', 'sufi': 'Sufi',
+      'classical': 'Classical', 'ghazal': 'Classical',
+      'sufi': 'Sufi', 'qawwali': 'Sufi',
       'jazz': 'Jazz', 'rock': 'Rock', 'pop': 'Pop', 'folk': 'Folk',
       'hip-hop': 'Hip-Hop', 'hiphop': 'Hip-Hop', 'rap': 'Hip-Hop',
-      'fusion': 'Fusion', 'qawwali': 'Qawwali', 'acoustic': 'Acoustic',
-      'techno': 'Techno', 'house': 'House', 'wedding': 'Wedding',
-      'brass': 'Brass Band', 'rajasthani': 'Rajasthani',
+      'fusion': 'Fusion', 'acoustic': 'Fusion',
     };
+    // Terms that search stage_name/bio via q= instead of genre filter
+    const qMappings: Record<string, string> = {
+      'band': 'band', 'live band': 'band',
+      'comedian': 'comedy', 'comedy': 'comedy', 'standup': 'comedy',
+      'dancer': 'dance', 'dance': 'dance',
+    };
+    for (const [keyword, searchTerm] of Object.entries(qMappings)) {
+      if (lower.includes(keyword)) { params.q = searchTerm; return params; }
+    }
     for (const [keyword, genre] of Object.entries(genres)) {
       if (lower.includes(keyword)) { params.genre = genre; break; }
     }
