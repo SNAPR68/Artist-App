@@ -179,7 +179,7 @@ export default function IntelligenceHubPage() {
             data.top_cities.map((c) => (
               <span
                 key={c.city}
-                className="inline-flex items-center gap-2 bg-nocturne-surface-2 border border-nocturne-border px-4 py-2 rounded-full text-nocturne-text-secondary text-sm font-display font-semibold hover:bg-nocturne-surface-2 transition-colors duration-300"
+                className="inline-flex items-center gap-2 bg-nocturne-surface-2 border border-white/10 px-4 py-2 rounded-full text-nocturne-text-secondary text-sm font-display font-semibold hover:bg-nocturne-surface-2 transition-colors duration-300"
               >
                 <MapPin size={14} className="text-nocturne-accent" />
                 {c.city}
@@ -207,7 +207,7 @@ export default function IntelligenceHubPage() {
             data.top_event_types.map((e) => (
               <span
                 key={e.event_type}
-                className="inline-flex items-center gap-2 bg-nocturne-surface-2 border border-nocturne-border px-4 py-2 rounded-full text-nocturne-text-secondary text-sm font-display font-semibold hover:bg-nocturne-surface-2 transition-colors duration-300"
+                className="inline-flex items-center gap-2 bg-nocturne-surface-2 border border-white/10 px-4 py-2 rounded-full text-nocturne-text-secondary text-sm font-display font-semibold hover:bg-nocturne-surface-2 transition-colors duration-300"
               >
                 <Target size={14} className="text-secondary-400" />
                 {e.event_type}

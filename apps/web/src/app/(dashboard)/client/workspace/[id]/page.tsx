@@ -280,7 +280,7 @@ export default function WorkspaceDetailPage() {
                           <Link
                             key={b.id}
                             href={`/client/bookings/${b.id}`}
-                            className="block bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-3 hover:border-primary-300 transition-colors"
+                            className="block bg-nocturne-surface border border-white/5 rounded-lg p-3 hover:border-primary-300 transition-colors"
                           >
                             <p className="font-medium text-sm text-nocturne-text-primary">{b.artist_name}</p>
                             <p className="text-xs text-nocturne-text-tertiary mt-1">{b.event_type}</p>
@@ -320,7 +320,7 @@ export default function WorkspaceDetailPage() {
               {showCreateEvent && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
                   <div className="bg-nocturne-surface rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-                    <div className="flex items-center justify-between px-5 py-4 border-b border-nocturne-border-subtle">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
                       <h2 className="text-lg font-semibold text-nocturne-text-primary">Create New Event</h2>
                       <button onClick={() => setShowCreateEvent(false)} className="text-nocturne-text-tertiary hover:text-nocturne-text-secondary text-xl">&times;</button>
                     </div>
@@ -334,7 +334,7 @@ export default function WorkspaceDetailPage() {
                           required
                           value={eventForm.name}
                           onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
-                          className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                          className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                           placeholder="e.g., Sharma Wedding Reception"
                         />
                       </div>
@@ -346,7 +346,7 @@ export default function WorkspaceDetailPage() {
                             type="date"
                             value={eventForm.event_date}
                             onChange={(e) => setEventForm({ ...eventForm, event_date: e.target.value })}
-                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                           />
                         </div>
                         <div>
@@ -355,7 +355,7 @@ export default function WorkspaceDetailPage() {
                             required
                             value={eventForm.event_type}
                             onChange={(e) => setEventForm({ ...eventForm, event_type: e.target.value })}
-                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none capitalize"
+                            className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none capitalize"
                           >
                             {EVENT_TYPES.map((t) => (
                               <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
@@ -370,7 +370,7 @@ export default function WorkspaceDetailPage() {
                             required
                             value={eventForm.event_city}
                             onChange={(e) => setEventForm({ ...eventForm, event_city: e.target.value })}
-                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="Mumbai"
                           />
                         </div>
@@ -379,7 +379,7 @@ export default function WorkspaceDetailPage() {
                           <input
                             value={eventForm.venue}
                             onChange={(e) => setEventForm({ ...eventForm, venue: e.target.value })}
-                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="Taj Palace"
                           />
                         </div>
@@ -392,7 +392,7 @@ export default function WorkspaceDetailPage() {
                             min="1"
                             value={eventForm.guest_count}
                             onChange={(e) => setEventForm({ ...eventForm, guest_count: e.target.value })}
-                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="200"
                           />
                         </div>
@@ -401,7 +401,7 @@ export default function WorkspaceDetailPage() {
                           <input
                             value={eventForm.client_name}
                             onChange={(e) => setEventForm({ ...eventForm, client_name: e.target.value })}
-                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="Mr. Sharma"
                           />
                         </div>
@@ -414,7 +414,7 @@ export default function WorkspaceDetailPage() {
                             min="0"
                             value={eventForm.budget_min}
                             onChange={(e) => setEventForm({ ...eventForm, budget_min: e.target.value })}
-                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="50000"
                           />
                         </div>
@@ -425,7 +425,7 @@ export default function WorkspaceDetailPage() {
                             min="0"
                             value={eventForm.budget_max}
                             onChange={(e) => setEventForm({ ...eventForm, budget_max: e.target.value })}
-                            className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
+                            className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none"
                             placeholder="200000"
                           />
                         </div>
@@ -436,7 +436,7 @@ export default function WorkspaceDetailPage() {
                           rows={2}
                           value={eventForm.notes}
                           onChange={(e) => setEventForm({ ...eventForm, notes: e.target.value })}
-                          className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none resize-none"
+                          className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-400 outline-none resize-none"
                           placeholder="Any special requirements..."
                         />
                       </div>
@@ -444,7 +444,7 @@ export default function WorkspaceDetailPage() {
                         <button
                           type="button"
                           onClick={() => setShowCreateEvent(false)}
-                          className="px-4 py-2 text-sm text-nocturne-text-secondary bg-nocturne-surface rounded-lg hover:bg-nocturne-surface-2 transition-colors"
+                          className="px-4 py-2 text-sm text-nocturne-text-secondary glass-card rounded-xl hover:bg-nocturne-surface-2 transition-colors"
                         >
                           Cancel
                         </button>
@@ -462,13 +462,13 @@ export default function WorkspaceDetailPage() {
               )}
 
               {events.length === 0 ? (
-                <div className="bg-nocturne-base border border-nocturne-border-subtle rounded-lg p-8 text-center">
+                <div className="bg-nocturne-base border border-white/5 rounded-lg p-8 text-center">
                   <p className="text-nocturne-text-tertiary">No events in this workspace yet.</p>
                   <p className="text-sm text-nocturne-text-tertiary mt-1">Click &quot;Add Event&quot; to create your first event.</p>
                 </div>
               ) : (
                 events.map((evt) => (
-                  <div key={evt.id} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4">
+                  <div key={evt.id} className="bg-nocturne-surface border border-white/5 rounded-lg p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <h3 className="font-medium text-nocturne-text-primary">{evt.name}</h3>
@@ -504,12 +504,12 @@ export default function WorkspaceDetailPage() {
           {activeTab === 'team' && (
             <div className="space-y-3">
               {members.length === 0 ? (
-                <div className="bg-nocturne-base border border-nocturne-border-subtle rounded-lg p-8 text-center">
+                <div className="bg-nocturne-base border border-white/5 rounded-lg p-8 text-center">
                   <p className="text-nocturne-text-tertiary">No team members yet.</p>
                 </div>
               ) : (
                 members.map((m) => (
-                  <div key={m.id} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4 flex items-center justify-between">
+                  <div key={m.id} className="bg-nocturne-surface border border-white/5 rounded-lg p-4 flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-nocturne-text-primary">{m.name || m.role || 'Team Member'}</span>

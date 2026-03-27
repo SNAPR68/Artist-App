@@ -79,7 +79,7 @@ export default function NotificationsPage() {
           )}
         </div>
         <div className="flex items-center gap-4 flex-wrap justify-end">
-          <div className="flex gap-2 bg-nocturne-surface-2/50 rounded-full p-1 border border-nocturne-border backdrop-blur-3xl">
+          <div className="flex gap-2 bg-nocturne-surface-2/50 rounded-full p-1 border border-white/10 backdrop-blur-3xl">
             {(['all', 'unread'] as const).map((f) => (
               <button
                 key={f}
@@ -95,7 +95,7 @@ export default function NotificationsPage() {
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
-              className="px-4 py-2 text-sm font-medium text-nocturne-accent hover:text-nocturne-accent bg-nocturne-primary-light border border-nocturne-border rounded-full transition-all hover:bg-nocturne-primary-light"
+              className="px-4 py-2 text-sm font-medium text-nocturne-accent hover:text-nocturne-accent bg-nocturne-primary-light border border-white/10 rounded-full transition-all hover:bg-nocturne-primary-light"
             >
               Mark all read
             </button>
@@ -108,7 +108,7 @@ export default function NotificationsPage() {
           <div className="animate-spin rounded-full h-10 w-10 border-2 border-nocturne-primary/20 border-t-nocturne-primary" />
         </div>
       ) : notifications.length === 0 ? (
-        <div className="glass-card border border-nocturne-border p-12 text-center space-y-3">
+        <div className="glass-card border border-white/10 p-12 text-center space-y-3">
           <Bell className="w-12 h-12 text-nocturne-text-secondary mx-auto opacity-50" />
           <p className="text-nocturne-text-primary text-lg font-semibold">No notifications</p>
           <p className="text-sm text-nocturne-text-secondary">You&apos;re all caught up!</p>
@@ -118,7 +118,7 @@ export default function NotificationsPage() {
           {notifications.map((n) => (
             <div
               key={n.id}
-              className={`glass-card border border-nocturne-border px-6 py-4 flex items-start gap-4 transition-all duration-300 hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm ${
+              className={`glass-card border border-white/10 px-6 py-4 flex items-start gap-4 transition-all duration-300 hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm ${
                 n.read_at ? 'opacity-75' : 'opacity-100'
               }`}
             >

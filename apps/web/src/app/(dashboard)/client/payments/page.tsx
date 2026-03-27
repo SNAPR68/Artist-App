@@ -98,21 +98,21 @@ export default function PaymentHistoryPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Payment History</h1></section>
+        <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Payment History</h1></div></div>
         <p className="text-nocturne-text-secondary mt-1">View and manage all your booking payments</p>
       </div>
 
       {payments.length === 0 ? (
-        <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-12 text-center">
+        <div className="glass-card rounded-xl border border-white/5 p-12 text-center">
           <p className="text-nocturne-text-tertiary">No payments yet</p>
           <p className="text-sm text-nocturne-text-tertiary mt-1">Your payment history will appear here</p>
         </div>
       ) : (
-        <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
+        <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-nocturne-surface-2 border-b border-nocturne-border-subtle">
+                <tr className="bg-nocturne-surface-2 border-b border-white/5">
                   <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Artist</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Amount</th>
@@ -123,7 +123,7 @@ export default function PaymentHistoryPage() {
               </thead>
               <tbody>
                 {payments.map((payment) => (
-                  <tr key={payment.id} className="border-b border-nocturne-border-subtle hover:bg-nocturne-glass-panel transition-colors">
+                  <tr key={payment.id} className="border-b border-white/5 hover:bg-nocturne-glass-panel transition-colors">
                     <td className="px-6 py-4 text-sm text-nocturne-text-primary">
                       {new Date(payment.confirmed_at).toLocaleDateString('en-IN')}
                     </td>

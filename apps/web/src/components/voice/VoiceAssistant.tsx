@@ -680,7 +680,7 @@ export function VoiceAssistant() {
                   )}
                 </select>
                 <p className="text-[10px] text-white/30">
-                  {voices.filter(v => v.lang.startsWith('en')).length} English voices available
+                  {voices.filter(v => v.lang.startsWith('en')).length} English + {voices.filter(v => v.lang.startsWith('hi')).length} Hindi voices
                 </p>
               </div>
             )}

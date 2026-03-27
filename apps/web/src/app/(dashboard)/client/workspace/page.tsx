@@ -73,12 +73,12 @@ export default function WorkspaceListPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Workspaces</h1></section>
+          <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Workspaces</h1></div></div>
           <p className="text-nocturne-text-secondary mt-1">Manage your event organizing spaces and teams</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="glass-card border border-nocturne-border-strong hover-glow px-4 py-2 rounded-lg text-sm font-medium text-nocturne-accent flex items-center gap-2 transition-all"
+          className="glass-card border border-white/10-strong hover-glow px-4 py-2 rounded-lg text-sm font-medium text-nocturne-accent flex items-center gap-2 transition-all"
         >
           <Plus size={16} />
           {showForm ? 'Cancel' : 'New Workspace'}
@@ -94,7 +94,7 @@ export default function WorkspaceListPage() {
               value={formName}
               onChange={(e) => setFormName(e.target.value)}
               placeholder="e.g. My Events Company"
-              className="w-full px-4 py-2.5 bg-nocturne-base border border-nocturne-border rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
+              className="w-full px-4 py-2.5 bg-nocturne-base border border-white/10 rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
               required
             />
           </div>
@@ -103,7 +103,7 @@ export default function WorkspaceListPage() {
             <select
               value={formType}
               onChange={(e) => setFormType(e.target.value)}
-              className="w-full px-4 py-2.5 bg-nocturne-base border border-nocturne-border rounded-lg text-sm text-nocturne-text-primary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
+              className="w-full px-4 py-2.5 bg-nocturne-base border border-white/10 rounded-lg text-sm text-nocturne-text-primary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
             >
               <option value="corporate">Corporate</option>
               <option value="wedding_planner">Wedding Planner</option>
@@ -159,7 +159,7 @@ export default function WorkspaceListPage() {
                   <p className="text-xs text-nocturne-text-secondary mt-1">/{ws.slug}</p>
                 </div>
                 <span
-                  className={`text-xs font-semibold px-3 py-1 rounded-full ${COMPANY_TYPE_COLORS[ws.company_type] ?? 'bg-nocturne-surface/10 border border-nocturne-border text-nocturne-text-secondary'}`}
+                  className={`text-xs font-semibold px-3 py-1 rounded-full ${COMPANY_TYPE_COLORS[ws.company_type] ?? 'bg-nocturne-surface/10 border border-white/10 text-nocturne-text-secondary'}`}
                 >
                   {ws.company_type.replace(/_/g, ' ')}
                 </span>

@@ -139,7 +139,7 @@ export default function WorkspaceCommissionPage() {
       </div>
 
       {/* Default Commission Rate */}
-      <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-5">
+      <div className="bg-nocturne-surface border border-white/5 rounded-lg p-5">
         <h2 className="text-sm font-semibold text-nocturne-text-secondary mb-3">Default Commission Rate</h2>
         <div className="flex items-center gap-3">
           <div className="relative">
@@ -150,7 +150,7 @@ export default function WorkspaceCommissionPage() {
               step={0.5}
               value={defaultPct}
               onChange={(e) => setDefaultPct(e.target.value)}
-              className="w-28 rounded-lg border border-nocturne-border px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-28 rounded-lg border border-white/10 px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-nocturne-text-tertiary">%</span>
           </div>
@@ -169,23 +169,23 @@ export default function WorkspaceCommissionPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-5">
+        <div className="bg-nocturne-surface border border-white/5 rounded-lg p-5">
           <p className="text-xs font-medium text-nocturne-text-tertiary uppercase tracking-wide">Total Booking Value</p>
           <p className="text-2xl font-bold text-nocturne-text-primary mt-1">{formatINR(summary.total_booking_value_paise)}</p>
           <p className="text-xs text-nocturne-text-tertiary mt-1">{summary.total_bookings} booking{summary.total_bookings !== 1 ? 's' : ''}</p>
         </div>
-        <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-5">
+        <div className="bg-nocturne-surface border border-white/5 rounded-lg p-5">
           <p className="text-xs font-medium text-nocturne-text-tertiary uppercase tracking-wide">Total Commission Earned</p>
           <p className="text-2xl font-bold text-nocturne-success mt-1">{formatINR(summary.total_commission_paise)}</p>
         </div>
-        <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-5">
+        <div className="bg-nocturne-surface border border-white/5 rounded-lg p-5">
           <p className="text-xs font-medium text-nocturne-text-tertiary uppercase tracking-wide">Effective Rate</p>
           <p className="text-2xl font-bold text-nocturne-text-primary mt-1">{effectiveRate}%</p>
         </div>
       </div>
 
       {/* Bookings Table */}
-      <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg overflow-hidden">
+      <div className="bg-nocturne-surface border border-white/5 rounded-lg overflow-hidden">
         <div className="px-5 py-3 border-b border-white/5">
           <h2 className="text-sm font-semibold text-nocturne-text-secondary">Bookings</h2>
         </div>
@@ -248,7 +248,7 @@ export default function WorkspaceCommissionPage() {
                               if (e.key === 'Escape') setEditingBookingId(null);
                             }}
                             autoFocus
-                            className="w-20 rounded border border-nocturne-border px-2 py-1 text-sm text-right focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            className="w-20 rounded border border-white/10 px-2 py-1 text-sm text-right focus:outline-none focus:ring-2 focus:ring-primary-500"
                           />
                           <span className="text-nocturne-text-tertiary text-xs">%</span>
                         </div>

@@ -1,5 +1,5 @@
 # Artist Booking Platform — CLAUDE.md
-_Last updated: 2026-03-23_
+_Last updated: 2026-03-26_
 
 ## Project Overview
 India's live entertainment booking marketplace connecting artists, clients, agents, and event companies through an intelligence-driven platform. Monorepo with Fastify API backend, Next.js frontend, and shared packages. 77 migrations, 36 API modules, 237 endpoints, 23 cron jobs, 49 frontend pages.
@@ -129,7 +129,67 @@ pnpm turbo build --filter=@artist-booking/web
 ## Middleware (6)
 `auth` | `error-handler` | `rate-limiter` | `rbac` | `request-logger` | `validation`
 
-## Current Build Status (as of 2026-03-23)
+## Design System: Nocturne Hollywood
+The frontend uses the **Nocturne Hollywood** dark theme — a cinematic glassmorphism design system from Stitch.
+
+### Brand
+- **Name**: ArtistBook (NOT "Nocturne Elite" — that's the Stitch codename)
+- **Voice**: Human, direct, Indian market. No AI jargon or placeholder copy.
+
+### Colors
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `bg-[#0e0e0f]` | Obsidian | Page backgrounds |
+| `bg-[#1a191b]` / `bg-[#1a1a1d]` | Surface | Card backgrounds |
+| `bg-[#201f21]` | Surface high | Elevated panels |
+| `bg-[#262627]` | Surface highest | Deep containers |
+| `bg-[#2c2c2d]` | Surface bright | Hover states |
+| `text-[#c39bff]` / `#8A2BE2` | Primary purple | Brand, CTAs, accents |
+| `text-[#a1faff]` | Cyan | AI/data highlights, labels |
+| `text-[#ffbf00]` | Gold | Ratings, badges, secondary accent |
+| `text-white/50` | — | Secondary text |
+| `text-white/30` | — | Tertiary/muted text |
+| `border-white/5` | — | Subtle borders |
+| `border-white/10` | — | Standard borders |
+
+### Typography
+- **Display font**: `font-display` (Manrope) — headlines, page titles
+- **Body font**: `font-sans` (Inter) — paragraphs, labels
+- Headlines: `font-extrabold tracking-tighter`
+- Labels: `text-xs tracking-widest uppercase font-bold`
+
+### Layout Patterns
+- **Bento Hero**: `grid grid-cols-1 md:grid-cols-12 gap-6` with `md:col-span-8` main + `md:col-span-4` sidebar
+- **Glass Card**: `glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden`
+- **Ambient Glow**: `<div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />`
+- **Onboarding**: Full-screen `5+7` split with radial gradient background glows
+- **Artist Profile**: Cover hero (aspect-[21/9]) + `8+4` tabbed content + sticky booking card
+
+### CSS Utilities (defined in `apps/web/src/styles/globals.css`)
+```
+glass-card, glass-panel, glass-floating    — Glassmorphism surfaces
+btn-nocturne-primary/secondary/accent      — Button variants
+input-nocturne                             — Form inputs
+badge-nocturne, nocturne-chip              — Tags and pills
+nocturne-divider                           — Subtle 1px separator
+nocturne-table                             — Dark table styling
+text-gradient-nocturne                     — Purple-to-cyan gradient text
+nocturne-nav-item, nocturne-nav-item-active — Sidebar navigation
+stage-glow-violet, stage-glow-cyan         — Background radial glows
+inner-glow-status/success/warning/error    — Status indicator box-shadows
+nocturne-skeleton                          — Dark shimmer loading state
+nocturne-overlay                           — Modal backdrop
+```
+
+### Stitch Reference Designs
+Full HTML/Tailwind reference designs live in: `stitch_product_requirements_document (2)/stitch_product_requirements_document/`
+Key folders: `premium_landing_page`, `artist_portfolio_hollywood_glamour`, `artist_management_hollywood_glamour`, `escrow_wallet_hollywood_glamour`, `ai_artist_discovery`, `booking_inquiry_management`, `onboarding_welcome_hollywood_glamour`, `fund_escrow_confirm_booking_1`, `booking_confirmed`
+
+### Rebuild Status (as of 2026-03-26)
+- **Done (12 pages)**: Landing page, artist dashboard, artist bookings list, artist earnings, artist financial, artist intelligence, client dashboard, client bookings list, client workspace detail, event company dashboard, agent dashboard, search results
+- **Remaining (24 pages)**: See `COWORK_REBUILD_24_PAGES.md` for full handoff doc with templates
+
+## Current Build Status (as of 2026-03-26)
 
 ### Production Score: ~100/100 (code complete)
 
@@ -137,7 +197,12 @@ pnpm turbo build --filter=@artist-booking/web
 - Login/auth flow (OTP with bypass for dev, real MSG91 ready)
 - All 4 role dashboards: Artist, Client/Event Company, Agent, Admin
 - Search API with 100 seeded artists across 10 cities
-- Voice Assistant — universal widget with guest navigation + auth'd full commands
+- Voice Assistant — Backstage AI floating widget with:
+  - Web Speech API (mic input, works on HTTPS/Vercel deploy)
+  - Browser TTS with English + Hindi voice picker
+  - Guest mode: public artist search without login
+  - Auth mode: full voice query API (6 intents, 40+ page targets)
+  - Text input fallback when mic unavailable
 - Escrow payments (8 states, auto-settlement, refund webhooks)
 - PDF generation (branded multi-artist proposals)
 - Event company workspace CRM + onboarding wizard
@@ -146,6 +211,7 @@ pnpm turbo build --filter=@artist-booking/web
 - GDPR: account deletion endpoint, cookie consent banner
 - Swagger API docs at /docs
 - 100 seeded artist profiles with realistic data
+- Nocturne Hollywood dark theme applied across all 50+ pages (zero light-theme classes)
 
 ### Security (Sprint 3)
 - JWT 1h access / 30d refresh tokens

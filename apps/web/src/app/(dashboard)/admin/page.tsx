@@ -388,7 +388,7 @@ export default function AdminDashboardPage() {
                           {u.is_verified && <span className="ml-2 text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Verified</span>}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-xs px-2 py-1 rounded-full bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium capitalize">
+                          <span className="text-xs px-2 py-1 rounded-full bg-nocturne-primary-light text-nocturne-accent border border-white/5 font-medium capitalize">
                             {u.role?.replace('_', ' ')}
                           </span>
                         </td>
@@ -575,11 +575,11 @@ export default function AdminDashboardPage() {
                         </td>
                         <td className="px-4 py-3">
                           {resolvingDispute === d.id ? (
-                            <div className="space-y-2 bg-nocturne-base p-3 rounded-lg border border-nocturne-border">
+                            <div className="space-y-2 bg-nocturne-base p-3 rounded-lg border border-white/10">
                               <select
                                 value={resolveForm.resolution}
                                 onChange={(e) => setResolveForm((f) => ({ ...f, resolution: e.target.value }))}
-                                className="block w-full text-xs bg-nocturne-surface border border-nocturne-border rounded px-2 py-1.5 text-nocturne-text-primary"
+                                className="block w-full text-xs bg-nocturne-surface border border-white/10 rounded px-2 py-1.5 text-nocturne-text-primary"
                               >
                                 <option value="upheld">Upheld</option>
                                 <option value="overturned">Overturned</option>
@@ -589,7 +589,7 @@ export default function AdminDashboardPage() {
                                 value={resolveForm.admin_notes}
                                 onChange={(e) => setResolveForm((f) => ({ ...f, admin_notes: e.target.value }))}
                                 placeholder="Admin notes..."
-                                className="block w-full text-xs bg-nocturne-surface border border-nocturne-border rounded px-2 py-1.5 h-16 resize-none text-nocturne-text-primary placeholder-nocturne-text-secondary"
+                                className="block w-full text-xs bg-nocturne-surface border border-white/10 rounded px-2 py-1.5 h-16 resize-none text-nocturne-text-primary placeholder-nocturne-text-secondary"
                               />
                               <div className="flex gap-2">
                                 <button
@@ -612,7 +612,7 @@ export default function AdminDashboardPage() {
                                 </button>
                                 <button
                                   onClick={() => { setResolvingDispute(null); setResolveForm({ resolution: 'upheld', admin_notes: '' }); }}
-                                  className="text-xs px-2 py-1 rounded-lg border border-nocturne-border text-nocturne-text-secondary hover:bg-nocturne-surface/10 font-medium"
+                                  className="text-xs px-2 py-1 rounded-lg border border-white/10 text-nocturne-text-secondary hover:bg-nocturne-surface/10 font-medium"
                                 >
                                   Cancel
                                 </button>
@@ -622,7 +622,7 @@ export default function AdminDashboardPage() {
                             <button
                               onClick={() => setResolvingDispute(d.id)}
                               disabled={d.status === 'upheld' || d.status === 'overturned' || d.status === 'dismissed'}
-                              className="text-xs px-2 py-1 rounded-lg border border-nocturne-border-subtle text-nocturne-accent hover:bg-primary-500/10 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                              className="text-xs px-2 py-1 rounded-lg border border-white/5 text-nocturne-accent hover:bg-primary-500/10 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                             >
                               Resolve
                             </button>
@@ -663,7 +663,7 @@ export default function AdminDashboardPage() {
                           <td className="px-4 py-3 text-nocturne-text-primary font-medium">{v.name}</td>
                           <td className="px-4 py-3 text-nocturne-text-secondary">{v.city}</td>
                           <td className="px-4 py-3">
-                            <span className="text-xs px-2 py-1 rounded-full bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium">
+                            <span className="text-xs px-2 py-1 rounded-full bg-nocturne-primary-light text-nocturne-accent border border-white/5 font-medium">
                               {v.venue_type?.replace('_', ' ') ?? '-'}
                             </span>
                           </td>
@@ -682,7 +682,7 @@ export default function AdminDashboardPage() {
                                 setActionLoading(null);
                               }}
                               disabled={actionLoading === v.id}
-                              className="text-xs px-2 py-1 rounded-lg border border-nocturne-border-subtle text-nocturne-accent hover:bg-primary-500/10 disabled:opacity-50 font-medium"
+                              className="text-xs px-2 py-1 rounded-lg border border-white/5 text-nocturne-accent hover:bg-primary-500/10 disabled:opacity-50 font-medium"
                             >
                               {actionLoading === v.id ? 'Loading...' : expandedVenue === v.id ? 'Hide Issues' : 'View Issues'}
                             </button>
@@ -699,7 +699,7 @@ export default function AdminDashboardPage() {
                                     <div key={issue.id} className="flex items-start justify-between glass-card border-nocturne-border rounded-lg p-3">
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <span className="text-xs px-2 py-1 rounded-full bg-nocturne-primary-light text-nocturne-accent border border-nocturne-border-subtle font-medium">
+                                          <span className="text-xs px-2 py-1 rounded-full bg-nocturne-primary-light text-nocturne-accent border border-white/5 font-medium">
                                             {issue.issue_type.replace('_', ' ')}
                                           </span>
                                           {issue.is_verified && (

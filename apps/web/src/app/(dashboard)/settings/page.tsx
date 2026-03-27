@@ -53,7 +53,7 @@ function Toggle({
       role="switch"
       aria-checked={enabled}
       onClick={() => onChange(!enabled)}
-      className={`relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border border-nocturne-border transition-all duration-300 ease-in-out focus:outline-none focus:ring-1 focus:ring-nocturne-primary ${
+      className={`relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border border-white/10 transition-all duration-300 ease-in-out focus:outline-none focus:ring-1 focus:ring-nocturne-primary ${
         enabled ? 'bg-gradient-accent shadow-nocturne-glow-sm' : 'bg-nocturne-surface-2/50 backdrop-blur-sm'
       }`}
     >
@@ -143,9 +143,9 @@ export default function SettingsPage() {
       )}
 
       {/* Notification Channels */}
-      <div className="glass-card border border-nocturne-border p-8 space-y-6">
+      <div className="glass-card border border-white/10 p-8 space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-nocturne-primary-light border border-nocturne-border">
+          <div className="p-2.5 rounded-lg bg-nocturne-primary-light border border-white/10">
             <MessageSquare className="w-5 h-5 text-nocturne-accent" />
           </div>
           <div>
@@ -155,7 +155,7 @@ export default function SettingsPage() {
         </div>
         <div className="space-y-4 border-t border-nocturne-border pt-6">
           {CHANNEL_OPTIONS.map((option) => (
-            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-nocturne-surface-2/50 border border-nocturne-border hover:border-nocturne-border-strong transition-all">
+            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-nocturne-surface-2/50 border border-white/10 hover:border-nocturne-border-strong transition-all">
               <div className="flex-1">
                 <p className="text-sm font-semibold text-nocturne-text-primary">{option.label}</p>
                 <p className="text-xs text-nocturne-text-secondary mt-1">{option.description}</p>
@@ -170,7 +170,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Notification Categories */}
-      <div className="glass-card border border-nocturne-border p-8 space-y-6">
+      <div className="glass-card border border-white/10 p-8 space-y-6">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-lg bg-gradient-nocturne/20 border border-nocturne-accent/30">
             <Bell className="w-5 h-5 text-nocturne-accent" />
@@ -182,7 +182,7 @@ export default function SettingsPage() {
         </div>
         <div className="space-y-4 border-t border-nocturne-border pt-6">
           {CATEGORY_OPTIONS.map((option) => (
-            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-nocturne-surface-2/50 border border-nocturne-border hover:border-nocturne-border-strong transition-all">
+            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-nocturne-surface-2/50 border border-white/10 hover:border-nocturne-border-strong transition-all">
               <div className="flex-1">
                 <p className="text-sm font-semibold text-nocturne-text-primary">{option.label}</p>
                 <p className="text-xs text-nocturne-text-secondary mt-1">{option.description}</p>

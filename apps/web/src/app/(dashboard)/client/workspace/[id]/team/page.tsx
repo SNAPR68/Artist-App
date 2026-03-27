@@ -207,7 +207,7 @@ export default function WorkspaceTeamPage() {
 
       {/* Add Member Form */}
       {showAddForm && (
-        <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-5 space-y-4">
+        <div className="bg-nocturne-surface border border-white/5 rounded-lg p-5 space-y-4">
           <h2 className="text-lg font-semibold text-nocturne-text-primary">Add Team Member</h2>
 
           <form onSubmit={handleAddMember} className="space-y-4">
@@ -221,7 +221,7 @@ export default function WorkspaceTeamPage() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="member@example.com"
-                className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
               />
             </div>
 
@@ -233,7 +233,7 @@ export default function WorkspaceTeamPage() {
                 {ROLES.map((r) => (
                   <label
                     key={r.value}
-                    className="flex items-start gap-3 p-3 border border-nocturne-border-subtle rounded-lg cursor-pointer hover:bg-nocturne-base transition-colors"
+                    className="flex items-start gap-3 p-3 border border-white/5 rounded-lg cursor-pointer hover:bg-nocturne-base transition-colors"
                   >
                     <input
                       type="radio"
@@ -256,7 +256,7 @@ export default function WorkspaceTeamPage() {
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="px-4 py-2 text-sm font-medium text-nocturne-text-secondary border border-nocturne-border rounded-lg hover:bg-nocturne-base transition-colors"
+                className="px-4 py-2 text-sm font-medium text-nocturne-text-secondary border border-white/10 rounded-lg hover:bg-nocturne-base transition-colors"
               >
                 Cancel
               </button>
@@ -273,7 +273,7 @@ export default function WorkspaceTeamPage() {
       )}
 
       {/* Members List */}
-      <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg overflow-hidden">
+      <div className="bg-nocturne-surface border border-white/5 rounded-lg overflow-hidden">
         {members.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-nocturne-text-tertiary">No team members yet.</p>
@@ -309,7 +309,7 @@ export default function WorkspaceTeamPage() {
                           <select
                             value={editRole}
                             onChange={(e) => setEditRole(e.target.value)}
-                            className="text-sm border border-nocturne-border rounded px-2 py-1"
+                            className="text-sm border border-white/10 rounded px-2 py-1"
                           >
                             {ROLES.map((r) => (
                               <option key={r.value} value={r.value}>
@@ -375,7 +375,7 @@ export default function WorkspaceTeamPage() {
       </div>
 
       {/* Role Legend */}
-      <div className="bg-nocturne-base border border-nocturne-border-subtle rounded-lg p-4">
+      <div className="bg-nocturne-base border border-white/5 rounded-lg p-4">
         <h3 className="text-sm font-semibold text-nocturne-text-primary mb-3">Role Permissions</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {ROLES.map((r) => (

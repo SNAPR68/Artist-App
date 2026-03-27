@@ -106,11 +106,11 @@ export default function ReputationPage() {
 
   return (
     <div className="space-y-6">
-      <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Reputation & Reviews</h1></section>
+      <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Reputation & Reviews</h1></div></div>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+        <div className="glass-card rounded-xl p-4 border border-white/5">
           <p className="text-sm text-nocturne-text-tertiary">Overall Rating</p>
           <p className="text-xl font-bold text-nocturne-text-primary flex items-center gap-1">
             <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -120,7 +120,7 @@ export default function ReputationPage() {
           </p>
         </div>
         {showVenueAdjusted && (
-          <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle relative group">
+          <div className="glass-card rounded-xl p-4 border border-white/5 relative group">
             <p className="text-sm text-nocturne-text-tertiary">Venue-Adjusted</p>
             <p className="text-xl font-bold text-nocturne-text-primary">{venueAdjusted!.toFixed(1)}</p>
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-nocturne-text-primary text-nocturne-surface text-xs rounded px-2 py-1 whitespace-nowrap">
@@ -129,23 +129,23 @@ export default function ReputationPage() {
           </div>
         )}
         {!showVenueAdjusted && (
-          <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+          <div className="glass-card rounded-xl p-4 border border-white/5">
             <p className="text-sm text-nocturne-text-tertiary">Venue-Adjusted</p>
             <p className="text-xl font-bold text-nocturne-text-tertiary">Same</p>
           </div>
         )}
-        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+        <div className="glass-card rounded-xl p-4 border border-white/5">
           <p className="text-sm text-nocturne-text-tertiary">Rebook Rate</p>
           <p className="text-xl font-bold text-nocturne-text-primary">{reputation.rebook_rate ?? 0}%</p>
         </div>
-        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+        <div className="glass-card rounded-xl p-4 border border-white/5">
           <p className="text-sm text-nocturne-text-tertiary">Avg Crowd Energy</p>
           <p className="text-xl font-bold text-nocturne-text-primary">{reputation.avg_crowd_energy ?? 0}</p>
         </div>
       </div>
 
       {/* Review Trend */}
-      <section className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4">
+      <section className="glass-card rounded-xl border border-white/5 p-4">
         <h2 className="text-lg font-semibold text-nocturne-text-primary mb-2">Review Trend</h2>
         <p className="text-sm text-nocturne-text-secondary">{trendText(reputation.trend)}</p>
         <div className="flex items-center gap-4 mt-3 text-sm text-nocturne-text-tertiary">
@@ -159,13 +159,13 @@ export default function ReputationPage() {
       <section>
         <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">Review Disputes</h2>
         {disputes.length === 0 ? (
-          <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 text-center">
+          <div className="glass-card rounded-xl border border-white/5 p-6 text-center">
             <p className="text-nocturne-text-tertiary">No active review disputes.</p>
           </div>
         ) : (
           <div className="space-y-3">
             {disputes.map((d) => (
-              <div key={d.id} className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4">
+              <div key={d.id} className="glass-card rounded-xl border border-white/5 p-4">
                 <div className="flex items-start justify-between mb-2">
                   <p className="text-sm text-nocturne-text-secondary italic line-clamp-2">&ldquo;{d.review_excerpt}&rdquo;</p>
                   {statusBadge(d.status)}

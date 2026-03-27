@@ -126,7 +126,7 @@ export default function ArtistBookingDetailPage() {
       </div>
 
       {/* Event Details */}
-      <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-xl border border-nocturne-border">
+      <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-xl border border-white/10">
         <h2 className="text-sm font-semibold text-gradient uppercase tracking-wide font-display">Event Details</h2>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex items-start gap-3">
@@ -175,7 +175,7 @@ export default function ArtistBookingDetailPage() {
       </div>
 
       {/* Timeline */}
-      <div className="glass-card rounded-xl p-6 backdrop-blur-xl border border-nocturne-border">
+      <div className="glass-card rounded-xl p-6 backdrop-blur-xl border border-white/10">
         <h2 className="text-sm font-semibold text-gradient uppercase tracking-wide mb-4 font-display">Status Timeline</h2>
         <StateTimeline currentStatus={booking.status} events={booking.events} />
       </div>
@@ -204,10 +204,10 @@ export default function ArtistBookingDetailPage() {
 
       {/* Existing Quotes */}
       {booking.quotes.length > 0 && (
-        <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-xl border border-nocturne-border">
+        <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-xl border border-white/10">
           <h2 className="text-sm font-semibold text-gradient uppercase tracking-wide font-display">Negotiation History</h2>
           {booking.quotes.map((q, idx) => (
-            <div key={q.round} className={`bg-nocturne-surface-2 rounded-lg p-4 border border-nocturne-border backdrop-blur-md ${
+            <div key={q.round} className={`bg-nocturne-surface-2 rounded-lg p-4 border border-white/10 backdrop-blur-md ${
               idx % 2 === 0 ? 'ml-0 mr-auto' : 'ml-auto mr-0'
             } w-full md:w-5/6`}>
               <div className="flex items-start justify-between mb-3">
@@ -228,7 +228,7 @@ export default function ArtistBookingDetailPage() {
 
       {/* Submit Quote / Counter */}
       {canQuote && (
-        <div className="glass-card rounded-xl p-6 space-y-3 backdrop-blur-xl border border-nocturne-border">
+        <div className="glass-card rounded-xl p-6 space-y-3 backdrop-blur-xl border border-white/10">
           <h3 className="text-sm font-semibold text-nocturne-text-primary">
             {booking.quotes.length === 0 ? 'Submit Your Quote' : 'Counter-Offer'}
           </h3>
@@ -241,7 +241,7 @@ export default function ArtistBookingDetailPage() {
                   value={quoteAmount}
                   onChange={(e) => setQuoteAmount(e.target.value)}
                   placeholder="0"
-                  className="w-full pl-6 pr-3 py-2.5 bg-white/5 border border-nocturne-border rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                  className="w-full pl-6 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                   required
                 />
               </div>
@@ -254,7 +254,7 @@ export default function ArtistBookingDetailPage() {
               value={quoteNotes}
               onChange={(e) => setQuoteNotes(e.target.value)}
               placeholder="Add notes for the client (optional)"
-              className="w-full px-3 py-2.5 bg-white/5 border border-nocturne-border rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+              className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
             />
           </form>
         </div>

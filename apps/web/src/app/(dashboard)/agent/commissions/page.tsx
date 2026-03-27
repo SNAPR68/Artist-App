@@ -63,14 +63,14 @@ export default function AgentCommissionDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Commission Dashboard</h1></section>
+        <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Commission Dashboard</h1></div></div>
         <p className="text-nocturne-text-tertiary mt-1">Track your earnings and commission history</p>
       </div>
 
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-6">
+          <div className="bg-nocturne-surface border border-white/5 rounded-lg p-6">
             <p className="text-sm font-medium text-nocturne-text-secondary uppercase tracking-wide">Total Earned</p>
             <p className="text-3xl font-bold text-nocturne-success mt-2">
               ₹{(stats.total_commission_earned_paise / 100).toLocaleString('en-IN')}
@@ -78,7 +78,7 @@ export default function AgentCommissionDashboard() {
             <p className="text-xs text-nocturne-text-tertiary mt-2">All time earnings</p>
           </div>
 
-          <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-6">
+          <div className="bg-nocturne-surface border border-white/5 rounded-lg p-6">
             <p className="text-sm font-medium text-nocturne-text-secondary uppercase tracking-wide">Pending Payment</p>
             <p className="text-3xl font-bold text-nocturne-warning mt-2">
               ₹{(stats.total_commission_pending_paise / 100).toLocaleString('en-IN')}
@@ -86,7 +86,7 @@ export default function AgentCommissionDashboard() {
             <p className="text-xs text-nocturne-text-tertiary mt-2">Awaiting settlement</p>
           </div>
 
-          <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-6">
+          <div className="bg-nocturne-surface border border-white/5 rounded-lg p-6">
             <p className="text-sm font-medium text-nocturne-text-secondary uppercase tracking-wide">Already Paid</p>
             <p className="text-3xl font-bold text-nocturne-info mt-2">
               ₹{(stats.total_commission_paid_paise / 100).toLocaleString('en-IN')}
@@ -103,7 +103,7 @@ export default function AgentCommissionDashboard() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 border-b border-nocturne-border-subtle">
+        <div className="flex gap-2 border-b border-white/5">
           {filters.map((f) => (
             <button
               key={f.key}
@@ -129,14 +129,14 @@ export default function AgentCommissionDashboard() {
 
         {/* Commission Table */}
         {filtered.length === 0 ? (
-          <div className="bg-nocturne-surface-2 border border-nocturne-border-subtle rounded-lg p-8 text-center">
+          <div className="bg-nocturne-surface-2 border border-white/5 rounded-lg p-8 text-center">
             <p className="text-nocturne-text-tertiary">No commissions in this category.</p>
           </div>
         ) : (
-          <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg overflow-hidden">
+          <div className="bg-nocturne-surface border border-white/5 rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-nocturne-surface-2 border-b border-nocturne-border-subtle">
+                <thead className="bg-nocturne-surface-2 border-b border-white/5">
                   <tr>
                     <th className="text-left px-4 py-3 font-medium text-nocturne-text-secondary">Artist</th>
                     <th className="text-left px-4 py-3 font-medium text-nocturne-text-secondary">Event Date</th>

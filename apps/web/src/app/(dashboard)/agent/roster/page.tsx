@@ -88,7 +88,7 @@ export default function AgentRosterPage() {
       </div>
 
       {/* Add Artist Form */}
-      <form onSubmit={handleAdd} className="bg-nocturne-surface rounded-2xl p-6 border border-nocturne-border">
+      <form onSubmit={handleAdd} className="bg-nocturne-surface rounded-2xl p-6 border border-white/10">
         <label className="block text-sm font-semibold text-nocturne-text-primary mb-3">Add Artist to Roster</label>
         <div className="flex gap-3">
           <div className="flex-1 relative">
@@ -98,13 +98,13 @@ export default function AgentRosterPage() {
               value={artistId}
               onChange={(e) => setArtistId(e.target.value)}
               placeholder="Enter artist ID"
-              className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl pl-10 pr-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+              className="w-full bg-nocturne-surface bg-nocturne-surface border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
             />
           </div>
           <button
             type="submit"
             disabled={adding}
-            className="bg-nocturne-surface px-6 py-3 rounded-xl text-sm font-semibold text-nocturne-text-primary hover:hover-glow disabled:opacity-50 transition-all border border-nocturne-border flex items-center gap-2"
+            className="bg-nocturne-surface px-6 py-3 rounded-xl text-sm font-semibold text-nocturne-text-primary hover:hover-glow disabled:opacity-50 transition-all border border-white/10 flex items-center gap-2"
           >
             {adding ? 'Adding...' : 'Add'}
           </button>
@@ -124,7 +124,7 @@ export default function AgentRosterPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name, city, or genre..."
-          className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl pl-12 pr-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+          className="w-full bg-nocturne-surface bg-nocturne-surface border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
         />
       </div>
 
@@ -136,7 +136,7 @@ export default function AgentRosterPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-nocturne-surface rounded-2xl p-12 text-center border border-nocturne-border">
+        <div className="bg-nocturne-surface rounded-2xl p-12 text-center border border-white/10">
           <Search size={48} className="mx-auto text-nocturne-text-secondary/40 mb-4" />
           <p className="text-nocturne-text-secondary mb-4">
             {roster.length === 0 ? 'Your roster is empty. Add artists to get started.' : 'No artists match your search.'}
@@ -148,7 +148,7 @@ export default function AgentRosterPage() {
             const isExpanded = expandedId === artist.artist_id;
 
             return (
-              <div key={artist.artist_id} className="bg-nocturne-surface rounded-2xl p-6 border border-nocturne-border hover:hover-glow transition-all group">
+              <div key={artist.artist_id} className="bg-nocturne-surface rounded-2xl p-6 border border-white/10 hover:hover-glow transition-all group">
                 {/* Header */}
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400/30 to-primary-600/30 flex items-center justify-center flex-shrink-0 text-nocturne-accent font-semibold">
@@ -216,25 +216,25 @@ export default function AgentRosterPage() {
                   <div className="mt-4 pt-4 border-t border-nocturne-border bg-nocturne-surface rounded-xl p-4 space-y-3">
                     <div className="grid grid-cols-2 gap-3">
                       {artist.intelligence.booking_velocity_30d != null && (
-                        <div className="bg-nocturne-surface rounded-lg p-2">
+                        <div className="glass-card rounded-xl p-2">
                           <p className="text-xs text-nocturne-text-secondary">Velocity (30d)</p>
                           <p className="text-sm font-semibold text-nocturne-accent">{artist.intelligence.booking_velocity_30d}</p>
                         </div>
                       )}
                       {artist.intelligence.booking_velocity_90d != null && (
-                        <div className="bg-nocturne-surface rounded-lg p-2">
+                        <div className="glass-card rounded-xl p-2">
                           <p className="text-xs text-nocturne-text-secondary">Velocity (90d)</p>
                           <p className="text-sm font-semibold text-nocturne-accent">{artist.intelligence.booking_velocity_90d}</p>
                         </div>
                       )}
                       {artist.intelligence.demand_alignment_pct != null && (
-                        <div className="bg-nocturne-surface rounded-lg p-2">
+                        <div className="glass-card rounded-xl p-2">
                           <p className="text-xs text-nocturne-text-secondary">Demand Alignment</p>
                           <p className="text-sm font-semibold text-emerald-300">{artist.intelligence.demand_alignment_pct}%</p>
                         </div>
                       )}
                       {artist.intelligence.gig_advisor_count != null && (
-                        <div className="bg-nocturne-surface rounded-lg p-2">
+                        <div className="glass-card rounded-xl p-2">
                           <p className="text-xs text-nocturne-text-secondary">Gig Advisor</p>
                           <p className="text-sm font-semibold text-blue-300">{artist.intelligence.gig_advisor_count} recs</p>
                         </div>
@@ -245,7 +245,7 @@ export default function AgentRosterPage() {
                         <p className="text-xs text-nocturne-text-secondary mb-2">Top Event Types</p>
                         <div className="flex flex-wrap gap-2">
                           {artist.intelligence.top_event_types.map((t) => (
-                            <span key={t} className="inline-block bg-nocturne-surface border border-nocturne-border text-nocturne-text-secondary text-xs px-2.5 py-1 rounded-full">
+                            <span key={t} className="inline-block bg-nocturne-surface border border-white/10 text-nocturne-text-secondary text-xs px-2.5 py-1 rounded-full">
                               {t}
                             </span>
                           ))}

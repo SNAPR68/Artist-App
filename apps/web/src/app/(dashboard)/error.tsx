@@ -40,7 +40,7 @@ export default function DashboardError({ error, reset }: ErrorProps) {
 
         {/* Error code (if available) */}
         {error.digest && (
-          <div className="bg-nocturne-surface rounded-lg p-4">
+          <div className="glass-card rounded-xl p-4">
             <p className="text-sm text-nocturne-text-secondary font-mono break-all">
               Error ID: {error.digest}
             </p>
@@ -59,7 +59,7 @@ export default function DashboardError({ error, reset }: ErrorProps) {
 
           <button
             onClick={() => router.push('/artist')}
-            className="flex items-center justify-center gap-2 w-full bg-nocturne-surface-2 text-nocturne-text-primary font-medium py-3 rounded-lg hover:bg-nocturne-surface border border-nocturne-border transition-colors"
+            className="flex items-center justify-center gap-2 w-full bg-nocturne-surface-2 text-nocturne-text-primary font-medium py-3 rounded-lg hover:bg-nocturne-surface border border-white/10 transition-colors"
           >
             <Home className="w-4 h-4" />
             Go to Dashboard

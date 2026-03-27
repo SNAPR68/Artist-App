@@ -150,7 +150,7 @@ export default function ArtistBookingsPage() {
                 className={`glass-card group hover:bg-nocturne-surface-2 backdrop-blur-xl rounded-xl p-5 transition-all duration-300 hover-glow shadow-nocturne-glow-sm cursor-pointer block animate-fade-in-up ${
                   isNew
                     ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-2 border-gradient-accent shadow-lg shadow-blue-500/20'
-                    : 'bg-white/5 border border-nocturne-border hover:border-white/20'
+                    : 'bg-white/5 border border-white/10 hover:border-white/20'
                 }`}
                 style={{ animationDelay: `${50 + idx * 25}ms` }}
               >

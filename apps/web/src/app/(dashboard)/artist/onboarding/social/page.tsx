@@ -96,7 +96,7 @@ export default function SocialAnalyzerPage() {
               type="url"
               value={profileUrl}
               onChange={(e) => setProfileUrl(e.target.value)}
-              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="https://instagram.com/yourprofile or https://youtube.com/@yourchannel"
             />
           </div>
@@ -145,7 +145,7 @@ export default function SocialAnalyzerPage() {
           </div>
 
           {/* Profile Summary */}
-          <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-6 space-y-4">
+          <div className="bg-nocturne-surface border border-white/5 rounded-lg p-6 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-nocturne-text-primary">{profileData.display_name}</h2>
@@ -209,7 +209,7 @@ export default function SocialAnalyzerPage() {
             </button>
             <button
               onClick={() => router.push('/artist/onboarding')}
-              className="px-6 py-2.5 text-sm font-medium text-nocturne-text-secondary bg-nocturne-surface border border-nocturne-border rounded-lg hover:bg-nocturne-base"
+              className="px-6 py-2.5 text-sm font-medium text-nocturne-text-secondary bg-nocturne-surface border border-white/10 rounded-lg hover:bg-nocturne-base"
             >
               Skip
             </button>

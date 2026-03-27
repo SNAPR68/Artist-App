@@ -37,7 +37,7 @@ const COMPLETED_STATUSES = ['completed', 'settled'];
 const CANCELLED_STATUSES = ['cancelled'];
 
 const BookingSkeleton = () => (
-  <div className="bg-nocturne-surface rounded-2xl p-6 animate-pulse border border-nocturne-border">
+  <div className="bg-nocturne-surface rounded-2xl p-6 animate-pulse border border-white/10">
     <div className="flex gap-4">
       <div className="flex-1">
         <div className="h-4 bg-gradient-to-r from-primary-400/20 to-transparent rounded w-48 mb-3" />
@@ -135,7 +135,7 @@ export default function AgentBookingsPage() {
         </div>
         <button
           onClick={() => setShowConcierge(!showConcierge)}
-          className="bg-nocturne-surface px-6 py-3 rounded-full text-sm font-semibold text-nocturne-text-primary hover:hover-glow transition-all flex items-center gap-2 border border-nocturne-border"
+          className="bg-nocturne-surface px-6 py-3 rounded-full text-sm font-semibold text-nocturne-text-primary hover:hover-glow transition-all flex items-center gap-2 border border-white/10"
         >
           <Plus size={18} />
           New Booking
@@ -144,7 +144,7 @@ export default function AgentBookingsPage() {
 
       {/* Concierge Booking Form */}
       {showConcierge && (
-        <div className="bg-nocturne-surface rounded-2xl p-8 border border-nocturne-border animate-fade-in">
+        <div className="bg-nocturne-surface rounded-2xl p-8 border border-white/10 animate-fade-in">
           <h2 className="text-2xl font-bold text-gradient-nocturne mb-6">Create New Booking</h2>
           <form onSubmit={handleConciergeBook} className="space-y-6">
             {/* Row 1 */}
@@ -157,7 +157,7 @@ export default function AgentBookingsPage() {
                   value={conciergeForm.artist_id}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, artist_id: e.target.value })}
                   placeholder="Enter artist ID"
-                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-white/10 rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
               <div>
@@ -168,7 +168,7 @@ export default function AgentBookingsPage() {
                   value={conciergeForm.client_name}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, client_name: e.target.value })}
                   placeholder="Client name"
-                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-white/10 rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
             </div>
@@ -182,7 +182,7 @@ export default function AgentBookingsPage() {
                   value={conciergeForm.event_type}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, event_type: e.target.value })}
                   placeholder="e.g., Wedding, Corporate"
-                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-white/10 rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
               <div>
@@ -192,7 +192,7 @@ export default function AgentBookingsPage() {
                   value={conciergeForm.event_city}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, event_city: e.target.value })}
                   placeholder="City name"
-                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-white/10 rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
             </div>
@@ -205,7 +205,7 @@ export default function AgentBookingsPage() {
                   type="date"
                   value={conciergeForm.event_date}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, event_date: e.target.value })}
-                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-white/10 rounded-xl px-4 py-3 text-sm text-nocturne-text-primary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
               <div>
@@ -215,7 +215,7 @@ export default function AgentBookingsPage() {
                   min="1"
                   value={conciergeForm.event_duration_hours}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, event_duration_hours: Number(e.target.value) })}
-                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-white/10 rounded-xl px-4 py-3 text-sm text-nocturne-text-primary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
               <div>
@@ -226,7 +226,7 @@ export default function AgentBookingsPage() {
                   value={conciergeForm.budget_paise / 100}
                   onChange={(e) => setConciergeForm({ ...conciergeForm, budget_paise: Number(e.target.value) * 100 })}
                   placeholder="0"
-                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-nocturne-border rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                  className="w-full bg-nocturne-surface bg-nocturne-surface border border-white/10 rounded-xl px-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                 />
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function AgentBookingsPage() {
               <button
                 type="button"
                 onClick={() => setShowConcierge(false)}
-                className="flex-1 bg-nocturne-surface px-6 py-3 rounded-xl text-sm font-semibold text-nocturne-text-primary border border-nocturne-border hover:hover-glow transition-all"
+                className="flex-1 bg-nocturne-surface px-6 py-3 rounded-xl text-sm font-semibold text-nocturne-text-primary border border-white/10 hover:hover-glow transition-all"
               >
                 Cancel
               </button>
@@ -271,7 +271,7 @@ export default function AgentBookingsPage() {
               className={`px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
                 filter === f.key
                   ? 'bg-gradient-nocturne text-white border border-primary-400/50'
-                  : 'bg-nocturne-surface text-nocturne-text-primary border border-nocturne-border hover:hover-glow'
+                  : 'bg-nocturne-surface text-nocturne-text-primary border border-white/10 hover:hover-glow'
               }`}
             >
               {f.label}
@@ -291,7 +291,7 @@ export default function AgentBookingsPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-nocturne-surface rounded-2xl p-12 text-center border border-nocturne-border">
+        <div className="bg-nocturne-surface rounded-2xl p-12 text-center border border-white/10">
           <Calendar size={48} className="mx-auto text-nocturne-text-secondary/40 mb-4" />
           <p className="text-nocturne-text-secondary">No bookings in this status.</p>
         </div>
@@ -304,7 +304,7 @@ export default function AgentBookingsPage() {
               <Link
                 key={b.id}
                 href={`/agent/bookings/${b.id}`}
-                className="bg-nocturne-surface rounded-2xl p-6 border border-nocturne-border hover:hover-glow transition-all group"
+                className="bg-nocturne-surface rounded-2xl p-6 border border-white/10 hover:hover-glow transition-all group"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">

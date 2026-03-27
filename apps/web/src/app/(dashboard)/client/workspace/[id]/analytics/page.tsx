@@ -147,7 +147,7 @@ export default function WorkspaceAnalyticsPage() {
         </div>
 
         {/* Date Range Filter */}
-        <div className="flex gap-1 bg-nocturne-surface rounded-lg p-1">
+        <div className="flex gap-1 glass-card rounded-xl p-1">
           {(Object.keys(DATE_RANGE_LABELS) as DateRangeKey[]).map((key) => (
             <button
               key={key}
@@ -166,17 +166,17 @@ export default function WorkspaceAnalyticsPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+        <div className="glass-card rounded-xl p-4 border border-white/5">
           <p className="text-sm text-nocturne-text-tertiary">Total Spend</p>
           <p className="text-xl font-bold text-nocturne-text-primary">
             ₹{formatINR(analytics.total_spend_paise)}
           </p>
         </div>
-        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+        <div className="glass-card rounded-xl p-4 border border-white/5">
           <p className="text-sm text-nocturne-text-tertiary">Total Bookings</p>
           <p className="text-xl font-bold text-nocturne-text-primary">{analytics.booking_count}</p>
         </div>
-        <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle">
+        <div className="glass-card rounded-xl p-4 border border-white/5">
           <p className="text-sm text-nocturne-text-tertiary">Avg Booking Value</p>
           <p className="text-xl font-bold text-nocturne-text-primary">₹{formatINR(avgBookingValue)}</p>
         </div>
@@ -187,8 +187,8 @@ export default function WorkspaceAnalyticsPage() {
       </div>
 
       {/* Spend by Month */}
-      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
-        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+      <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
+        <div className="px-4 py-3 border-b border-white/5">
           <h2 className="text-lg font-semibold text-nocturne-text-primary">Spend by Month</h2>
         </div>
         {analytics.monthly_revenue.length === 0 ? (
@@ -220,8 +220,8 @@ export default function WorkspaceAnalyticsPage() {
       </div>
 
       {/* Top Artists */}
-      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
-        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+      <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
+        <div className="px-4 py-3 border-b border-white/5">
           <h2 className="text-lg font-semibold text-nocturne-text-primary">Top Artists</h2>
         </div>
         {analytics.top_artists.length === 0 ? (
@@ -259,8 +259,8 @@ export default function WorkspaceAnalyticsPage() {
       </div>
 
       {/* Event Type Breakdown */}
-      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
-        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+      <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
+        <div className="px-4 py-3 border-b border-white/5">
           <h2 className="text-lg font-semibold text-nocturne-text-primary">Event Type Breakdown</h2>
         </div>
         {Object.keys(eventTypeBreakdown).length === 0 ? (

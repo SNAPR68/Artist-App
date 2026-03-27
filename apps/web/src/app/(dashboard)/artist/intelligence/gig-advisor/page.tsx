@@ -106,20 +106,20 @@ export default function GigAdvisorPage() {
 
   return (
     <div className="space-y-6">
-      <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Gig Advisor</h1></section>
+      <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Gig Advisor</h1></div></div>
 
       {/* Active Inquiries */}
       <section>
         <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">Active Inquiries</h2>
         {inquiries.length === 0 ? (
-          <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 text-center">
+          <div className="glass-card rounded-xl border border-white/5 p-6 text-center">
             <p className="text-nocturne-text-tertiary">No active inquiries to compare right now.</p>
             <p className="text-sm text-nocturne-text-tertiary mt-1">When you receive new booking inquiries, our advisor will help you evaluate them.</p>
           </div>
         ) : (
           <div className="space-y-3">
             {inquiries.map((inq) => (
-              <div key={inq.inquiry_id} className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4">
+              <div key={inq.inquiry_id} className="glass-card rounded-xl border border-white/5 p-4">
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <p className="font-medium text-nocturne-text-primary">
@@ -163,14 +163,14 @@ export default function GigAdvisorPage() {
       <section>
         <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">Opportunities Near You</h2>
         {opportunities.length === 0 ? (
-          <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 text-center">
+          <div className="glass-card rounded-xl border border-white/5 p-6 text-center">
             <p className="text-nocturne-text-tertiary">No new opportunities detected right now.</p>
             <p className="text-sm text-nocturne-text-tertiary mt-1">We scan demand patterns regularly and will show matches here.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {opportunities.map((opp) => (
-              <div key={opp.id} className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4">
+              <div key={opp.id} className="glass-card rounded-xl border border-white/5 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="font-medium text-nocturne-text-primary">{opp.city}</p>
                   {demandBadge(opp.demand_level)}

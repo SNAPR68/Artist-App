@@ -54,7 +54,7 @@ export default function AgentOnboarding() {
               required
               value={form.agency_name}
               onChange={(e) => setForm({ ...form, agency_name: e.target.value })}
-              className="w-full border border-nocturne-border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full border border-white/10 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Star Entertainment Agency"
             />
           </div>
@@ -65,7 +65,7 @@ export default function AgentOnboarding() {
               required
               value={form.contact_person}
               onChange={(e) => setForm({ ...form, contact_person: e.target.value })}
-              className="w-full border border-nocturne-border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full border border-white/10 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Rahul Sharma"
             />
           </div>
@@ -79,7 +79,7 @@ export default function AgentOnboarding() {
               required
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className="w-full border border-nocturne-border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full border border-white/10 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="9876543210"
             />
           </div>
@@ -90,7 +90,7 @@ export default function AgentOnboarding() {
               required
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full border border-nocturne-border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full border border-white/10 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="agent@example.com"
             />
           </div>
@@ -104,7 +104,7 @@ export default function AgentOnboarding() {
               required
               value={form.city}
               onChange={(e) => setForm({ ...form, city: e.target.value })}
-              className="w-full border border-nocturne-border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full border border-white/10 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Mumbai"
             />
           </div>
@@ -116,7 +116,7 @@ export default function AgentOnboarding() {
               max={50}
               value={form.commission_pct}
               onChange={(e) => setForm({ ...form, commission_pct: Number(e.target.value) })}
-              className="w-full border border-nocturne-border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full border border-white/10 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -127,7 +127,7 @@ export default function AgentOnboarding() {
             value={form.bio}
             onChange={(e) => setForm({ ...form, bio: e.target.value })}
             rows={3}
-            className="w-full border border-nocturne-border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full border border-white/10 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="Tell us about your agency..."
           />
         </div>

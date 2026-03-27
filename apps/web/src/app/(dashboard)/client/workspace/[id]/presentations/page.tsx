@@ -224,7 +224,7 @@ export default function WorkspacePresentationsPage() {
 
       {/* ── Create Form ──────────────────────────────────────── */}
       {showForm && (
-        <div className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-6 space-y-5">
+        <div className="bg-nocturne-surface border border-white/5 rounded-lg p-6 space-y-5">
           <h2 className="text-lg font-semibold text-nocturne-text-primary">New Presentation</h2>
 
           {/* Title */}
@@ -235,7 +235,7 @@ export default function WorkspacePresentationsPage() {
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="e.g., Artist Lineup for Wedding Reception"
-              className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             />
           </div>
 
@@ -249,7 +249,7 @@ export default function WorkspacePresentationsPage() {
                 No artists found in workspace pipeline. Add bookings first.
               </p>
             ) : (
-              <div className="space-y-2 max-h-60 overflow-y-auto border border-nocturne-border-subtle rounded-lg p-3">
+              <div className="space-y-2 max-h-60 overflow-y-auto border border-white/5 rounded-lg p-3">
                 {artists.map((a) => {
                   const isSelected = form.artist_ids.includes(a.artist_id);
                   return (
@@ -272,7 +272,7 @@ export default function WorkspacePresentationsPage() {
                             onChange={(e) => updateNote(a.artist_id, e.target.value)}
                             placeholder={`Note about ${a.artist_name} (optional)`}
                             rows={2}
-                            className="w-full border border-nocturne-border-subtle rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
+                            className="w-full border border-white/5 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
                           />
                         </div>
                       )}
@@ -313,7 +313,7 @@ export default function WorkspacePresentationsPage() {
               onChange={(e) => setForm({ ...form, custom_header: e.target.value })}
               placeholder="Introductory message shown at the top of the presentation"
               rows={2}
-              className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
+              className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
             />
           </div>
 
@@ -324,7 +324,7 @@ export default function WorkspacePresentationsPage() {
               onChange={(e) => setForm({ ...form, custom_footer: e.target.value })}
               placeholder="Closing message or terms shown at the bottom"
               rows={2}
-              className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
+              className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
             />
           </div>
 
@@ -335,7 +335,7 @@ export default function WorkspacePresentationsPage() {
               value={form.expires_at}
               onChange={(e) => setForm({ ...form, expires_at: e.target.value })}
               min={new Date().toISOString().split('T')[0]}
-              className="border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             />
           </div>
 
@@ -343,7 +343,7 @@ export default function WorkspacePresentationsPage() {
           <div className="flex justify-end gap-3 pt-2">
             <button
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 text-sm font-medium text-nocturne-text-secondary border border-nocturne-border rounded-lg hover:bg-nocturne-base transition-colors"
+              className="px-4 py-2 text-sm font-medium text-nocturne-text-secondary border border-white/10 rounded-lg hover:bg-nocturne-base transition-colors"
             >
               Cancel
             </button>
@@ -360,7 +360,7 @@ export default function WorkspacePresentationsPage() {
 
       {/* ── Presentations List ───────────────────────────────── */}
       {presentations.length === 0 && !showForm ? (
-        <div className="bg-nocturne-base border border-nocturne-border-subtle rounded-lg p-12 text-center">
+        <div className="bg-nocturne-base border border-white/5 rounded-lg p-12 text-center">
           <div className="text-4xl mb-3">📋</div>
           <p className="text-nocturne-text-tertiary mb-1">No presentations yet</p>
           <p className="text-sm text-nocturne-text-tertiary">
@@ -381,7 +381,7 @@ export default function WorkspacePresentationsPage() {
             return (
               <div
                 key={pres.id}
-                className={`bg-nocturne-surface border rounded-lg p-4 ${isExpired ? 'border-red-200 bg-nocturne-error/15/30' : 'border-nocturne-border-subtle'}`}
+                className={`bg-nocturne-surface border rounded-lg p-4 ${isExpired ? 'border-red-200 bg-nocturne-error/15/30' : 'border-white/5'}`}
               >
                 <div className="flex items-start justify-between">
                   <div>

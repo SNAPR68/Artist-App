@@ -139,7 +139,7 @@ export default function ClientBookingDetailPage() {
       </div>
 
       {/* Event Details */}
-      <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-3xl border border-nocturne-border">
+      <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-3xl border border-white/10">
         <h2 className="text-sm font-semibold text-gradient-nocturne uppercase tracking-wide font-display">Event Details</h2>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex items-start gap-3">
@@ -188,17 +188,17 @@ export default function ClientBookingDetailPage() {
       </div>
 
       {/* Timeline */}
-      <div className="glass-card rounded-xl p-6 backdrop-blur-3xl border border-nocturne-border">
+      <div className="glass-card rounded-xl p-6 backdrop-blur-3xl border border-white/10">
         <h2 className="text-sm font-semibold text-gradient-nocturne uppercase tracking-wide mb-4 font-display">Status Timeline</h2>
         <StateTimeline currentStatus={booking.status} events={booking.events} />
       </div>
 
       {/* Quotes / Negotiation */}
       {booking.quotes.length > 0 && (
-        <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-3xl border border-nocturne-border">
+        <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-3xl border border-white/10">
           <h2 className="text-sm font-semibold text-gradient-nocturne uppercase tracking-wide font-display">Quote History</h2>
           {booking.quotes.map((q, idx) => (
-            <div key={q.round} className={`bg-nocturne-surface-2 rounded-lg p-4 border border-nocturne-border backdrop-blur-3xl ${
+            <div key={q.round} className={`bg-nocturne-surface-2 rounded-lg p-4 border border-white/10 backdrop-blur-3xl ${
               idx % 2 === 0 ? 'ml-0 mr-auto' : 'ml-auto mr-0'
             } w-full md:w-5/6`}>
               <div className="flex items-start justify-between mb-3">
@@ -242,7 +242,7 @@ export default function ClientBookingDetailPage() {
 
       {/* Contract Download */}
       {canDownloadContract && (
-        <div className="glass-card rounded-xl p-6 flex items-center justify-between backdrop-blur-3xl border border-nocturne-border hover:bg-nocturne-surface-2 transition-all">
+        <div className="glass-card rounded-xl p-6 flex items-center justify-between backdrop-blur-3xl border border-white/10 hover:bg-nocturne-surface-2 transition-all">
           <div>
             <h3 className="text-sm font-semibold text-nocturne-text-primary">Booking Contract</h3>
             <p className="text-xs text-nocturne-text-tertiary mt-1">Download the terms and financial details for this booking.</p>
@@ -258,7 +258,7 @@ export default function ClientBookingDetailPage() {
       )}
 
       {/* Actions */}
-      <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-3xl border border-nocturne-border">
+      <div className="glass-card rounded-xl p-6 space-y-4 backdrop-blur-3xl border border-white/10">
         {canNegotiate && (
           <form onSubmit={handleCounterOffer} className="space-y-3 pb-4 border-b border-white/10">
             <h3 className="text-sm font-semibold text-nocturne-text-primary">Submit Counter-Offer</h3>
@@ -270,7 +270,7 @@ export default function ClientBookingDetailPage() {
                   value={counterAmount}
                   onChange={(e) => setCounterAmount(e.target.value)}
                   placeholder="0"
-                  className="w-full pl-6 pr-3 py-2.5 bg-white/5 border border-nocturne-border rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                  className="w-full pl-6 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                   required
                 />
               </div>
@@ -283,7 +283,7 @@ export default function ClientBookingDetailPage() {
               value={counterNotes}
               onChange={(e) => setCounterNotes(e.target.value)}
               placeholder="Add any notes (optional)"
-              className="w-full px-3 py-2.5 bg-white/5 border border-nocturne-border rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+              className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
             />
           </form>
         )}
@@ -306,7 +306,7 @@ export default function ClientBookingDetailPage() {
 
       {/* Review Form for completed bookings */}
       {canReview && !reviewSubmitted && (
-        <div className="glass-card rounded-xl p-6 backdrop-blur-3xl border border-nocturne-border">
+        <div className="glass-card rounded-xl p-6 backdrop-blur-3xl border border-white/10">
           <h2 className="text-sm font-semibold text-gradient-nocturne uppercase tracking-wide mb-4 font-display">Leave a Review</h2>
           <ReviewForm
             bookingId={id}

@@ -81,12 +81,12 @@ export default function ShortlistsPage() {
 
       {/* Create Form */}
       {creating && (
-        <form onSubmit={handleCreate} className="glass-card border border-nocturne-border rounded-xl p-4 flex gap-2 animate-fade-in-up">
+        <form onSubmit={handleCreate} className="glass-card border border-white/10 rounded-xl p-4 flex gap-2 animate-fade-in-up">
           <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Shortlist name (e.g., Wedding DJs)"
-            className="flex-1 px-4 py-2.5 bg-nocturne-base border border-nocturne-border rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
+            className="flex-1 px-4 py-2.5 bg-nocturne-base border border-white/10 rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
             autoFocus
           />
           <button type="submit" className="px-4 py-2.5 bg-gradient-nocturne text-white rounded-lg text-sm font-medium hover-glow transition-all">
@@ -100,7 +100,7 @@ export default function ShortlistsPage() {
 
       {/* Shortlist List */}
       {shortlists.length === 0 ? (
-        <div className="glass-card border border-nocturne-border rounded-xl p-16 text-center">
+        <div className="glass-card border border-white/10 rounded-xl p-16 text-center">
           <ListCheck size={48} className="mx-auto mb-4 text-nocturne-accent/50" />
           <p className="text-nocturne-text-secondary mb-2 font-medium">No shortlists yet</p>
           <p className="text-sm text-nocturne-text-secondary">Create one to start comparing and organizing artists for your events</p>
@@ -117,10 +117,10 @@ export default function ShortlistsPage() {
             <Link
               key={sl.id}
               href={`/client/shortlists/${sl.id}`}
-              className="group glass-card border border-nocturne-border rounded-xl p-5 flex items-center justify-between hover-glow transition-all duration-300 animate-fade-in"
+              className="group glass-card border border-white/10 rounded-xl p-5 flex items-center justify-between hover-glow transition-all duration-300 animate-fade-in"
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="p-2.5 rounded-lg bg-nocturne-primary-light border border-nocturne-border group-hover:bg-primary-500/30 transition-colors flex-shrink-0">
+                <div className="p-2.5 rounded-lg bg-nocturne-primary-light border border-white/10 group-hover:bg-primary-500/30 transition-colors flex-shrink-0">
                   <ListCheck size={18} className="text-nocturne-accent" />
                 </div>
                 <div className="min-w-0 flex-1">

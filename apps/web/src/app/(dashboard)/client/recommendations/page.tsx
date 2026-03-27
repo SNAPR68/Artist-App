@@ -36,7 +36,7 @@ function ArtistCard({ artist, badge }: { artist: RecommendedArtist; badge?: stri
   return (
     <Link
       href={`/artists/${artist.artist_id}`}
-      className="group glass-card border border-nocturne-border rounded-xl p-5 hover-glow transition-all duration-300 flex-shrink-0 w-56 animate-fade-in"
+      className="group glass-card border border-white/10 rounded-xl p-5 hover-glow transition-all duration-300 flex-shrink-0 w-56 animate-fade-in"
     >
       {badge && (
         <div className="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/30 to-orange-500/30 border border-amber-400/30 text-amber-300 mb-3 font-semibold">
@@ -52,7 +52,7 @@ function ArtistCard({ artist, badge }: { artist: RecommendedArtist; badge?: stri
 
       <div className="flex flex-wrap gap-1.5 mt-3">
         {artist.genres.slice(0, 3).map((g) => (
-          <span key={g} className="bg-nocturne-primary-light text-nocturne-accent text-xs px-2 py-1 rounded-full border border-nocturne-border font-medium">
+          <span key={g} className="bg-nocturne-primary-light text-nocturne-accent text-xs px-2 py-1 rounded-full border border-white/10 font-medium">
             {g}
           </span>
         ))}
@@ -132,7 +132,7 @@ export default function RecommendationsPage() {
           <h2 className="text-xl font-display text-nocturne-text-primary">Recommended for You</h2>
         </div>
         {forMe.length === 0 ? (
-          <div className="glass-card border border-nocturne-border rounded-xl p-8 text-center">
+          <div className="glass-card border border-white/10 rounded-xl p-8 text-center">
             <Sparkles size={40} className="mx-auto mb-3 text-nocturne-accent/50" />
             <p className="text-nocturne-text-secondary text-sm">Book more to get personalized recommendations!</p>
           </div>

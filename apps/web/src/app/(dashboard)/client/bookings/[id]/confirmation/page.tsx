@@ -265,7 +265,7 @@ export default function PaymentConfirmationPage() {
           <button
             onClick={handleDownloadInvoice}
             disabled={downloadingInvoice}
-            className="w-full flex items-center justify-between p-4 bg-nocturne-surface-2 rounded-lg border border-nocturne-border hover:bg-nocturne-surface-2 transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-between p-4 bg-nocturne-surface-2 rounded-lg border border-white/10 hover:bg-nocturne-surface-2 transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="flex items-center gap-3">
               <Download size={20} className="text-nocturne-accent" />
@@ -284,7 +284,7 @@ export default function PaymentConfirmationPage() {
           <button
             onClick={handleDownloadContract}
             disabled={downloadingContract}
-            className="w-full flex items-center justify-between p-4 bg-nocturne-surface-2 rounded-lg border border-nocturne-border hover:bg-nocturne-surface-2 transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-between p-4 bg-nocturne-surface-2 rounded-lg border border-white/10 hover:bg-nocturne-surface-2 transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="flex items-center gap-3">
               <Download size={20} className="text-nocturne-accent" />
@@ -335,7 +335,7 @@ export default function PaymentConfirmationPage() {
           </button>
           <button
             onClick={() => router.push('/client')}
-            className="flex items-center justify-center gap-2 py-3 bg-nocturne-surface-2 border border-nocturne-border text-nocturne-text-primary rounded-lg font-display font-semibold transition-all duration-300 hover:bg-nocturne-surface-2 hover-glow"
+            className="flex items-center justify-center gap-2 py-3 bg-nocturne-surface-2 border border-white/10 text-nocturne-text-primary rounded-lg font-display font-semibold transition-all duration-300 hover:bg-nocturne-surface-2 hover-glow"
           >
             <Home size={18} />
             Dashboard

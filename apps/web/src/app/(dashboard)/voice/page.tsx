@@ -127,7 +127,7 @@ export default function VoicePage() {
         {messages.length > 0 && (
           <button
             onClick={handleNewSession}
-            className="text-sm text-nocturne-text-tertiary hover:text-nocturne-text-secondary border border-nocturne-border-subtle rounded-lg px-3 py-1.5"
+            className="text-sm text-nocturne-text-tertiary hover:text-nocturne-text-secondary border border-white/5 rounded-lg px-3 py-1.5"
           >
             New Chat
           </button>
@@ -135,7 +135,7 @@ export default function VoicePage() {
       </div>
 
       {/* Chat Container */}
-      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle min-h-[400px] flex flex-col">
+      <div className="glass-card rounded-xl border border-white/5 min-h-[400px] flex flex-col">
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {messages.length === 0 && (
@@ -171,7 +171,7 @@ export default function VoicePage() {
           ))}
           {sending && (
             <div className="flex justify-start">
-              <div className="bg-nocturne-surface rounded-lg px-4 py-2.5">
+              <div className="glass-card rounded-xl px-4 py-2.5">
                 <div className="flex gap-1">
                   <span className="w-2 h-2 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                   <span className="w-2 h-2 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -200,14 +200,14 @@ export default function VoicePage() {
         )}
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="border-t border-nocturne-border-subtle p-3 flex gap-2">
+        <form onSubmit={handleSubmit} className="border-t border-white/5 p-3 flex gap-2">
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Ask me anything... e.g. 'band chahiye Jaipur mein'"
             disabled={sending}
-            className="flex-1 border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none disabled:opacity-50"
+            className="flex-1 border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none disabled:opacity-50"
           />
           <button
             type="submit"

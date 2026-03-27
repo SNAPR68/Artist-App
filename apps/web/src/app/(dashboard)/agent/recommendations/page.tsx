@@ -34,7 +34,7 @@ function ArtistCard({ artist }: { artist: RecommendedArtist }) {
   return (
     <Link
       href={`/artists/${artist.artist_id}`}
-      className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4 hover:border-primary-300 transition-colors"
+      className="bg-nocturne-surface border border-white/5 rounded-lg p-4 hover:border-primary-300 transition-colors"
     >
       <div className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold ${colors[colorIdx]} mb-3`}>
         {initials}
@@ -87,7 +87,7 @@ export default function AgentRecommendationsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Discover Artists</h1></section>
+        <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Discover Artists</h1></div></div>
         <p className="text-sm text-nocturne-text-tertiary mt-1">Find new artists for your roster and client events.</p>
       </div>
 
@@ -95,7 +95,7 @@ export default function AgentRecommendationsPage() {
       <section>
         <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">Recommended</h2>
         {forMe.length === 0 ? (
-          <div className="bg-nocturne-base border border-nocturne-border-subtle rounded-lg p-6 text-center">
+          <div className="bg-nocturne-base border border-white/5 rounded-lg p-6 text-center">
             <p className="text-nocturne-text-tertiary text-sm">
               Manage more bookings to get personalized recommendations.
             </p>
@@ -113,7 +113,7 @@ export default function AgentRecommendationsPage() {
       <section>
         <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">Popular Artists</h2>
         {popular.length === 0 ? (
-          <div className="bg-nocturne-base border border-nocturne-border-subtle rounded-lg p-6 text-center">
+          <div className="bg-nocturne-base border border-white/5 rounded-lg p-6 text-center">
             <p className="text-nocturne-text-tertiary text-sm">No popular artists data available yet.</p>
           </div>
         ) : (

@@ -227,7 +227,7 @@ export default function OnboardingPage() {
               type="text"
               value={stageName}
               onChange={(e) => setStageName(e.target.value)}
-              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="Your artist/band name"
             />
           </div>
@@ -237,7 +237,7 @@ export default function OnboardingPage() {
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="Tell clients about your act, experience, and what makes you unique..."
             />
           </div>
@@ -247,7 +247,7 @@ export default function OnboardingPage() {
               type="text"
               value={baseCity}
               onChange={(e) => setBaseCity(e.target.value)}
-              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="e.g., Mumbai, Delhi, Bangalore"
             />
           </div>
@@ -343,7 +343,7 @@ export default function OnboardingPage() {
                 onChange={(e) => setDurationMin(Number(e.target.value))}
                 min={15}
                 max={480}
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-nocturne-primary"
               />
             </div>
             <div>
@@ -354,7 +354,7 @@ export default function OnboardingPage() {
                 onChange={(e) => setDurationMax(Number(e.target.value))}
                 min={15}
                 max={480}
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-nocturne-primary"
               />
             </div>
           </div>
@@ -368,7 +368,7 @@ export default function OnboardingPage() {
           <p className="text-sm text-nocturne-text-secondary">Set price ranges per event type and city tier. Clients will see these as indicative ranges.</p>
 
           {pricing.map((entry, i) => (
-            <div key={i} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4 space-y-3">
+            <div key={i} className="bg-nocturne-surface border border-white/5 rounded-lg p-4 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-nocturne-text-secondary">Rate #{i + 1}</span>
                 {pricing.length > 1 && (
@@ -383,7 +383,7 @@ export default function OnboardingPage() {
                   <select
                     value={entry.event_type}
                     onChange={(e) => updatePricing(i, 'event_type', e.target.value)}
-                    className="w-full px-2 py-1.5 border border-nocturne-border rounded text-sm"
+                    className="w-full px-2 py-1.5 border border-white/10 rounded text-sm"
                   >
                     {EVENT_TYPES.map((t) => (
                       <option key={t.value} value={t.value}>{t.label}</option>
@@ -395,7 +395,7 @@ export default function OnboardingPage() {
                   <select
                     value={entry.city_tier}
                     onChange={(e) => updatePricing(i, 'city_tier', e.target.value)}
-                    className="w-full px-2 py-1.5 border border-nocturne-border rounded text-sm"
+                    className="w-full px-2 py-1.5 border border-white/10 rounded text-sm"
                   >
                     <option value="tier_1">Tier 1 (Metro)</option>
                     <option value="tier_2">Tier 2</option>
@@ -409,7 +409,7 @@ export default function OnboardingPage() {
                     value={entry.min_price}
                     onChange={(e) => updatePricing(i, 'min_price', Number(e.target.value))}
                     min={0}
-                    className="w-full px-2 py-1.5 border border-nocturne-border rounded text-sm"
+                    className="w-full px-2 py-1.5 border border-white/10 rounded text-sm"
                   />
                 </div>
                 <div>
@@ -419,7 +419,7 @@ export default function OnboardingPage() {
                     value={entry.max_price}
                     onChange={(e) => updatePricing(i, 'max_price', Number(e.target.value))}
                     min={0}
-                    className="w-full px-2 py-1.5 border border-nocturne-border rounded text-sm"
+                    className="w-full px-2 py-1.5 border border-white/10 rounded text-sm"
                   />
                 </div>
               </div>

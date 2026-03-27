@@ -99,7 +99,7 @@ export default function SubstitutionsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Emergency Replacements</h1></section>
+        <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Emergency Replacements</h1></div></div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-nocturne-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-nocturne-primary transition-colors"
@@ -110,7 +110,7 @@ export default function SubstitutionsPage() {
 
       {/* Inline Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-nocturne-surface border border-white/5 rounded-lg p-4 space-y-4">
           <div>
             <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">Booking ID</label>
             <input
@@ -119,7 +119,7 @@ export default function SubstitutionsPage() {
               value={formBookingId}
               onChange={(e) => setFormBookingId(e.target.value)}
               placeholder="e.g. bk_abc123"
-              className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             />
           </div>
           <div>
@@ -127,7 +127,7 @@ export default function SubstitutionsPage() {
             <select
               value={formUrgency}
               onChange={(e) => setFormUrgency(e.target.value as 'critical' | 'urgent' | 'standard')}
-              className="w-full border border-nocturne-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             >
               <option value="critical">Critical</option>
               <option value="urgent">Urgent</option>
@@ -149,7 +149,7 @@ export default function SubstitutionsPage() {
       <section>
         <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">My Requests</h2>
         {requests.length === 0 ? (
-          <div className="bg-nocturne-base border border-nocturne-border-subtle rounded-lg p-6 text-center">
+          <div className="bg-nocturne-base border border-white/5 rounded-lg p-6 text-center">
             <p className="text-nocturne-text-tertiary text-sm">
               No replacement requests. When an artist cancels, you can find a replacement here.
             </p>
@@ -157,7 +157,7 @@ export default function SubstitutionsPage() {
         ) : (
           <div className="space-y-3">
             {requests.map((req) => (
-              <div key={req.id} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4">
+              <div key={req.id} className="bg-nocturne-surface border border-white/5 rounded-lg p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-medium text-nocturne-text-primary text-sm">

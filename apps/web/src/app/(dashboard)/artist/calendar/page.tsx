@@ -171,14 +171,14 @@ export default function CalendarPage() {
         <div className="flex items-center justify-between">
           <button
             onClick={prevMonth}
-            className="p-2 rounded-lg bg-nocturne-surface-2 border border-nocturne-border hover:bg-nocturne-surface-2 transition-all duration-300 hover-glow text-nocturne-text-primary"
+            className="p-2 rounded-lg bg-nocturne-surface-2 border border-white/10 hover:bg-nocturne-surface-2 transition-all duration-300 hover-glow text-nocturne-text-primary"
           >
             <ChevronLeft size={20} />
           </button>
           <h2 className="text-xl font-display font-bold text-gradient">{monthName}</h2>
           <button
             onClick={nextMonth}
-            className="p-2 rounded-lg bg-nocturne-surface-2 border border-nocturne-border hover:bg-nocturne-surface-2 transition-all duration-300 hover-glow text-nocturne-text-primary"
+            className="p-2 rounded-lg bg-nocturne-surface-2 border border-white/10 hover:bg-nocturne-surface-2 transition-all duration-300 hover-glow text-nocturne-text-primary"
           >
             <ChevronRight size={20} />
           </button>

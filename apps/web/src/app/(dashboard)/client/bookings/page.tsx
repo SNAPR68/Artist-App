@@ -127,7 +127,7 @@ export default function ClientBookingsPage() {
               <Link
                 key={b.id}
                 href={`/client/bookings/${b.id}`}
-                className="glass-card group hover:bg-nocturne-surface-2 backdrop-blur-3xl bg-white/5 border border-nocturne-border hover:border-white/20 rounded-xl p-5 transition-all duration-300 hover-glow shadow-nocturne-glow-sm cursor-pointer block animate-fade-in-up"
+                className="glass-card group hover:bg-nocturne-surface-2 backdrop-blur-3xl bg-white/5 border border-white/10 hover:border-white/20 rounded-xl p-5 transition-all duration-300 hover-glow shadow-nocturne-glow-sm cursor-pointer block animate-fade-in-up"
                 style={{ animationDelay: `${50 + idx * 25}ms` }}
               >
                 <div className="flex items-start justify-between mb-3">

@@ -67,7 +67,7 @@ export default function BackupPreferencesPage() {
         </p>
       </div>
 
-      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 space-y-6">
+      <div className="glass-card rounded-xl border border-white/5 p-6 space-y-6">
         {/* Toggle */}
         <div className="flex items-center justify-between">
           <div>
@@ -107,7 +107,7 @@ export default function BackupPreferencesPage() {
                   backup_premium_pct: Math.max(0, Math.min(100, Number(e.target.value) || 0)),
                 }))
               }
-              className="w-32 border border-nocturne-border-subtle rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-nocturne-accent focus:border-nocturne-accent outline-none bg-nocturne-surface-2 text-nocturne-text-primary"
+              className="w-32 border border-white/5 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-nocturne-accent focus:border-nocturne-accent outline-none bg-nocturne-surface-2 text-nocturne-text-primary"
             />
             <p className="text-xs text-nocturne-text-tertiary mt-1">
               You&apos;ll earn {prefs.backup_premium_pct}% more than the original booking amount for

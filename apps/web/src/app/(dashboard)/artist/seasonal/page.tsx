@@ -85,19 +85,19 @@ export default function SeasonalInsightsPage() {
 
   return (
     <div className="space-y-8">
-      <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Seasonal Demand</h1></section>
+      <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Seasonal Demand</h1></div></div>
 
       {/* Demand by Month */}
       <section>
         <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">Demand by Month</h2>
         {curves.length === 0 ? (
-          <div className="bg-nocturne-surface-2 border border-nocturne-border-subtle rounded-lg p-6 text-center">
+          <div className="bg-nocturne-surface-2 border border-white/5 rounded-lg p-6 text-center">
             <p className="text-nocturne-text-tertiary text-sm">Not enough booking data to show seasonal trends yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {curves.map((c) => (
-              <div key={c.month} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4">
+              <div key={c.month} className="bg-nocturne-surface border border-white/5 rounded-lg p-4">
                 <p className="font-medium text-nocturne-text-primary text-sm">{c.month_name}</p>
                 <div className="mt-2 flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${DEMAND_DOT[c.demand_level]}`} />
@@ -132,13 +132,13 @@ export default function SeasonalInsightsPage() {
       <section>
         <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">Alerts &amp; Opportunities</h2>
         {alerts.length === 0 ? (
-          <div className="bg-nocturne-surface-2 border border-nocturne-border-subtle rounded-lg p-6 text-center">
+          <div className="bg-nocturne-surface-2 border border-white/5 rounded-lg p-6 text-center">
             <p className="text-nocturne-text-tertiary text-sm">No seasonal alerts right now.</p>
           </div>
         ) : (
           <div className="space-y-3">
             {alerts.map((alert) => (
-              <div key={alert.id} className="bg-nocturne-surface border border-nocturne-border-subtle rounded-lg p-4 flex items-start gap-3">
+              <div key={alert.id} className="bg-nocturne-surface border border-white/5 rounded-lg p-4 flex items-start gap-3">
                 <span className="text-xl flex-shrink-0">{ALERT_ICONS[alert.type] ?? '📢'}</span>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-nocturne-text-primary text-sm">{alert.title}</p>
@@ -150,7 +150,7 @@ export default function SeasonalInsightsPage() {
                 <button
                   onClick={() => handleMarkRead(alert.id)}
                   disabled={markingRead === alert.id}
-                  className="text-xs text-nocturne-text-tertiary hover:text-nocturne-text-secondary border border-nocturne-border-subtle rounded px-2.5 py-1 flex-shrink-0 disabled:opacity-50"
+                  className="text-xs text-nocturne-text-tertiary hover:text-nocturne-text-secondary border border-white/5 rounded px-2.5 py-1 flex-shrink-0 disabled:opacity-50"
                 >
                   {markingRead === alert.id ? 'Marking...' : 'Mark Read'}
                 </button>

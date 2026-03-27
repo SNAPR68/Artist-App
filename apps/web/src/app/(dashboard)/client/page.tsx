@@ -116,7 +116,7 @@ export default function ClientDashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all group">
+        <div className="glass-card rounded-xl p-6 border border-white/10 hover:border-nocturne-border-strong transition-all group">
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm text-nocturne-text-secondary font-medium">Active Bookings</p>
             <Calendar className="w-5 h-5 text-nocturne-accent group-hover:scale-110 transition-transform" />
@@ -125,7 +125,7 @@ export default function ClientDashboardPage() {
           <p className="text-xs text-nocturne-text-secondary mt-2">Coming up soon</p>
         </div>
 
-        <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all group">
+        <div className="glass-card rounded-xl p-6 border border-white/10 hover:border-nocturne-border-strong transition-all group">
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm text-nocturne-text-secondary font-medium">Shortlisted Artists</p>
             <Heart className="w-5 h-5 text-accent-magenta group-hover:scale-110 transition-transform" />
@@ -134,7 +134,7 @@ export default function ClientDashboardPage() {
           <p className="text-xs text-nocturne-text-secondary mt-2">Ready to contact</p>
         </div>
 
-        <div className="glass-card rounded-xl p-6 border border-nocturne-border hover:border-nocturne-border-strong transition-all group">
+        <div className="glass-card rounded-xl p-6 border border-white/10 hover:border-nocturne-border-strong transition-all group">
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm text-nocturne-text-secondary font-medium">Total Events</p>
             <Sparkles className="w-5 h-5 text-success group-hover:scale-110 transition-transform" />
@@ -218,7 +218,7 @@ export default function ClientDashboardPage() {
                 key={sl.id}
                 href={`/client/shortlists/${sl.id}`}
               >
-                <div className="glass-card rounded-xl p-4 border border-nocturne-border hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm transition-all group cursor-pointer">
+                <div className="glass-card rounded-xl p-4 border border-white/10 hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm transition-all group cursor-pointer">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <h3 className="font-semibold text-nocturne-text-primary group-hover:text-nocturne-accent transition-colors">

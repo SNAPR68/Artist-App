@@ -143,7 +143,7 @@ export default function WorkspaceSettingsPage() {
       )}
 
       {/* Workspace Info */}
-      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 space-y-4">
+      <div className="glass-card rounded-xl border border-white/5 p-6 space-y-4">
         <h2 className="text-sm font-semibold text-nocturne-text-tertiary uppercase tracking-wide">
           Workspace Info
         </h2>
@@ -153,7 +153,7 @@ export default function WorkspaceSettingsPage() {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="Workspace name"
           />
         </div>
@@ -164,7 +164,7 @@ export default function WorkspaceSettingsPage() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="Brief description of your workspace"
           />
         </div>
@@ -174,7 +174,7 @@ export default function WorkspaceSettingsPage() {
           <select
             value={companyType}
             onChange={(e) => setCompanyType(e.target.value)}
-            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-nocturne-surface"
+            className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-nocturne-surface"
           >
             {COMPANY_TYPES.map((ct) => (
               <option key={ct.value} value={ct.value}>
@@ -189,7 +189,7 @@ export default function WorkspaceSettingsPage() {
           <input
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="e.g. Mumbai"
           />
         </div>
@@ -200,14 +200,14 @@ export default function WorkspaceSettingsPage() {
             value={website}
             onChange={(e) => setWebsite(e.target.value)}
             type="url"
-            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="https://example.com"
           />
         </div>
       </div>
 
       {/* Branding */}
-      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 space-y-4">
+      <div className="glass-card rounded-xl border border-white/5 p-6 space-y-4">
         <h2 className="text-sm font-semibold text-nocturne-text-tertiary uppercase tracking-wide">Branding</h2>
 
         <div>
@@ -216,7 +216,7 @@ export default function WorkspaceSettingsPage() {
             value={logoUrl}
             onChange={(e) => setLogoUrl(e.target.value)}
             type="url"
-            className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="https://example.com/logo.png"
           />
           {logoUrl && (
@@ -226,7 +226,7 @@ export default function WorkspaceSettingsPage() {
                 alt="Logo preview"
                 width={48}
                 height={48}
-                className="object-contain rounded border border-nocturne-border-subtle"
+                className="object-contain rounded border border-white/5"
               />
             </div>
           )}
@@ -238,13 +238,13 @@ export default function WorkspaceSettingsPage() {
             <input
               value={brandColor}
               onChange={(e) => setBrandColor(e.target.value)}
-              className="flex-1 px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="flex-1 px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="#FF5733"
               maxLength={7}
             />
             {brandColor && /^#[0-9A-Fa-f]{6}$/.test(brandColor) && (
               <div
-                className="w-10 h-10 rounded-lg border border-nocturne-border-subtle flex-shrink-0"
+                className="w-10 h-10 rounded-lg border border-white/5 flex-shrink-0"
                 style={{ backgroundColor: brandColor }}
                 title={brandColor}
               />
@@ -265,7 +265,7 @@ export default function WorkspaceSettingsPage() {
       </div>
 
       {/* Danger Zone */}
-      <div className="bg-nocturne-surface rounded-lg border border-red-200 p-6">
+      <div className="glass-card rounded-xl border border-red-200 p-6">
         <h2 className="text-sm font-semibold text-nocturne-error uppercase tracking-wide mb-3">
           Danger Zone
         </h2>

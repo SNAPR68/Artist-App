@@ -147,11 +147,11 @@ function ArtistGigsView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Gig Marketplace</h1></section>
+        <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Gig Marketplace</h1></div></div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-nocturne-border-subtle">
+      <div className="flex gap-2 border-b border-white/5">
         {(['matching', 'browse', 'applications'] as const).map((t) => (
           <button
             key={t}
@@ -174,12 +174,12 @@ function ArtistGigsView() {
             placeholder="Filter by city..."
             value={cityFilter}
             onChange={(e) => setCityFilter(e.target.value)}
-            className="px-3 py-1.5 text-sm border border-nocturne-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="px-3 py-1.5 text-sm border border-white/10 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500"
           />
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-1.5 text-sm border border-nocturne-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="px-3 py-1.5 text-sm border border-white/10 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             <option value="">All Event Types</option>
             {EVENT_TYPES.map((t) => (
@@ -205,7 +205,7 @@ function ArtistGigsView() {
               <Link
                 key={app.id}
                 href={`/gigs/${app.gig_post_id}`}
-                className="block bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4 hover:border-primary-300 transition-colors"
+                className="block glass-card rounded-xl border border-white/5 p-4 hover:border-primary-300 transition-colors"
               >
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-medium text-nocturne-text-primary">{app.gig_title}</h3>
@@ -325,7 +325,7 @@ function ClientGigsView() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="glass-card rounded-xl border border-white/5 p-6 space-y-4">
           <h2 className="text-lg font-semibold text-nocturne-text-primary">Post a New Gig</h2>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -337,7 +337,7 @@ function ClientGigsView() {
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="e.g., 3-piece band for Jaipur wedding"
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -346,7 +346,7 @@ function ClientGigsView() {
                 required
                 value={form.event_type}
                 onChange={(e) => setForm({ ...form, event_type: e.target.value })}
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               >
                 {EVENT_TYPES.map((t) => (
                   <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
@@ -360,7 +360,7 @@ function ClientGigsView() {
                 required
                 value={form.event_date}
                 onChange={(e) => setForm({ ...form, event_date: e.target.value })}
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -371,7 +371,7 @@ function ClientGigsView() {
                 value={form.event_city}
                 onChange={(e) => setForm({ ...form, event_city: e.target.value })}
                 placeholder="e.g., Jaipur"
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -382,7 +382,7 @@ function ClientGigsView() {
                 value={form.genres_needed}
                 onChange={(e) => setForm({ ...form, genres_needed: e.target.value })}
                 placeholder="e.g., Bollywood, Sufi, Folk"
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -392,7 +392,7 @@ function ClientGigsView() {
                 value={form.guest_count}
                 onChange={(e) => setForm({ ...form, guest_count: e.target.value })}
                 placeholder="e.g., 500"
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -403,7 +403,7 @@ function ClientGigsView() {
                 value={form.budget_min}
                 onChange={(e) => setForm({ ...form, budget_min: e.target.value })}
                 placeholder="e.g., 100000"
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -414,7 +414,7 @@ function ClientGigsView() {
                 value={form.budget_max}
                 onChange={(e) => setForm({ ...form, budget_max: e.target.value })}
                 placeholder="e.g., 200000"
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -425,7 +425,7 @@ function ClientGigsView() {
                 value={form.duration_hours}
                 onChange={(e) => setForm({ ...form, duration_hours: e.target.value })}
                 placeholder="e.g., 3"
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -438,7 +438,7 @@ function ClientGigsView() {
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="Describe what you're looking for..."
-              className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
 
@@ -449,7 +449,7 @@ function ClientGigsView() {
               value={form.requirements}
               onChange={(e) => setForm({ ...form, requirements: e.target.value })}
               placeholder="Any specific requirements (sound setup, outfits, etc.)"
-              className="w-full px-3 py-2 border border-nocturne-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
 
@@ -478,7 +478,7 @@ function ClientGigsView() {
             <Link
               key={gig.id}
               href={`/gigs/${gig.id}`}
-              className="block bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4 hover:border-primary-300 transition-colors"
+              className="block glass-card rounded-xl border border-white/5 p-4 hover:border-primary-300 transition-colors"
             >
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium text-nocturne-text-primary">{gig.title}</h3>
@@ -516,7 +516,7 @@ function GigCard({ gig, showMatchScore }: { gig: GigPost; showMatchScore?: boole
   return (
     <Link
       href={`/gigs/${gig.id}`}
-      className="block bg-nocturne-surface rounded-lg border border-nocturne-border-subtle p-4 hover:border-primary-300 hover:shadow-sm transition-all"
+      className="block glass-card rounded-xl border border-white/5 p-4 hover:border-primary-300 hover:shadow-sm transition-all"
     >
       <div className="flex items-start justify-between mb-2">
         <h3 className="font-medium text-nocturne-text-primary leading-tight">{gig.title}</h3>

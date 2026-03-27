@@ -136,7 +136,7 @@ export default function ClientOnboardingPage() {
             <select
               value={clientType}
               onChange={(e) => setClientType(e.target.value)}
-              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
             >
               <option value="">Select a type...</option>
               {CLIENT_TYPES.map((ct) => (
@@ -150,7 +150,7 @@ export default function ClientOnboardingPage() {
               type="text"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
-              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="Your company or organization name"
             />
           </div>
@@ -160,7 +160,7 @@ export default function ClientOnboardingPage() {
               type="text"
               value={companyType}
               onChange={(e) => setCompanyType(e.target.value)}
-              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="e.g., Entertainment Agency, Corporate HR, Venue"
             />
           </div>
@@ -170,7 +170,7 @@ export default function ClientOnboardingPage() {
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-nocturne-primary focus:border-nocturne-primary"
               placeholder="e.g., Mumbai, Delhi, Bangalore"
             />
           </div>
@@ -209,7 +209,7 @@ export default function ClientOnboardingPage() {
                 value={averageBudgetMin || ''}
                 onChange={(e) => setAverageBudgetMin(Number(e.target.value))}
                 min={0}
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-nocturne-primary"
                 placeholder="e.g., 25000"
               />
             </div>
@@ -220,7 +220,7 @@ export default function ClientOnboardingPage() {
                 value={averageBudgetMax || ''}
                 onChange={(e) => setAverageBudgetMax(Number(e.target.value))}
                 min={0}
-                className="w-full px-3 py-2 border border-nocturne-border rounded-lg focus:ring-2 focus:ring-nocturne-primary"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-nocturne-primary"
                 placeholder="e.g., 200000"
               />
             </div>

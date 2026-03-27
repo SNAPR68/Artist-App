@@ -186,7 +186,7 @@ export default function GigDetailPage() {
       </Link>
 
       {/* Header */}
-      <div className="glass-card border border-nocturne-border p-8 space-y-6">
+      <div className="glass-card border border-white/10 p-8 space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <h1 className="text-4xl font-display font-bold text-gradient-nocturne mb-2">{gig.title}</h1>
@@ -200,36 +200,36 @@ export default function GigDetailPage() {
 
         {/* Details grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-nocturne-border">
+          <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-white/10">
             <p className="text-xs text-nocturne-text-secondary uppercase tracking-wider mb-1">Event Type</p>
             <p className="text-sm font-semibold text-nocturne-text-primary">{gig.event_type.replace(/_/g, ' ')}</p>
           </div>
-          <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-nocturne-border">
+          <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-white/10">
             <p className="text-xs text-nocturne-text-secondary uppercase tracking-wider mb-1">Date</p>
             <p className="text-sm font-semibold text-nocturne-text-primary">{new Date(gig.event_date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
           </div>
-          <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-nocturne-border">
+          <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-white/10">
             <p className="text-xs text-nocturne-text-secondary uppercase tracking-wider mb-1">City</p>
             <p className="text-sm font-semibold text-nocturne-text-primary">{gig.event_city}</p>
           </div>
-          <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-nocturne-border">
+          <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-white/10">
             <p className="text-xs text-nocturne-text-secondary uppercase tracking-wider mb-1">Budget Range</p>
             <p className="text-sm font-semibold text-gradient-nocturne">{formatPaise(gig.budget_min_paise)} - {formatPaise(gig.budget_max_paise)}</p>
           </div>
           {gig.guest_count && (
-            <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-nocturne-border">
+            <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-white/10">
               <p className="text-xs text-nocturne-text-secondary uppercase tracking-wider mb-1">Guest Count</p>
               <p className="text-sm font-semibold text-nocturne-text-primary">{gig.guest_count.toLocaleString()}</p>
             </div>
           )}
           {gig.duration_hours && (
-            <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-nocturne-border">
+            <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-white/10">
               <p className="text-xs text-nocturne-text-secondary uppercase tracking-wider mb-1">Duration</p>
               <p className="text-sm font-semibold text-nocturne-text-primary">{gig.duration_hours} hours</p>
             </div>
           )}
           {!gig.guest_count && !gig.duration_hours && (
-            <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-nocturne-border">
+            <div className="bg-nocturne-surface-2/50 backdrop-blur-3xl rounded-lg p-4 border border-white/10">
               <p className="text-xs text-nocturne-text-secondary uppercase tracking-wider mb-1">Applications</p>
               <p className="text-sm font-semibold text-gradient-nocturne">{gig.application_count}</p>
             </div>
@@ -265,7 +265,7 @@ export default function GigDetailPage() {
           <div className="flex gap-3 pt-4 border-t border-nocturne-border">
             <Link
               href={`/gigs/${gig.id}`}
-              className="px-4 py-2 rounded-full text-sm font-medium bg-nocturne-primary-light text-nocturne-accent hover:bg-nocturne-primary-light transition-all border border-nocturne-border"
+              className="px-4 py-2 rounded-full text-sm font-medium bg-nocturne-primary-light text-nocturne-accent hover:bg-nocturne-primary-light transition-all border border-white/10"
             >
               Edit
             </Link>
@@ -303,7 +303,7 @@ export default function GigDetailPage() {
                     value={coverNote}
                     onChange={(e) => setCoverNote(e.target.value)}
                     placeholder="Tell the client why you're a great fit..."
-                    className="w-full px-4 py-3 bg-nocturne-surface-2/50 border border-nocturne-border rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                    className="w-full px-4 py-3 bg-nocturne-surface-2/50 border border-white/10 rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                   />
                 </div>
                 <div>
@@ -313,7 +313,7 @@ export default function GigDetailPage() {
                     value={proposedAmount}
                     onChange={(e) => setProposedAmount(e.target.value)}
                     placeholder="e.g., 150000"
-                    className="w-full px-4 py-3 bg-nocturne-surface-2/50 border border-nocturne-border rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                    className="w-full px-4 py-3 bg-nocturne-surface-2/50 border border-white/10 rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
                   />
                 </div>
                 <div className="flex gap-3">
@@ -327,7 +327,7 @@ export default function GigDetailPage() {
                   <button
                     type="button"
                     onClick={() => setShowApplyForm(false)}
-                    className="px-6 py-3 rounded-full text-sm font-semibold text-nocturne-text-secondary hover:text-nocturne-text-primary transition-colors bg-nocturne-surface-2/50 border border-nocturne-border"
+                    className="px-6 py-3 rounded-full text-sm font-semibold text-nocturne-text-secondary hover:text-nocturne-text-primary transition-colors bg-nocturne-surface-2/50 border border-white/10"
                   >
                     Cancel
                   </button>
@@ -340,7 +340,7 @@ export default function GigDetailPage() {
 
       {/* Applications (poster view) */}
       {isPoster && (
-        <div className="glass-card border border-nocturne-border p-8 space-y-6">
+        <div className="glass-card border border-white/10 p-8 space-y-6">
           <h2 className="text-2xl font-display font-bold text-gradient-nocturne">
             Applications <span className="text-base font-normal text-nocturne-text-secondary">({applications.length})</span>
           </h2>
@@ -352,7 +352,7 @@ export default function GigDetailPage() {
           ) : (
             <div className="space-y-4">
               {applications.map((app) => (
-                <div key={app.id} className="bg-nocturne-surface-2 border border-nocturne-border p-5 space-y-4 hover:border-nocturne-border-strong transition-all duration-300">
+                <div key={app.id} className="bg-nocturne-surface-2 border border-white/10 p-5 space-y-4 hover:border-nocturne-border-strong transition-all duration-300">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                       {app.profile_image_url ? (

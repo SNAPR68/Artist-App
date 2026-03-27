@@ -123,7 +123,7 @@ export default function EventCompanyOnboarding() {
               </p>
             </div>
 
-            <div className="glass-card-nocturne rounded-xl p-6 border border-nocturne-border space-y-4">
+            <div className="glass-card-nocturne rounded-xl p-6 border border-white/10 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-nocturne-text-secondary mb-2">
                   Company Name
@@ -133,7 +133,7 @@ export default function EventCompanyOnboarding() {
                   value={companyName}
                   onChange={(e) => { setCompanyName(e.target.value); setError(''); }}
                   placeholder="e.g., Stellar Events Pvt Ltd"
-                  className="w-full px-4 py-3 bg-nocturne-surface-2 border border-nocturne-border rounded-lg text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
+                  className="w-full px-4 py-3 bg-nocturne-surface-2 border border-white/10 rounded-lg text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
                 />
               </div>
 
@@ -195,7 +195,7 @@ export default function EventCompanyOnboarding() {
                 { icon: Building2, title: 'Presentation Builder', desc: 'Create branded artist proposal PDFs for clients' },
                 { icon: Mic, title: 'Voice Commands', desc: 'Say "find DJs in Mumbai" or "create a presentation" — hands free' },
               ].map((feature) => (
-                <div key={feature.title} className="glass-card-nocturne rounded-xl p-4 border border-nocturne-border flex items-start gap-4">
+                <div key={feature.title} className="glass-card-nocturne rounded-xl p-4 border border-white/10 flex items-start gap-4">
                   <div className="w-10 h-10 rounded-lg bg-nocturne-primary flex items-center justify-center flex-shrink-0">
                     <feature.icon className="w-5 h-5 text-white" />
                   </div>

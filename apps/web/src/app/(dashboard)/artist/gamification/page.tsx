@@ -96,10 +96,10 @@ export default function GamificationPage() {
 
   return (
     <div className="space-y-6">
-      <section className="relative mb-2"><div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" /><h1 className="relative z-10 text-3xl font-display font-extrabold tracking-tighter text-white">Achievements</h1></section>
+      <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Achievements</h1></div></div>
 
       {/* Level Progress */}
-      <div className="bg-nocturne-surface rounded-lg p-6 border border-nocturne-border-subtle">
+      <div className="glass-card rounded-xl p-6 border border-white/5">
         <div className="flex items-center justify-between mb-3">
           <div>
             <span className={`inline-block px-3 py-1 rounded-full text-white text-sm font-semibold capitalize ${LEVEL_COLORS[profile?.level ?? 'bronze'] ?? 'bg-nocturne-text-tertiary'}`}>
@@ -127,7 +127,7 @@ export default function GamificationPage() {
       </div>
 
       {/* Streak Counter */}
-      <div className="bg-nocturne-surface rounded-lg p-4 border border-nocturne-border-subtle flex items-center gap-3">
+      <div className="glass-card rounded-xl p-4 border border-white/5 flex items-center gap-3">
         <span className="text-2xl">&#128293;</span>
         <div>
           <p className="text-lg font-bold text-nocturne-text-primary">{profile?.streak_days ?? 0}-day streak</p>
@@ -136,8 +136,8 @@ export default function GamificationPage() {
       </div>
 
       {/* Badge Gallery */}
-      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
-        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+      <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
+        <div className="px-4 py-3 border-b border-white/5">
           <h2 className="text-lg font-semibold text-nocturne-text-primary">Badges</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
@@ -150,7 +150,7 @@ export default function GamificationPage() {
                 className={`rounded-lg p-4 border text-center ${
                   earned
                     ? 'border-nocturne-primary-light bg-nocturne-primary-light'
-                    : 'border-nocturne-border-subtle bg-nocturne-surface-2 opacity-50'
+                    : 'border-white/5 bg-nocturne-surface-2 opacity-50'
                 }`}
               >
                 <div className={`text-3xl mb-2 ${earned ? '' : 'grayscale'}`}>
@@ -181,8 +181,8 @@ export default function GamificationPage() {
 
       {/* Level Distribution */}
       {leaderboard && leaderboard.total > 0 && (
-        <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
-          <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+        <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
+          <div className="px-4 py-3 border-b border-white/5">
             <h2 className="text-lg font-semibold text-nocturne-text-primary">Platform Level Distribution</h2>
           </div>
           <div className="p-4 space-y-3">
@@ -207,8 +207,8 @@ export default function GamificationPage() {
       )}
 
       {/* Recent Activity */}
-      <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle overflow-hidden">
-        <div className="px-4 py-3 border-b border-nocturne-border-subtle">
+      <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
+        <div className="px-4 py-3 border-b border-white/5">
           <h2 className="text-lg font-semibold text-nocturne-text-primary">Recent Activity</h2>
         </div>
         {transactions.length === 0 ? (

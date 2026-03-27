@@ -133,7 +133,7 @@ export default function PaymentPage() {
         </div>
 
         {status === 'success' && (
-          <div className="glass-card border border-nocturne-border p-8 text-center space-y-4 animate-fade-in-up">
+          <div className="glass-card border border-white/10 p-8 text-center space-y-4 animate-fade-in-up">
             <div className="flex justify-center">
               <div className="relative w-16 h-16 bg-gradient-nocturne rounded-full flex items-center justify-center shadow-nocturne-glow-sm">
                 <Check className="w-8 h-8 text-white" />
@@ -147,7 +147,7 @@ export default function PaymentPage() {
         )}
 
         {status === 'failed' && (
-          <div className="glass-card border border-nocturne-border p-8 text-center space-y-4 animate-fade-in-up">
+          <div className="glass-card border border-white/10 p-8 text-center space-y-4 animate-fade-in-up">
             <div className="flex justify-center">
               <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center border border-red-500/30">
                 <X className="w-8 h-8 text-red-400" />
@@ -167,7 +167,7 @@ export default function PaymentPage() {
         )}
 
         {(status === 'idle' || status === 'loading') && (
-          <div className="glass-card border border-nocturne-border p-8 space-y-6 animate-fade-in-up">
+          <div className="glass-card border border-white/10 p-8 space-y-6 animate-fade-in-up">
             {order && (
               <div className="text-center space-y-2 py-4">
                 <p className="text-nocturne-text-secondary text-sm uppercase tracking-wide">Amount to Pay</p>
@@ -175,7 +175,7 @@ export default function PaymentPage() {
               </div>
             )}
 
-            <div className="bg-nocturne-surface-2/50 backdrop-blur-md rounded-lg p-4 border border-nocturne-border space-y-3">
+            <div className="bg-nocturne-surface-2/50 backdrop-blur-md rounded-lg p-4 border border-white/10 space-y-3">
               <h3 className="text-sm font-semibold text-nocturne-text-primary">Payment Methods Accepted</h3>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-center gap-2 text-nocturne-text-secondary">
@@ -217,7 +217,7 @@ export default function PaymentPage() {
         )}
 
         {status === 'verifying' && (
-          <div className="glass-card border border-nocturne-border p-8 text-center space-y-4 animate-fade-in-up">
+          <div className="glass-card border border-white/10 p-8 text-center space-y-4 animate-fade-in-up">
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary-500/20 border-t-primary-500" />
             </div>
@@ -226,7 +226,7 @@ export default function PaymentPage() {
         )}
 
         {status === 'checkout' && (
-          <div className="glass-card border border-nocturne-border p-8 text-center space-y-4 animate-fade-in-up">
+          <div className="glass-card border border-white/10 p-8 text-center space-y-4 animate-fade-in-up">
             <div className="flex justify-center">
               <div className="shimmer-overlay w-12 h-12 rounded-full" />
             </div>
