@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// ElevenLabs voice IDs
-// English (Indian accent): "Rachel" or "Adam" — or use "Aria" for neutral clear English
-// Hindi: ElevenLabs has Hindi support via multilingual v2 model
+// ElevenLabs voice IDs — defaults are curated for Indian market
 const VOICE_IDS: Record<string, string> = {
-  'en': process.env.ELEVENLABS_VOICE_EN ?? 'EXAVITQu4vr4xnSDxMaL', // Sarah — clear, professional
-  'hi': process.env.ELEVENLABS_VOICE_HI ?? 'onwK4e9ZLuTAKqWW03F9', // Daniel — multilingual works for Hindi
+  'en': process.env.ELEVENLABS_VOICE_EN ?? 'EXAVITQu4vr4xnSDxMaL', // Sarah — clear female English
+  'hi': process.env.ELEVENLABS_VOICE_HI ?? 'VESUG427mhGhpQ6fo6Rh', // Ravikant — warm native Hindi male
 };
 
 export async function POST(req: NextRequest) {

@@ -70,6 +70,7 @@ export function VoiceAssistant() {
   const [selectedVoiceURI, setSelectedVoiceURI] = useState<string>('');
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
   const [cloudTTSAvailable, setCloudTTSAvailable] = useState(false);
+  const [ttsLang, setTtsLang] = useState<'en' | 'hi'>('en');
 
   // Load available TTS voices — pick best English + Hindi only
   useEffect(() => {
@@ -201,12 +202,11 @@ export function VoiceAssistant() {
   // ─── Helper: speak response text via cloud TTS (ElevenLabs) with browser fallback ───
   const speakResponse = useCallback((text: string) => {
     setState('responding');
-    const lang = selectedVoiceURI?.includes('hi') ? 'hi' : 'en';
 
     fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, lang }),
+      body: JSON.stringify({ text, lang: ttsLang }),
     })
       .then(async (res) => {
         if (!res.ok) throw new Error('cloud-tts-unavailable');
@@ -216,16 +216,14 @@ export function VoiceAssistant() {
         audio.onended = () => { setState('idle'); URL.revokeObjectURL(url); };
         audio.onerror = () => { setState('idle'); URL.revokeObjectURL(url); };
         audio.play().catch(() => {
-          // Autoplay blocked — fall back to browser TTS
           URL.revokeObjectURL(url);
           speakBrowser(text);
         });
       })
       .catch(() => {
-        // Cloud TTS unavailable — use browser TTS
         speakBrowser(text);
       });
-  }, [selectedVoiceURI, speakBrowser]);
+  }, [ttsLang, speakBrowser]);
 
   // ─── Unauthenticated discovery via public search API ───
   const handleGuestQuery = useCallback(
@@ -688,24 +686,24 @@ export function VoiceAssistant() {
                       </span>
                     )}
                   </div>
-                  {voices.map(v => {
-                    const isEnglish = v.lang.startsWith('en');
-                    const label = isEnglish ? 'English' : 'Hindi';
-                    const isActive = selectedVoiceURI === v.voiceURI;
-                    return (
-                      <button
-                        key={v.voiceURI}
-                        onClick={() => setSelectedVoiceURI(v.voiceURI)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                          isActive
-                            ? 'bg-[#c39bff]/20 text-[#c39bff] border border-[#c39bff]/30'
-                            : 'bg-white/5 text-white/50 border border-white/10 hover:text-white hover:bg-white/10'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
+                  {(['en', 'hi'] as const).map(lang => (
+                    <button
+                      key={lang}
+                      onClick={() => {
+                        setTtsLang(lang);
+                        // Also update browser voice for fallback
+                        const match = voices.find(v => v.lang.startsWith(lang));
+                        if (match) setSelectedVoiceURI(match.voiceURI);
+                      }}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                        ttsLang === lang
+                          ? 'bg-[#c39bff]/20 text-[#c39bff] border border-[#c39bff]/30'
+                          : 'bg-white/5 text-white/50 border border-white/10 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      {lang === 'en' ? 'English' : 'Hindi'}
+                    </button>
+                  ))}
                   <button
                     onClick={() => speakResponse('Hello! I am Backstage AI. How can I help you?')}
                     className="text-[10px] text-[#a1faff] hover:text-white transition-colors px-2 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10"
