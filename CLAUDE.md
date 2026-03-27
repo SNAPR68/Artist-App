@@ -1,5 +1,5 @@
 # Artist Booking Platform — CLAUDE.md
-_Last updated: 2026-03-26_
+_Last updated: 2026-03-27_
 
 ## Project Overview
 India's live entertainment booking marketplace connecting artists, clients, agents, and event companies through an intelligence-driven platform. Monorepo with Fastify API backend, Next.js frontend, and shared packages. 77 migrations, 36 API modules, 237 endpoints, 23 cron jobs, 49 frontend pages.
@@ -188,12 +188,13 @@ Key folders: `premium_landing_page`, `artist_portfolio_hollywood_glamour`, `arti
 ### Rebuild Status (as of 2026-03-27)
 - **Hollywood Glamour complete**: All 50+ pages converted to Nocturne Hollywood
 - **Full structural rebuilds**: Landing page (cinematic hero + bento value props + poster gallery), artist public profile (3D perspective poster gallery + 4-col bento stats + sticky booking sidebar), search/discovery (bento results grid + glass pill search bar + filter chips)
+- **Hero carousel**: 5 rotating Unsplash event images (DJ, concert, festival, club, wedding) cycling every 3s with crossfade + Ken Burns zoom, dark gradient overlay, event type label + dot indicators
 - **Bento hero headers**: All dashboard pages have glass-card hero blocks with ambient glows
 - **Onboarding flows**: All 4 onboarding pages use 5+7 cinematic split with glass form cards
 - **Glass-card treatment**: All flat card containers converted to glassmorphism
 - **Zero light-theme classes remaining** (except presentations/[slug] which stays light for print)
 
-## Current Build Status (as of 2026-03-26)
+## Current Build Status (as of 2026-03-27)
 
 ### Production Score: ~100/100 (code complete)
 
@@ -201,12 +202,14 @@ Key folders: `premium_landing_page`, `artist_portfolio_hollywood_glamour`, `arti
 - Login/auth flow (OTP with bypass for dev, real MSG91 ready)
 - All 4 role dashboards: Artist, Client/Event Company, Agent, Admin
 - Search API with 100 seeded artists across 10 cities
-- Voice Assistant — Backstage AI floating widget with:
+- Voice Assistant — **Zara & Kabir** (formerly Backstage AI) floating widget with:
+  - **Cloud TTS**: ElevenLabs multilingual v2 via `/api/tts` proxy route (falls back to browser TTS)
+  - **Zara** (English, female, purple `#c39bff`) + **Kabir** (Hindi, male, cyan `#a1faff`) mascot avatars
   - Web Speech API (mic input, works on HTTPS/Vercel deploy)
-  - Browser TTS with English + Hindi voice picker
   - Guest mode: public artist search without login
   - Auth mode: full voice query API (6 intents, 40+ page targets)
   - Text input fallback when mic unavailable
+  - Env: `ELEVENLABS_API_KEY` on Vercel (optional — graceful fallback to browser TTS)
 - Escrow payments (8 states, auto-settlement, refund webhooks)
 - PDF generation (branded multi-artist proposals)
 - Event company workspace CRM + onboarding wizard
@@ -216,6 +219,9 @@ Key folders: `premium_landing_page`, `artist_portfolio_hollywood_glamour`, `arti
 - Swagger API docs at /docs
 - 100 seeded artist profiles with realistic data
 - Nocturne Hollywood dark theme applied across all 50+ pages (zero light-theme classes)
+- **pg type parser fix**: `pg.types.setTypeParser` for NUMERIC/FLOAT OIDs in `database.ts` — coerces all DECIMAL columns to JS numbers at driver level (fixes `.toFixed()` crashes across 45+ columns)
+- **Null safety**: All `.toFixed()` calls wrapped in `Number()` with `?? 0` guards across 10+ files
+- **PWA icons**: 7 brand-purple placeholder PNGs in `/public/icons/`, manifest updated to Nocturne theme colors
 
 ### Security (Sprint 3)
 - JWT 1h access / 30d refresh tokens
