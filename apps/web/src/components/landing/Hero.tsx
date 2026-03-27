@@ -1,9 +1,33 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import Image from 'next/image';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 
+// ─── Hero Background Images ─────────────────────────────────
+const HERO_SLIDES = [
+  {
+    url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1920&q=80',
+    label: 'DJ Night',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1920&q=80',
+    label: 'Live Concert',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1920&q=80',
+    label: 'Music Festival',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=1920&q=80',
+    label: 'Club Night',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1920&q=80',
+    label: 'Wedding Celebration',
+  },
+];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -26,6 +50,15 @@ export function Hero() {
   const router = useRouter();
   const containerRef = useRef(null);
   const { scrollY } = useScroll();
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  // Cycle slides every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const violetOrbY = useTransform(scrollY, [0, 500], [0, 150]);
   const cyanOrbY = useTransform(scrollY, [0, 500], [0, -100]);
@@ -35,8 +68,32 @@ export function Hero() {
       ref={containerRef}
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#0e0e0f] px-6"
     >
-      {/* ─── Stage Lighting Background ─── */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* ─── Rotating Background Images ─── */}
+      <div className="absolute inset-0">
+        {HERO_SLIDES.map((slide, i) => (
+          <div
+            key={slide.url}
+            className={`absolute inset-0 transition-all duration-[2000ms] ease-in-out ${
+              i === activeSlide ? 'opacity-100 scale-105' : 'opacity-0 scale-100'
+            }`}
+          >
+            <Image
+              src={slide.url}
+              alt={slide.label}
+              fill
+              sizes="100vw"
+              className="object-cover"
+              priority={i === 0}
+            />
+          </div>
+        ))}
+
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0e0e0f]/80 via-[#0e0e0f]/60 to-[#0e0e0f] z-[1]" />
+      </div>
+
+      {/* ─── Stage Lighting (on top of images) ─── */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-[2]">
         <motion.div
           style={{ y: violetOrbY }}
           className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full"
@@ -44,7 +101,7 @@ export function Hero() {
           animate={{ opacity: 1 }}
           transition={{ duration: 1.5 }}
         >
-          <div className="w-full h-full bg-[#c39bff]/10 blur-[120px] rounded-full" />
+          <div className="w-full h-full bg-[#c39bff]/15 blur-[120px] rounded-full" />
         </motion.div>
 
         <motion.div
@@ -54,16 +111,8 @@ export function Hero() {
           animate={{ opacity: 1 }}
           transition={{ duration: 1.5, delay: 0.2 }}
         >
-          <div className="w-full h-full bg-[#ffbf00]/5 blur-[100px] rounded-full" />
+          <div className="w-full h-full bg-[#ffbf00]/8 blur-[100px] rounded-full" />
         </motion.div>
-
-        {/* Carbon fibre texture overlay */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: "url('https://www.transparenttextures.com/patterns/carbon-fibre.png')",
-          }}
-        />
       </div>
 
       {/* ─── Main Content ─── */}
@@ -88,7 +137,7 @@ export function Hero() {
           {/* ─── Headline ─── */}
           <motion.h1
             variants={itemVariants}
-            className="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[0.9] max-w-4xl mx-auto text-white"
+            className="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[0.9] max-w-4xl mx-auto text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
           >
             Book the{' '}
             <span className="bg-gradient-to-r from-[#c39bff] via-[#b68cf6] to-[#a1faff] bg-clip-text text-transparent italic">
@@ -100,7 +149,7 @@ export function Hero() {
           {/* ─── Subtitle ─── */}
           <motion.p
             variants={itemVariants}
-            className="text-white/50 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed"
+            className="text-white/70 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
           >
             DJs, singers, bands, comedians — 5,000+ verified artists across India.
             Browse, compare, book, and pay. All in one place.
@@ -129,9 +178,40 @@ export function Hero() {
               I&apos;m an Event Company
             </motion.button>
           </motion.div>
-        </motion.div>
 
-        {/* Voice assistant is the floating Backstage AI widget — no placeholder needed here */}
+          {/* ─── Event Type Label ─── */}
+          <motion.div variants={itemVariants} className="pt-6">
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={activeSlide}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/40"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#c39bff] animate-pulse" />
+                {HERO_SLIDES[activeSlide].label}
+              </motion.span>
+            </AnimatePresence>
+
+            {/* Dot indicators */}
+            <div className="flex items-center justify-center gap-2 mt-4">
+              {HERO_SLIDES.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveSlide(i)}
+                  className={`rounded-full transition-all duration-500 ${
+                    i === activeSlide
+                      ? 'w-6 h-1.5 bg-[#c39bff]'
+                      : 'w-1.5 h-1.5 bg-white/20 hover:bg-white/40'
+                  }`}
+                  aria-label={`Slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

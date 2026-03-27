@@ -641,8 +641,8 @@ export function VoiceAssistant() {
             </button>
             {/* Label */}
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-semibold text-nocturne-text-primary leading-tight">Backstage AI</span>
-              <span className="text-[10px] text-nocturne-text-secondary leading-tight">Ask or speak for anything</span>
+              <span className="text-sm font-semibold text-nocturne-text-primary leading-tight">Zara & Kabir</span>
+              <span className="text-[10px] text-nocturne-text-secondary leading-tight">Your voice assistants</span>
             </div>
             {/* Online dot */}
             <span className="relative flex h-2 w-2 shrink-0 ml-1">
@@ -676,15 +676,16 @@ export function VoiceAssistant() {
                     <path d="m15 18-6-6 6-6" />
                   </svg>
                 </button>
-                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                  {sparkleIcon(16, 'white')}
+                <div className="flex items-center gap-1 shrink-0">
+                  <ZaraMascot size={22} glow />
+                  <KabirMascot size={22} glow />
                 </div>
                 <div>
                   <h3 className="font-display font-semibold text-white text-sm leading-tight">
-                    Backstage AI
+                    Zara & Kabir
                   </h3>
                   <p className="text-[10px] text-white/70 leading-tight">
-                    Ask me anything — search, navigate, or get help
+                    Your voice assistants
                   </p>
                 </div>
               </div>
