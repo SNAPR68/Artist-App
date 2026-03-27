@@ -56,7 +56,7 @@ export function Hero() {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, 5000);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
