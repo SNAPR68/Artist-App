@@ -46,6 +46,51 @@ interface Message {
   artists?: DiscoverArtist[];
 }
 
+// ─── Mascot Avatars ─────────────────────────────────────────
+function ZaraMascot({ size = 28, glow = false }: { size?: number; glow?: boolean }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" className={glow ? 'drop-shadow-[0_0_6px_rgba(195,155,255,0.6)]' : ''}>
+      <circle cx="20" cy="20" r="20" fill="#c39bff" fillOpacity={glow ? 0.25 : 0.15} />
+      <circle cx="20" cy="20" r="18" stroke="#c39bff" strokeWidth="1.5" strokeOpacity={glow ? 0.8 : 0.3} fill="none" />
+      {/* Face */}
+      <circle cx="20" cy="16" r="6" fill="#c39bff" fillOpacity={glow ? 0.9 : 0.5} />
+      {/* Hair — flowing */}
+      <path d="M14 14c0-4 3-7 6-7s6 3 6 7c1-1 2-3 2-5 0 0 1 4-1 7-1 1.5-2.5 2-3 2h-6c-.5 0-2-.5-3-2-2-3-1-7-1-7 0 2 1 4 2 5z" fill="#c39bff" fillOpacity={glow ? 0.7 : 0.35} />
+      {/* Body */}
+      <path d="M12 32c0-5 3.5-8 8-8s8 3 8 8" fill="#c39bff" fillOpacity={glow ? 0.6 : 0.3} />
+      {/* Headphone band */}
+      <path d="M11 16a9 9 0 0118 0" stroke="#c39bff" strokeWidth="1.5" strokeOpacity={glow ? 0.9 : 0.4} fill="none" strokeLinecap="round" />
+      {/* Headphone cups */}
+      <rect x="9" y="14" width="4" height="5" rx="2" fill="#c39bff" fillOpacity={glow ? 0.8 : 0.4} />
+      <rect x="27" y="14" width="4" height="5" rx="2" fill="#c39bff" fillOpacity={glow ? 0.8 : 0.4} />
+    </svg>
+  );
+}
+
+function KabirMascot({ size = 28, glow = false }: { size?: number; glow?: boolean }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" className={glow ? 'drop-shadow-[0_0_6px_rgba(161,250,255,0.6)]' : ''}>
+      <circle cx="20" cy="20" r="20" fill="#a1faff" fillOpacity={glow ? 0.25 : 0.15} />
+      <circle cx="20" cy="20" r="18" stroke="#a1faff" strokeWidth="1.5" strokeOpacity={glow ? 0.8 : 0.3} fill="none" />
+      {/* Face */}
+      <circle cx="20" cy="16" r="6" fill="#a1faff" fillOpacity={glow ? 0.9 : 0.5} />
+      {/* Hair — short cropped */}
+      <path d="M14 14c0-4 3-7 6-7s6 3 6 7c0-2-2-5-6-5s-6 3-6 5z" fill="#a1faff" fillOpacity={glow ? 0.7 : 0.35} />
+      {/* Body — broader shoulders */}
+      <path d="M10 32c0-5 4-9 10-9s10 4 10 9" fill="#a1faff" fillOpacity={glow ? 0.6 : 0.3} />
+      {/* Headphone band */}
+      <path d="M11 16a9 9 0 0118 0" stroke="#a1faff" strokeWidth="1.5" strokeOpacity={glow ? 0.9 : 0.4} fill="none" strokeLinecap="round" />
+      {/* Headphone cups */}
+      <rect x="9" y="14" width="4" height="5" rx="2" fill="#a1faff" fillOpacity={glow ? 0.8 : 0.4} />
+      <rect x="27" y="14" width="4" height="5" rx="2" fill="#a1faff" fillOpacity={glow ? 0.8 : 0.4} />
+    </svg>
+  );
+}
+
+function ActiveMascot({ lang, size = 20 }: { lang: 'en' | 'hi'; size?: number }) {
+  return lang === 'en' ? <ZaraMascot size={size} glow /> : <KabirMascot size={size} glow />;
+}
+
 export function VoiceAssistant() {
   const router = useRouter();
   const pathname = usePathname();
@@ -674,39 +719,60 @@ export function VoiceAssistant() {
               </div>
             </div>
 
-            {/* ─── Voice Settings: Simple EN/HI Toggle ─── */}
+            {/* ─── Voice Settings: Mascot Selector ─── */}
             {showVoiceSettings && (
               <div className="shrink-0 px-4 py-3 border-b border-white/10 bg-white/5">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 mr-auto">
-                    <span className="text-xs font-semibold text-white/50">Voice</span>
-                    {cloudTTSAvailable && (
-                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#a1faff]/10 text-[#a1faff] border border-[#a1faff]/20">
-                        HD
-                      </span>
-                    )}
-                  </div>
-                  {(['en', 'hi'] as const).map(lang => (
-                    <button
-                      key={lang}
-                      onClick={() => {
-                        setTtsLang(lang);
-                        // Also update browser voice for fallback
-                        const match = voices.find(v => v.lang.startsWith(lang));
-                        if (match) setSelectedVoiceURI(match.voiceURI);
-                      }}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                        ttsLang === lang
-                          ? 'bg-[#c39bff]/20 text-[#c39bff] border border-[#c39bff]/30'
-                          : 'bg-white/5 text-white/50 border border-white/10 hover:text-white hover:bg-white/10'
-                      }`}
-                    >
-                      {lang === 'en' ? 'English' : 'Hindi'}
-                    </button>
-                  ))}
+                <div className="flex items-center gap-3 justify-center">
+                  {/* Zara — English */}
                   <button
-                    onClick={() => speakResponse('Hello! I am Backstage AI. How can I help you?')}
-                    className="text-[10px] text-[#a1faff] hover:text-white transition-colors px-2 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10"
+                    onClick={() => {
+                      setTtsLang('en');
+                      const match = voices.find(v => v.lang.startsWith('en'));
+                      if (match) setSelectedVoiceURI(match.voiceURI);
+                    }}
+                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${
+                      ttsLang === 'en'
+                        ? 'bg-[#c39bff]/15 border border-[#c39bff]/30 shadow-[0_0_12px_rgba(195,155,255,0.2)]'
+                        : 'bg-white/5 border border-white/5 opacity-50 hover:opacity-80'
+                    }`}
+                  >
+                    <div className={`relative ${ttsLang === 'en' ? 'animate-pulse' : ''}`} style={{ animationDuration: '3s' }}>
+                      <ZaraMascot size={32} glow={ttsLang === 'en'} />
+                      {cloudTTSAvailable && ttsLang === 'en' && (
+                        <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#c39bff] shadow-[0_0_6px_rgba(195,155,255,0.8)]" />
+                      )}
+                    </div>
+                    <span className={`text-[10px] font-bold tracking-wide ${ttsLang === 'en' ? 'text-[#c39bff]' : 'text-white/40'}`}>Zara</span>
+                    <span className={`text-[8px] ${ttsLang === 'en' ? 'text-white/50' : 'text-white/20'}`}>English</span>
+                  </button>
+
+                  {/* Kabir — Hindi */}
+                  <button
+                    onClick={() => {
+                      setTtsLang('hi');
+                      const match = voices.find(v => v.lang.startsWith('hi'));
+                      if (match) setSelectedVoiceURI(match.voiceURI);
+                    }}
+                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${
+                      ttsLang === 'hi'
+                        ? 'bg-[#a1faff]/15 border border-[#a1faff]/30 shadow-[0_0_12px_rgba(161,250,255,0.2)]'
+                        : 'bg-white/5 border border-white/5 opacity-50 hover:opacity-80'
+                    }`}
+                  >
+                    <div className={`relative ${ttsLang === 'hi' ? 'animate-pulse' : ''}`} style={{ animationDuration: '3s' }}>
+                      <KabirMascot size={32} glow={ttsLang === 'hi'} />
+                      {cloudTTSAvailable && ttsLang === 'hi' && (
+                        <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#a1faff] shadow-[0_0_6px_rgba(161,250,255,0.8)]" />
+                      )}
+                    </div>
+                    <span className={`text-[10px] font-bold tracking-wide ${ttsLang === 'hi' ? 'text-[#a1faff]' : 'text-white/40'}`}>Kabir</span>
+                    <span className={`text-[8px] ${ttsLang === 'hi' ? 'text-white/50' : 'text-white/20'}`}>Hindi</span>
+                  </button>
+
+                  {/* Test */}
+                  <button
+                    onClick={() => speakResponse(ttsLang === 'en' ? 'Hi, I\'m Zara! How can I help you today?' : 'Namaste, main Kabir hoon! Aapki kya madad kar sakta hoon?')}
+                    className="text-[10px] text-white/40 hover:text-white transition-colors px-2 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 self-end"
                   >
                     Test
                   </button>
@@ -719,13 +785,16 @@ export function VoiceAssistant() {
               {messages.length === 0 && (
                 <div className="space-y-4 pt-4">
                   {/* Welcome message as chat bubble */}
-                  <div className="flex justify-start">
-                    <div className="max-w-[90%] space-y-3">
+                  <div className="flex justify-start gap-2">
+                    <div className="shrink-0 mt-1">
+                      <ActiveMascot lang={ttsLang} size={20} />
+                    </div>
+                    <div className="max-w-[85%] space-y-3">
                       <div className="rounded-2xl px-4 py-3 glass-card text-white border border-white/10">
                         <p className="text-sm leading-relaxed">
                           {user
-                            ? 'Hey! I can help you find artists, check bookings, manage your calendar, and more. What do you need?'
-                            : 'Hey! I\'m your AI assistant for finding the perfect artist. Tell me about your event and I\'ll find the best match — DJs, singers, bands, comedians, and more across India.'}
+                            ? `Hey! I'm ${ttsLang === 'en' ? 'Zara' : 'Kabir'}. I can help you find artists, check bookings, manage your calendar, and more. What do you need?`
+                            : `Hey! I'm ${ttsLang === 'en' ? 'Zara' : 'Kabir'}, your AI assistant for finding the perfect artist. Tell me about your event and I'll find the best match — DJs, singers, bands, comedians, and more across India.`}
                         </p>
                       </div>
                       {/* Quick action chips */}
@@ -746,8 +815,14 @@ export function VoiceAssistant() {
               )}
 
               {messages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[90%] space-y-2 ${msg.role === 'user' ? '' : ''}`}>
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} ${msg.role === 'assistant' ? 'gap-2' : ''}`}>
+                  {/* Mascot avatar for assistant messages */}
+                  {msg.role === 'assistant' && (
+                    <div className="shrink-0 mt-1">
+                      <ActiveMascot lang={ttsLang} size={20} />
+                    </div>
+                  )}
+                  <div className={`max-w-[85%] space-y-2`}>
                     {/* Message bubble */}
                     <div
                       className={`rounded-2xl px-4 py-2.5 ${
@@ -825,8 +900,13 @@ export function VoiceAssistant() {
               </div>
             )}
             {state === 'responding' && (
-              <div className="shrink-0 px-4 py-2 text-center border-t border-white/10 bg-white/5">
-                <p className="text-xs text-white animate-pulse">Speaking...</p>
+              <div className="shrink-0 px-4 py-2 border-t border-white/10 bg-white/5 flex items-center justify-center gap-2">
+                <div className="animate-pulse" style={{ animationDuration: '1.5s' }}>
+                  <ActiveMascot lang={ttsLang} size={22} />
+                </div>
+                <p className={`text-xs font-medium ${ttsLang === 'en' ? 'text-[#c39bff]' : 'text-[#a1faff]'}`}>
+                  {ttsLang === 'en' ? 'Zara' : 'Kabir'} is speaking...
+                </p>
               </div>
             )}
 
