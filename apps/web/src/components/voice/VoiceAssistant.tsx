@@ -69,6 +69,7 @@ export function VoiceAssistant() {
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoiceURI, setSelectedVoiceURI] = useState<string>('');
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
+  const [cloudTTSAvailable, setCloudTTSAvailable] = useState(false);
 
   // Load available TTS voices — pick best English + Hindi only
   useEffect(() => {
@@ -97,6 +98,17 @@ export function VoiceAssistant() {
     loadVoices();
     window.speechSynthesis.onvoiceschanged = loadVoices;
   }, [selectedVoiceURI]);
+  // Check if cloud TTS is available (ElevenLabs API key configured)
+  useEffect(() => {
+    fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: '' }),
+    })
+      .then((res) => { if (res.status !== 503) setCloudTTSAvailable(true); })
+      .catch(() => {});
+  }, []);
+
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [textInput, setTextInput] = useState('');
@@ -154,33 +166,60 @@ export function VoiceAssistant() {
     return authKeywords.some(kw => lower.includes(kw));
   }
 
-  // ─── Helper: speak response text via TTS ───
-  const speakResponse = useCallback((text: string) => {
-    setState('idle');
+  // ─── Helper: speak via browser TTS fallback ───
+  const speakBrowser = useCallback((text: string) => {
     try {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis) {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         if (selectedVoiceURI) {
           const voice = voices.find(v => v.voiceURI === selectedVoiceURI);
-          if (voice) {
-            utterance.voice = voice;
-            utterance.lang = voice.lang;
-          }
+          if (voice) { utterance.voice = voice; utterance.lang = voice.lang; }
         } else {
           utterance.lang = 'en-IN';
         }
-        utterance.rate = 1.0;
+        utterance.rate = 1.05;
         utterance.pitch = 1.0;
         utterance.onerror = () => setState('idle');
         utterance.onend = () => setState('idle');
         window.speechSynthesis.speak(utterance);
         setState('responding');
+      } else {
+        setState('idle');
       }
     } catch {
-      // TTS failed — state already set to idle above
+      setState('idle');
     }
   }, [voices, selectedVoiceURI]);
+
+  // ─── Helper: speak response text via cloud TTS (ElevenLabs) with browser fallback ───
+  const speakResponse = useCallback((text: string) => {
+    setState('responding');
+    const lang = selectedVoiceURI?.includes('hi') ? 'hi' : 'en';
+
+    fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, lang }),
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error('cloud-tts-unavailable');
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.onended = () => { setState('idle'); URL.revokeObjectURL(url); };
+        audio.onerror = () => { setState('idle'); URL.revokeObjectURL(url); };
+        audio.play().catch(() => {
+          // Autoplay blocked — fall back to browser TTS
+          URL.revokeObjectURL(url);
+          speakBrowser(text);
+        });
+      })
+      .catch(() => {
+        // Cloud TTS unavailable — use browser TTS
+        speakBrowser(text);
+      });
+  }, [selectedVoiceURI, speakBrowser]);
 
   // ─── Unauthenticated discovery via public search API ───
   const handleGuestQuery = useCallback(
@@ -635,7 +674,14 @@ export function VoiceAssistant() {
             {showVoiceSettings && (
               <div className="shrink-0 px-4 py-3 border-b border-white/10 bg-white/5">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-white/50 mr-auto">Voice</span>
+                  <div className="flex items-center gap-1.5 mr-auto">
+                    <span className="text-xs font-semibold text-white/50">Voice</span>
+                    {cloudTTSAvailable && (
+                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#a1faff]/10 text-[#a1faff] border border-[#a1faff]/20">
+                        HD
+                      </span>
+                    )}
+                  </div>
                   {voices.map(v => {
                     const isEnglish = v.lang.startsWith('en');
                     const label = isEnglish ? 'English' : 'Hindi';
