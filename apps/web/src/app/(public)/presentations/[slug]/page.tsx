@@ -259,9 +259,9 @@ function ArtistCard({
         )}
 
         {/* Trust Score Badge */}
-        {artist.trust_score > 0 && (
+        {Number(artist.trust_score) > 0 && (
           <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-            <TrustStars score={artist.trust_score} />
+            <TrustStars score={Number(artist.trust_score)} />
           </div>
         )}
       </div>

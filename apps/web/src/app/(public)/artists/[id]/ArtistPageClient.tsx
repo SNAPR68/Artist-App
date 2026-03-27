@@ -190,7 +190,7 @@ export default function PublicArtistPage() {
           <div className="bg-[#201f21] p-10 rounded-xl border border-white/5 flex flex-col items-center justify-center text-center h-[400px]">
             <div className="text-6xl font-black text-[#ffbf00] mb-4">{profile.total_bookings}</div>
             <div className="uppercase tracking-[0.2em] text-sm font-bold text-white/50">Total Bookings</div>
-            <div className="mt-6 text-4xl font-black text-[#a1faff]">{profile.trust_score?.toFixed(1) ?? '—'}</div>
+            <div className="mt-6 text-4xl font-black text-[#a1faff]">{profile.trust_score != null ? Number(profile.trust_score).toFixed(1) : '—'}</div>
             <div className="uppercase tracking-[0.2em] text-sm font-bold text-white/50 mt-1">Trust Score</div>
           </div>
 
@@ -207,7 +207,7 @@ export default function PublicArtistPage() {
               <div>
                 <h4 className="text-xl font-bold mb-4">Quick Stats</h4>
                 <div className="space-y-3 text-sm text-white/50">
-                  <div className="flex justify-between"><span>Acceptance Rate</span><span className="text-white font-bold">{profile.acceptance_rate ?? 0}%</span></div>
+                  <div className="flex justify-between"><span>Acceptance Rate</span><span className="text-white font-bold">{Math.round(Number(profile.acceptance_rate ?? 0))}%</span></div>
                   <div className="flex justify-between"><span>Response Time</span><span className="text-white font-bold">{profile.avg_response_time_hours ?? '—'}h</span></div>
                   <div className="flex justify-between"><span>Duration</span><span className="text-white font-bold">{profile.performance_duration_min}–{profile.performance_duration_max} min</span></div>
                   <div className="flex justify-between"><span>Languages</span><span className="text-white font-bold">{profile.languages.join(', ')}</span></div>

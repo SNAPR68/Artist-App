@@ -99,8 +99,8 @@ export default function ArtistBookingsPage() {
           <div className="space-y-4">
             <div>
               <p className="text-2xl font-black text-white">
-                ₹{bookings.filter(b => b.quoted_amount_paise).reduce((sum, b) => sum + (b.quoted_amount_paise ?? 0), 0) > 0
-                  ? (bookings.reduce((sum, b) => sum + (b.quoted_amount_paise ?? 0), 0) / 100).toLocaleString('en-IN')
+                ₹{bookings.filter(b => b.quoted_amount_paise).reduce((sum, b) => sum + Number(b.quoted_amount_paise ?? 0), 0) > 0
+                  ? (bookings.reduce((sum, b) => sum + Number(b.quoted_amount_paise ?? 0), 0) / 100).toLocaleString('en-IN')
                   : '0'}
               </p>
               <p className="text-xs text-white/40">Total quoted value</p>

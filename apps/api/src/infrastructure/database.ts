@@ -1,5 +1,13 @@
 import knex from 'knex';
+import pg from 'pg';
 import { config } from '../config/index.js';
+
+// PostgreSQL returns DECIMAL/NUMERIC columns as strings for precision.
+// Our app doesn't need arbitrary precision — parse them as JS floats.
+// OID 1700 = NUMERIC, 700 = FLOAT4, 701 = FLOAT8
+pg.types.setTypeParser(1700, (val: string) => parseFloat(val));
+pg.types.setTypeParser(700, (val: string) => parseFloat(val));
+pg.types.setTypeParser(701, (val: string) => parseFloat(val));
 
 // Supabase direct connection (db.*.supabase.co) is IPv6-only and unreachable from Render.
 // Automatically rewrite to the IPv4-compatible session pooler if needed.

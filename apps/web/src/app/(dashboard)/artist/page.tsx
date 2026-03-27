@@ -105,7 +105,7 @@ export default function ArtistHomePage() {
           <div className="flex items-center gap-4 glass-card px-6 py-4 rounded-xl border border-white/5">
             <div>
               <span className="text-[10px] uppercase tracking-widest text-[#a1faff] font-bold">Earnings This Month</span>
-              <p className="text-2xl font-extrabold text-white">₹{(profile?.earnings_this_month ?? 0).toLocaleString('en-IN')}</p>
+              <p className="text-2xl font-extrabold text-white">₹{Number(profile?.earnings_this_month ?? 0).toLocaleString('en-IN')}</p>
             </div>
             <div className="w-[1px] h-10 bg-white/10" />
             <Wallet className="w-7 h-7 text-[#c39bff]" />
@@ -114,16 +114,16 @@ export default function ArtistHomePage() {
       </section>
 
       {/* ─── Profile Completion ─── */}
-      {(profile?.profile_completion_pct ?? 0) < 100 && (
+      {Number(profile?.profile_completion_pct ?? 0) < 100 && (
         <div className="glass-card rounded-xl p-5 border border-white/5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-white text-sm">Profile Completion</h3>
-            <span className="text-sm font-bold text-[#c39bff]">{profile?.profile_completion_pct}%</span>
+            <span className="text-sm font-bold text-[#c39bff]">{Math.round(Number(profile?.profile_completion_pct ?? 0))}%</span>
           </div>
           <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden mb-3">
             <div
               className="h-full bg-gradient-to-r from-[#c39bff] to-[#a1faff] rounded-full transition-all duration-500"
-              style={{ width: `${profile?.profile_completion_pct}%` }}
+              style={{ width: `${Number(profile?.profile_completion_pct ?? 0)}%` }}
             />
           </div>
           <Link href="/artist/profile" className="text-xs font-medium text-[#a1faff] hover:text-white transition-colors flex items-center gap-1">
@@ -149,9 +149,9 @@ export default function ArtistHomePage() {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <StatMini label="Bookings" value={String(profile?.total_bookings ?? 0)} icon={Calendar} color="text-[#a1faff]" />
-              <StatMini label="Trust Score" value={`${profile?.trust_score ?? 0}%`} icon={Shield} color="text-[#c39bff]" />
+              <StatMini label="Trust Score" value={`${Number(profile?.trust_score ?? 0).toFixed(1)}`} icon={Shield} color="text-[#c39bff]" />
               <StatMini label="Profile Views" value={String(profile?.profile_views ?? 0)} icon={Eye} color="text-[#a1faff]" />
-              <StatMini label="Earnings" value={`₹${(profile?.earnings_this_month ?? 0).toLocaleString('en-IN')}`} icon={IndianRupee} color="text-green-400" highlight />
+              <StatMini label="Earnings" value={`₹${Number(profile?.earnings_this_month ?? 0).toLocaleString('en-IN')}`} icon={IndianRupee} color="text-green-400" highlight />
             </div>
           </div>
         </div>
@@ -163,8 +163,8 @@ export default function ArtistHomePage() {
             <h3 className="text-sm font-extrabold uppercase tracking-widest text-[#a1faff]">Backstage AI</h3>
           </div>
           <div className="space-y-4">
-            <ProgressBar label="Trust Score" value={profile?.trust_score ?? 0} color="bg-[#a1faff]" />
-            <ProgressBar label="Profile Completion" value={profile?.profile_completion_pct ?? 0} color="bg-[#c39bff]" />
+            <ProgressBar label="Trust Score" value={Number(profile?.trust_score ?? 0)} color="bg-[#a1faff]" />
+            <ProgressBar label="Profile Completion" value={Number(profile?.profile_completion_pct ?? 0)} color="bg-[#c39bff]" />
           </div>
           <div className="mt-2 p-4 rounded-xl bg-white/3 border border-white/5 italic text-sm text-white/40">
             &ldquo;Keep accepting bookings to boost your trust score and unlock premium visibility.&rdquo;

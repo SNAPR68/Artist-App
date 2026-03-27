@@ -127,8 +127,8 @@ export default function WorkspaceAnalyticsPage() {
   }
 
   const avgBookingValue =
-    analytics.booking_count > 0
-      ? Math.round(analytics.total_spend_paise / analytics.booking_count)
+    Number(analytics.booking_count) > 0
+      ? Math.round(Number(analytics.total_spend_paise) / Number(analytics.booking_count))
       : 0;
 
   return (
@@ -252,7 +252,7 @@ export default function WorkspaceAnalyticsPage() {
                       ₹{formatINR(a.total_revenue_paise)}
                     </td>
                     <td className="px-4 py-2 text-nocturne-text-primary text-right">
-                      ₹{formatINR(a.booking_count > 0 ? Math.round(a.total_revenue_paise / a.booking_count) : 0)}
+                      ₹{formatINR(Number(a.booking_count) > 0 ? Math.round(Number(a.total_revenue_paise) / Number(a.booking_count)) : 0)}
                     </td>
                   </tr>
                 ))}
