@@ -188,7 +188,7 @@ Key folders: `premium_landing_page`, `artist_portfolio_hollywood_glamour`, `arti
 ### Rebuild Status (as of 2026-03-27)
 - **Hollywood Glamour complete**: All 50+ pages converted to Nocturne Hollywood
 - **Full structural rebuilds**: Landing page (cinematic hero + bento value props + poster gallery), artist public profile (3D perspective poster gallery + 4-col bento stats + sticky booking sidebar), search/discovery (bento results grid + glass pill search bar + filter chips)
-- **Hero carousel**: 5 rotating Unsplash event images (DJ, concert, festival, club, wedding) cycling every 3s with crossfade + Ken Burns zoom, dark gradient overlay, event type label + dot indicators
+- **Hero**: "Live entertainment, reinvented." headline + "The entertainment OS for India" subtitle. 5 rotating Unsplash event images cycling every 3s with crossfade + Ken Burns zoom. 3 CTAs: "Hire an Artist" (purple gradient), "Event Company OS" (glass card with CRM subtitle), "Join as Artist" (outline). 3D Zara & Kabir mascots inline with float + glow animations
 - **Bento hero headers**: All dashboard pages have glass-card hero blocks with ambient glows
 - **Onboarding flows**: All 4 onboarding pages use 5+7 cinematic split with glass form cards
 - **Glass-card treatment**: All flat card containers converted to glassmorphism
@@ -202,9 +202,12 @@ Key folders: `premium_landing_page`, `artist_portfolio_hollywood_glamour`, `arti
 - Login/auth flow (OTP with bypass for dev, real MSG91 ready)
 - All 4 role dashboards: Artist, Client/Event Company, Agent, Admin
 - Search API with 100 seeded artists across 10 cities
-- Voice Assistant — **Zara & Kabir** (formerly Backstage AI) floating widget with:
-  - **Cloud TTS**: ElevenLabs multilingual v2 via `/api/tts` proxy route (falls back to browser TTS)
-  - **Zara** (English, female, purple `#c39bff`) + **Kabir** (Hindi, male, cyan `#a1faff`) mascot avatars
+- Voice Assistant — **Zara & Kabir** (formerly Backstage AI):
+  - **3D mascot avatars** on homepage hero + fixed bottom-right (replace old FAB pill)
+  - Clicking Zara opens English chat, clicking Kabir opens Hindi chat
+  - **Cloud TTS**: ElevenLabs multilingual v2 via `/api/tts` Next.js route (falls back to browser TTS)
+  - **Zara** (English, female, purple `#c39bff`) + **Kabir** (Hindi, male, cyan `#a1faff`)
+  - CSS 3D: `perspective`, `mascotFloat`, `mascotGlow` keyframes in globals.css
   - Web Speech API (mic input, works on HTTPS/Vercel deploy)
   - Guest mode: public artist search without login
   - Auth mode: full voice query API (6 intents, 40+ page targets)
