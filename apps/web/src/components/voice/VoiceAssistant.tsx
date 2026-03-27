@@ -595,12 +595,6 @@ export function VoiceAssistant() {
   // Concierge is available for ALL visitors — logged in or not
   if (!mounted) return null;
 
-  // Sparkle SVG reused in header and collapsed widget
-  const sparkleIcon = (size: number, color = 'currentColor') => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-    </svg>
-  );
 
   const guestChips = [
     'Find a DJ for wedding in Mumbai',
