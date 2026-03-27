@@ -185,9 +185,13 @@ nocturne-overlay                           — Modal backdrop
 Full HTML/Tailwind reference designs live in: `stitch_product_requirements_document (2)/stitch_product_requirements_document/`
 Key folders: `premium_landing_page`, `artist_portfolio_hollywood_glamour`, `artist_management_hollywood_glamour`, `escrow_wallet_hollywood_glamour`, `ai_artist_discovery`, `booking_inquiry_management`, `onboarding_welcome_hollywood_glamour`, `fund_escrow_confirm_booking_1`, `booking_confirmed`
 
-### Rebuild Status (as of 2026-03-26)
-- **Done (12 pages)**: Landing page, artist dashboard, artist bookings list, artist earnings, artist financial, artist intelligence, client dashboard, client bookings list, client workspace detail, event company dashboard, agent dashboard, search results
-- **Remaining (24 pages)**: See `COWORK_REBUILD_24_PAGES.md` for full handoff doc with templates
+### Rebuild Status (as of 2026-03-27)
+- **Hollywood Glamour complete**: All 50+ pages converted to Nocturne Hollywood
+- **Full structural rebuilds**: Landing page (cinematic hero + bento value props + poster gallery), artist public profile (3D perspective poster gallery + 4-col bento stats + sticky booking sidebar), search/discovery (bento results grid + glass pill search bar + filter chips)
+- **Bento hero headers**: All dashboard pages have glass-card hero blocks with ambient glows
+- **Onboarding flows**: All 4 onboarding pages use 5+7 cinematic split with glass form cards
+- **Glass-card treatment**: All flat card containers converted to glassmorphism
+- **Zero light-theme classes remaining** (except presentations/[slug] which stays light for print)
 
 ## Current Build Status (as of 2026-03-26)
 
