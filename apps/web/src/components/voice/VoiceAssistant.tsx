@@ -138,7 +138,7 @@ export function VoiceAssistant() {
 
     // Only use q when no genre was detected — extract keywords, not full sentence
     if (!params.genre) {
-      const stopWords = ['find', 'show', 'me', 'a', 'an', 'the', 'for', 'in', 'near', 'around', 'i', 'want', 'need', 'looking', 'get', 'book', 'hire', 'best', 'top', 'good'];
+      const stopWords = ['find', 'show', 'me', 'a', 'an', 'the', 'for', 'in', 'near', 'around', 'i', 'want', 'need', 'looking', 'get', 'book', 'hire', 'best', 'top', 'good', 'artists', 'artist', 'performer', 'performers', 'act', 'acts', 'talent', 'talents', 'please', 'can', 'you', 'some', 'any', 'all'];
       const words = lower.split(/\s+/).filter(w => !stopWords.includes(w) && w.length > 1);
       const cityLower = params.city?.toLowerCase();
       const searchWords = cityLower ? words.filter(w => w !== cityLower) : words;
