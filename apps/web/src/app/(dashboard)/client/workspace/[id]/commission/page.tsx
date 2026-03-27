@@ -129,17 +129,21 @@ export default function WorkspaceCommissionPage() {
     sortKey === key ? (sortAsc ? ' ↑' : ' ↓') : '';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 relative">
+      {/* Ambient glows */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-[#c39bff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-[#a1faff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
       {/* Header */}
       <div>
-        <Link href={`/client/workspace/${workspaceId}`} className="text-sm text-primary-500 hover:underline">
+        <Link href={`/client/workspace/${workspaceId}`} className="text-[10px] font-bold text-[#a1faff] hover:text-[#c39bff] uppercase tracking-widest">
           &larr; Back to Workspace
         </Link>
-        <h1 className="text-2xl font-display font-extrabold tracking-tighter text-white mt-1">Commission Tracking</h1>
+        <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white mt-3">Commission Tracking</h1>
       </div>
 
       {/* Default Commission Rate */}
-      <div className="bg-nocturne-surface border border-white/5 rounded-lg p-5">
+      <div className="glass-card border border-white/10 rounded-2xl p-8">
         <h2 className="text-sm font-semibold text-nocturne-text-secondary mb-3">Default Commission Rate</h2>
         <div className="flex items-center gap-3">
           <div className="relative">

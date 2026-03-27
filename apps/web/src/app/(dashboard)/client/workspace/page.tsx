@@ -64,46 +64,57 @@ export default function WorkspaceListPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c39bff]" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 relative">
+      {/* Ambient glows */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-[#c39bff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-[#a1faff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
       <div className="flex items-center justify-between">
         <div>
-          <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Workspaces</h1></div></div>
-          <p className="text-nocturne-text-secondary mt-1">Manage your event organizing spaces and teams</p>
+          <div className="glass-card rounded-2xl p-8 border border-white/10 relative overflow-hidden">
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+            <div className="relative z-10">
+              <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Client Dashboard</span>
+              <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white">Workspaces</h1>
+              <p className="text-white/50 text-sm mt-2">Manage your event organizing spaces and teams</p>
+            </div>
+          </div>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="glass-card border border-white/10-strong hover-glow px-4 py-2 rounded-lg text-sm font-medium text-nocturne-accent flex items-center gap-2 transition-all"
+          className="glass-card border border-[#c39bff]/30 hover:border-[#c39bff]/60 bg-[#c39bff]/10 hover:bg-[#c39bff]/20 px-6 py-3 rounded-xl text-sm font-bold text-[#c39bff] flex items-center gap-2 transition-all"
         >
-          <Plus size={16} />
+          <Plus size={18} />
           {showForm ? 'Cancel' : 'New Workspace'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} className="glass-card border-nocturne-border rounded-xl p-6 space-y-4 animate-fade-in-up">
+        <form onSubmit={handleCreate} className="glass-card border border-white/10 rounded-2xl p-8 space-y-5 animate-fade-in">
+          <h2 className="text-xl font-display font-bold text-white">Create Workspace</h2>
           <div>
-            <label className="block text-sm font-medium text-nocturne-text-primary mb-2">Workspace Name</label>
+            <label className="text-[10px] uppercase tracking-widest font-bold text-[#a1faff] block mb-3">Workspace Name</label>
             <input
               type="text"
               value={formName}
               onChange={(e) => setFormName(e.target.value)}
               placeholder="e.g. My Events Company"
-              className="w-full px-4 py-2.5 bg-nocturne-base border border-white/10 rounded-lg text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#c39bff]/50 transition-all"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-nocturne-text-primary mb-2">Company Type</label>
+            <label className="text-[10px] uppercase tracking-widest font-bold text-[#a1faff] block mb-3">Company Type</label>
             <select
               value={formType}
               onChange={(e) => setFormType(e.target.value)}
-              className="w-full px-4 py-2.5 bg-nocturne-base border border-white/10 rounded-lg text-sm text-nocturne-text-primary focus:outline-none focus:ring-1 focus:ring-nocturne-primary"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#c39bff]/50 transition-all"
             >
               <option value="corporate">Corporate</option>
               <option value="wedding_planner">Wedding Planner</option>
@@ -112,19 +123,19 @@ export default function WorkspaceListPage() {
               <option value="agency">Agency</option>
             </select>
           </div>
-          {error && <p className="text-sm text-rose-400">{error}</p>}
-          <div className="flex gap-3 pt-2">
+          {error && <p className="text-sm text-[#ff6b9d]">{error}</p>}
+          <div className="flex gap-3 pt-4">
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 px-4 py-2.5 bg-gradient-accent text-white rounded-lg text-sm font-medium hover-glow disabled:opacity-50 transition-all"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-[#c39bff] to-[#8A2BE2] text-white rounded-xl text-sm font-bold hover:shadow-[0_0_30px_rgba(195,155,255,0.3)] disabled:opacity-50 transition-all"
             >
               {submitting ? 'Creating...' : 'Create'}
             </button>
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="px-4 py-2.5 bg-nocturne-base text-nocturne-text-secondary rounded-lg text-sm font-medium hover:bg-nocturne-surface transition-colors"
+              className="px-6 py-3 bg-white/5 text-white/70 rounded-xl text-sm font-medium border border-white/10 hover:bg-white/10 transition-all"
             >
               Cancel
             </button>
@@ -133,46 +144,45 @@ export default function WorkspaceListPage() {
       )}
 
       {workspaces.length === 0 && !showForm ? (
-        <div className="glass-card border-nocturne-border rounded-xl p-8 text-center animate-fade-in">
-          <Building2 size={48} className="mx-auto mb-4 text-nocturne-accent/50" />
-          <p className="text-nocturne-text-secondary mb-4">
-            Create your first workspace to manage events, team members, and booking pipelines.
-          </p>
+        <div className="glass-card border border-white/10 rounded-2xl p-16 text-center">
+          <Building2 size={56} className="mx-auto mb-6 text-[#a1faff]/40" />
+          <h3 className="text-xl font-display font-bold text-white mb-3">No Workspaces Yet</h3>
+          <p className="text-white/50 mb-6">Create your first workspace to manage events, team members, and booking pipelines.</p>
           <button
             onClick={() => setShowForm(true)}
-            className="text-nocturne-accent text-sm font-medium hover:text-nocturne-accent transition-colors"
+            className="text-[#c39bff] text-sm font-bold hover:text-[#a1faff] transition-colors"
           >
             Get Started →
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {workspaces.map((ws) => (
             <Link
               key={ws.id}
               href={`/client/workspace/${ws.id}`}
-              className="group glass-card border-nocturne-border rounded-xl p-6 hover-glow transition-all duration-300 animate-fade-in"
+              className="group glass-card border border-white/10 hover:border-[#c39bff]/40 rounded-2xl p-6 hover:shadow-[0_0_40px_rgba(195,155,255,0.15)] transition-all duration-300"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start justify-between mb-5">
                 <div className="flex-1">
-                  <h3 className="font-display text-lg text-nocturne-text-primary group-hover:text-nocturne-accent transition-colors">{ws.name}</h3>
-                  <p className="text-xs text-nocturne-text-secondary mt-1">/{ws.slug}</p>
+                  <h3 className="font-display text-2xl font-bold text-white group-hover:text-[#c39bff] transition-colors">{ws.name}</h3>
+                  <p className="text-xs text-white/40 mt-2">/{ws.slug}</p>
                 </div>
                 <span
-                  className={`text-xs font-semibold px-3 py-1 rounded-full ${COMPANY_TYPE_COLORS[ws.company_type] ?? 'bg-nocturne-surface/10 border border-white/10 text-nocturne-text-secondary'}`}
+                  className={`text-xs font-bold px-4 py-2 rounded-full ${COMPANY_TYPE_COLORS[ws.company_type] ?? 'bg-white/5 border border-white/10 text-white/50'}`}
                 >
                   {ws.company_type.replace(/_/g, ' ')}
                 </span>
               </div>
 
-              <div className="flex gap-4 text-sm">
-                <div className="flex items-center gap-2 text-nocturne-text-secondary">
-                  <Users size={16} className="text-nocturne-accent" />
-                  <span>{ws.member_count} member{ws.member_count !== 1 ? 's' : ''}</span>
+              <div className="flex gap-6 text-sm pt-4 border-t border-white/5">
+                <div className="flex items-center gap-2 text-white/60">
+                  <Users size={16} className="text-[#a1faff]" />
+                  <span className="font-medium">{ws.member_count} {ws.member_count === 1 ? 'member' : 'members'}</span>
                 </div>
-                <div className="flex items-center gap-2 text-nocturne-text-secondary">
-                  <Calendar size={16} className="text-nocturne-accent" />
-                  <span>{ws.event_count} event{ws.event_count !== 1 ? 's' : ''}</span>
+                <div className="flex items-center gap-2 text-white/60">
+                  <Calendar size={16} className="text-[#a1faff]" />
+                  <span className="font-medium">{ws.event_count} {ws.event_count === 1 ? 'event' : 'events'}</span>
                 </div>
               </div>
             </Link>

@@ -83,28 +83,32 @@ export default function AgentDashboard() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4 space-y-8 animate-fade-in">
+    <div className="max-w-7xl mx-auto py-12 px-4 space-y-8 relative">
+      {/* Ambient glows */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-[#c39bff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-[#a1faff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
       {/* ─── Bento Hero ─── */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden">
+        <div className="md:col-span-8 glass-card rounded-2xl p-10 border border-white/10 relative overflow-hidden">
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
           <div className="relative z-10">
-            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Agent Dashboard</span>
-            <h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white mb-1">{profile.agency_name}</h1>
-            <p className="text-white/40 text-sm">{profile.contact_person} · {profile.city}</p>
+            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-3 block">Agent Dashboard</span>
+            <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white mb-3">{profile.agency_name}</h1>
+            <p className="text-white/50 text-sm font-medium">{profile.contact_person} · {profile.city}</p>
           </div>
         </div>
-        <div className="md:col-span-4 glass-card rounded-xl p-6 border border-white/5 flex flex-col justify-center items-center gap-4">
+        <div className="md:col-span-4 glass-card rounded-2xl p-6 border border-white/10 flex flex-col justify-center gap-4">
           <Link
             href="/agent/roster"
-            className="w-full py-3 bg-gradient-to-br from-[#c39bff] to-[#8A2BE2] text-white rounded-xl text-sm font-bold text-center hover:shadow-[0_0_20px_rgba(195,155,255,0.3)] transition-all flex items-center justify-center gap-2"
+            className="w-full py-4 bg-gradient-to-r from-[#c39bff] to-[#8A2BE2] text-white rounded-xl text-sm font-bold text-center hover:shadow-[0_0_30px_rgba(195,155,255,0.4)] transition-all flex items-center justify-center gap-2"
           >
             <Users size={18} />
             Manage Roster
           </Link>
           <Link
             href="/agent/bookings"
-            className="w-full py-3 border border-white/10 text-white/60 rounded-xl text-sm font-medium text-center hover:bg-white/5 transition-all"
+            className="w-full py-4 border border-[#c39bff]/30 bg-[#c39bff]/5 text-[#c39bff] hover:bg-[#c39bff]/10 hover:border-[#c39bff]/60 rounded-xl text-sm font-bold text-center transition-all"
           >
             View Bookings
           </Link>

@@ -93,7 +93,7 @@ export default function PaymentPage() {
         ondismiss: () => setStatus('idle'),
       },
       theme: {
-        color: '#1A56DB',
+        color: '#c39bff',
       },
     });
 
@@ -125,23 +125,27 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6 animate-fade-in">
+    <div className="min-h-screen bg-[#1a191b] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Ambient glows */}
+      <div className="absolute -top-40 -right-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute -bottom-40 -left-20 w-80 h-80 bg-[#a1faff]/5 blur-[100px] rounded-full pointer-events-none" />
+
+      <div className="w-full max-w-md space-y-6 animate-fade-in relative z-10">
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-display font-bold text-gradient">Complete Payment</h1>
-          <p className="text-nocturne-text-secondary">Secure transaction powered by Razorpay</p>
+          <h1 className="text-4xl font-display font-extrabold tracking-tighter text-white">Complete Payment</h1>
+          <p className="text-white/60">Secure transaction powered by Razorpay</p>
         </div>
 
         {status === 'success' && (
           <div className="glass-card border border-white/10 p-8 text-center space-y-4 animate-fade-in-up">
             <div className="flex justify-center">
-              <div className="relative w-16 h-16 bg-gradient-nocturne rounded-full flex items-center justify-center shadow-nocturne-glow-sm">
+              <div className="relative w-16 h-16 bg-gradient-to-br from-[#c39bff] to-[#8A2BE2] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(195,155,255,0.3)]">
                 <Check className="w-8 h-8 text-white" />
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-display font-bold text-gradient mb-2">Payment Successful!</h2>
-              <p className="text-nocturne-text-secondary">Your booking has been confirmed. Redirecting...</p>
+              <h2 className="text-2xl font-display font-extrabold text-white mb-2">Payment Successful!</h2>
+              <p className="text-white/60">Your booking has been confirmed. Redirecting...</p>
             </div>
           </div>
         )}
@@ -149,17 +153,17 @@ export default function PaymentPage() {
         {status === 'failed' && (
           <div className="glass-card border border-white/10 p-8 text-center space-y-4 animate-fade-in-up">
             <div className="flex justify-center">
-              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center border border-red-500/30">
-                <X className="w-8 h-8 text-red-400" />
+              <div className="w-16 h-16 bg-[#ff6e84]/20 rounded-full flex items-center justify-center border border-[#ff6e84]/30">
+                <X className="w-8 h-8 text-[#ff6e84]" />
               </div>
             </div>
             <div>
-              <h2 className="text-xl font-display font-bold text-red-300 mb-2">Payment Failed</h2>
-              <p className="text-sm text-red-200 mb-4">{error}</p>
+              <h2 className="text-xl font-display font-extrabold text-[#ff6e84] mb-2">Payment Failed</h2>
+              <p className="text-sm text-[#ff6e84]/80 mb-4">{error}</p>
             </div>
             <button
               onClick={createOrder}
-              className="w-full bg-gradient-nocturne hover-glow text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105"
+              className="w-full bg-gradient-to-br from-[#c39bff] to-[#8A2BE2] hover:shadow-[0_0_20px_rgba(195,155,255,0.3)] text-white px-6 py-3 rounded-full font-display font-semibold transition-all duration-300 transform hover:scale-105"
             >
               Try Again
             </button>
@@ -170,27 +174,27 @@ export default function PaymentPage() {
           <div className="glass-card border border-white/10 p-8 space-y-6 animate-fade-in-up">
             {order && (
               <div className="text-center space-y-2 py-4">
-                <p className="text-nocturne-text-secondary text-sm uppercase tracking-wide">Amount to Pay</p>
-                <p className="text-5xl font-display font-bold text-gradient">₹{formatINR(order.amount_paise)}</p>
+                <p className="text-white/40 text-sm uppercase tracking-widest">Amount to Pay</p>
+                <p className="text-5xl font-display font-extrabold text-[#c39bff]">₹{formatINR(order.amount_paise)}</p>
               </div>
             )}
 
-            <div className="bg-nocturne-surface-2/50 backdrop-blur-md rounded-lg p-4 border border-white/10 space-y-3">
-              <h3 className="text-sm font-semibold text-nocturne-text-primary">Payment Methods Accepted</h3>
+            <div className="bg-white/5 backdrop-blur-md rounded-lg p-4 border border-white/10 space-y-3">
+              <h3 className="text-sm font-semibold text-white">Payment Methods Accepted</h3>
               <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-2 text-nocturne-text-secondary">
+                <div className="flex items-center gap-2 text-white/60">
                   <CreditCard className="w-4 h-4" />
                   <span className="text-xs">Credit/Debit Cards</span>
                 </div>
-                <div className="flex items-center gap-2 text-nocturne-text-secondary">
+                <div className="flex items-center gap-2 text-white/60">
                   <Smartphone className="w-4 h-4" />
                   <span className="text-xs">UPI & Mobile Wallets</span>
                 </div>
-                <div className="flex items-center gap-2 text-nocturne-text-secondary">
+                <div className="flex items-center gap-2 text-white/60">
                   <Building2 className="w-4 h-4" />
                   <span className="text-xs">Net Banking</span>
                 </div>
-                <div className="flex items-center gap-2 text-nocturne-text-secondary">
+                <div className="flex items-center gap-2 text-white/60">
                   <Wallet className="w-4 h-4" />
                   <span className="text-xs">Digital Wallets</span>
                 </div>
@@ -200,7 +204,7 @@ export default function PaymentPage() {
             <button
               onClick={createOrder}
               disabled={status === 'loading'}
-              className="w-full bg-gradient-nocturne hover-glow text-white py-4 rounded-full font-display font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-br from-[#c39bff] to-[#8A2BE2] hover:shadow-[0_0_20px_rgba(195,155,255,0.3)] text-white py-4 rounded-full font-display font-extrabold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center gap-2"
             >
               {status === 'loading' ? (
                 <>
@@ -212,25 +216,25 @@ export default function PaymentPage() {
               )}
             </button>
 
-            <p className="text-center text-xs text-nocturne-text-secondary">Secure payment powered by Razorpay. Your data is encrypted.</p>
+            <p className="text-center text-xs text-white/40">Secure payment powered by Razorpay. Your data is encrypted.</p>
           </div>
         )}
 
         {status === 'verifying' && (
           <div className="glass-card border border-white/10 p-8 text-center space-y-4 animate-fade-in-up">
             <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary-500/20 border-t-primary-500" />
+              <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#c39bff]/20 border-t-[#c39bff]" />
             </div>
-            <p className="text-nocturne-text-primary font-medium">Verifying your payment...</p>
+            <p className="text-white font-medium">Verifying your payment...</p>
           </div>
         )}
 
         {status === 'checkout' && (
           <div className="glass-card border border-white/10 p-8 text-center space-y-4 animate-fade-in-up">
             <div className="flex justify-center">
-              <div className="shimmer-overlay w-12 h-12 rounded-full" />
+              <div className="w-12 h-12 bg-gradient-to-br from-[#c39bff]/20 to-[#8A2BE2]/20 rounded-full animate-pulse" />
             </div>
-            <p className="text-nocturne-text-primary font-medium">Complete the payment in the Razorpay window...</p>
+            <p className="text-white font-medium">Complete the payment in the Razorpay window...</p>
           </div>
         )}
       </div>

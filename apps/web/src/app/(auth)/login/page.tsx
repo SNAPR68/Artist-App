@@ -35,60 +35,70 @@ function LoginContent() {
   };
 
   return (
-    <div className="glass-card p-8">
-      <div>
-        <div className="flex justify-end mb-2 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-          <LanguageSwitcher />
-        </div>
-
-        <div className="text-center mb-8 animate-fade-in-up" style={{ animationDelay: '0.28s' }}>
-          <h1 className="text-h3 font-display font-bold text-nocturne-text-primary mb-2">{t('auth.welcome')}</h1>
-          <p className="text-sm text-nocturne-text-secondary">{t('auth.enterPhone')}</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in-up" style={{ animationDelay: '0.36s' }}>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center h-12 px-3 rounded-xl bg-nocturne-surface border border-nocturne-border text-nocturne-text-secondary text-sm">
-              +91
-            </div>
-            <div className="flex-1 relative">
-              <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-nocturne-text-secondary" />
-              <input
-                type="tel"
-                placeholder={t('auth.phonePlaceholder')}
-                value={phone}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, '').slice(0, 10);
-                  setPhone(val);
-                  setError('');
-                }}
-                autoFocus
-                inputMode="numeric"
-                autoComplete="tel"
-                className="w-full pl-10 pr-4 py-3 bg-nocturne-surface border border-nocturne-border rounded-xl text-sm text-nocturne-text-primary placeholder:text-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
-              />
-            </div>
-          </div>
-
-          {error && (
-            <p className="text-xs text-red-400 px-1 animate-fade-in-up">
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-3 bg-gradient-nocturne disabled:opacity-50 text-white font-semibold rounded-xl transition-all hover:shadow-nocturne-glow-sm hover:scale-[1.01] active:scale-[0.99]"
-          >
-            {isLoading ? 'Sending...' : t('auth.sendOtp')}
-          </button>
-        </form>
-
-        <p className="text-[10px] text-nocturne-text-secondary text-center mt-6 leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.44s' }}>
-          {t('auth.termsNotice')}
-        </p>
+    <div className="space-y-8">
+      {/* Language Switcher */}
+      <div className="flex justify-end mb-2 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <LanguageSwitcher />
       </div>
+
+      {/* Header */}
+      <div className="text-center space-y-2 animate-fade-in-up" style={{ animationDelay: '0.28s' }}>
+        <div className="inline-block px-4 py-1 rounded-full border border-[#c39bff]/20 bg-[#c39bff]/5 text-[#c39bff] text-[10px] font-bold tracking-[0.2em] uppercase mb-4">
+          Step 01 / 02
+        </div>
+        <h2 className="text-2xl lg:text-3xl font-display font-extrabold tracking-tighter text-white">
+          {t('auth.welcome')}
+        </h2>
+        <p className="text-sm text-white/60">{t('auth.enterPhone')}</p>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-5 animate-fade-in-up" style={{ animationDelay: '0.36s' }}>
+        {/* Phone Input with +91 Code */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm font-medium">
+            +91
+          </div>
+          <div className="flex-1 relative">
+            <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+            <input
+              type="tel"
+              placeholder={t('auth.phonePlaceholder')}
+              value={phone}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                setPhone(val);
+                setError('');
+              }}
+              autoFocus
+              inputMode="numeric"
+              autoComplete="tel"
+              className="input-nocturne pl-10"
+            />
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <p className="text-xs text-red-400 px-1 animate-fade-in-up">
+            {error}
+          </p>
+        )}
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-3 bg-gradient-to-r from-[#c39bff] to-[#8A2BE2] text-white font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(195,155,255,0.2)] hover:shadow-[0_0_30px_rgba(195,155,255,0.4)] disabled:opacity-50 transition-all uppercase tracking-widest"
+        >
+          {isLoading ? 'Sending...' : t('auth.sendOtp')}
+        </button>
+      </form>
+
+      {/* Terms Notice */}
+      <p className="text-[10px] text-white/40 text-center leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.44s' }}>
+        {t('auth.termsNotice')}
+      </p>
     </div>
   );
 }

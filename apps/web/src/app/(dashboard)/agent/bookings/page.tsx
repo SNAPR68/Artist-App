@@ -122,20 +122,24 @@ export default function AgentBookingsPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-8 relative">
+      {/* Ambient glows */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-[#c39bff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-[#a1faff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-gradient-nocturne">Booking Pipeline</h1>
-          <p className="text-nocturne-text-secondary mt-2 flex gap-4">
-            <span><span className="text-nocturne-accent font-semibold">{stats.active}</span> active</span>
-            <span><span className="text-emerald-300 font-semibold">{stats.completed}</span> completed</span>
-            <span><span className="text-nocturne-text-secondary font-semibold">{stats.total}</span> total</span>
+          <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white">Booking Pipeline</h1>
+          <p className="text-white/50 mt-3 flex gap-6 font-medium text-sm">
+            <span><span className="text-[#c39bff] font-bold">{stats.active}</span> active</span>
+            <span><span className="text-emerald-300 font-bold">{stats.completed}</span> completed</span>
+            <span><span className="text-white/50 font-bold">{stats.total}</span> total</span>
           </p>
         </div>
         <button
           onClick={() => setShowConcierge(!showConcierge)}
-          className="bg-nocturne-surface px-6 py-3 rounded-full text-sm font-semibold text-nocturne-text-primary hover:hover-glow transition-all flex items-center gap-2 border border-white/10"
+          className="glass-card px-6 py-3 rounded-xl text-sm font-bold text-[#c39bff] border border-[#c39bff]/30 bg-[#c39bff]/5 hover:bg-[#c39bff]/15 hover:border-[#c39bff]/60 transition-all flex items-center gap-2"
         >
           <Plus size={18} />
           New Booking

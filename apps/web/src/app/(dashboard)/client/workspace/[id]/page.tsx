@@ -204,23 +204,27 @@ export default function WorkspaceDetailPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 relative">
+      {/* Ambient glows */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-[#c39bff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-[#a1faff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
       {/* ─── Cinematic Bento Header ─── */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden">
+        <div className="md:col-span-8 glass-card rounded-2xl p-8 border border-white/10 relative overflow-hidden">
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
           <div className="relative z-10">
-            <Link href="/client/workspace" className="text-sm text-[#c39bff] hover:underline mb-2 inline-block">
+            <Link href="/client/workspace" className="text-[10px] font-bold text-[#a1faff] hover:text-[#c39bff] mb-3 inline-block tracking-widest uppercase">
               &larr; Back to Workspaces
             </Link>
-            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Workspace</span>
-            <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white mb-1">{workspace.name}</h1>
-            <p className="text-white/40 text-sm">Manage events, bookings, and team for this workspace</p>
+            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-3 block">Workspace</span>
+            <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white mb-2">{workspace.name}</h1>
+            <p className="text-white/50 text-sm">Manage events, bookings, and team for this workspace</p>
           </div>
         </div>
-        <div className="md:col-span-4 glass-card rounded-xl p-6 border border-white/5 flex flex-col justify-between">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-white/40 mb-4">Quick Links</h3>
-          <div className="grid grid-cols-2 gap-2">
+        <div className="md:col-span-4 glass-card rounded-2xl p-6 border border-white/10 flex flex-col justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-[#a1faff] mb-4">Quick Links</h3>
+          <div className="grid grid-cols-2 gap-3">
             {[
               { href: `/client/workspace/${workspaceId}/team`, label: 'Team' },
               { href: `/client/workspace/${workspaceId}/analytics`, label: 'Analytics' },
@@ -230,7 +234,7 @@ export default function WorkspaceDetailPage() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-xs glass-card bg-white/5 border border-white/5 text-white/60 px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-all text-center font-medium"
+                className="text-xs font-bold glass-card bg-white/5 border border-white/10 text-[#c39bff] hover:bg-[#c39bff]/10 hover:border-[#c39bff]/30 px-4 py-3 rounded-xl text-center transition-all"
               >
                 {link.label}
               </Link>

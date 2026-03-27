@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { ChevronDown, Search } from 'lucide-react';
 
 interface FAQItem {
   q: string;
@@ -89,69 +90,112 @@ const FAQ_SECTIONS: { title: string; items: FAQItem[] }[] = [
 
 export default function HelpPage() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const toggle = (key: string) => {
     setOpenIndex(openIndex === key ? null : key);
   };
 
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-12 min-h-screen bg-[#0e0e0f]">
-      <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white mb-2">Help & FAQ</h1>
-      <p className="text-nocturne-text-tertiary mb-8">
-        Find answers to common questions about using ArtistBooking.
-      </p>
+  // Filter FAQs based on search query
+  const filteredSections = FAQ_SECTIONS.map(section => ({
+    ...section,
+    items: section.items.filter(item =>
+      item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.a.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })).filter(section => section.items.length > 0);
 
-      {FAQ_SECTIONS.map((section, si) => (
-        <div key={section.title} className="mb-8">
-          <h2 className="text-lg font-semibold text-nocturne-text-primary mb-3">{section.title}</h2>
-          <div className="bg-nocturne-surface rounded-lg border border-nocturne-border-subtle divide-y divide-white/5">
-            {section.items.map((item, ii) => {
-              const key = `${si}-${ii}`;
-              const isOpen = openIndex === key;
-              return (
-                <div key={key}>
-                  <button
-                    onClick={() => toggle(key)}
-                    className="w-full px-4 py-3 flex items-center justify-between text-left"
-                  >
-                    <span className="text-sm font-medium text-nocturne-text-primary">{item.q}</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className={`h-4 w-4 text-nocturne-text-tertiary transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                  {isOpen && (
-                    <div className="px-4 pb-3 text-sm text-nocturne-text-secondary leading-relaxed">
-                      {item.a}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+  return (
+    <div className="min-h-screen bg-nocturne-base">
+      {/* Ambient glows */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-[#c39bff]/5 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#a1faff]/5 blur-3xl rounded-full pointer-events-none" />
+
+      <div className="max-w-3xl mx-auto px-4 py-16 relative z-10">
+        {/* Header */}
+        <div className="mb-12">
+          <h1 className="text-5xl font-display font-extrabold tracking-tighter text-white mb-3">Help & FAQ</h1>
+          <p className="text-white/50 text-lg">
+            Find answers to common questions about using ArtistBook.
+          </p>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-12">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+            <input
+              type="text"
+              placeholder="Search FAQs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input-nocturne w-full pl-12 pr-4 py-3 rounded-lg"
+            />
           </div>
         </div>
-      ))}
 
-      <div className="bg-nocturne-primary-light rounded-lg p-6 text-center">
-        <h3 className="font-semibold text-nocturne-text-primary mb-2">Still need help?</h3>
-        <p className="text-sm text-nocturne-text-secondary mb-4">
-          Our support team is here to assist you.
-        </p>
-        <a
-          href="mailto:support@artistbooking.in"
-          className="inline-block bg-nocturne-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-nocturne-primary transition-colors"
-        >
-          Contact Support
-        </a>
-      </div>
+        {/* FAQ Sections */}
+        {searchQuery && filteredSections.length === 0 ? (
+          <div className="glass-card rounded-2xl p-12 text-center border border-white/10">
+            <p className="text-white mb-2">No results found</p>
+            <p className="text-white/50">Try searching for different keywords</p>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {(searchQuery ? filteredSections : FAQ_SECTIONS).map((section, si) => (
+              <div key={section.title}>
+                <h2 className="text-2xl font-display font-bold text-white mb-4">{section.title}</h2>
+                <div className="glass-card rounded-2xl border border-white/10 divide-y divide-white/5 overflow-hidden">
+                  {section.items.map((item, ii) => {
+                    const key = `${si}-${ii}`;
+                    const isOpen = openIndex === key;
+                    return (
+                      <div key={key}>
+                        <button
+                          onClick={() => toggle(key)}
+                          className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                        >
+                          <span className="text-base font-semibold text-white flex-1">{item.q}</span>
+                          <ChevronDown
+                            className={`w-5 h-5 text-white/50 transition-transform flex-shrink-0 ml-4 ${
+                              isOpen ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </button>
+                        {isOpen && (
+                          <div className="px-6 pb-4 text-base text-white/70 leading-relaxed border-t border-white/5">
+                            {item.a}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-      <div className="mt-8 text-center text-sm text-nocturne-text-tertiary space-x-4">
-        <Link href="/terms" className="hover:text-nocturne-text-secondary">Terms of Service</Link>
-        <Link href="/privacy" className="hover:text-nocturne-text-secondary">Privacy Policy</Link>
+        {/* Contact Section */}
+        <div className="mt-16 glass-card rounded-2xl border border-white/10 p-8 text-center space-y-4">
+          <h3 className="font-display font-bold text-white text-xl">Still need help?</h3>
+          <p className="text-white/50">
+            Our support team is here to assist you.
+          </p>
+          <a
+            href="mailto:support@artistbooking.in"
+            className="inline-block btn-nocturne-primary px-8 py-3 rounded-lg font-semibold"
+          >
+            Contact Support
+          </a>
+        </div>
+
+        {/* Footer Links */}
+        <div className="mt-12 text-center space-x-6 text-sm text-white/50">
+          <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+          <span>•</span>
+          <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+        </div>
       </div>
     </div>
   );

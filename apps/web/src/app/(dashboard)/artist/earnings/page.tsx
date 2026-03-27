@@ -66,15 +66,19 @@ export default function EarningsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c39bff]" />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* ─── Bento Hero ─── */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      {/* ─── Ambient Glows ─── */}
+      <div className="fixed -top-40 -right-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="fixed -bottom-40 -left-20 w-80 h-80 bg-[#a1faff]/5 blur-[100px] rounded-full pointer-events-none" />
+
+      {/* ─── Bento Hero: 8+4 ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 relative z-10">
         <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden">
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
           <div className="relative z-10">
@@ -88,9 +92,9 @@ export default function EarningsPage() {
                   <button
                     key={p}
                     onClick={() => setPeriod(p)}
-                    className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
+                    className={`px-3 py-1.5 text-xs rounded-md font-bold uppercase tracking-widest transition-all ${
                       period === p
-                        ? 'bg-[#c39bff]/20 text-[#c39bff] font-medium'
+                        ? 'bg-[#c39bff]/20 text-[#c39bff]'
                         : 'text-white/40 hover:text-white'
                     }`}
                   >
@@ -100,35 +104,35 @@ export default function EarningsPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-              <div className="bg-white/5 p-4 rounded-lg">
-                <p className="text-[10px] text-white/40 uppercase font-bold mb-1">Gross</p>
-                <p className="text-lg font-bold text-white">₹{formatINR(summary?.gross_total ?? null)}</p>
+              <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                <p className="text-[10px] text-white/40 uppercase font-black mb-1 tracking-widest">Gross</p>
+                <p className="text-lg font-black text-white">₹{formatINR(summary?.gross_total ?? null)}</p>
               </div>
-              <div className="bg-white/5 p-4 rounded-lg">
-                <p className="text-[10px] text-white/40 uppercase font-bold mb-1">TDS</p>
-                <p className="text-lg font-bold text-red-400">-₹{formatINR(summary?.total_tds ?? null)}</p>
+              <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                <p className="text-[10px] text-white/40 uppercase font-black mb-1 tracking-widest">TDS</p>
+                <p className="text-lg font-black text-[#ff8b9a]">-₹{formatINR(summary?.total_tds ?? null)}</p>
               </div>
-              <div className="bg-white/5 p-4 rounded-lg">
-                <p className="text-[10px] text-white/40 uppercase font-bold mb-1">Platform Fee</p>
-                <p className="text-lg font-bold text-white/40">-₹{formatINR(summary?.total_platform_fee ?? null)}</p>
+              <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                <p className="text-[10px] text-white/40 uppercase font-black mb-1 tracking-widest">Platform Fee</p>
+                <p className="text-lg font-black text-white/40">-₹{formatINR(summary?.total_platform_fee ?? null)}</p>
               </div>
               <div className="bg-white/5 p-4 rounded-lg border border-green-400/20">
-                <p className="text-[10px] text-green-400 uppercase font-bold mb-1">Net Payout</p>
-                <p className="text-lg font-bold text-green-400">₹{formatINR(summary?.net_total ?? null)}</p>
+                <p className="text-[10px] text-green-400 uppercase font-black mb-1 tracking-widest">Net Payout</p>
+                <p className="text-lg font-black text-green-400">₹{formatINR(summary?.net_total ?? null)}</p>
               </div>
             </div>
           </div>
         </div>
-        <div className="md:col-span-4 glass-card rounded-xl p-6 border border-white/5 border-l-4 border-l-green-400 flex flex-col justify-between">
+        <div className="md:col-span-4 glass-card rounded-xl p-6 border border-white/5 border-l-4 border-l-[#ffbf00] flex flex-col justify-between">
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-white/40 mb-6">Summary</h3>
+            <h3 className="text-xs font-black uppercase tracking-widest text-white/40 mb-6">Summary</h3>
             <div className="space-y-4">
               <div>
-                <p className="text-3xl font-extrabold text-white">₹{formatINR(summary?.net_total ?? null)}</p>
+                <p className="text-3xl font-black text-white">₹{formatINR(summary?.net_total ?? null)}</p>
                 <p className="text-xs text-white/40">Net earnings this period</p>
               </div>
-              <div className="pt-4 border-t border-white/5">
-                <p className="text-xl font-bold text-[#a1faff]">{summary?.transaction_count ?? 0}</p>
+              <div className="pt-4 border-t border-white/10">
+                <p className="text-xl font-black text-[#a1faff]">{summary?.transaction_count ?? 0}</p>
                 <p className="text-xs text-white/40">Settled transactions</p>
               </div>
             </div>
@@ -136,22 +140,22 @@ export default function EarningsPage() {
         </div>
       </div>
 
-      {/* Transaction List */}
-      <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+      {/* ─── Transaction List ─── */}
+      <div className="glass-card rounded-xl border border-white/5 overflow-hidden relative z-10">
+        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-white/5">
           <h2 className="text-lg font-display font-bold text-white">Payment History</h2>
           <span className="text-xs text-white/40">{summary?.transaction_count ?? 0} transactions</span>
         </div>
         {transactions.length === 0 ? (
-          <div className="p-8 text-center text-nocturne-text-tertiary">No transactions yet</div>
+          <div className="p-8 text-center text-white/50">No transactions yet</div>
         ) : (
-          <div className="divide-y divide-nocturne-border-subtle">
+          <div className="divide-y divide-white/5">
             {transactions.map((txn) => (
-              <div key={txn.id} className="px-4 py-3 flex items-center justify-between">
+              <div key={txn.id} className="px-4 py-4 flex items-center justify-between hover:bg-white/5 transition-colors">
                 <div>
-                  <p className="font-medium text-nocturne-text-primary">{txn.event_type}</p>
-                  <p className="text-sm text-nocturne-text-tertiary">
-                    {txn.event_city} &middot; {new Date(txn.event_date).toLocaleDateString('en-IN', {
+                  <p className="font-semibold text-white">{txn.event_type}</p>
+                  <p className="text-sm text-white/50">
+                    {txn.event_city} • {new Date(txn.event_date).toLocaleDateString('en-IN', {
                       day: 'numeric',
                       month: 'short',
                       year: 'numeric',
@@ -160,12 +164,12 @@ export default function EarningsPage() {
                 </div>
                 <div className="text-right flex items-center gap-2">
                   <div>
-                    <p className="font-medium text-nocturne-text-primary">₹{formatINR(txn.artist_payout_paise)}</p>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      txn.status === 'settled' ? 'bg-nocturne-success/15 text-nocturne-success' :
-                      txn.status === 'captured' ? 'bg-nocturne-info/15 text-nocturne-info' :
-                      txn.status === 'refund_initiated' ? 'bg-nocturne-warning/15 text-nocturne-warning' :
-                      'bg-nocturne-surface-2 text-nocturne-text-secondary'
+                    <p className="font-semibold text-white">₹{formatINR(txn.artist_payout_paise)}</p>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-bold uppercase tracking-widest ${
+                      txn.status === 'settled' ? 'bg-green-400/15 text-green-400' :
+                      txn.status === 'captured' ? 'bg-[#a1faff]/15 text-[#a1faff]' :
+                      txn.status === 'refund_initiated' ? 'bg-[#ffbf00]/15 text-[#ffbf00]' :
+                      'bg-white/5 text-white/40'
                     }`}>
                       {txn.status}
                     </span>
@@ -188,7 +192,7 @@ export default function EarningsPage() {
                           URL.revokeObjectURL(url);
                         }
                       }}
-                      className="text-xs text-primary-500 hover:text-primary-600"
+                      className="text-xs text-[#c39bff] hover:text-[#a1faff] transition-colors"
                       title="Download Invoice"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

@@ -110,24 +110,29 @@ export default function VoicePage() {
   if (loadingSessions) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c39bff]" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 animate-fade-in">
+      {/* Ambient glows */}
+      <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#c39bff]/5 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-[#a1faff]/5 blur-3xl rounded-full pointer-events-none" />
+
+      {/* Header */}
+      <div className="flex items-center justify-between relative z-10">
         <div>
-          <h1 className="text-2xl font-bold text-nocturne-text-primary">Voice Assistant</h1>
-          <p className="text-sm text-nocturne-text-tertiary mt-1">
+          <h1 className="text-4xl font-display font-bold text-white">Voice Dashboard</h1>
+          <p className="text-sm text-white/50 mt-2">
             Ask anything about bookings, earnings, demand, or artist search.
           </p>
         </div>
         {messages.length > 0 && (
           <button
             onClick={handleNewSession}
-            className="text-sm text-nocturne-text-tertiary hover:text-nocturne-text-secondary border border-white/5 rounded-lg px-3 py-1.5"
+            className="text-sm text-white/50 hover:text-white border border-white/10 rounded-lg px-4 py-2.5 transition-colors"
           >
             New Chat
           </button>
@@ -135,25 +140,28 @@ export default function VoicePage() {
       </div>
 
       {/* Chat Container */}
-      <div className="glass-card rounded-xl border border-white/5 min-h-[400px] flex flex-col">
+      <div className="glass-card rounded-2xl border border-white/10 min-h-[500px] flex flex-col">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.length === 0 && (
-            <div className="flex items-center justify-center h-full text-nocturne-text-tertiary text-sm py-20">
-              Start a conversation...
+            <div className="flex items-center justify-center h-full text-white/50 text-sm py-20">
+              <div className="text-center">
+                <p className="mb-2">Start a conversation...</p>
+                <p className="text-xs text-white/40">e.g., "How many gigs am I shortlisted for?" or "What's my balance?"</p>
+              </div>
             </div>
           )}
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div
-                className={`max-w-[80%] rounded-lg px-4 py-2.5 text-sm ${
+                className={`max-w-[80%] rounded-2xl px-5 py-3 text-sm ${
                   msg.role === 'user'
-                    ? 'bg-nocturne-primary-light text-primary-900'
-                    : 'bg-nocturne-surface text-nocturne-text-primary'
+                    ? 'bg-[#c39bff] text-white'
+                    : 'bg-white/5 text-white border border-white/10'
                 }`}
               >
                 {msg.intent && (
-                  <span className="inline-block text-xs px-1.5 py-0.5 rounded bg-primary-200 text-nocturne-primary mb-1 mr-1">
+                  <span className="inline-block text-xs px-2 py-1 rounded bg-white/10 text-white/70 mb-2 mr-2">
                     {msg.intent}
                   </span>
                 )}
@@ -161,9 +169,9 @@ export default function VoicePage() {
                 {msg.action?.type === 'navigate' && msg.action.route && (
                   <button
                     onClick={() => router.push(msg.action!.route!)}
-                    className="mt-2 text-xs bg-nocturne-primary-light text-nocturne-primary border border-primary-200 rounded-lg px-3 py-1.5 hover:bg-nocturne-primary-light transition-colors"
+                    className="mt-3 text-xs bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-lg px-3 py-2 transition-all"
                   >
-                    Go to page &rarr;
+                    Go to page →
                   </button>
                 )}
               </div>
@@ -171,8 +179,8 @@ export default function VoicePage() {
           ))}
           {sending && (
             <div className="flex justify-start">
-              <div className="glass-card rounded-xl px-4 py-2.5">
-                <div className="flex gap-1">
+              <div className="glass-card rounded-2xl px-4 py-3">
+                <div className="flex gap-1.5">
                   <span className="w-2 h-2 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                   <span className="w-2 h-2 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                   <span className="w-2 h-2 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -185,13 +193,13 @@ export default function VoicePage() {
 
         {/* Suggestions */}
         {lastAssistant?.suggestions && lastAssistant.suggestions.length > 0 && (
-          <div className="px-4 pb-2 flex gap-2 flex-wrap">
+          <div className="px-6 py-3 flex gap-2 flex-wrap border-t border-white/10">
             {lastAssistant.suggestions.map((s, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSend(s)}
                 disabled={sending}
-                className="text-xs bg-nocturne-primary-light text-nocturne-primary px-3 py-1.5 rounded-full hover:bg-nocturne-primary-light transition-colors disabled:opacity-50"
+                className="text-xs bg-white/5 hover:bg-white/10 text-[#c39bff] px-3 py-2 rounded-full border border-white/10 transition-all disabled:opacity-50"
               >
                 {s}
               </button>
@@ -200,39 +208,39 @@ export default function VoicePage() {
         )}
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="border-t border-white/5 p-3 flex gap-2">
+        <form onSubmit={handleSubmit} className="border-t border-white/10 p-4 flex gap-3 bg-white/5">
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Ask me anything... e.g. 'band chahiye Jaipur mein'"
+            placeholder="Ask me anything... e.g. 'Show my bookings'"
             disabled={sending}
-            className="flex-1 border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none disabled:opacity-50"
+            className="input-nocturne flex-1 rounded-lg px-4 py-3"
           />
           <button
             type="submit"
             disabled={sending || !inputText.trim()}
-            className="bg-nocturne-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-nocturne-primary transition-colors disabled:opacity-50"
+            className="btn-nocturne-primary px-6 py-3 rounded-lg disabled:opacity-50 font-semibold"
           >
             Send
           </button>
         </form>
       </div>
 
-      {/* Past Sessions */}
+      {/* Past Sessions Sidebar */}
       {sessions.length > 0 && (
-        <section>
-          <h2 className="text-sm font-medium text-nocturne-text-tertiary mb-2">Past Sessions</h2>
-          <div className="space-y-1">
+        <section className="glass-card rounded-2xl border border-white/10 p-6">
+          <h2 className="text-sm font-semibold text-white mb-4">Past Sessions</h2>
+          <div className="space-y-2">
             {sessions.slice(0, 5).map((s) => (
-              <div key={s.id} className="text-xs text-nocturne-text-tertiary flex items-center gap-2">
+              <div key={s.id} className="text-xs text-white/50 flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 transition-all cursor-pointer">
                 <span>
                   {new Date(s.created_at).toLocaleDateString('en-IN', {
                     day: 'numeric',
                     month: 'short',
                   })}
                 </span>
-                <span>&middot;</span>
+                <span>•</span>
                 <span>{s.message_count} messages</span>
               </div>
             ))}

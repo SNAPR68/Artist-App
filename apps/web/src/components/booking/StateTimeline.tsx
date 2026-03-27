@@ -28,7 +28,7 @@ interface StateTimelineProps {
 }
 
 export function StateTimeline({ currentStatus, events }: StateTimelineProps) {
-  const config = STATE_CONFIG[currentStatus] ?? { label: currentStatus, color: 'bg-gray-500' };
+  const config = STATE_CONFIG[currentStatus] ?? { label: currentStatus, color: 'bg-white/10 text-white/40' };
 
   return (
     <div>
@@ -41,7 +41,7 @@ export function StateTimeline({ currentStatus, events }: StateTimelineProps) {
       {/* Timeline */}
       <div className="space-y-0">
         {events.map((event, i) => {
-          const toConfig = STATE_CONFIG[event.to_status] ?? { label: event.to_status, color: 'bg-gray-400' };
+          const toConfig = STATE_CONFIG[event.to_status] ?? { label: event.to_status, color: 'bg-white/10 text-white/40' };
           return (
             <div key={i} className="flex items-start gap-3">
               <div className="flex flex-col items-center">

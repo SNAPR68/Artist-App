@@ -26,17 +26,17 @@ function formatINR(paise: number): string {
 }
 
 function getStatusBadge(status: string) {
-  const baseClasses = 'inline-block px-2.5 py-1 rounded-full text-xs font-semibold';
+  const baseClasses = 'inline-block px-2.5 py-1 rounded-full text-xs font-semibold border';
   switch (status.toLowerCase()) {
     case 'completed':
     case 'success':
-      return `${baseClasses} bg-nocturne-success/15 text-nocturne-success`;
+      return `${baseClasses} bg-[#4ade80]/20 text-[#4ade80] border-[#4ade80]/30`;
     case 'pending':
-      return `${baseClasses} bg-nocturne-warning/15 text-nocturne-warning`;
+      return `${baseClasses} bg-[#ffbf00]/20 text-[#ffbf00] border-[#ffbf00]/30`;
     case 'failed':
-      return `${baseClasses} bg-nocturne-error/15 text-nocturne-error`;
+      return `${baseClasses} bg-[#ff6e84]/20 text-[#ff6e84] border-[#ff6e84]/30`;
     default:
-      return `${baseClasses} bg-nocturne-surface-2 text-nocturne-text-secondary`;
+      return `${baseClasses} bg-white/10 text-white/60 border-white/10`;
   }
 }
 
@@ -90,48 +90,57 @@ export default function PaymentHistoryPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c39bff]" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Payment History</h1></div></div>
-        <p className="text-nocturne-text-secondary mt-1">View and manage all your booking payments</p>
+    <div className="max-w-4xl mx-auto space-y-6 relative">
+      {/* Ambient glows */}
+      <div className="absolute -top-40 -right-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute -bottom-40 -left-20 w-80 h-80 bg-[#a1faff]/5 blur-[100px] rounded-full pointer-events-none" />
+
+      <div className="relative z-10">
+        <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up">
+          <div className="absolute -top-40 -right-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
+          <div className="relative z-10">
+            <h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Payment History</h1>
+          </div>
+        </div>
+        <p className="text-white/40 mt-1">View and manage all your booking payments</p>
       </div>
 
       {payments.length === 0 ? (
-        <div className="glass-card rounded-xl border border-white/5 p-12 text-center">
-          <p className="text-nocturne-text-tertiary">No payments yet</p>
-          <p className="text-sm text-nocturne-text-tertiary mt-1">Your payment history will appear here</p>
+        <div className="glass-card rounded-xl border border-white/5 p-12 text-center relative z-10">
+          <p className="text-white/40">No payments yet</p>
+          <p className="text-sm text-white/40 mt-1">Your payment history will appear here</p>
         </div>
       ) : (
-        <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
+        <div className="glass-card rounded-xl border border-white/5 overflow-hidden relative z-10">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-nocturne-surface-2 border-b border-white/5">
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Artist</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Method</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-nocturne-text-secondary uppercase">Status</th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold text-nocturne-text-secondary uppercase">Actions</th>
+                <tr className="bg-white/5 border-b border-white/5">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-white/60 uppercase tracking-widest">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-white/60 uppercase tracking-widest">Artist</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-white/60 uppercase tracking-widest">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-white/60 uppercase tracking-widest">Method</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-white/60 uppercase tracking-widest">Status</th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-white/60 uppercase tracking-widest">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {payments.map((payment) => (
-                  <tr key={payment.id} className="border-b border-white/5 hover:bg-nocturne-glass-panel transition-colors">
-                    <td className="px-6 py-4 text-sm text-nocturne-text-primary">
+                  <tr key={payment.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td className="px-6 py-4 text-sm text-white">
                       {new Date(payment.confirmed_at).toLocaleDateString('en-IN')}
                     </td>
-                    <td className="px-6 py-4 text-sm text-nocturne-text-primary">{payment.artist_name || 'N/A'}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-nocturne-text-primary">
+                    <td className="px-6 py-4 text-sm text-white">{payment.artist_name || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-white">
                       ₹{formatINR(payment.amount_paise)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-nocturne-text-secondary capitalize">
+                    <td className="px-6 py-4 text-sm text-white/60 capitalize">
                       {payment.payment_method || 'N/A'}
                     </td>
                     <td className="px-6 py-4 text-sm">
@@ -142,7 +151,7 @@ export default function PaymentHistoryPage() {
                     <td className="px-6 py-4 text-right space-x-2 flex items-center justify-end">
                       <button
                         onClick={() => router.push(`/client/bookings/${payment.booking_id}`)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-nocturne-accent hover:bg-nocturne-glass-panel rounded-lg transition-colors"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-[#a1faff] hover:bg-white/10 rounded-lg transition-colors"
                         title="View booking details"
                       >
                         <Eye size={14} />
@@ -151,11 +160,11 @@ export default function PaymentHistoryPage() {
                       <button
                         onClick={() => handleDownloadInvoice(payment.id)}
                         disabled={downloading === payment.id}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-nocturne-accent hover:bg-nocturne-glass-panel rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-[#a1faff] hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Download invoice"
                       >
                         {downloading === payment.id ? (
-                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary-600" />
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#c39bff]" />
                         ) : (
                           <Download size={14} />
                         )}

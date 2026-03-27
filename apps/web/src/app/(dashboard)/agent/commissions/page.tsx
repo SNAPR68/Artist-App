@@ -61,10 +61,20 @@ export default function AgentCommissionDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 relative">
+      {/* Ambient glows */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-[#c39bff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-[#a1faff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
       <div>
-        <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Commission Dashboard</h1></div></div>
-        <p className="text-nocturne-text-tertiary mt-1">Track your earnings and commission history</p>
+        <div className="glass-card rounded-2xl p-10 border border-white/10 relative overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="relative z-10">
+            <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-3 block">Earnings</span>
+            <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white">Commission Dashboard</h1>
+            <p className="text-white/50 text-sm mt-3">Track your earnings and commission history</p>
+          </div>
+        </div>
       </div>
 
       {/* Stats Cards */}

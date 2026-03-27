@@ -166,24 +166,26 @@ export default function WorkspaceTeamPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 relative">
+      {/* Ambient glows */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-[#c39bff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-[#a1faff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <Link
             href={`/client/workspace/${workspaceId}`}
-            className="text-sm text-primary-500 hover:underline"
+            className="text-[10px] font-bold text-[#a1faff] hover:text-[#c39bff] uppercase tracking-widest"
           >
             &larr; Back to Workspace
           </Link>
-          <h1 className="text-2xl font-display font-extrabold tracking-tighter text-white mt-1">Team Members</h1>
-          <p className="text-sm text-nocturne-text-tertiary mt-0.5">
-            Manage team members and their permissions
-          </p>
+          <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white mt-3">Team Members</h1>
+          <p className="text-white/50 text-sm mt-2">Manage team members and their permissions</p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-nocturne-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-nocturne-primary transition-colors"
+          className="glass-card px-6 py-3 rounded-xl text-sm font-bold text-[#c39bff] border border-[#c39bff]/30 bg-[#c39bff]/5 hover:bg-[#c39bff]/15 transition-all"
         >
           {showAddForm ? 'Cancel' : 'Add Member'}
         </button>

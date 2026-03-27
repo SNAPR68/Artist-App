@@ -43,12 +43,11 @@ const BADGE_INFO: Record<string, { label: string; requirement: string }> = {
 };
 
 const LEVEL_COLORS: Record<string, string> = {
-  bronze: 'bg-amber-600',
-  silver: 'bg-white/40',
-  gold: 'bg-yellow-400',
-  platinum: 'bg-indigo-500',
+  bronze: 'from-amber-600 to-amber-700',
+  silver: 'from-white/40 to-white/30',
+  gold: 'from-[#ffbf00] to-yellow-600',
+  platinum: 'from-[#c39bff] to-[#8A2BE2]',
 };
-
 
 const ACTION_LABELS: Record<string, string> = {
   profile_complete: 'Profile Completed',
@@ -84,157 +83,116 @@ export default function GamificationPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c39bff]" />
       </div>
     );
   }
 
-  const earnedBadgeTypes = new Set(profile?.badges.map((b) => b.badge_type) ?? []);
-  const progressPercent = profile && profile.next_level_at
-    ? Math.min(100, Math.round((profile.points / profile.next_level_at) * 100))
-    : 100;
-
   return (
     <div className="space-y-6">
-      <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up"><div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" /><div className="relative z-10"><h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Achievements</h1></div></div>
+      {/* ─── Ambient Glows ─── */}
+      <div className="fixed -top-40 -right-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="fixed -bottom-40 -left-20 w-80 h-80 bg-[#a1faff]/5 blur-[100px] rounded-full pointer-events-none" />
 
-      {/* Level Progress */}
-      <div className="glass-card rounded-xl p-6 border border-white/5">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <span className={`inline-block px-3 py-1 rounded-full text-white text-sm font-semibold capitalize ${LEVEL_COLORS[profile?.level ?? 'bronze'] ?? 'bg-nocturne-text-tertiary'}`}>
-              {profile?.level ?? 'Bronze'}
-            </span>
-            <span className="ml-3 text-lg font-bold text-nocturne-text-primary">{profile?.points ?? 0} points</span>
+      {/* Hero */}
+      <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden animate-fade-in-up relative z-10">
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="relative z-10">
+          <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Achievements & Streaks</span>
+          <h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white">Gamification Hub</h1>
+          <p className="text-white/40 text-sm mt-1">Earn points, unlock badges, and climb the leaderboard</p>
+        </div>
+      </div>
+
+      {/* Profile Stats */}
+      {profile && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10">
+          <div className={`glass-card rounded-xl p-6 border border-white/5 bg-gradient-to-br ${LEVEL_COLORS[profile.level.toLowerCase()] || LEVEL_COLORS.bronze}`}>
+            <p className="text-xs font-black uppercase tracking-widest text-white/70 mb-1">Level</p>
+            <p className="text-3xl font-black text-white">{profile.level}</p>
           </div>
-          {profile?.next_level_at && (
-            <span className="text-sm text-nocturne-text-tertiary">
-              {profile.points}/{profile.next_level_at} to{' '}
-              {(() => {
-                const levels = ['bronze', 'silver', 'gold', 'platinum'];
-                const idx = levels.indexOf(profile.level);
-                return idx < levels.length - 1 ? levels[idx + 1] : '';
-              })()}
-            </span>
-          )}
-        </div>
-        <div className="w-full bg-nocturne-surface-2 rounded-full h-3">
-          <div
-            className={`h-3 rounded-full transition-all ${LEVEL_COLORS[profile?.level ?? 'bronze'] ?? 'bg-nocturne-text-tertiary'}`}
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Streak Counter */}
-      <div className="glass-card rounded-xl p-4 border border-white/5 flex items-center gap-3">
-        <span className="text-2xl">&#128293;</span>
-        <div>
-          <p className="text-lg font-bold text-nocturne-text-primary">{profile?.streak_days ?? 0}-day streak</p>
-          <p className="text-sm text-nocturne-text-tertiary">Keep your streak alive by staying active daily</p>
-        </div>
-      </div>
-
-      {/* Badge Gallery */}
-      <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
-        <div className="px-4 py-3 border-b border-white/5">
-          <h2 className="text-lg font-semibold text-nocturne-text-primary">Badges</h2>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
-          {Object.entries(BADGE_INFO).map(([type, info]) => {
-            const earned = earnedBadgeTypes.has(type);
-            const badge = profile?.badges.find((b) => b.badge_type === type);
-            return (
-              <div
-                key={type}
-                className={`rounded-lg p-4 border text-center ${
-                  earned
-                    ? 'border-nocturne-primary-light bg-nocturne-primary-light'
-                    : 'border-white/5 bg-nocturne-surface-2 opacity-50'
-                }`}
-              >
-                <div className={`text-3xl mb-2 ${earned ? '' : 'grayscale'}`}>
-                  {type === 'verified_artist' && '\u2705'}
-                  {type === 'top_performer' && '\u2B50'}
-                  {type === 'rising_star' && '\uD83C\uDF1F'}
-                  {type === 'reliable_backup' && '\uD83D\uDEE1\uFE0F'}
-                  {type === 'early_bird' && '\uD83D\uDC26'}
-                  {type === 'crowd_favorite' && '\uD83C\uDF89'}
-                </div>
-                <p className="font-semibold text-nocturne-text-primary text-sm">{info.label}</p>
-                {earned && badge ? (
-                  <p className="text-xs text-nocturne-success mt-1">
-                    Earned {new Date(badge.earned_at).toLocaleDateString('en-IN', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-                  </p>
-                ) : (
-                  <p className="text-xs text-nocturne-text-tertiary mt-1">{info.requirement}</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Level Distribution */}
-      {leaderboard && leaderboard.total > 0 && (
-        <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
-          <div className="px-4 py-3 border-b border-white/5">
-            <h2 className="text-lg font-semibold text-nocturne-text-primary">Platform Level Distribution</h2>
+          <div className="glass-card rounded-xl p-6 border border-white/5">
+            <p className="text-xs font-black uppercase tracking-widest text-white/60 mb-1">Points</p>
+            <p className="text-3xl font-black text-[#c39bff]">{profile.points}</p>
           </div>
-          <div className="p-4 space-y-3">
-            {(['platinum', 'gold', 'silver', 'bronze'] as const).map((level) => {
-              const count = leaderboard[`${level}_count` as keyof Leaderboard] as number;
-              const pct = Math.round((count / leaderboard.total) * 100);
-              return (
-                <div key={level} className="flex items-center gap-3">
-                  <span className="w-20 text-sm font-medium text-nocturne-text-secondary capitalize">{level}</span>
-                  <div className="flex-1 bg-nocturne-surface-2 rounded-full h-4">
-                    <div
-                      className={`h-4 rounded-full ${LEVEL_COLORS[level]}`}
-                      style={{ width: `${Math.max(pct, 2)}%` }}
-                    />
-                  </div>
-                  <span className="w-12 text-sm text-nocturne-text-tertiary text-right">{pct}%</span>
-                </div>
-              );
-            })}
+          <div className="glass-card rounded-xl p-6 border border-white/5">
+            <p className="text-xs font-black uppercase tracking-widest text-white/60 mb-1">Streak</p>
+            <p className="text-3xl font-black text-[#ffbf00]">{profile.streak_days}🔥</p>
+          </div>
+          <div className="glass-card rounded-xl p-6 border border-white/5">
+            <p className="text-xs font-black uppercase tracking-widest text-white/60 mb-1">Badges</p>
+            <p className="text-3xl font-black text-[#a1faff]">{profile.badges.length}</p>
           </div>
         </div>
       )}
 
-      {/* Recent Activity */}
-      <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
-        <div className="px-4 py-3 border-b border-white/5">
-          <h2 className="text-lg font-semibold text-nocturne-text-primary">Recent Activity</h2>
-        </div>
-        {transactions.length === 0 ? (
-          <div className="p-8 text-center text-nocturne-text-tertiary">No activity yet. Start earning points!</div>
-        ) : (
-          <div className="divide-y divide-nocturne-border-subtle">
-            {transactions.map((txn) => (
-              <div key={txn.id} className="px-4 py-3 flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-nocturne-text-primary">
-                    {ACTION_LABELS[txn.action_type] ?? txn.action_type}
-                  </p>
-                  <p className="text-sm text-nocturne-text-tertiary">
-                    {new Date(txn.created_at).toLocaleDateString('en-IN', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-                  </p>
+      {/* Badges */}
+      {profile && profile.badges.length > 0 && (
+        <section className="relative z-10">
+          <h2 className="text-lg font-bold uppercase tracking-widest text-white mb-4">Badges Earned</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {profile.badges.map((badge) => {
+              const info = BADGE_INFO[badge.badge_type] || { label: badge.badge_type, requirement: 'Earn this badge' };
+              return (
+                <div key={badge.badge_type} className="glass-card rounded-xl p-6 border border-white/5 text-center">
+                  <div className="text-4xl mb-2">⭐</div>
+                  <p className="font-bold text-white text-sm mb-1">{info.label}</p>
+                  <p className="text-xs text-white/40">Earned {new Date(badge.earned_at).toLocaleDateString('en-IN')}</p>
                 </div>
-                <span className="text-sm font-bold text-nocturne-success">+{txn.points} pts</span>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Leaderboard */}
+      {leaderboard && (
+        <section className="relative z-10">
+          <h2 className="text-lg font-bold uppercase tracking-widest text-white mb-4">Leaderboard Breakdown</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            <div className="glass-card rounded-xl p-4 border border-white/5 text-center">
+              <p className="text-2xl font-black text-white">{leaderboard.bronze_count}</p>
+              <p className="text-xs text-white/50 mt-1">Bronze</p>
+            </div>
+            <div className="glass-card rounded-xl p-4 border border-white/5 text-center">
+              <p className="text-2xl font-black text-white/70">{leaderboard.silver_count}</p>
+              <p className="text-xs text-white/50 mt-1">Silver</p>
+            </div>
+            <div className="glass-card rounded-xl p-4 border border-white/5 text-center">
+              <p className="text-2xl font-black text-[#ffbf00]">{leaderboard.gold_count}</p>
+              <p className="text-xs text-white/50 mt-1">Gold</p>
+            </div>
+            <div className="glass-card rounded-xl p-4 border border-white/5 text-center">
+              <p className="text-2xl font-black text-[#c39bff]">{leaderboard.platinum_count}</p>
+              <p className="text-xs text-white/50 mt-1">Platinum</p>
+            </div>
+            <div className="glass-card rounded-xl p-4 border border-white/5 text-center">
+              <p className="text-2xl font-black text-[#a1faff]">{leaderboard.total}</p>
+              <p className="text-xs text-white/50 mt-1">Total Artists</p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Points History */}
+      {transactions.length > 0 && (
+        <section className="relative z-10">
+          <h2 className="text-lg font-bold uppercase tracking-widest text-white mb-4">Recent Points Activity</h2>
+          <div className="space-y-2">
+            {transactions.slice(0, 10).map((txn) => (
+              <div key={txn.id} className="glass-card rounded-xl p-4 border border-white/5 flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-white text-sm">{ACTION_LABELS[txn.action_type] || txn.action_type}</p>
+                  <p className="text-xs text-white/40">{new Date(txn.created_at).toLocaleDateString('en-IN')}</p>
+                </div>
+                <span className={`font-black ${txn.points >= 0 ? 'text-green-400' : 'text-[#ff8b9a]'}`}>
+                  {txn.points >= 0 ? '+' : ''}{txn.points}
+                </span>
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </section>
+      )}
     </div>
   );
 }

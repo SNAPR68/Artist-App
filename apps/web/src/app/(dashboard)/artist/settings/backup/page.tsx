@@ -53,38 +53,42 @@ export default function BackupPreferencesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c39bff]" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-nocturne-text-primary">Backup Artist Preferences</h1>
-        <p className="text-sm text-nocturne-text-tertiary mt-1">
+    <div className="space-y-6 relative">
+      {/* ─── Ambient Glows ─── */}
+      <div className="fixed -top-40 -right-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="fixed -bottom-40 -left-20 w-80 h-80 bg-[#a1faff]/5 blur-[100px] rounded-full pointer-events-none" />
+
+      <div className="relative z-10">
+        <h1 className="text-3xl font-display font-extrabold tracking-tighter text-white">Backup Artist Preferences</h1>
+        <p className="text-white/50 text-sm mt-2">
           Opt in to receive last-minute booking opportunities when another artist cancels.
         </p>
       </div>
 
-      <div className="glass-card rounded-xl border border-white/5 p-6 space-y-6">
+      <div className="glass-card rounded-xl border border-white/5 p-8 space-y-6 relative z-10">
         {/* Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium text-nocturne-text-primary text-sm">Available as backup artist</p>
-            <p className="text-xs text-nocturne-text-tertiary mt-0.5">
-              You&apos;ll be notified when short-notice gigs match your profile.
+            <p className="font-bold text-white text-sm">Available as backup artist</p>
+            <p className="text-xs text-white/50 mt-1">
+              You'll be notified when short-notice gigs match your profile.
             </p>
           </div>
           <button
             onClick={() => setPrefs((p) => ({ ...p, is_reliable_backup: !p.is_reliable_backup }))}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              prefs.is_reliable_backup ? 'bg-nocturne-accent' : 'bg-nocturne-surface-2'
+            className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+              prefs.is_reliable_backup ? 'bg-[#c39bff]' : 'bg-white/10'
             }`}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                prefs.is_reliable_backup ? 'translate-x-6' : 'translate-x-1'
+              className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                prefs.is_reliable_backup ? 'translate-x-7' : 'translate-x-1'
               }`}
             />
           </button>
@@ -92,8 +96,8 @@ export default function BackupPreferencesPage() {
 
         {/* Premium Input */}
         {prefs.is_reliable_backup && (
-          <div>
-            <label className="block text-sm font-medium text-nocturne-text-secondary mb-1">
+          <div className="border-t border-white/10 pt-6">
+            <label className="block text-xs font-black uppercase tracking-widest text-white/60 mb-3">
               Premium for short notice (%)
             </label>
             <input
@@ -107,28 +111,27 @@ export default function BackupPreferencesPage() {
                   backup_premium_pct: Math.max(0, Math.min(100, Number(e.target.value) || 0)),
                 }))
               }
-              className="w-32 border border-white/5 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-nocturne-accent focus:border-nocturne-accent outline-none bg-nocturne-surface-2 text-nocturne-text-primary"
+              className="w-32 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c39bff] bg-white/5 text-white placeholder-white/30"
             />
-            <p className="text-xs text-nocturne-text-tertiary mt-1">
-              You&apos;ll earn {prefs.backup_premium_pct}% more than the original booking amount for
-              accepting short-notice gigs.
+            <p className="text-xs text-white/50 mt-2">
+              You'll earn {prefs.backup_premium_pct}% more than the original booking amount for accepting short-notice gigs.
             </p>
           </div>
         )}
 
         {/* Save */}
-        <div className="flex items-center gap-3">
+        <div className="border-t border-white/10 pt-6 flex items-center gap-3">
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-nocturne-accent text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-nocturne-primary transition-colors disabled:opacity-50"
+            className="bg-gradient-to-r from-[#c39bff] to-[#8A2BE2] text-white text-sm font-bold uppercase tracking-widest px-6 py-3 rounded-lg hover:shadow-[0_0_20px_rgba(195,155,255,0.3)] disabled:opacity-50 transition-all"
           >
             {saving ? 'Saving...' : 'Save Preferences'}
           </button>
           {success && (
-            <span className="text-sm text-nocturne-success font-medium">Preferences saved!</span>
+            <span className="text-sm text-green-400 font-bold">Preferences saved!</span>
           )}
-          {error && <span className="text-sm text-nocturne-error">{error}</span>}
+          {error && <span className="text-sm text-[#ff8b9a] font-bold">{error}</span>}
         </div>
       </div>
     </div>

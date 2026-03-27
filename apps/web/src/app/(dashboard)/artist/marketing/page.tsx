@@ -1,200 +1,92 @@
 'use client';
 
-import {
-  TrendingUp,
-  Eye,
-  Share2,
-  ArrowRight,
-  Zap,
-} from 'lucide-react';
+import { Eye, Share2, ArrowRight } from 'lucide-react';
 
 export default function MarketingIntelligencePage() {
   return (
-    <div className="min-h-screen bg-nocturne-bg-primary p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="font-display text-gradient-nocturne text-4xl md:text-5xl font-bold mb-2">
-            Marketing Intelligence
-          </h1>
-          <p className="text-nocturne-text-secondary text-lg">
-            AI-powered insights to grow your brand
-          </p>
-        </div>
+    <div className="space-y-6 relative">
+      {/* ─── Ambient Glows ─── */}
+      <div className="fixed -top-40 -right-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="fixed -bottom-40 -left-20 w-80 h-80 bg-[#a1faff]/5 blur-[100px] rounded-full pointer-events-none" />
 
-        {/* Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Social Media Reach Card */}
-          <div
-            className="glass-card animate-tilt-in p-6 rounded-4xl"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-nocturne-text-secondary text-sm mb-2">
-                  Total Reach
-                </p>
-                <p className="font-display text-h2 text-nocturne-text-primary">
-                  12.4K
-                </p>
-              </div>
-              <Share2 className="text-nocturne-accent w-6 h-6" />
-            </div>
+      {/* Header */}
+      <div className="relative z-10">
+        <span className="text-[#a1faff] font-bold text-xs tracking-widest uppercase mb-2 block">Growth Tools</span>
+        <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white mb-2">Marketing Intelligence</h1>
+        <p className="text-white/40 text-lg">AI-powered insights to grow your brand and reach</p>
+      </div>
 
-            {/* Mini Chart */}
-            <div className="flex items-end gap-1 h-12">
-              <div
-                className="flex-1 rounded-sm bg-gradient-to-t from-nocturne-accent via-nocturne-accent to-transparent opacity-80"
-                style={{ height: '40%' }}
-              />
-              <div
-                className="flex-1 rounded-sm bg-gradient-to-t from-cyan-500 to-transparent opacity-80"
-                style={{ height: '60%' }}
-              />
-              <div
-                className="flex-1 rounded-sm bg-gradient-to-t from-nocturne-accent via-nocturne-accent to-transparent opacity-80"
-                style={{ height: '50%' }}
-              />
-              <div
-                className="flex-1 rounded-sm bg-gradient-to-t from-cyan-500 to-transparent opacity-80"
-                style={{ height: '75%' }}
-              />
-              <div
-                className="flex-1 rounded-sm bg-gradient-to-t from-nocturne-accent via-nocturne-accent to-transparent opacity-80"
-                style={{ height: '55%' }}
-              />
+      {/* Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+        {/* Social Media Reach Card */}
+        <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden group">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="relative z-10 flex items-start justify-between mb-6">
+            <div>
+              <p className="text-white/50 text-xs uppercase tracking-widest font-bold mb-2">Total Reach</p>
+              <p className="text-5xl font-black text-white">12.4K</p>
             </div>
+            <Share2 className="text-[#c39bff] w-8 h-8 opacity-60" />
           </div>
-
-          {/* Profile Views Card */}
-          <div
-            className="glass-card animate-tilt-in p-6 rounded-4xl"
-            style={{ animationDelay: '100ms' }}
-          >
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <p className="text-nocturne-text-secondary text-sm mb-2">
-                  This Month
-                </p>
-                <p className="font-display text-h2 text-nocturne-text-primary">
-                  847
-                </p>
-              </div>
-              <Eye className="text-nocturne-accent w-6 h-6" />
-            </div>
-            <p className="text-nocturne-success text-sm font-medium">
-              +23% vs last month
-            </p>
-          </div>
-
-          {/* Booking Conversion Card */}
-          <div
-            className="glass-card animate-tilt-in p-6 rounded-4xl"
-            style={{ animationDelay: '200ms' }}
-          >
-            <div className="flex flex-col items-center justify-center py-4">
-              <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-                {/* SVG Circular Progress */}
-                <svg
-                  className="absolute"
-                  width="120"
-                  height="120"
-                  viewBox="0 0 120 120"
-                >
-                  {/* Background track */}
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="50"
-                    fill="none"
-                    stroke="rgba(255,255,255,0.1)"
-                    strokeWidth="8"
-                  />
-                  {/* Progress fill */}
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="50"
-                    fill="none"
-                    stroke="#8A2BE2"
-                    strokeWidth="8"
-                    strokeDasharray={`${(68 / 100) * 2 * Math.PI * 50} ${
-                      2 * Math.PI * 50
-                    }`}
-                    strokeLinecap="round"
-                    transform="rotate(-90 60 60)"
-                  />
-                </svg>
-                {/* Center text */}
-                <div className="text-center z-10">
-                  <p className="font-display text-nocturne-text-primary text-2xl font-bold">
-                    68%
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start justify-between w-full">
-                <div>
-                  <p className="text-nocturne-text-secondary text-sm">
-                    Inquiry → Booked
-                  </p>
-                </div>
-                <TrendingUp className="text-nocturne-accent w-5 h-5 flex-shrink-0" />
-              </div>
-            </div>
-          </div>
-
-          {/* AI Recommendations Card */}
-          <div
-            className="glass-card animate-tilt-in p-6 rounded-4xl"
-            style={{ animationDelay: '300ms' }}
-          >
-            <h3 className="font-display text-nocturne-text-primary text-lg mb-4">
-              AI Suggestions
-            </h3>
-
-            <div className="space-y-2">
-              {/* Suggestion 1 */}
-              <div className="glass-panel rounded-2xl p-3 flex gap-3">
-                <Zap className="text-nocturne-accent w-5 h-5 flex-shrink-0 mt-0.5" />
-                <p className="text-nocturne-text-secondary text-sm">
-                  Add a Sufi music tag — 40% of searches in your area include it
-                </p>
-              </div>
-
-              {/* Suggestion 2 */}
-              <div className="glass-panel rounded-2xl p-3 flex gap-3">
-                <Zap className="text-nocturne-accent w-5 h-5 flex-shrink-0 mt-0.5" />
-                <p className="text-nocturne-text-secondary text-sm">
-                  Upload 2 more portfolio videos to increase profile views by 35%
-                </p>
-              </div>
-
-              {/* Suggestion 3 */}
-              <div className="glass-panel rounded-2xl p-3 flex gap-3">
-                <Zap className="text-nocturne-accent w-5 h-5 flex-shrink-0 mt-0.5" />
-                <p className="text-nocturne-text-secondary text-sm">
-                  Lower weekday rates by 15% to fill empty calendar slots
-                </p>
-              </div>
-            </div>
+          <div className="flex items-end gap-1 h-12">
+            {[40, 60, 45, 70, 55, 80, 50].map((h, i) => (
+              <div
+                key={i}
+                className="flex-1 rounded-sm bg-gradient-to-t from-[#c39bff] to-transparent opacity-80"
+                style={{ height: `${h}%` }}
+              />
+            ))}
           </div>
         </div>
 
-        {/* CTA Section */}
-        <div className="glass-panel rounded-4xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <p className="font-display text-nocturne-text-primary text-xl font-semibold mb-1">
-              Want more bookings?
-            </p>
-            <p className="text-nocturne-text-secondary">
-              Upgrade to Pro for advanced analytics
-            </p>
+        {/* Profile Views Card */}
+        <div className="glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden group">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#a1faff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="relative z-10 flex items-start justify-between mb-6">
+            <div>
+              <p className="text-white/50 text-xs uppercase tracking-widest font-bold mb-2">Profile Views</p>
+              <p className="text-5xl font-black text-[#a1faff]">847</p>
+            </div>
+            <Eye className="text-[#a1faff] w-8 h-8 opacity-60" />
           </div>
-          <button className="btn-nocturne-primary whitespace-nowrap flex items-center justify-center gap-2">
-            Upgrade to Pro
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <p className="text-xs text-white/40">+12% from last month</p>
         </div>
       </div>
+
+      {/* Marketing Tools */}
+      <section className="relative z-10">
+        <h2 className="text-lg font-bold uppercase tracking-widest text-white mb-4">Marketing Tools</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="glass-card rounded-xl p-6 border border-white/5 group hover:border-white/15 transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-white">Share Your Profile</h3>
+              <ArrowRight className="w-5 h-5 text-[#c39bff] group-hover:translate-x-1 transition-transform" />
+            </div>
+            <p className="text-sm text-white/50">Generate social media links and QR codes</p>
+          </div>
+          <div className="glass-card rounded-xl p-6 border border-white/5 group hover:border-white/15 transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-white">Media Kit</h3>
+              <ArrowRight className="w-5 h-5 text-[#c39bff] group-hover:translate-x-1 transition-transform" />
+            </div>
+            <p className="text-sm text-white/50">Professional media kit for partnerships</p>
+          </div>
+          <div className="glass-card rounded-xl p-6 border border-white/5 group hover:border-white/15 transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-white">Promo Codes</h3>
+              <ArrowRight className="w-5 h-5 text-[#c39bff] group-hover:translate-x-1 transition-transform" />
+            </div>
+            <p className="text-sm text-white/50">Create unique discount codes for followers</p>
+          </div>
+          <div className="glass-card rounded-xl p-6 border border-white/5 group hover:border-white/15 transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-white">Analytics</h3>
+              <ArrowRight className="w-5 h-5 text-[#c39bff] group-hover:translate-x-1 transition-transform" />
+            </div>
+            <p className="text-sm text-white/50">Track clicks, impressions, and conversions</p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

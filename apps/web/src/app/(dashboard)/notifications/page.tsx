@@ -71,21 +71,27 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between gap-4">
+      {/* Ambient glows */}
+      <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#c39bff]/5 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-[#a1faff]/5 blur-3xl rounded-full pointer-events-none" />
+
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 relative z-10">
         <div>
-          <h1 className="text-4xl font-display font-bold text-gradient-nocturne mb-1">Notifications</h1>
+          <h1 className="text-4xl font-display font-bold text-white">Notifications</h1>
           {unreadCount > 0 && (
-            <p className="text-sm text-nocturne-text-secondary">{unreadCount} unread</p>
+            <p className="text-sm text-white/50 mt-2">{unreadCount} unread</p>
           )}
         </div>
         <div className="flex items-center gap-4 flex-wrap justify-end">
-          <div className="flex gap-2 bg-nocturne-surface-2/50 rounded-full p-1 border border-white/10 backdrop-blur-3xl">
+          {/* Filter buttons */}
+          <div className="flex gap-2 bg-white/5 rounded-full p-1 border border-white/10">
             {(['all', 'unread'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-4 py-2 text-sm rounded-lg capitalize font-medium transition-all duration-200 ${
-                  filter === f ? 'bg-gradient-nocturne text-white shadow-nocturne-glow-sm' : 'text-nocturne-text-secondary hover:text-nocturne-text-primary'
+                className={`px-4 py-2 text-sm rounded-lg capitalize font-medium transition-all ${
+                  filter === f ? 'bg-[#c39bff] text-white shadow-lg shadow-[#c39bff]/20' : 'text-white/50 hover:text-white'
                 }`}
               >
                 {f}
@@ -95,7 +101,7 @@ export default function NotificationsPage() {
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
-              className="px-4 py-2 text-sm font-medium text-nocturne-accent hover:text-nocturne-accent bg-nocturne-primary-light border border-white/10 rounded-full transition-all hover:bg-nocturne-primary-light"
+              className="px-4 py-2 text-sm font-medium text-[#c39bff] hover:text-[#a1faff] bg-white/5 border border-white/10 rounded-lg transition-all"
             >
               Mark all read
             </button>
@@ -105,40 +111,40 @@ export default function NotificationsPage() {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-nocturne-primary/20 border-t-nocturne-primary" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#c39bff]/20 border-t-[#c39bff]" />
         </div>
       ) : notifications.length === 0 ? (
-        <div className="glass-card border border-white/10 p-12 text-center space-y-3">
-          <Bell className="w-12 h-12 text-nocturne-text-secondary mx-auto opacity-50" />
-          <p className="text-nocturne-text-primary text-lg font-semibold">No notifications</p>
-          <p className="text-sm text-nocturne-text-secondary">You&apos;re all caught up!</p>
+        <div className="glass-card border border-white/10 p-16 text-center space-y-4">
+          <Bell className="w-12 h-12 text-white/30 mx-auto" />
+          <p className="text-white text-lg font-semibold">No notifications</p>
+          <p className="text-sm text-white/50">You're all caught up!</p>
         </div>
       ) : (
         <div className="space-y-3">
           {notifications.map((n) => (
             <div
               key={n.id}
-              className={`glass-card border border-white/10 px-6 py-4 flex items-start gap-4 transition-all duration-300 hover:border-nocturne-border-strong hover:shadow-nocturne-glow-sm ${
-                n.read_at ? 'opacity-75' : 'opacity-100'
+              className={`glass-card border border-white/10 px-6 py-4 flex items-start gap-4 transition-all hover:border-white/20 ${
+                n.read_at ? 'opacity-60' : 'opacity-100'
               }`}
             >
-              <div className={`flex-shrink-0 p-2.5 rounded-lg ${n.read_at ? 'bg-slate-500/20 text-slate-300' : 'bg-gradient-nocturne/20 text-nocturne-accent'}`}>
+              <div className={`flex-shrink-0 p-2.5 rounded-lg ${n.read_at ? 'bg-slate-500/20 text-slate-300' : 'bg-[#c39bff]/20 text-[#c39bff]'}`}>
                 {TYPE_ICONS[n.type] ?? <Bell className="w-5 h-5" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-semibold ${n.read_at ? 'text-nocturne-text-secondary' : 'text-nocturne-text-primary'}`}>
+                <p className={`text-sm font-semibold ${n.read_at ? 'text-white/50' : 'text-white'}`}>
                   {n.title}
                 </p>
-                {n.body && <p className="text-sm text-nocturne-text-secondary mt-1 line-clamp-2">{n.body}</p>}
-                <p className="text-xs text-nocturne-text-secondary mt-2">{timeAgo(n.created_at)}</p>
+                {n.body && <p className="text-sm text-white/50 mt-1 line-clamp-2">{n.body}</p>}
+                <p className="text-xs text-white/40 mt-2">{timeAgo(n.created_at)}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 {!n.read_at && (
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-gradient-nocturne animate-pulse" />
+                    <div className="w-2 h-2 rounded-full bg-[#c39bff] animate-pulse" />
                     <button
                       onClick={() => handleMarkRead(n.id)}
-                      className="text-xs text-nocturne-accent hover:text-nocturne-accent whitespace-nowrap font-medium transition-colors"
+                      className="text-xs text-[#c39bff] hover:text-[#a1faff] whitespace-nowrap font-medium transition-colors"
                     >
                       Mark read
                     </button>

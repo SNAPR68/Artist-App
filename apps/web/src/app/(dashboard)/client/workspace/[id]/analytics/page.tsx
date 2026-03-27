@@ -133,29 +133,33 @@ export default function WorkspaceAnalyticsPage() {
 
   return (
     <ErrorBoundary>
-    <div className="space-y-6">
+    <div className="space-y-8 relative">
+      {/* Ambient glows */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-[#c39bff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-[#a1faff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <Link
             href={`/client/workspace/${workspaceId}`}
-            className="text-sm text-primary-500 hover:underline"
+            className="text-[10px] font-bold text-[#a1faff] hover:text-[#c39bff] uppercase tracking-widest"
           >
             &larr; Back to Workspace
           </Link>
-          <h1 className="text-2xl font-display font-extrabold tracking-tighter text-white mt-1">Analytics</h1>
+          <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white mt-3">Analytics</h1>
         </div>
 
         {/* Date Range Filter */}
-        <div className="flex gap-1 glass-card rounded-xl p-1">
+        <div className="flex gap-2 glass-card rounded-xl p-2 border border-white/10">
           {(Object.keys(DATE_RANGE_LABELS) as DateRangeKey[]).map((key) => (
             <button
               key={key}
               onClick={() => setRange(key)}
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
                 range === key
-                  ? 'bg-nocturne-surface text-nocturne-accent font-medium shadow-sm'
-                  : 'text-nocturne-text-secondary hover:text-nocturne-text-primary'
+                  ? 'bg-gradient-to-r from-[#c39bff] to-[#8A2BE2] text-white shadow-lg'
+                  : 'text-white/60 hover:text-white/80'
               }`}
             >
               {DATE_RANGE_LABELS[key]}
@@ -165,7 +169,7 @@ export default function WorkspaceAnalyticsPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="glass-card rounded-xl p-4 border border-white/5">
           <p className="text-sm text-nocturne-text-tertiary">Total Spend</p>
           <p className="text-xl font-bold text-nocturne-text-primary">
@@ -192,15 +196,15 @@ export default function WorkspaceAnalyticsPage() {
           <h2 className="text-lg font-semibold text-nocturne-text-primary">Spend by Month</h2>
         </div>
         {analytics.monthly_revenue.length === 0 ? (
-          <div className="p-8 text-center text-nocturne-text-tertiary">No monthly data available</div>
+          <div className="p-8 text-center text-white/40">No monthly data available</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/5 text-left">
-                  <th className="px-4 py-2 font-medium text-nocturne-text-tertiary">Month</th>
-                  <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Bookings</th>
-                  <th className="px-4 py-2 font-medium text-nocturne-text-tertiary text-right">Total Spend</th>
+                <tr className="border-b border-white/10 text-left">
+                  <th className="px-5 py-3 font-bold text-[10px] uppercase tracking-widest text-[#a1faff]">Month</th>
+                  <th className="px-5 py-3 font-bold text-[10px] uppercase tracking-widest text-[#a1faff] text-right">Bookings</th>
+                  <th className="px-5 py-3 font-bold text-[10px] uppercase tracking-widest text-[#a1faff] text-right">Total Spend</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">

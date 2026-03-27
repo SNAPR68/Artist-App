@@ -81,36 +81,40 @@ export default function AgentRosterPage() {
   );
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-8 relative">
+      {/* Ambient glows */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-[#c39bff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-[#a1faff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
       <div>
-        <h1 className="text-4xl font-bold text-gradient-nocturne mb-2">Artist Roster</h1>
-        <p className="text-nocturne-text-secondary">{roster.length} artists in your roster</p>
+        <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white mb-3">Artist Roster</h1>
+        <p className="text-white/50 font-medium">{roster.length} {roster.length === 1 ? 'artist' : 'artists'} in your roster</p>
       </div>
 
       {/* Add Artist Form */}
-      <form onSubmit={handleAdd} className="bg-nocturne-surface rounded-2xl p-6 border border-white/10">
-        <label className="block text-sm font-semibold text-nocturne-text-primary mb-3">Add Artist to Roster</label>
+      <form onSubmit={handleAdd} className="glass-card rounded-2xl p-8 border border-white/10">
+        <label className="block text-xs font-bold uppercase tracking-widest text-[#a1faff] mb-4">Add Artist to Roster</label>
         <div className="flex gap-3">
           <div className="flex-1 relative">
-            <Plus size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-nocturne-text-secondary" />
+            <Plus size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
             <input
               type="text"
               value={artistId}
               onChange={(e) => setArtistId(e.target.value)}
               placeholder="Enter artist ID"
-              className="w-full bg-nocturne-surface bg-nocturne-surface border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+              className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#c39bff]/50 transition-all"
             />
           </div>
           <button
             type="submit"
             disabled={adding}
-            className="bg-nocturne-surface px-6 py-3 rounded-xl text-sm font-semibold text-nocturne-text-primary hover:hover-glow disabled:opacity-50 transition-all border border-white/10 flex items-center gap-2"
+            className="glass-card px-8 py-3 rounded-xl text-sm font-bold text-[#c39bff] border border-[#c39bff]/30 bg-[#c39bff]/5 hover:bg-[#c39bff]/15 disabled:opacity-50 transition-all flex items-center gap-2"
           >
             {adding ? 'Adding...' : 'Add'}
           </button>
         </div>
         {error && (
-          <div className="mt-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+          <div className="mt-4 p-4 rounded-xl bg-[#ff6b9d]/10 border border-[#ff6b9d]/30 text-[#ff6b9d] text-sm font-medium">
             {error}
           </div>
         )}
@@ -118,13 +122,13 @@ export default function AgentRosterPage() {
 
       {/* Search/Filter */}
       <div className="relative">
-        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-nocturne-text-secondary" />
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name, city, or genre..."
-          className="w-full bg-nocturne-surface bg-nocturne-surface border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-nocturne-text-primary placeholder-nocturne-text-secondary focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+          className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#c39bff]/50 transition-all"
         />
       </div>
 

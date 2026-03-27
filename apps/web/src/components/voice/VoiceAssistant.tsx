@@ -530,7 +530,7 @@ export function VoiceAssistant() {
       {/* ─── Collapsed: Compact chat bar (doesn't overlap content) ─── */}
       {!isOpen && (
         <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-modal animate-scale-in">
-          <div className="flex items-center gap-2 rounded-full bg-nocturne-glass-floating backdrop-blur-3xl cursor-pointer hover:shadow-glow-md transition-all animate-glow-pulse pl-1.5 pr-3 py-1.5" onClick={() => setIsOpen(true)}>
+          <div className="flex items-center gap-2 rounded-full glass-card backdrop-blur-3xl cursor-pointer hover:shadow-lg hover:shadow-[#c39bff]/20 transition-all pl-1.5 pr-3 py-1.5 border border-white/10" onClick={() => setIsOpen(true)}>
             {/* Mic button */}
             <button
               onClick={(e) => {
@@ -542,7 +542,7 @@ export function VoiceAssistant() {
                 setIsOpen(true);
               }}
               disabled={!isSupported}
-              className="w-10 h-10 rounded-full bg-gradient-accent flex items-center justify-center text-white shrink-0 shadow-glow-sm hover:shadow-glow-md hover:scale-105 transition-all disabled:opacity-40"
+              className="w-10 h-10 rounded-full bg-[#c39bff] flex items-center justify-center text-white shrink-0 shadow-lg shadow-[#c39bff]/20 hover:scale-105 transition-all disabled:opacity-40"
               aria-label="Tap to speak"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -574,9 +574,9 @@ export function VoiceAssistant() {
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-modal md:w-[400px] md:h-[600px] md:rounded-2xl flex flex-col overflow-hidden bg-nocturne-base/95 backdrop-blur-[80px] border-0 md:border md:border-nocturne-border md:shadow-nocturne-glow-sm animate-scale-in">
+          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-modal md:w-[400px] md:h-[600px] md:rounded-2xl flex flex-col overflow-hidden glass-card animate-scale-in">
             {/* ─── Header ─── */}
-            <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-gradient-to-r from-primary-600 to-accent-violet">
+            <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[#c39bff] to-[#a1faff]">
               <div className="flex items-center gap-2.5">
                 {/* Back arrow on mobile */}
                 <button
@@ -592,7 +592,7 @@ export function VoiceAssistant() {
                   {sparkleIcon(16, 'white')}
                 </div>
                 <div>
-                  <h3 className="font-display font-semibold text-gradient-nocturne text-sm leading-tight">
+                  <h3 className="font-display font-semibold text-white text-sm leading-tight">
                     Backstage AI
                   </h3>
                   <p className="text-[10px] text-white/70 leading-tight">
@@ -671,7 +671,7 @@ export function VoiceAssistant() {
                   {/* Welcome message as chat bubble */}
                   <div className="flex justify-start">
                     <div className="max-w-[90%] space-y-3">
-                      <div className="rounded-2xl px-4 py-3 glass-card text-nocturne-text-primary">
+                      <div className="rounded-2xl px-4 py-3 glass-card text-white border border-white/10">
                         <p className="text-sm leading-relaxed">
                           {user
                             ? 'Hey! I can help you find artists, check bookings, manage your calendar, and more. What do you need?'
@@ -684,7 +684,7 @@ export function VoiceAssistant() {
                           <button
                             key={q}
                             onClick={() => sendQueryCb(q)}
-                            className="text-xs badge-nocturne rounded-full px-3 py-1.5 transition-all"
+                            className="text-xs bg-[#c39bff]/20 text-[#c39bff] hover:bg-[#c39bff]/30 rounded-full px-3 py-1.5 transition-all border border-[#c39bff]/30"
                           >
                             {q}
                           </button>
@@ -702,8 +702,8 @@ export function VoiceAssistant() {
                     <div
                       className={`rounded-2xl px-4 py-2.5 ${
                         msg.role === 'user'
-                          ? 'bg-gradient-nocturne text-white'
-                          : 'glass-card rounded-2xl text-nocturne-text-primary'
+                          ? 'bg-[#c39bff] text-white'
+                          : 'glass-card rounded-2xl text-white border border-white/10'
                       }`}
                     >
                       <p className="text-sm leading-relaxed whitespace-pre-line">{msg.text}</p>
@@ -741,7 +741,7 @@ export function VoiceAssistant() {
                           <button
                             key={j}
                             onClick={() => handleSuggestionClick(s)}
-                            className="text-xs badge-nocturne rounded-full px-2.5 py-1 transition-all"
+                            className="text-xs bg-[#c39bff]/20 text-[#c39bff] hover:bg-[#c39bff]/30 rounded-full px-2.5 py-1 transition-all border border-[#c39bff]/30"
                           >
                             {s}
                           </button>
@@ -756,40 +756,40 @@ export function VoiceAssistant() {
 
             {/* ─── Status Bar ─── */}
             {state === 'listening' && (
-              <div className="shrink-0 px-4 py-2 text-center border-t border-nocturne-border bg-nocturne-surface/60">
+              <div className="shrink-0 px-4 py-2 text-center border-t border-white/10 bg-white/5">
                 <VoiceWaveform isActive={true} />
                 {interimTranscript && (
-                  <p className="text-xs text-nocturne-text-secondary italic mt-1">{interimTranscript}</p>
+                  <p className="text-xs text-white/50 italic mt-1">{interimTranscript}</p>
                 )}
-                <p className="text-xs text-nocturne-accent mt-1">Listening...</p>
+                <p className="text-xs text-[#c39bff] mt-1">Listening...</p>
               </div>
             )}
             {state === 'processing' && (
-              <div className="shrink-0 px-4 py-2 text-center border-t border-nocturne-border bg-nocturne-surface/60">
+              <div className="shrink-0 px-4 py-2 text-center border-t border-white/10 bg-white/5">
                 <div className="flex items-center justify-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent-violet animate-pulse [animation-delay:0.2s]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent-magenta animate-pulse [animation-delay:0.4s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c39bff] animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#a1faff] animate-pulse [animation-delay:0.2s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#ffbf00] animate-pulse [animation-delay:0.4s]" />
                 </div>
-                <p className="text-xs text-nocturne-text-secondary mt-1">Thinking...</p>
+                <p className="text-xs text-white/50 mt-1">Thinking...</p>
               </div>
             )}
             {state === 'responding' && (
-              <div className="shrink-0 px-4 py-2 text-center border-t border-nocturne-border bg-nocturne-surface/60">
-                <p className="text-xs text-nocturne-text-primary animate-pulse">Speaking...</p>
+              <div className="shrink-0 px-4 py-2 text-center border-t border-white/10 bg-white/5">
+                <p className="text-xs text-white animate-pulse">Speaking...</p>
               </div>
             )}
 
             {/* ─── Input Area ─── */}
-            <div className="shrink-0 px-3 py-3 border-t border-nocturne-border bg-nocturne-surface/80 backdrop-blur-3xl flex items-center gap-2 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
+            <div className="shrink-0 px-3 py-3 border-t border-white/10 bg-white/5 backdrop-blur-3xl flex items-center gap-2 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
               {/* Mic button */}
               <button
                 onClick={handleMicClick}
                 disabled={!isSupported || state === 'processing' || state === 'responding'}
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shrink-0 ${
                   state === 'listening'
-                    ? 'bg-red-500/90 text-white animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.4)]'
-                    : 'glass-card text-nocturne-text-primary hover:bg-nocturne-surface-2'
+                    ? 'bg-red-500 text-white animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.4)]'
+                    : 'glass-card text-white hover:bg-white/10'
                 } disabled:opacity-40 disabled:cursor-not-allowed`}
                 aria-label={state === 'listening' ? 'Stop listening' : 'Start voice input'}
               >
@@ -807,13 +807,13 @@ export function VoiceAssistant() {
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
                   placeholder="Ask anything — search, navigate, book..."
-                  className="flex-1 input-nocturne rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-nocturne-primary transition-all"
+                  className="input-nocturne flex-1 rounded-full px-4 py-2 text-sm"
                   disabled={state !== 'idle'}
                 />
                 <button
                   type="submit"
                   disabled={!textInput.trim() || state !== 'idle'}
-                  className="text-nocturne-accent hover:text-nocturne-accent font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
+                  className="text-[#c39bff] hover:text-[#a1faff] font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m22 2-7 20-4-9-9-4z" />

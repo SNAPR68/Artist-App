@@ -53,8 +53,8 @@ function Toggle({
       role="switch"
       aria-checked={enabled}
       onClick={() => onChange(!enabled)}
-      className={`relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border border-white/10 transition-all duration-300 ease-in-out focus:outline-none focus:ring-1 focus:ring-nocturne-primary ${
-        enabled ? 'bg-gradient-accent shadow-nocturne-glow-sm' : 'bg-nocturne-surface-2/50 backdrop-blur-sm'
+      className={`relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border border-white/10 transition-all duration-300 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#c39bff] ${
+        enabled ? 'bg-[#c39bff] shadow-lg shadow-[#c39bff]/20' : 'bg-white/5'
       }`}
     >
       <span
@@ -62,7 +62,7 @@ function Toggle({
           enabled ? 'translate-x-7' : 'translate-x-0.5'
         }`}
       >
-        {enabled && <Check className="w-4 h-4 text-gradient-accent" />}
+        {enabled && <Check className="w-4 h-4 text-[#c39bff]" />}
       </span>
     </button>
   );
@@ -117,48 +117,54 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c39bff]" />
       </div>
     );
   }
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="space-y-2">
-        <h1 className="text-4xl font-display font-bold text-gradient-nocturne">Settings</h1>
-        <p className="text-nocturne-text-secondary">Manage your notification preferences</p>
+      {/* Ambient glows */}
+      <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#c39bff]/5 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-[#a1faff]/5 blur-3xl rounded-full pointer-events-none" />
+
+      {/* Header */}
+      <div className="space-y-2 relative z-10">
+        <h1 className="text-4xl font-display font-bold text-white">Settings</h1>
+        <p className="text-white/50">Manage your notification preferences</p>
       </div>
 
       {/* Feedback Banner */}
       {feedback && (
         <div
-          className={`rounded-lg p-4 text-sm font-medium border transition-all duration-300 ${
+          className={`rounded-lg p-4 text-sm font-medium border transition-all ${
             feedback.type === 'success'
-              ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30'
-              : 'bg-red-500/20 text-red-200 border border-red-500/30'
+              ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/30'
+              : 'bg-red-500/20 text-red-200 border-red-500/30'
           }`}
         >
           {feedback.message}
         </div>
       )}
 
-      {/* Notification Channels */}
+      {/* Notification Channels Section */}
       <div className="glass-card border border-white/10 p-8 space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-nocturne-primary-light border border-white/10">
-            <MessageSquare className="w-5 h-5 text-nocturne-accent" />
+          <div className="p-2.5 rounded-lg bg-[#c39bff]/20 border border-[#c39bff]/30">
+            <MessageSquare className="w-5 h-5 text-[#c39bff]" />
           </div>
           <div>
-            <h2 className="text-xl font-display font-bold text-nocturne-text-primary">Notification Channels</h2>
-            <p className="text-sm text-nocturne-text-secondary mt-0.5">Choose how you want to receive notifications</p>
+            <h2 className="text-xl font-display font-bold text-white">Notification Channels</h2>
+            <p className="text-sm text-white/50 mt-0.5">Choose how you want to receive notifications</p>
           </div>
         </div>
-        <div className="space-y-4 border-t border-nocturne-border pt-6">
+        <div className="nocturne-divider" />
+        <div className="space-y-4">
           {CHANNEL_OPTIONS.map((option) => (
-            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-nocturne-surface-2/50 border border-white/10 hover:border-nocturne-border-strong transition-all">
+            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 transition-all">
               <div className="flex-1">
-                <p className="text-sm font-semibold text-nocturne-text-primary">{option.label}</p>
-                <p className="text-xs text-nocturne-text-secondary mt-1">{option.description}</p>
+                <p className="text-sm font-semibold text-white">{option.label}</p>
+                <p className="text-xs text-white/50 mt-1">{option.description}</p>
               </div>
               <Toggle
                 enabled={prefs[option.key]}
@@ -169,23 +175,24 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Notification Categories */}
+      {/* Notification Categories Section */}
       <div className="glass-card border border-white/10 p-8 space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-gradient-nocturne/20 border border-nocturne-accent/30">
-            <Bell className="w-5 h-5 text-nocturne-accent" />
+          <div className="p-2.5 rounded-lg bg-[#c39bff]/20 border border-[#c39bff]/30">
+            <Bell className="w-5 h-5 text-[#c39bff]" />
           </div>
           <div>
-            <h2 className="text-xl font-display font-bold text-nocturne-text-primary">Notification Categories</h2>
-            <p className="text-sm text-nocturne-text-secondary mt-0.5">Choose what you want to be notified about</p>
+            <h2 className="text-xl font-display font-bold text-white">Notification Categories</h2>
+            <p className="text-sm text-white/50 mt-0.5">Choose what you want to be notified about</p>
           </div>
         </div>
-        <div className="space-y-4 border-t border-nocturne-border pt-6">
+        <div className="nocturne-divider" />
+        <div className="space-y-4">
           {CATEGORY_OPTIONS.map((option) => (
-            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-nocturne-surface-2/50 border border-white/10 hover:border-nocturne-border-strong transition-all">
+            <div key={option.key} className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 transition-all">
               <div className="flex-1">
-                <p className="text-sm font-semibold text-nocturne-text-primary">{option.label}</p>
-                <p className="text-xs text-nocturne-text-secondary mt-1">{option.description}</p>
+                <p className="text-sm font-semibold text-white">{option.label}</p>
+                <p className="text-xs text-white/50 mt-1">{option.description}</p>
               </div>
               <Toggle
                 enabled={prefs[option.key]}
@@ -201,7 +208,7 @@ export default function SettingsPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="bg-gradient-nocturne hover-glow text-white px-8 py-4 rounded-full font-display font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 flex items-center gap-2"
+          className="btn-nocturne-primary px-8 py-4 rounded-lg font-display font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
           {saving && <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />}
           <span>{saving ? 'Saving...' : 'Save Preferences'}</span>

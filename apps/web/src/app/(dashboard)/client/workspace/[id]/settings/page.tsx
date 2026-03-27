@@ -117,25 +117,29 @@ export default function WorkspaceSettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 relative">
+      {/* Ambient glows */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-[#c39bff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-[#a1faff]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
       {/* Header */}
       <div>
         <Link
           href={`/client/workspace/${workspaceId}`}
-          className="text-sm text-primary-500 hover:underline"
+          className="text-[10px] font-bold text-[#a1faff] hover:text-[#c39bff] uppercase tracking-widest"
         >
           &larr; Back to Workspace
         </Link>
-        <h1 className="text-2xl font-display font-extrabold tracking-tighter text-white mt-1">Settings</h1>
+        <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white mt-3">Settings</h1>
       </div>
 
       {/* Toast */}
       {toast && (
         <div
-          className={`rounded-lg px-4 py-3 text-sm font-medium ${
+          className={`rounded-xl px-5 py-4 text-sm font-bold ${
             toast.type === 'success'
-              ? 'bg-nocturne-success/15 text-nocturne-success border border-green-200'
-              : 'bg-nocturne-error/15 text-nocturne-error border border-red-200'
+              ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+              : 'bg-[#ff6b9d]/10 text-[#ff6b9d] border border-[#ff6b9d]/30'
           }`}
         >
           {toast.message}
@@ -143,7 +147,7 @@ export default function WorkspaceSettingsPage() {
       )}
 
       {/* Workspace Info */}
-      <div className="glass-card rounded-xl border border-white/5 p-6 space-y-4">
+      <div className="glass-card rounded-2xl border border-white/10 p-8 space-y-6">
         <h2 className="text-sm font-semibold text-nocturne-text-tertiary uppercase tracking-wide">
           Workspace Info
         </h2>
