@@ -591,6 +591,17 @@ export function VoiceAssistant() {
     setIsOpen(false);
   }
 
+  // Listen for custom event from hero mascots to open with a specific language
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const lang = (e as CustomEvent).detail?.lang as 'en' | 'hi';
+      if (lang) setTtsLang(lang);
+      setIsOpen(true);
+    };
+    window.addEventListener('open-voice-assistant', handler);
+    return () => window.removeEventListener('open-voice-assistant', handler);
+  }, []);
+
   // Don't render until mounted (prevents hydration mismatch)
   // Concierge is available for ALL visitors — logged in or not
   if (!mounted) return null;
@@ -609,40 +620,31 @@ export function VoiceAssistant() {
 
   return (
     <>
-      {/* ─── Collapsed: Compact chat bar (doesn't overlap content) ─── */}
+      {/* ─── Collapsed: 3D Mascot Circles (bottom-right) ─── */}
       {!isOpen && (
         <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-modal animate-scale-in">
-          <div className="flex items-center gap-2 rounded-full glass-card backdrop-blur-3xl cursor-pointer hover:shadow-lg hover:shadow-[#c39bff]/20 transition-all pl-1.5 pr-3 py-1.5 border border-white/10" onClick={() => setIsOpen(true)}>
-            {/* Mic button */}
+          <div className="flex items-center gap-3">
+            {/* Zara — English */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                // Start listening IMMEDIATELY in the click handler (user gesture required by Web Speech API)
-                setState('listening');
-                startListening(); // async but we don't need to await — permissionDenied effect handles state reset
-                // Then open the panel
-                setIsOpen(true);
-              }}
-              disabled={!isSupported}
-              className="w-10 h-10 rounded-full bg-[#c39bff] flex items-center justify-center text-white shrink-0 shadow-lg shadow-[#c39bff]/20 hover:scale-105 transition-all disabled:opacity-40"
-              aria-label="Tap to speak"
+              onClick={() => { setTtsLang('en'); setIsOpen(true); }}
+              className="mascot-3d group flex flex-col items-center gap-1"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                <line x1="12" x2="12" y1="19" y2="22" />
-              </svg>
+              <div className="mascot-avatar mascot-glow-purple rounded-full p-0.5 border border-[#c39bff]/30 bg-[#c39bff]/10 group-hover:bg-[#c39bff]/25 transition-all">
+                <ZaraMascot size={36} glow />
+              </div>
+              <span className="text-[9px] font-bold text-[#c39bff]/70 group-hover:text-[#c39bff] transition-colors">Zara</span>
             </button>
-            {/* Label */}
-            <div className="flex flex-col min-w-0">
-              <span className="text-sm font-semibold text-nocturne-text-primary leading-tight">Zara & Kabir</span>
-              <span className="text-[10px] text-nocturne-text-secondary leading-tight">Your voice assistants</span>
-            </div>
-            {/* Online dot */}
-            <span className="relative flex h-2 w-2 shrink-0 ml-1">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
-            </span>
+
+            {/* Kabir — Hindi */}
+            <button
+              onClick={() => { setTtsLang('hi'); setIsOpen(true); }}
+              className="mascot-3d group flex flex-col items-center gap-1"
+            >
+              <div className="mascot-avatar mascot-glow-cyan rounded-full p-0.5 border border-[#a1faff]/30 bg-[#a1faff]/10 group-hover:bg-[#a1faff]/25 transition-all" style={{ animationDelay: '0.5s' }}>
+                <KabirMascot size={36} glow />
+              </div>
+              <span className="text-[9px] font-bold text-[#a1faff]/70 group-hover:text-[#a1faff] transition-colors">Kabir</span>
+            </button>
           </div>
         </div>
       )}

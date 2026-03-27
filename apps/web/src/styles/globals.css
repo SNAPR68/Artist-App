@@ -450,4 +450,42 @@
     0% { transform: scaleY(0.3); }
     100% { transform: scaleY(1); }
   }
+
+  /* ─── 3D Mascot Animations ─── */
+  @keyframes mascotFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+  }
+
+  @keyframes mascotGlow {
+    0%, 100% { box-shadow: 0 0 12px 2px rgba(195, 155, 255, 0.3); }
+    50% { box-shadow: 0 0 20px 6px rgba(195, 155, 255, 0.5); }
+  }
+
+  @keyframes mascotGlowCyan {
+    0%, 100% { box-shadow: 0 0 12px 2px rgba(161, 250, 255, 0.3); }
+    50% { box-shadow: 0 0 20px 6px rgba(161, 250, 255, 0.5); }
+  }
+
+  .mascot-3d {
+    perspective: 600px;
+    transform-style: preserve-3d;
+  }
+
+  .mascot-avatar {
+    animation: mascotFloat 3s ease-in-out infinite;
+    transition: transform 0.3s ease;
+  }
+
+  .mascot-avatar:hover {
+    transform: rotateY(15deg) scale(1.1);
+  }
+
+  .mascot-glow-purple {
+    animation: mascotGlow 2s ease-in-out infinite;
+  }
+
+  .mascot-glow-cyan {
+    animation: mascotGlowCyan 2s ease-in-out infinite;
+  }
 }
