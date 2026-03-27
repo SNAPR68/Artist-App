@@ -4,6 +4,21 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, RefreshCw, Home } from 'lucide-react';
 
+function getRoleHome(): string {
+  if (typeof window === 'undefined') return '/';
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) return '/';
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const role = payload?.role;
+    if (role === 'artist') return '/artist';
+    if (role === 'client' || role === 'event_company') return '/client';
+    if (role === 'agent') return '/agent';
+    if (role === 'admin') return '/admin';
+  } catch { /* ignore */ }
+  return '/';
+}
+
 interface ErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
@@ -58,7 +73,7 @@ export default function DashboardError({ error, reset }: ErrorProps) {
           </button>
 
           <button
-            onClick={() => router.push('/artist')}
+            onClick={() => router.push(getRoleHome())}
             className="flex items-center justify-center gap-2 w-full bg-nocturne-surface-2 text-nocturne-text-primary font-medium py-3 rounded-lg hover:bg-nocturne-surface border border-white/10 transition-colors"
           >
             <Home className="w-4 h-4" />

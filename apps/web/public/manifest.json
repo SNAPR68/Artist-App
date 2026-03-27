@@ -6,8 +6,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#007bff",
-  "background_color": "#ffffff",
+  "theme_color": "#c39bff",
+  "background_color": "#0e0e0f",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -66,7 +66,7 @@
       "name": "My Bookings",
       "short_name": "Bookings",
       "description": "View your bookings and payments",
-      "url": "/dashboard/bookings",
+      "url": "/notifications",
       "icons": [
         {
           "src": "/icons/bookings-icon-96.png",
@@ -78,7 +78,7 @@
       "name": "My Profile",
       "short_name": "Profile",
       "description": "Manage your profile and settings",
-      "url": "/dashboard/settings",
+      "url": "/settings",
       "icons": [
         {
           "src": "/icons/profile-icon-96.png",

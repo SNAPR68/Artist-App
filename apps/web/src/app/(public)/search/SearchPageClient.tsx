@@ -15,7 +15,7 @@ interface ArtistResult {
   bio?: string;
   genres: string[];
   base_city: string;
-  trust_score: number;
+  trust_score: number | null;
   total_bookings: number;
   is_verified: boolean;
   thumbnail_url?: string;
