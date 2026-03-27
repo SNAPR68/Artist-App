@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // Zara = English female, Kabir = Hindi male
 const VOICE_IDS: Record<string, string> = {
   'en': process.env.ELEVENLABS_VOICE_EN ?? 'EXAVITQu4vr4xnSDxMaL', // Sarah — clear female English (Zara)
-  'hi': process.env.ELEVENLABS_VOICE_HI ?? 'bpkHhw4QrZFYIfahwsHh', // Amit Bhawani — calm male Hindi (Kabir)
+  'hi': process.env.ELEVENLABS_VOICE_HI ?? 'TX3LPaxmHKxFdv7VOQHJ', // Liam — deep male, works well with Hindi via multilingual v2
 };
 
 export async function POST(req: NextRequest) {

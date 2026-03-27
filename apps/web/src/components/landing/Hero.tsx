@@ -5,27 +5,27 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 
-// ─── Hero Background Images ─────────────────────────────────
+// ─── Hero Background Images — crisp, vibrant event photography ───
 const HERO_SLIDES = [
   {
-    url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1920&q=80',
-    label: 'DJ Night',
+    url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1920&q=90&fit=crop',
+    label: 'Concert Night',
   },
   {
-    url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1920&q=80',
-    label: 'Live Concert',
+    url: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1920&q=90&fit=crop',
+    label: 'Festival Stage',
   },
   {
-    url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1920&q=80',
+    url: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=90&fit=crop',
     label: 'Music Festival',
   },
   {
-    url: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=1920&q=80',
-    label: 'Club Night',
+    url: 'https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=1920&q=90&fit=crop',
+    label: 'Wedding Sangeet',
   },
   {
-    url: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1920&q=80',
-    label: 'Wedding Celebration',
+    url: 'https://images.unsplash.com/photo-1574391884720-bbc3740c59d1?w=1920&q=90&fit=crop',
+    label: 'DJ Performance',
   },
 ];
 
@@ -166,7 +166,7 @@ export function Hero() {
               whileTap={{ scale: 0.95 }}
               className="px-8 py-4 bg-gradient-to-br from-[#c39bff] to-[#b68cf6] text-[#3f0e7a] font-bold rounded-full transition-all duration-300"
             >
-              Find Artists
+              Hire an Artist
             </motion.button>
 
             <motion.button
@@ -175,7 +175,7 @@ export function Hero() {
               whileTap={{ scale: 0.98 }}
               className="px-8 py-4 bg-transparent border border-white/20 text-white font-bold rounded-full transition-all duration-300 hover:bg-white/5 hover:border-white/40"
             >
-              I&apos;m an Event Company
+              Join as Artist
             </motion.button>
           </motion.div>
 
