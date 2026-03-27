@@ -742,3 +742,17 @@ export const conciergeCreateBookingSchema = z.object({
 
 // ─── Client Profile Update ─────────────────────────────────────
 export const updateClientProfileSchema = createClientProfileSchema.partial();
+
+// ─── InstaBook Interest (Waitlist) ──────────────────────────────
+export const instabookInterestSchema = z.object({
+  role: z.enum(['artist', 'event_company', 'client', 'agent']),
+  name: z.string().min(2).max(200),
+  phone: z.string().min(10).max(20),
+  email: z.string().email().max(200).optional().or(z.literal('')),
+  city: z.string().min(2).max(100),
+  excitement_score: z.number().int().min(1).max(5),
+  top_concern: z.string().max(2000).optional().or(z.literal('')),
+  would_use_first_month: z.enum(['yes', 'no', 'maybe']),
+  role_specific_data: z.record(z.unknown()).default({}),
+  source: z.enum(['web', 'voice_en', 'voice_hi']).default('web'),
+});

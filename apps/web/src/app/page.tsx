@@ -10,6 +10,7 @@ import { Hero } from '@/components/landing/Hero';
 // Lazy-load below-the-fold components
 const Categories = dynamic(() => import('@/components/landing/Categories').then(m => ({ default: m.Categories })), { ssr: false });
 const FeaturedArtists = dynamic(() => import('@/components/landing/FeaturedArtists').then(m => ({ default: m.FeaturedArtists })), { ssr: false });
+const InstaBookBanner = dynamic(() => import('@/components/landing/InstaBookBanner').then(m => ({ default: m.InstaBookBanner })), { ssr: false });
 const CTABanner = dynamic(() => import('@/components/landing/CTABanner').then(m => ({ default: m.CTABanner })), { ssr: false });
 const Footer = dynamic(() => import('@/components/layout/Footer').then(m => ({ default: m.Footer })), { ssr: false });
 
@@ -43,6 +44,7 @@ export default function HomePage() {
       <Hero />
       <Categories />
       <FeaturedArtists />
+      <InstaBookBanner />
       <CTABanner />
       <Footer />
     </main>

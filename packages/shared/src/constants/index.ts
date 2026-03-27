@@ -38,6 +38,7 @@ export const RATE_LIMITS = {
   SEARCH: { max: 60, windowMs: 60_000 },
   OTP_GENERATE: { max: 5, windowMs: 900_000 }, // 5 per 15 minutes
   OTP_VERIFY: { max: 5, windowMs: 300_000 }, // 5 per 5 minutes
+  INSTABOOK_INTEREST: { max: 5, windowMs: 3_600_000 }, // 5 per hour per IP
 } as const;
 
 // ─── Pagination ──────────────────────────────────────────────

@@ -288,6 +288,34 @@ export function VoiceAssistant() {
         return;
       }
 
+      // ─── InstaBook intent detection ───
+      const lowerText = text.toLowerCase();
+      const instabookKeywords = ['instabook', 'instant book', 'insta book', 'waitlist', 'wait list', 'fixed price', 'book instantly', 'instant booking'];
+      const isInstabookQuery = instabookKeywords.some(kw => lowerText.includes(kw));
+
+      if (isInstabookQuery) {
+        const wantsToJoin = ['join', 'sign up', 'interested', 'yes', 'waitlist', 'sign me'].some(kw => lowerText.includes(kw));
+        if (wantsToJoin) {
+          const voiceSource = ttsLang === 'hi' ? 'voice_hi' : 'voice_en';
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            text: 'Taking you to the InstaBook waitlist form. Fill it out to get priority access when we launch!',
+            suggestions: ['Back to home', 'Find a DJ in Mumbai'],
+            action: { type: 'navigate', route: `/instabook?source=${voiceSource}` },
+          }]);
+          speakResponse('Taking you to the InstaBook waitlist. You will get priority access when we launch!');
+          router.push(`/instabook?source=${voiceSource}`);
+        } else {
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            text: 'InstaBook is our upcoming feature that lets you book artists instantly at transparent prices — no negotiation, no middlemen. Your payment is escrow-protected until the event is done. Want to join the waitlist for early access?',
+            suggestions: ['Join the waitlist', 'Tell me more', 'No thanks'],
+          }]);
+          speakResponse('InstaBook lets you book artists instantly at transparent prices, with escrow-protected payments. Would you like to join the waitlist for early access?');
+        }
+        return;
+      }
+
       // ─── Check for navigation commands (guest-safe routes) ───
       const lower = text.toLowerCase();
       const navKeywords = ['go to', 'take me to', 'navigate to', 'open', 'show me the', 'switch to'];
