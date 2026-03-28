@@ -34,7 +34,7 @@ export const db = knex({
   client: 'pg',
   connection: {
     connectionString: connectionUrl,
-    ssl: config.NODE_ENV === 'production' ? true : false,
+    ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   },
   pool: {
     min: config.DATABASE_POOL_MIN ?? 5,
