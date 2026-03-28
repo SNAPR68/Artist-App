@@ -85,31 +85,22 @@ export default function EventCompanyDashboard() {
 
       {/* ─── Bento Grid: Voice + Insights ─── */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Backstage AI Card */}
-        <div className="md:col-span-8 glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden min-h-[280px] flex flex-col">
-          <div className="flex justify-between items-start">
+        {/* Zara & Kabir — Voice Assistant Card */}
+        <div className="md:col-span-8 glass-card rounded-xl p-6 border border-white/5 relative overflow-hidden flex flex-col">
+          <div className="absolute -top-20 -right-20 w-48 h-48 bg-[#c39bff]/8 blur-[80px] rounded-full pointer-events-none" />
+          <div className="flex justify-between items-start relative z-10">
             <div>
-              <h3 className="text-xl font-display font-bold text-white mb-1">Backstage AI</h3>
-              <p className="text-white/40 text-sm">&ldquo;Find me a singer for a corporate event in Delhi next month&rdquo;</p>
+              <h3 className="text-lg font-display font-bold text-white mb-0.5">Zara & Kabir</h3>
+              <p className="text-white/40 text-xs">Your voice assistants — try &ldquo;Find me a singer for a corporate event in Delhi&rdquo;</p>
             </div>
-            <div className="w-10 h-10 bg-[#c39bff]/20 rounded-full flex items-center justify-center border border-[#c39bff]/30 animate-pulse">
-              <Mic className="w-5 h-5 text-[#c39bff]" />
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-white/30 uppercase tracking-widest">Click below</span>
+              <div className="w-8 h-8 bg-[#c39bff]/20 rounded-full flex items-center justify-center border border-[#c39bff]/30">
+                <Mic className="w-4 h-4 text-[#c39bff]" />
+              </div>
             </div>
           </div>
-          <div className="flex-1 flex items-center justify-center gap-2 mt-6">
-            {[40, 60, 80, 50, 90, 40, 70, 30, 60, 85, 40, 20].map((h, i) => (
-              <div
-                key={i}
-                className={`w-2 rounded-full transition-all duration-500 ${i % 2 === 0 ? 'bg-[#c39bff]' : 'bg-[#a1faff]'}`}
-                style={{
-                  height: `${h}%`,
-                  animation: `voiceBar 0.8s ease-in-out infinite alternate`,
-                  animationDelay: `${i * 0.1}s`,
-                }}
-              />
-            ))}
-          </div>
-          <div className="mt-auto pt-4 flex gap-3 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-3 mt-4 overflow-x-auto scrollbar-hide relative z-10">
             <Link href="/search" className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-white/60 whitespace-nowrap hover:bg-white/10 transition-colors">
               Find artists
             </Link>
