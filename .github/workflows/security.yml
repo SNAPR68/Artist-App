@@ -43,7 +43,7 @@ jobs:
 
       - name: Upload audit report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: npm-audit-report
           path: npm-audit-report.json
@@ -102,7 +102,7 @@ jobs:
 
       - name: Upload dependency check results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dependency-check-report
           path: reports/
@@ -133,7 +133,7 @@ jobs:
 
       - name: Upload CodeQL results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: codeql-results-${{ matrix.language }}
           path: ${{ runner.temp }}/codeql-results/
@@ -172,7 +172,7 @@ jobs:
 
       - name: Upload Snyk report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: snyk-report
           path: snyk-report.json
