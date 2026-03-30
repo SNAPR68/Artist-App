@@ -18,10 +18,20 @@ export async function up(knex: Knex): Promise<void> {
     table.timestamp('updated_at').notNullable().defaultTo(knex.fn.now());
   });
 
-  await knex.raw(`
-    CREATE UNIQUE INDEX idx_demand_signals_unique
-    ON demand_signals (signal_date, city, COALESCE(genre, ''), COALESCE(event_type::text, ''))
-  `);
+  // Postgres requires immutable expressions in unique indexes.
+  // Use partial indexes to handle the four NULL combinations.
+  await knex.raw(`CREATE UNIQUE INDEX idx_demand_signals_unique_both
+    ON demand_signals (signal_date, city, genre, event_type)
+    WHERE genre IS NOT NULL AND event_type IS NOT NULL`);
+  await knex.raw(`CREATE UNIQUE INDEX idx_demand_signals_unique_genre_only
+    ON demand_signals (signal_date, city, genre)
+    WHERE genre IS NOT NULL AND event_type IS NULL`);
+  await knex.raw(`CREATE UNIQUE INDEX idx_demand_signals_unique_type_only
+    ON demand_signals (signal_date, city, event_type)
+    WHERE genre IS NULL AND event_type IS NOT NULL`);
+  await knex.raw(`CREATE UNIQUE INDEX idx_demand_signals_unique_none
+    ON demand_signals (signal_date, city)
+    WHERE genre IS NULL AND event_type IS NULL`);
   await knex.raw('CREATE INDEX idx_demand_signals_date ON demand_signals (signal_date)');
   await knex.raw('CREATE INDEX idx_demand_signals_city_date ON demand_signals (city, signal_date)');
   await knex.raw('CREATE INDEX idx_demand_signals_level ON demand_signals (demand_level)');

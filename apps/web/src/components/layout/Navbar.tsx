@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
-import { Menu, X, Search, Mic, ChevronRight, Building2 } from 'lucide-react';
+import { Menu, X, Search, Mic, ChevronRight, Building2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/lib/auth';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
@@ -70,28 +70,23 @@ export function Navbar() {
             whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', damping: 15, stiffness: 300 }}
           >
-            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-              <div className="w-7 h-7 rounded-lg bg-nocturne-primary flex items-center justify-center flex-shrink-0 shadow-nocturne-glow-sm">
-                <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
-                </svg>
-              </div>
-              <span className="text-base font-display font-bold text-white tracking-tight">
-                ArtistBook
+            <Link href="/" className="flex items-center flex-shrink-0">
+              <span className="text-xl font-sans font-black tracking-[0.3em] uppercase text-white">
+                GRID
               </span>
             </Link>
           </motion.div>
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-1">
+            <NavLink href="/brief" isActive={activeNavLink === '/brief'} onHoverStart={() => setActiveNavLink('/brief')} onHoverEnd={() => setActiveNavLink(null)} highlight>
+              Plan Event
+            </NavLink>
             <NavLink href="/search" isActive={activeNavLink === '/search'} onHoverStart={() => setActiveNavLink('/search')} onHoverEnd={() => setActiveNavLink(null)}>
               Artists
             </NavLink>
-            <NavLink href="/search" isActive={activeNavLink === '/bookings'} onHoverStart={() => setActiveNavLink('/bookings')} onHoverEnd={() => setActiveNavLink(null)}>
-              Bookings
-            </NavLink>
-            <NavLink href="/search" isActive={activeNavLink === '/live'} onHoverStart={() => setActiveNavLink('/live')} onHoverEnd={() => setActiveNavLink(null)}>
-              Live
+            <NavLink href="/gigs" isActive={activeNavLink === '/gigs'} onHoverStart={() => setActiveNavLink('/gigs')} onHoverEnd={() => setActiveNavLink(null)}>
+              Live Gigs
             </NavLink>
 
             <motion.div
@@ -191,13 +186,10 @@ export function Navbar() {
               className="fixed top-0 right-0 bottom-0 w-72 bg-nocturne-surface/95 backdrop-blur-xl border-l border-white/[0.08] z-[49] md:hidden flex flex-col"
             >
               <div className="p-5 border-b border-white/[0.08] flex items-center justify-between min-h-16">
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <div className="w-6 h-6 rounded-lg bg-nocturne-primary flex items-center justify-center flex-shrink-0">
-                    <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
-                    </svg>
-                  </div>
-                  <span className="text-sm font-display font-bold text-white">ArtistBook</span>
+                <div className="flex items-center flex-shrink-0">
+                  <span className="text-base font-sans font-black tracking-[0.3em] uppercase text-white">
+                    GRID
+                  </span>
                 </div>
                 <motion.button
                   onClick={handleCloseDrawer}
@@ -211,6 +203,7 @@ export function Navbar() {
 
               <motion.div className="flex-1 p-4 space-y-1">
                 {[
+                  { href: '/brief', label: 'Plan Your Event', icon: Sparkles },
                   { href: '/search', label: 'Find Artists', icon: Search },
                   { href: '/login', label: 'Event Company Login', icon: Building2 },
                   { href: '/artist/onboarding', label: 'List as Artist', icon: Mic },
@@ -280,12 +273,14 @@ function NavLink({
   href,
   children,
   isActive,
+  highlight,
   onHoverStart,
   onHoverEnd,
 }: {
   href: string;
   children: React.ReactNode;
   isActive?: boolean;
+  highlight?: boolean;
   onHoverStart?: () => void;
   onHoverEnd?: () => void;
 }) {
@@ -297,7 +292,7 @@ function NavLink({
     >
       <Link
         href={href}
-        className="text-[13px] text-nocturne-text-secondary hover:text-white px-3 py-2 rounded-lg hover:bg-white/[0.06] transition-colors duration-200 font-medium min-h-11 flex items-center relative"
+        className={`text-[13px] px-3 py-2 rounded-lg transition-colors duration-200 font-medium min-h-11 flex items-center relative ${highlight ? 'text-[#c39bff] hover:text-white hover:bg-[#c39bff]/10' : 'text-nocturne-text-secondary hover:text-white hover:bg-white/[0.06]'}`}
       >
         {children}
         {isActive && (

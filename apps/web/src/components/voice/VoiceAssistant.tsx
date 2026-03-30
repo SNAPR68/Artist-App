@@ -336,6 +336,11 @@ export function VoiceAssistant() {
           'artist login': { route: '/login', label: 'artist login' },
           'join': { route: '/login', label: 'sign up page' },
           'gigs': { route: '/gigs', label: 'gig listings' },
+          'brief': { route: '/brief', label: 'event planner' },
+          'plan event': { route: '/brief', label: 'event planner' },
+          'plan my event': { route: '/brief', label: 'event planner' },
+          'help me decide': { route: '/brief', label: 'event planner' },
+          'recommend': { route: '/brief', label: 'event planner' },
           'privacy': { route: '/privacy', label: 'privacy policy' },
           'terms': { route: '/terms', label: 'terms of service' },
         };

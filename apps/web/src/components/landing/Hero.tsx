@@ -1,9 +1,10 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { ArrowUp, Mic, Building2, Guitar } from 'lucide-react';
 
 // ─── Hero Background Images ─────────────────────────────────
 const HERO_SLIDES = [
@@ -12,6 +13,14 @@ const HERO_SLIDES = [
   { url: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=90&fit=crop', label: 'Music Festival' },
   { url: 'https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=1920&q=90&fit=crop', label: 'Wedding Sangeet' },
   { url: 'https://images.unsplash.com/photo-1574391884720-bbc3740c59d1?w=1920&q=90&fit=crop', label: 'DJ Performance' },
+];
+
+const EXAMPLE_BRIEFS = [
+  'Delhi wedding, 300 guests, Punjabi singer for sangeet night, 5L budget',
+  'Mumbai corporate annual day, 1000 pax, high-energy host + band',
+  'Bangalore house party, 50 people, acoustic singer, under 50k',
+  'Goa beach wedding, live DJ + dhol player, sunset ceremony',
+  'Hyderabad college fest, rapper + beatboxer, 2L budget',
 ];
 
 const containerVariants = {
@@ -24,54 +33,15 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { type: 'spring', damping: 25, stiffness: 100 } },
 };
 
-// ─── 3D Mascot SVGs (larger, for hero section) ──────────────
-function ZaraMascot3D({ size = 64 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
-      <defs>
-        <radialGradient id="zaraGrad" cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stopColor="#e0c3ff" />
-          <stop offset="100%" stopColor="#c39bff" />
-        </radialGradient>
-      </defs>
-      <circle cx="20" cy="20" r="19" fill="url(#zaraGrad)" fillOpacity="0.2" />
-      <circle cx="20" cy="20" r="18" stroke="#c39bff" strokeWidth="1.5" strokeOpacity="0.6" fill="none" />
-      <circle cx="20" cy="15" r="5.5" fill="#c39bff" fillOpacity="0.8" />
-      <path d="M14 13c0-4 3-7 6-7s6 3 6 7c1-1 2-3 2-5 0 0 1 4-1 7-1 1.5-2.5 2-3 2h-6c-.5 0-2-.5-3-2-2-3-1-7-1-7 0 2 1 4 2 5z" fill="#c39bff" fillOpacity="0.5" />
-      <path d="M12 33c0-5 3.5-8 8-8s8 3 8 8" fill="#c39bff" fillOpacity="0.4" />
-      <path d="M11 15a9 9 0 0118 0" stroke="#c39bff" strokeWidth="1.5" strokeOpacity="0.7" fill="none" strokeLinecap="round" />
-      <rect x="9" y="13" width="4" height="5" rx="2" fill="#c39bff" fillOpacity="0.6" />
-      <rect x="27" y="13" width="4" height="5" rx="2" fill="#c39bff" fillOpacity="0.6" />
-    </svg>
-  );
-}
-
-function KabirMascot3D({ size = 64 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
-      <defs>
-        <radialGradient id="kabirGrad" cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stopColor="#c8fcff" />
-          <stop offset="100%" stopColor="#a1faff" />
-        </radialGradient>
-      </defs>
-      <circle cx="20" cy="20" r="19" fill="url(#kabirGrad)" fillOpacity="0.2" />
-      <circle cx="20" cy="20" r="18" stroke="#a1faff" strokeWidth="1.5" strokeOpacity="0.6" fill="none" />
-      <circle cx="20" cy="15" r="5.5" fill="#a1faff" fillOpacity="0.8" />
-      <path d="M14 13c0-4 3-7 6-7s6 3 6 7c0-2-2-5-6-5s-6 3-6 5z" fill="#a1faff" fillOpacity="0.5" />
-      <path d="M10 33c0-5 4-9 10-9s10 4 10 9" fill="#a1faff" fillOpacity="0.4" />
-      <path d="M11 15a9 9 0 0118 0" stroke="#a1faff" strokeWidth="1.5" strokeOpacity="0.7" fill="none" strokeLinecap="round" />
-      <rect x="9" y="13" width="4" height="5" rx="2" fill="#a1faff" fillOpacity="0.6" />
-      <rect x="27" y="13" width="4" height="5" rx="2" fill="#a1faff" fillOpacity="0.6" />
-    </svg>
-  );
-}
-
 export function Hero() {
   const router = useRouter();
   const containerRef = useRef(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { scrollY } = useScroll();
   const [activeSlide, setActiveSlide] = useState(0);
+  const [briefText, setBriefText] = useState('');
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -80,13 +50,43 @@ export function Hero() {
     return () => clearInterval(interval);
   }, []);
 
+  // Rotate placeholder examples
+  useEffect(() => {
+    if (briefText) return; // Don't rotate if user is typing
+    const interval = setInterval(() => {
+      setPlaceholderIndex((prev) => (prev + 1) % EXAMPLE_BRIEFS.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [briefText]);
+
   const violetOrbY = useTransform(scrollY, [0, 500], [0, 150]);
   const cyanOrbY = useTransform(scrollY, [0, 500], [0, -100]);
 
-  // Dispatch custom event to open voice assistant with a specific language
-  const openVoiceAssistant = (lang: 'en' | 'hi') => {
+  const openVoiceAssistant = useCallback((lang: 'en' | 'hi') => {
     window.dispatchEvent(new CustomEvent('open-voice-assistant', { detail: { lang } }));
-  };
+  }, []);
+
+  const handleSubmit = useCallback(() => {
+    const text = briefText.trim();
+    if (!text || isSubmitting) return;
+    setIsSubmitting(true);
+    router.push(`/brief?q=${encodeURIComponent(text)}`);
+  }, [briefText, isSubmitting, router]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  }, [handleSubmit]);
+
+  // Auto-resize textarea
+  const handleInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setBriefText(e.target.value);
+    const ta = e.target;
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 200) + 'px';
+  }, []);
 
   return (
     <section
@@ -105,7 +105,7 @@ export function Hero() {
             <Image src={slide.url} alt={slide.label} fill sizes="100vw" className="object-cover" priority={i === 0} />
           </div>
         ))}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0e0e0f]/80 via-[#0e0e0f]/60 to-[#0e0e0f] z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0e0e0f]/85 via-[#0e0e0f]/70 to-[#0e0e0f] z-[1]" />
       </div>
 
       {/* ─── Stage Lighting ─── */}
@@ -119,110 +119,140 @@ export function Hero() {
       </div>
 
       {/* ─── Main Content ─── */}
-      <div className="relative z-10 max-w-6xl w-full text-center">
-        <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
-          {/* Badge */}
-          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-[#a1faff]"
-            style={{ background: 'rgba(38, 38, 39, 0.6)', backdropFilter: 'blur(20px)' }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-            <span className="text-[0.6875rem] font-bold tracking-widest uppercase">Verified Artists · Secure Payments</span>
-          </motion.div>
+      <div className="relative z-10 max-w-4xl w-full text-center pt-20">
+        <motion.div className="space-y-5" variants={containerVariants} initial="hidden" animate="visible">
 
           {/* Headline */}
-          <motion.h1 variants={itemVariants} className="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[0.9] max-w-4xl mx-auto text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
-            Live entertainment,{' '}
-            <span className="bg-gradient-to-r from-[#c39bff] via-[#b68cf6] to-[#a1faff] bg-clip-text text-transparent italic">
-              reinvented.
+          <motion.h1 variants={itemVariants} className="font-display text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter leading-[1] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+            Plug into India&apos;s{' '}
+            <span className="bg-gradient-to-r from-[#c39bff] via-[#b68cf6] to-[#a1faff] bg-clip-text text-transparent">
+              live entertainment grid.
             </span>
           </motion.h1>
 
           {/* Subtitle */}
-          <motion.p variants={itemVariants} className="text-white/70 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
-            The entertainment OS for India. 5,000+ verified artists.
-            Browse, compare, book, and pay — all in one place.
+          <motion.p variants={itemVariants} className="text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+            <span className="text-[#c39bff]">Artists grow careers.</span>{' '}
+            <span className="text-[#a1faff]">Companies build events.</span>{' '}
+            <span className="text-white/70">The industry moves — all on one platform.</span>
           </motion.p>
 
-          {/* ─── 3 CTA Buttons ─── */}
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <motion.button
-              onClick={() => router.push('/search')}
-              whileHover={{ scale: 1.05, boxShadow: '0px 24px 48px rgba(195,155,255,0.4)' }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 bg-gradient-to-br from-[#c39bff] to-[#b68cf6] text-[#3f0e7a] font-bold rounded-full transition-all duration-300"
+          {/* ─── Chat-Style Input ─── */}
+          <motion.div variants={itemVariants} className="relative mx-auto">
+            {/* Gradient border glow — always visible */}
+            <div className="absolute -inset-[1px] rounded-3xl bg-gradient-to-br from-[#c39bff]/50 via-[#a1faff]/20 to-[#c39bff]/50 blur-[1px] pointer-events-none" />
+            <div
+              className="relative rounded-3xl border border-[#c39bff]/25 hover:border-[#c39bff]/40 focus-within:border-[#c39bff]/60 transition-all duration-300"
+              style={{
+                background: 'rgba(26, 25, 27, 0.85)',
+                backdropFilter: 'blur(20px)',
+                boxShadow: '0 0 60px rgba(195, 155, 255, 0.08), 0 8px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+              }}
             >
-              Hire an Artist
-            </motion.button>
+              {/* Ambient glow on focus */}
+              <div className="absolute -inset-px rounded-3xl bg-gradient-to-b from-[#c39bff]/10 to-[#a1faff]/5 opacity-0 focus-within:opacity-100 transition-opacity pointer-events-none" />
 
-            <motion.button
-              onClick={() => router.push('/login')}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-8 py-4 rounded-full font-bold transition-all duration-300 border border-white/20 text-white hover:border-[#a1faff]/40 hover:bg-[#a1faff]/5"
-              style={{ backdropFilter: 'blur(12px)', background: 'rgba(255,255,255,0.05)' }}
-            >
-              <span className="block text-sm">Event Company OS</span>
-              <span className="block text-[10px] text-white/40 font-normal -mt-0.5">CRM · Bookings · Payouts</span>
-            </motion.button>
+              <textarea
+                ref={textareaRef}
+                value={briefText}
+                onChange={handleInput}
+                onKeyDown={handleKeyDown}
+                placeholder={EXAMPLE_BRIEFS[placeholderIndex]}
+                rows={6}
+                className="w-full bg-transparent text-white placeholder:text-white/25 text-lg md:text-xl px-7 pt-7 pb-18 resize-none focus:outline-none leading-relaxed"
+                style={{ minHeight: '220px', maxHeight: '320px' }}
+              />
 
-            <motion.button
-              onClick={() => router.push('/login')}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-8 py-4 bg-transparent border border-white/20 text-white font-bold rounded-full transition-all duration-300 hover:bg-white/5 hover:border-white/40"
+              {/* Bottom toolbar */}
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {/* Voice button */}
+                  <button
+                    onClick={() => openVoiceAssistant('en')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white/30 hover:text-[#c39bff] hover:bg-[#c39bff]/10 transition-all text-xs font-medium"
+                    title="Use voice"
+                  >
+                    <Mic size={14} />
+                    <span className="hidden sm:inline">Voice</span>
+                  </button>
+                </div>
+
+                {/* Submit button */}
+                <motion.button
+                  onClick={handleSubmit}
+                  disabled={!briefText.trim() || isSubmitting}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 ${
+                    briefText.trim()
+                      ? 'bg-[#c39bff] text-[#1a191b] shadow-[0_0_20px_rgba(195,155,255,0.4)] cursor-pointer'
+                      : 'bg-white/10 text-white/20 cursor-not-allowed'
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <ArrowUp size={18} strokeWidth={2.5} />
+                  )}
+                </motion.button>
+              </div>
+            </div>
+
+            {/* Example chips */}
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-wrap items-center justify-center gap-2 mt-4"
             >
-              Join as Artist
-            </motion.button>
+              {[
+                'Wedding sangeet in Delhi',
+                'Corporate event Mumbai',
+                'College fest band',
+                'House party DJ',
+              ].map((example) => (
+                <button
+                  key={example}
+                  onClick={() => {
+                    setBriefText(example);
+                    textareaRef.current?.focus();
+                  }}
+                  className="px-3 py-1.5 rounded-full border border-white/8 text-white/35 hover:text-white/60 hover:border-white/15 hover:bg-white/5 transition-all text-xs"
+                >
+                  {example}
+                </button>
+              ))}
+            </motion.div>
           </motion.div>
 
-          {/* ─── 3D Voice Assistant Mascots ─── */}
-          <motion.div variants={itemVariants} className="pt-8">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 mb-4">Voice Assistant</p>
-            <div className="flex items-center justify-center gap-8">
-              {/* Zara — English */}
-              <button
-                onClick={() => openVoiceAssistant('en')}
-                className="mascot-3d group flex flex-col items-center gap-2 cursor-pointer"
-              >
-                <div className="mascot-avatar mascot-glow-purple rounded-full p-1 border border-[#c39bff]/30 bg-[#c39bff]/10 group-hover:bg-[#c39bff]/20 transition-all">
-                  <ZaraMascot3D size={56} />
-                </div>
-                <div className="text-center">
-                  <p className="text-xs font-bold text-[#c39bff] group-hover:text-white transition-colors">Zara</p>
-                  <p className="text-[10px] text-white/30">English</p>
-                </div>
-              </button>
-
-              {/* Divider */}
-              <div className="w-px h-12 bg-white/10" />
-
-              {/* Kabir — Hindi */}
-              <button
-                onClick={() => openVoiceAssistant('hi')}
-                className="mascot-3d group flex flex-col items-center gap-2 cursor-pointer"
-              >
-                <div className="mascot-avatar mascot-glow-cyan rounded-full p-1 border border-[#a1faff]/30 bg-[#a1faff]/10 group-hover:bg-[#a1faff]/20 transition-all" style={{ animationDelay: '0.5s' }}>
-                  <KabirMascot3D size={56} />
-                </div>
-                <div className="text-center">
-                  <p className="text-xs font-bold text-[#a1faff] group-hover:text-white transition-colors">Kabir</p>
-                  <p className="text-[10px] text-white/30">हिंदी</p>
-                </div>
-              </button>
-            </div>
+          {/* ─── Secondary Links ─── */}
+          <motion.div variants={itemVariants} className="flex items-center justify-center gap-6 pt-2">
+            <button
+              onClick={() => router.push('/search')}
+              className="flex items-center gap-2 text-white/30 hover:text-white/60 transition-colors text-sm"
+            >
+              <Guitar size={14} />
+              Browse Artists
+            </button>
+            <div className="w-px h-4 bg-white/10" />
+            <button
+              onClick={() => router.push('/login')}
+              className="flex items-center gap-2 text-white/30 hover:text-white/60 transition-colors text-sm"
+            >
+              <Building2 size={14} />
+              Event Company OS
+            </button>
           </motion.div>
 
           {/* ─── Event Type Label + Dots ─── */}
-          <motion.div variants={itemVariants} className="pt-4">
+          <motion.div variants={itemVariants} className="pt-1">
             <AnimatePresence mode="wait">
               <motion.span key={activeSlide} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/40"
+                className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/20"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#c39bff] animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#c39bff]/60 animate-pulse" />
                 {HERO_SLIDES[activeSlide].label}
               </motion.span>
             </AnimatePresence>
-            <div className="flex items-center justify-center gap-2 mt-4">
+            <div className="flex items-center justify-center gap-2 mt-3">
               {HERO_SLIDES.map((_, i) => (
                 <button key={i} onClick={() => setActiveSlide(i)}
                   className={`rounded-full transition-all duration-500 ${i === activeSlide ? 'w-6 h-1.5 bg-[#c39bff]' : 'w-1.5 h-1.5 bg-white/20 hover:bg-white/40'}`}

@@ -483,6 +483,7 @@ export class VoiceExecutionService {
       commissions: { agent: '/agent/commissions' },
       backup: { artist: '/artist/settings/backup' },
       voice: { artist: '/voice', client: '/voice', agent: '/voice', event_company: '/voice', admin: '/voice' },
+      brief: { artist: '/brief', client: '/brief', agent: '/brief', event_company: '/brief', admin: '/brief' },
     };
 
     const routeMap = ROUTE_MAP[pageTarget];
@@ -505,6 +506,7 @@ export class VoiceExecutionService {
       recommendations: 'recommendations', shortlists: 'your shortlists', substitutions: 'substitution requests',
       payments: 'your payments', team: 'team management', roster: 'your artist roster',
       commissions: 'your commissions', backup: 'backup settings', voice: 'voice assistant',
+      brief: 'the event planner',
     };
 
     return {

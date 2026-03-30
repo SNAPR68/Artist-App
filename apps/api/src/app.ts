@@ -48,6 +48,7 @@ import { socialAnalyzerRoutes } from './modules/social-analyzer/social-analyzer.
 import { gigMarketplaceRoutes } from './modules/gig-marketplace/gig-marketplace.routes.js';
 import { gamificationRoutes } from './modules/gamification/gamification.routes.js';
 import { instabookInterestRoutes } from './modules/instabook-interest/instabook-interest.routes.js';
+import { decisionEngineRoutes } from './modules/decision-engine/decision-engine.routes.js';
 import { startCronJobs } from './infrastructure/cron.js';
 
 const app = Fastify({
@@ -254,6 +255,7 @@ await app.register(socialAnalyzerRoutes);
 await app.register(gigMarketplaceRoutes);
 await app.register(gamificationRoutes);
 await app.register(instabookInterestRoutes);
+await app.register(decisionEngineRoutes);
 
 // ─── Graceful Shutdown ───────────────────────────────────────
 async function shutdown(signal: string) {

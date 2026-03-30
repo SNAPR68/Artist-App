@@ -37,6 +37,12 @@ const INTENT_KEYWORDS: Record<string, string[]> = {
     'status', 'booking status', 'update', 'kahan tak', 'kya hua',
     'progress', 'confirm', 'confirmed',
   ],
+  create_brief: [
+    'brief', 'event brief', 'recommend', 'suggest options', 'what to book',
+    'entertainment options', 'find me options', 'best options',
+    'kya book karein', 'options do', 'suggest karo', 'brief bhejo',
+    'recommend karo', 'kaun accha hai', 'who should i book',
+  ],
 };
 
 // Date patterns

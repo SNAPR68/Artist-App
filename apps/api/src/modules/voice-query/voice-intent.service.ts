@@ -138,6 +138,9 @@ const PAGE_TARGETS: Record<string, string> = {
   'backup': 'backup', 'data backup': 'backup',
   'voice': 'voice', 'voice assistant': 'voice',
   'achievements': 'gamification', 'rewards': 'gamification', 'streaks': 'gamification',
+  'brief': 'brief', 'plan event': 'brief', 'plan my event': 'brief',
+  'event brief': 'brief', 'recommend artists': 'brief', 'suggest artists': 'brief',
+  'what should i book': 'brief', 'help me decide': 'brief', 'entertainment options': 'brief',
 };
 
 // Sorted page target keys: longest first for multi-word matching

@@ -211,3 +211,18 @@ export const GIG_TRAVEL_COST_TIERS_PAISE = {
   OVER_500KM: 2500000,
 } as const;
 export const GIG_ADVISOR_MAX_CONCURRENT = 5;
+
+// ─── Decision Engine ────────────────────────────────────────────
+export const DECISION_ENGINE_WEIGHTS = {
+  EVENT_TYPE_FIT: 0.25,
+  AUDIENCE_VIBE_FIT: 0.20,
+  BUDGET_FIT: 0.20,
+  RELIABILITY: 0.15,
+  LOGISTICS: 0.10,
+  MOMENTUM: 0.05,
+  STRATEGIC: 0.05,
+} as const;
+
+export const DECISION_ENGINE_MAX_CANDIDATES = 200;
+export const DECISION_ENGINE_TOP_N = 5;
+export const DECISION_ENGINE_MIN_CONFIDENCE = 0.3;

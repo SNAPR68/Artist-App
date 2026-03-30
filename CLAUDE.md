@@ -1,8 +1,30 @@
-# Artist Booking Platform — CLAUDE.md
-_Last updated: 2026-03-27_
+# Slash for Events — CLAUDE.md
+_Last updated: 2026-03-29_
+
+## Product Direction (Revised 2026-03-28)
+**Slash for Events** is the decision and operations layer for India's live entertainment industry. NOT a booking marketplace. The platform leads with a decision-first workflow:
+
+**brief → recommendation → proposal → concierge lock → booking**
+
+The immediate product wedge is a lightweight decision engine that answers: What should I book for this event? What should it cost? What are the best-fit options? Can I lock it quickly?
+
+### Strategy Documents (Single Source of Truth)
+```
+docs/strategy/prd.md                    — What we're building and why
+docs/strategy/build.md                  — 7-day build plan
+docs/strategy/system-architecture.md    — Technical architecture
+docs/strategy/ui.md                     — UI/UX specification
+```
+
+### Non-Goals (Current Sprint)
+- Broad public marketplace with browse-first discovery
+- Dashboard redesigns beyond decision workflow
+- Autonomous negotiation (human-assisted lock only)
+- Long-tail artist onboarding before demand flow
+- New modules unrelated to the decision wedge
 
 ## Project Overview
-India's live entertainment booking marketplace connecting artists, clients, agents, and event companies through an intelligence-driven platform. Monorepo with Fastify API backend, Next.js frontend, and shared packages. 77 migrations, 36 API modules, 237 endpoints, 23 cron jobs, 49 frontend pages.
+India's live entertainment decision and operations platform. Monorepo with Fastify API backend, Next.js frontend, and shared packages. 79 migrations, 38 API modules (including decision-engine), 247+ endpoints, 23 cron jobs, 50+ frontend pages.
 
 ## Tech Stack
 | Layer | Technology | Version |
@@ -19,7 +41,7 @@ India's live entertainment booking marketplace connecting artists, clients, agen
 
 ## Monorepo Structure
 ```
-apps/api/          — Fastify REST API (36 modules, 237 endpoints, 6 middleware)
+apps/api/          — Fastify REST API (38 modules, 242 endpoints, 6 middleware)
 apps/web/          — Next.js 14 frontend (49 pages)
 packages/shared/   — Zod validators, 35+ enums, types, constants
 packages/ui/       — Shared React component library
@@ -83,7 +105,7 @@ pnpm turbo build --filter=@artist-booking/web
 4. **Vercel build fails**: Root directory must be blank (not `./` or `apps/web`). Build command: `pnpm turbo build --filter=@artist-booking/web`. Output dir: `apps/web/.next`.
 5. **CORS errors in browser**: API must whitelist the Vercel frontend origin in Fastify CORS config. Check `app.ts` for `origin` array and ensure the deployed frontend URL is included.
 
-## Module Inventory (36 modules)
+## Module Inventory (38 modules)
 | Module | Description |
 |--------|-------------|
 | admin | Platform admin dashboard, system health, user management |
@@ -98,6 +120,7 @@ pnpm turbo build --filter=@artist-booking/web
 | concierge | Search and book on behalf of clients, assisted booking flow |
 | coordination | Pre-event T-minus checklists, logistics, rider fulfillment, escalation |
 | dispute | Dispute submission, evidence upload, resolution, appeal pipeline |
+| decision-engine | Brief parsing, ranked recommendations, proposal generation, concierge lock handoff |
 | document | Contract and invoice PDF generation |
 | dynamic-pricing | Rule-based surge, elasticity tracking, demand-aware auto-adjustment |
 | emergency-substitution | Last-minute artist replacement matching and rebooking |
@@ -256,10 +279,24 @@ Key folders: `premium_landing_page`, `artist_portfolio_hollywood_glamour`, `arti
 - OTP bypass enabled in dev/staging (env var `OTP_BYPASS_ENABLED=true`, code `123456`)
 
 ## Platform Thesis
-This is NOT a booking marketplace. It is the intelligence and operations layer for India's live entertainment industry. The booking flow is commodity software. The moat is built in 3 layers:
-1. Compounding data intelligence from every transaction
-2. Reputation and career infrastructure that can't be ported
-3. Operational workflow replacement that makes leaving expensive
+This is NOT a booking marketplace. It is the **decision and operations layer** for India's live entertainment industry. The market has 4 layers: demand, supply, decision, execution. We own the decision layer first, then expand into execution using already-built capabilities.
+
+The moat is built in 3 layers:
+1. **Decision intelligence** — every brief → recommendation → booking cycle improves pricing accuracy, recommendation quality, and trust scoring
+2. **Reputation and career infrastructure** that can't be ported
+3. **Operational workflow replacement** (booking, coordination, payment, escrow) that makes leaving expensive
+
+### Decision Engine Flow
+```
+brief (web/WhatsApp/voice) → parse → rank candidates → return recommendations
+  → generate proposal PDF → lock availability → concierge handoff → booking
+```
+
+### Key Entry Surfaces
+- `/brief` — public decision page (primary entry for planners/agencies)
+- WhatsApp `CREATE_BRIEF` intent — same flow via messaging
+- Voice (Zara/Kabir) — can route into brief creation
+- Concierge ops — internal deal desk
 
 ## Testing
 ```bash

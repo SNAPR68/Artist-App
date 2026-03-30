@@ -3,6 +3,7 @@ import { whatsAppIntentService } from './whatsapp-intent.service.js';
 import { whatsAppProviderService } from './whatsapp-provider.service.js';
 import { db } from '../../infrastructure/database.js';
 import { WHATSAPP_SESSION_TIMEOUT_HOURS } from '@artist-booking/shared';
+import { decisionEngineService } from '../decision-engine/decision-engine.service.js';
 
 /**
  * Conversation state machine for WhatsApp booking flow.
@@ -86,6 +87,9 @@ export class WhatsAppConversationService {
 
       case 'check_status':
         return this.handleStatusFlow(conversation, parsed.entities);
+
+      case 'create_brief':
+        return this.handleBriefFlow(conversation, parsed.entities);
 
       case 'general_question':
         return 'Thanks for reaching out! I can help you:\n\n'
@@ -187,6 +191,48 @@ export class WhatsAppConversationService {
       response += `• ${b.event_type} on ${b.event_date}: *${b.state}*\n`;
     }
     return response;
+  }
+
+  private async handleBriefFlow(conversation: Record<string, unknown>, entities: Record<string, unknown>): Promise<string> {
+    try {
+      const userId = conversation.user_id as string | null;
+      // Build raw text from available entities
+      const parts: string[] = [];
+      if (entities.city) parts.push(`in ${entities.city}`);
+      if (entities.date) parts.push(`on ${entities.date}`);
+      if (entities.budget) parts.push(`budget ${entities.budget}`);
+      if (entities.genre) parts.push(entities.genre as string);
+
+      const rawText = parts.length > 0 ? parts.join(', ') : 'entertainment options';
+
+      const result = await decisionEngineService.createBriefAndRecommend(userId, {
+        raw_text: rawText,
+        source: 'whatsapp',
+        city: entities.city as string | undefined,
+        event_date: entities.date as string | undefined,
+        budget_max_paise: entities.budget ? Number(entities.budget) * 100 : undefined,
+      });
+
+      if (result.recommendations.length === 0) {
+        return 'I couldn\'t find matching artists for your event right now. Try telling me more details like city, budget, or genre.';
+      }
+
+      let response = `Here are my top picks for your event:\n\n`;
+      for (const rec of result.recommendations.slice(0, 3)) {
+        const priceMin = `₹${Math.round(rec.price_min_paise / 100).toLocaleString('en-IN')}`;
+        const priceMax = `₹${Math.round(rec.price_max_paise / 100).toLocaleString('en-IN')}`;
+        response += `*${rec.rank}. ${rec.artist_name}* — ${rec.artist_type}\n`;
+        response += `   ${priceMin} – ${priceMax}\n`;
+        if (rec.why_fit.length > 0) response += `   ✓ ${rec.why_fit[0]}\n`;
+        response += '\n';
+      }
+      response += `Brief ID: ${result.brief_id.slice(0, 8)}...\n`;
+      response += 'Reply "lock [number]" to book, or "proposal" to get a PDF proposal.';
+
+      return response;
+    } catch {
+      return 'I had trouble processing your brief. Could you describe your event again? Include details like city, budget, and type of entertainment.';
+    }
   }
 
   /**
