@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import BriefPageClient from './BriefPageClient';
 
 export const metadata: Metadata = {
@@ -11,5 +12,9 @@ export const metadata: Metadata = {
 };
 
 export default function BriefPage() {
-  return <BriefPageClient />;
+  return (
+    <Suspense>
+      <BriefPageClient />
+    </Suspense>
+  );
 }
