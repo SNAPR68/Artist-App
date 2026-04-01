@@ -10,8 +10,8 @@ const VOICE_IDS: Record<string, string> = {
 export async function POST(req: NextRequest) {
   const apiKey = process.env.ELEVENLABS_API_KEY;
 
-  const body = await req.json() as { text: string; lang?: string };
-  const { text, lang = 'en' } = body;
+  const body = await req.json() as { text: string; lang?: string; stream?: boolean };
+  const { text, lang = 'en', stream = false } = body;
 
   if (!text || typeof text !== 'string') {
     return NextResponse.json({ error: 'text required' }, { status: 400 });
@@ -57,6 +57,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'TTS API error' }, { status: 502 });
     }
 
+    // Streaming mode: pipe ElevenLabs stream directly to client
+    // Browser can start playing audio as chunks arrive (lower TTFB)
+    if (stream && response.body) {
+      return new NextResponse(response.body as ReadableStream, {
+        status: 200,
+        headers: {
+          'Content-Type': 'audio/mpeg',
+          'Cache-Control': 'no-store',
+          'Transfer-Encoding': 'chunked',
+        },
+      });
+    }
+
+    // Non-streaming: buffer full response then send (legacy behavior)
     const audioBuffer = await response.arrayBuffer();
     return new NextResponse(audioBuffer, {
       status: 200,

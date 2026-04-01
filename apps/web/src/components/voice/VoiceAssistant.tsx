@@ -5,8 +5,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useVoiceRecognition } from './useVoiceRecognition';
 import { VoiceWaveform } from './VoiceWaveform';
 import { MiniArtistCard } from './MiniArtistCard';
+import { CardRenderer } from './cards/CardRenderer';
 import { apiClient } from '../../lib/api-client';
 import { useAuthStore } from '../../lib/auth';
+import type { VoiceCard, VoiceFollowUp } from '@artist-booking/shared';
 
 type AssistantState = 'idle' | 'listening' | 'processing' | 'responding';
 
@@ -18,6 +20,8 @@ interface VoiceResponse {
   session_id: string;
   action?: { type: 'navigate' | 'execute'; route?: string; params?: Record<string, unknown> };
   data?: Record<string, unknown>;
+  cards?: VoiceCard[];
+  follow_up?: VoiceFollowUp;
 }
 
 interface DiscoverArtist {
@@ -44,6 +48,8 @@ interface Message {
   action?: VoiceResponse['action'];
   data?: Record<string, unknown>;
   artists?: DiscoverArtist[];
+  cards?: VoiceCard[];
+  follow_up?: VoiceFollowUp;
 }
 
 // ─── Mascot Avatars ─────────────────────────────────────────
@@ -251,10 +257,44 @@ export function VoiceAssistant() {
     fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, lang: ttsLang }),
+      body: JSON.stringify({ text, lang: ttsLang, stream: true }),
     })
       .then(async (res) => {
         if (!res.ok) throw new Error('cloud-tts-unavailable');
+
+        // Use MediaSource for streaming playback when available
+        if (typeof MediaSource !== 'undefined' && MediaSource.isTypeSupported('audio/mpeg') && res.body) {
+          const mediaSource = new MediaSource();
+          const audio = new Audio();
+          audio.src = URL.createObjectURL(mediaSource);
+
+          mediaSource.addEventListener('sourceopen', async () => {
+            const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+            const reader = res.body!.getReader();
+
+            const pump = async (): Promise<void> => {
+              const { done, value } = await reader.read();
+              if (done) {
+                if (!sourceBuffer.updating) mediaSource.endOfStream();
+                else sourceBuffer.addEventListener('updateend', () => mediaSource.endOfStream(), { once: true });
+                return;
+              }
+              if (sourceBuffer.updating) {
+                await new Promise<void>((resolve) => sourceBuffer.addEventListener('updateend', () => resolve(), { once: true }));
+              }
+              sourceBuffer.appendBuffer(value);
+              await pump();
+            };
+            pump().catch(() => { /* stream ended */ });
+          });
+
+          audio.onended = () => setState('idle');
+          audio.onerror = () => setState('idle');
+          audio.play().catch(() => speakBrowser(text));
+          return;
+        }
+
+        // Fallback: buffer full response
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
@@ -511,7 +551,7 @@ export function VoiceAssistant() {
           const data = res.data;
           setSessionId(data.session_id);
 
-          // Extract artists from DISCOVER responses
+          // Extract artists from DISCOVER responses (legacy)
           const artists = (data.data?.artists as DiscoverArtist[]) ?? undefined;
 
           setMessages((prev) => [
@@ -523,6 +563,8 @@ export function VoiceAssistant() {
               action: data.action,
               data: data.data,
               artists,
+              cards: data.cards,
+              follow_up: data.follow_up,
             },
           ]);
 
@@ -691,7 +733,7 @@ export function VoiceAssistant() {
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-modal md:w-[400px] md:h-[600px] md:rounded-2xl flex flex-col overflow-hidden glass-card animate-scale-in">
+          <div className="fixed inset-0 md:inset-4 md:left-auto md:w-[520px] md:rounded-2xl z-modal flex flex-col overflow-hidden glass-card animate-scale-in">
             {/* ─── Header ─── */}
             <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[#c39bff] to-[#a1faff]">
               <div className="flex items-center gap-2.5">
@@ -864,12 +906,38 @@ export function VoiceAssistant() {
                       <p className="text-sm leading-relaxed whitespace-pre-line">{msg.text}</p>
                     </div>
 
-                    {/* ─── Artist Cards ─── */}
-                    {msg.artists && msg.artists.length > 0 && (
+                    {/* ─── Rich Visual Cards (new) ─── */}
+                    {msg.cards && msg.cards.length > 0 && (
+                      <CardRenderer
+                        cards={msg.cards}
+                        onSelectArtist={(id) => handleSuggestionClick(`Tell me more about artist ${id}`)}
+                      />
+                    )}
+
+                    {/* ─── Legacy Artist Cards (fallback) ─── */}
+                    {!msg.cards && msg.artists && msg.artists.length > 0 && (
                       <div className="-mx-4">
                         <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
                           {msg.artists.map((artist) => (
                             <MiniArtistCard key={artist.id} {...artist} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ─── Follow-up Prompt ─── */}
+                    {msg.follow_up && (
+                      <div className="rounded-xl border border-[#c39bff]/20 bg-[#c39bff]/5 px-3 py-2.5 space-y-2">
+                        <p className="text-xs text-white/60">{msg.follow_up.question}</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {msg.follow_up.options.map((opt, j) => (
+                            <button
+                              key={j}
+                              onClick={() => handleSuggestionClick(opt)}
+                              className="text-xs bg-[#c39bff]/15 text-[#c39bff] hover:bg-[#c39bff]/25 rounded-full px-2.5 py-1 transition-all border border-[#c39bff]/25 font-medium"
+                            >
+                              {opt}
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -890,7 +958,7 @@ export function VoiceAssistant() {
                     )}
 
                     {/* Suggestion chips */}
-                    {msg.suggestions && msg.suggestions.length > 0 && (
+                    {msg.suggestions && msg.suggestions.length > 0 && !msg.follow_up && (
                       <div className="flex flex-wrap gap-1.5">
                         {msg.suggestions.map((s, j) => (
                           <button

@@ -57,6 +57,16 @@ const INTENT_KEYWORDS: Record<string, string[]> = {
     'jao', 'dikhao', 'kholo', 'dekho', 'mera', 'mere', 'meri',
     'page', 'dashboard', 'screen', 'section',
   ],
+  BRIEF: [
+    'plan my event', 'plan event', 'plan a', 'for my event', 'for my wedding',
+    'for our event', 'for our wedding', 'what should i book', 'what to book',
+    'help me decide', 'help me plan', 'event brief', 'entertainment options',
+    'best options for', 'who should i book', 'recommend for', 'suggest for',
+    'kya book karein', 'kaun accha hai', 'options do', 'suggest karo',
+    'recommend karo', 'brief bhejo', 'event ke liye',
+    'need entertainment for', 'looking for entertainment',
+    'i need a', 'we need a', 'looking for a',
+  ],
 };
 
 // Sorted keywords per intent: longest first for multi-word matching

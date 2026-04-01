@@ -5,12 +5,15 @@
 
 import { db } from '../../infrastructure/database.js';
 import type { VoiceParsedIntent } from './voice-intent.service.js';
+import type { VoiceCard, VoiceFollowUp } from '@artist-booking/shared';
 
 // ─── Types ──────────────────────────────────────────────────
 
 export interface VoiceExecutionResult {
   response_text: string;
   data?: Record<string, unknown>;
+  cards?: VoiceCard[];
+  follow_up?: VoiceFollowUp;
   suggestions: string[];
   action?: {
     type: 'navigate' | 'execute';
@@ -55,6 +58,9 @@ export class VoiceExecutionService {
 
       case 'NAVIGATE':
         return this.handleNavigate(parsedIntent, userRole);
+
+      case 'BRIEF':
+        return this.handleBrief(parsedIntent, userId);
 
       default:
         return {
@@ -144,22 +150,39 @@ export class VoiceExecutionService {
       };
     }
 
-    let response = `I found ${results.length} artist${results.length > 1 ? 's' : ''} matching your search. Here are the top picks:\n\n`;
+    const response = `I found ${results.length} artist${results.length > 1 ? 's' : ''} matching your search. Here are the top picks.`;
     const firstArtist = results[0] as Record<string, unknown>;
+    const firstName = firstArtist.stage_name as string;
 
-    results.forEach((a: Record<string, unknown>, i: number) => {
-      const genres = Array.isArray(a.genres) ? a.genres.slice(0, 2).join(', ') : '';
-      const trustScore = a.trust_score ?? 'N/A';
-      const priceRange = a.price_range_min && a.price_range_max
-        ? `₹${Number(a.price_range_min).toLocaleString('en-IN')}-${Number(a.price_range_max).toLocaleString('en-IN')}`
-        : '';
-      response += `${i + 1}. ${a.stage_name}${genres ? ` (${genres})` : ''} — ${trustScore} trust${priceRange ? `, ${priceRange}` : ''}\n`;
+    // Build visual cards for each artist
+    const cards: VoiceCard[] = results.map((a: Record<string, unknown>) => {
+      const pricing = Array.isArray(a.pricing) ? a.pricing[0] : null;
+      return {
+        type: 'artist_discover' as const,
+        data: {
+          id: a.id,
+          stage_name: a.stage_name,
+          artist_type: a.artist_type ?? a.category,
+          genres: a.genres,
+          trust_score: a.trust_score ? Number(a.trust_score) : undefined,
+          base_city: a.base_city,
+          thumbnail_url: a.thumbnail_url ?? null,
+          is_verified: a.is_verified ?? false,
+          total_bookings: a.total_bookings ? Number(a.total_bookings) : undefined,
+          price_min_paise: pricing?.min_paise ?? pricing?.min_price ? Number(pricing.min_price) * 100 : null,
+          price_max_paise: pricing?.max_paise ?? pricing?.max_price ? Number(pricing.max_price) * 100 : null,
+        },
+      };
     });
 
-    const firstName = firstArtist.stage_name as string;
     return {
       response_text: response,
       data: { artists: results },
+      cards,
+      follow_up: {
+        question: 'Want me to check availability for any of them?',
+        options: [`Tell me about ${firstName}`, 'Show more results', 'Plan my event'],
+      },
       suggestions: [
         `Tell me more about ${firstName}`,
         'Show me more results',
@@ -198,8 +221,24 @@ export class VoiceExecutionService {
         : 'TBD';
 
       return {
-        response_text: `Your booking with ${artistName} for ${booking.event_type || 'event'} on ${booking.event_date || 'TBD'} is currently ${booking.state}. Amount: ${amount}.`,
+        response_text: `Your booking with ${artistName} is currently ${booking.state}. Amount: ${amount}.`,
         data: { booking },
+        cards: [{
+          type: 'booking_status',
+          data: {
+            id: booking.id,
+            artist_name: artistName,
+            artist_thumbnail: artist?.profile_image ?? null,
+            event_type: booking.event_type,
+            event_date: booking.event_date,
+            venue_city: booking.venue_city,
+            status: booking.state,
+            amount_paise: booking.agreed_amount ? Number(booking.agreed_amount) : undefined,
+          },
+        }],
+        follow_up: booking.state === 'confirmed'
+          ? { question: 'Need to send coordination details?', options: ['Yes', 'Show other bookings'] }
+          : undefined,
         suggestions: [
           `What's the payment status for this booking?`,
           'Show my other bookings',
@@ -223,17 +262,32 @@ export class VoiceExecutionService {
       };
     }
 
-    let response = 'Here are your recent bookings:\n\n';
-    for (const b of bookings) {
-      const amount = b.agreed_amount
-        ? ` — ₹${(Number(b.agreed_amount) / 100).toLocaleString('en-IN')}`
-        : '';
-      response += `• ${b.event_type || 'Event'} on ${b.event_date || 'TBD'}: ${b.state}${amount}\n`;
+    const response = `Here are your ${bookings.length} recent booking${bookings.length > 1 ? 's' : ''}.`;
+
+    // Fetch artist names for the booking cards
+    const artistIds = [...new Set(bookings.map((b: any) => b.artist_id).filter(Boolean))];
+    const artistMap = new Map<string, string>();
+    if (artistIds.length > 0) {
+      const artists = await db('artist_profiles').whereIn('user_id', artistIds).select('user_id', 'stage_name', 'profile_image');
+      for (const a of artists) artistMap.set(a.user_id, a.stage_name);
     }
+
+    const cards: VoiceCard[] = bookings.map((b: any) => ({
+      type: 'booking_status' as const,
+      data: {
+        id: b.id,
+        artist_name: artistMap.get(b.artist_id) || 'Artist',
+        event_type: b.event_type,
+        event_date: b.event_date,
+        status: b.state,
+        amount_paise: b.agreed_amount ? Number(b.agreed_amount) : undefined,
+      },
+    }));
 
     return {
       response_text: response,
       data: { bookings },
+      cards,
       suggestions: [
         `Check details for ${bookings[0].event_type || 'latest'} booking`,
         'Find artists for a new event',
@@ -347,12 +401,30 @@ export class VoiceExecutionService {
         const snapshot = await artistIntelligenceService.getEarningsAnalytics(userId, { period_type: 'monthly' });
 
         if (snapshot) {
-          const total = snapshot.summary?.total_revenue_paise
-            ? `₹${(Number(snapshot.summary.total_revenue_paise) / 100).toLocaleString('en-IN')}`
-            : '₹0';
+          const totalPaise = Number(snapshot.summary?.total_revenue_paise || 0);
+          const total = `₹${(totalPaise / 100).toLocaleString('en-IN')}`;
+          const bookingCount = snapshot.summary?.total_bookings || 0;
           return {
-            response_text: `Here's your earnings summary: Total earnings: ${total}. Total bookings: ${snapshot.summary?.total_bookings || 0}.`,
+            response_text: `Your total earnings this month: ${total} from ${bookingCount} booking${bookingCount !== 1 ? 's' : ''}.`,
             data: { earnings: snapshot },
+            cards: [{
+              type: 'earnings_summary',
+              data: {
+                total_paise: totalPaise,
+                period: 'This Month',
+                booking_count: bookingCount,
+                change_pct: (snapshot.summary as any)?.growth_pct ?? null,
+                top_gigs: ((snapshot as any).recent_bookings || snapshot.snapshots || []).slice(0, 3).map((b: any) => ({
+                  event_type: b.event_type,
+                  amount_paise: Number(b.amount_paise || b.agreed_amount || 0),
+                  date: b.event_date || b.created_at,
+                })),
+              },
+            }],
+            follow_up: {
+              question: 'Would you like to see how this compares to last month?',
+              options: ['Yes, compare', 'Show demand trends', 'Check market position'],
+            },
             suggestions: [
               'Show demand trends',
               'What should I charge for weddings?',
@@ -442,6 +514,91 @@ export class VoiceExecutionService {
       ],
     };
   }
+  // ─── BRIEF (Decision Engine) ────────────────────────────
+
+  private async handleBrief(
+    parsedIntent: VoiceParsedIntent,
+    userId: string,
+  ): Promise<VoiceExecutionResult> {
+    const { city, event_type, budget, date, genre } = parsedIntent.entities;
+
+    try {
+      const { decisionEngineService } = await import('../decision-engine/decision-engine.service.js');
+
+      // Build brief input from extracted entities
+      const briefInput: Record<string, unknown> = {
+        raw_text: parsedIntent.raw_text,
+        source: 'voice',
+      };
+      if (event_type) briefInput.event_type = event_type;
+      if (city) briefInput.city = city;
+      if (date) briefInput.event_date = date;
+      if (budget) briefInput.budget_max_paise = Math.round(budget * 100);
+      if (genre) briefInput.genres = [genre];
+
+      const result = await decisionEngineService.createBriefAndRecommend(
+        userId || null,
+        briefInput as any,
+      );
+
+      if (!result || !result.recommendations || result.recommendations.length === 0) {
+        return {
+          response_text: `I couldn't find strong matches for your event. Try adding more details like city, budget, or event type.`,
+          follow_up: {
+            question: 'Want me to broaden the search?',
+            options: ['Yes, broaden search', 'Try different city', 'Talk to concierge'],
+          },
+          suggestions: ['Find artists in Mumbai', 'Show all DJs', 'Plan a different event'],
+        };
+      }
+
+      const topArtist = result.recommendations[0];
+      const topName = topArtist.artist_name || 'a highly-rated artist';
+      const response = `I found ${result.recommendations.length} great options for your event. The top recommendation is ${topName} with a ${Math.round((topArtist.confidence ?? 0) * 100)}% confidence score.`;
+
+      // Build recommendation cards
+      const cards: VoiceCard[] = result.recommendations.map((rec: any) => ({
+        type: 'artist_recommendation' as const,
+        data: {
+          id: rec.artist_id,
+          stage_name: rec.artist_name || 'Artist',
+          artist_type: rec.artist_type,
+          thumbnail_url: rec.profile_image ?? null,
+          score: rec.score,
+          confidence: rec.confidence,
+          rank: rec.rank,
+          price_min_paise: rec.price_min_paise ? Number(rec.price_min_paise) : null,
+          price_max_paise: rec.price_max_paise ? Number(rec.price_max_paise) : null,
+          expected_close_paise: rec.expected_close_paise ? Number(rec.expected_close_paise) : null,
+          why_fit: Array.isArray(rec.why_fit) ? rec.why_fit : [],
+          risk_flags: Array.isArray(rec.risk_flags) ? rec.risk_flags : [],
+          logistics_flags: Array.isArray(rec.logistics_flags) ? rec.logistics_flags : [],
+          score_breakdown: rec.score_breakdown,
+        },
+      }));
+
+      return {
+        response_text: response,
+        data: { brief_id: result.brief_id, recommendations: result.recommendations },
+        cards,
+        follow_up: {
+          question: 'Should I generate a proposal for the top pick?',
+          options: ['Yes, send proposal', 'Show me more details', 'Lock availability'],
+        },
+        suggestions: [
+          `Tell me more about ${topName}`,
+          'Generate proposal',
+          'Lock availability',
+        ],
+      };
+    } catch (err: any) {
+      return {
+        response_text: `I had trouble processing your event brief. ${err?.message || 'Please try again.'}`,
+        suggestions: ['Try again', 'Find artists manually', 'Talk to concierge'],
+      };
+    }
+  }
+
   // ─── NAVIGATE ──────────────────────────────────────────
 
   private async handleNavigate(

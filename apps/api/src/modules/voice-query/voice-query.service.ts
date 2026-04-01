@@ -8,6 +8,7 @@ import { VOICE_QUERY_CONFIDENCE_THRESHOLD, VOICE_SESSION_TIMEOUT_MINUTES } from 
 import { voiceQueryRepository } from './voice-query.repository.js';
 import { voiceIntentService } from './voice-intent.service.js';
 import { voiceExecutionService } from './voice-execution.service.js';
+import { voiceContextService } from './voice-context.service.js';
 import type { VoiceExecutionResult } from './voice-execution.service.js';
 
 // ─── Error class ────────────────────────────────────────────
@@ -212,10 +213,34 @@ export class VoiceQueryService {
       confidence: parsed.confidence,
     });
 
-    // 6. Execute
-    const result = await voiceExecutionService.execute(parsed, userId, conversationContext);
+    // 6. Enrich with conversation memory (multi-turn context)
+    const enriched = await voiceContextService.enrichQuery(conversationId, parsed);
+    const queryToExecute = enriched.context_used
+      ? { ...parsed, entities: enriched.resolved_entities, intent: enriched.intent ?? parsed.intent }
+      : parsed;
 
-    // 7. Update conversation state
+    // 7. Execute
+    const result = await voiceExecutionService.execute(queryToExecute, userId, conversationContext);
+
+    // 8. Update conversation memory with results
+    const artistIds = result.cards
+      ?.filter((c) => c.type === 'artist_recommendation' || c.type === 'artist_discover')
+      .map((c) => (c.data as any)?.id)
+      .filter(Boolean) || [];
+    const briefId = (result.data as any)?.brief_id;
+
+    await voiceContextService.updateMemoryAfterResponse(conversationId, queryToExecute, {
+      artist_ids: artistIds.length > 0 ? artistIds : undefined,
+      brief_id: briefId,
+      result_type: parsed.intent === 'BRIEF' ? 'recommendations' : parsed.intent === 'DISCOVER' ? 'discover' : undefined,
+      pending_action: result.follow_up ? {
+        type: parsed.intent === 'BRIEF' ? 'proposal' : 'book',
+        brief_id: briefId,
+        artist_id: artistIds[0],
+      } : undefined,
+    });
+
+    // 9. Update conversation state
     const previousIntents = conversationContext.previous_intents.slice(-9); // Keep last 10
     previousIntents.push(parsed.intent);
 
