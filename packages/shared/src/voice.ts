@@ -116,9 +116,19 @@ export type VoiceFollowUp = z.infer<typeof voiceFollowUpSchema>;
 
 // ─── Rich Response Message ─────────────────────────────────
 
+export const clarifyingQuestionSchema = z.object({
+  field: z.string(),
+  question: z.string(),
+  question_hi: z.string(),
+  options: z.array(z.object({ label: z.string(), value: z.union([z.string(), z.number()]) })),
+});
+
 export const voiceResponseMessageSchema = z.object({
   text: z.string(),
+  response_type: z.enum(['clarifying_questions', 'recommendations', 'default']).optional(),
   cards: z.array(voiceCardSchema).optional(),
+  clarifying_questions: z.array(clarifyingQuestionSchema).optional(),
+  parsed_context: z.record(z.unknown()).optional(),
   follow_up: voiceFollowUpSchema.optional(),
   suggestions: z.array(z.string()).optional(),
   action: z.object({
@@ -129,6 +139,29 @@ export const voiceResponseMessageSchema = z.object({
 });
 
 export type VoiceResponseMessage = z.infer<typeof voiceResponseMessageSchema>;
+
+// ─── Clarifying Questions ──────────────────────────────────
+
+export interface ClarifyingQuestionOption {
+  label: string;
+  value: string | number;
+}
+
+export interface ClarifyingQuestion {
+  field: string;
+  question: string;
+  question_hi: string;
+  options: ClarifyingQuestionOption[];
+}
+
+export interface ClarifyingState {
+  phase: 'collecting' | 'ready';
+  original_query: string;
+  collected_entities: Record<string, unknown>;
+  asked_fields: string[];
+  clarifying_rounds: number;
+  user_skipped: boolean;
+}
 
 // ─── Conversation Memory ───────────────────────────────────
 

@@ -226,3 +226,8 @@ export const DECISION_ENGINE_WEIGHTS = {
 export const DECISION_ENGINE_MAX_CANDIDATES = 200;
 export const DECISION_ENGINE_TOP_N = 5;
 export const DECISION_ENGINE_MIN_CONFIDENCE = 0.3;
+
+// ─── Clarifying Questions ──────────────────────────────────────
+export const CLARIFYING_MAX_ROUNDS = 2;
+export const CLARIFYING_MAX_QUESTIONS_PER_ROUND = 2;
+export const CLARIFYING_REQUIRED_FIELDS = ['event_type', 'budget', 'date'] as const;

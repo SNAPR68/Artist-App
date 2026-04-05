@@ -213,13 +213,19 @@ export class VoiceQueryService {
       confidence: parsed.confidence,
     });
 
-    // 6. Enrich with conversation memory (multi-turn context)
+    // 6. Check if we're in a clarifying flow — force intent to BRIEF for answers
+    const isClarifying = sessionState.clarifying?.phase === 'collecting';
+    if (isClarifying && parsed.intent !== 'STATUS' && parsed.intent !== 'NAVIGATE' && parsed.intent !== 'EMERGENCY') {
+      parsed.intent = 'BRIEF'; // Route answer back to handleBrief
+    }
+
+    // 7. Enrich with conversation memory (multi-turn context)
     const enriched = await voiceContextService.enrichQuery(conversationId, parsed);
     const queryToExecute = enriched.context_used
       ? { ...parsed, entities: enriched.resolved_entities, intent: enriched.intent ?? parsed.intent }
       : parsed;
 
-    // 7. Execute
+    // 8. Execute
     const result = await voiceExecutionService.execute(queryToExecute, userId, conversationContext);
 
     // 8. Update conversation memory with results
@@ -244,16 +250,24 @@ export class VoiceQueryService {
     const previousIntents = conversationContext.previous_intents.slice(-9); // Keep last 10
     previousIntents.push(parsed.intent);
 
+    // Save/clear clarifying state based on result
+    const newSessionState: Record<string, unknown> = {
+      ...sessionState,
+      ...parsed.entities,
+      last_intent: parsed.intent,
+      previous_intents: previousIntents,
+      user_role: user?.role,
+      current_page: currentPage,
+    };
+    if (result.clarifying_state) {
+      newSessionState.clarifying = result.clarifying_state;
+    } else {
+      delete newSessionState.clarifying;
+    }
+
     await voiceQueryRepository.updateConversation(conversationId, {
       current_intent: parsed.intent,
-      session_state: JSON.stringify({
-        ...sessionState,
-        ...parsed.entities,
-        last_intent: parsed.intent,
-        previous_intents: previousIntents,
-        user_role: user?.role,
-        current_page: currentPage,
-      }),
+      session_state: JSON.stringify(newSessionState),
     });
 
     // 8. Store outbound message

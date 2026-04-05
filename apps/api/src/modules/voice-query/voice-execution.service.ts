@@ -5,14 +5,19 @@
 
 import { db } from '../../infrastructure/database.js';
 import type { VoiceParsedIntent } from './voice-intent.service.js';
-import type { VoiceCard, VoiceFollowUp } from '@artist-booking/shared';
+import { clarifyingQuestionsService } from './clarifying-questions.service.js';
+import type { VoiceCard, VoiceFollowUp, ClarifyingQuestion, ClarifyingState } from '@artist-booking/shared';
 
 // ─── Types ──────────────────────────────────────────────────
 
 export interface VoiceExecutionResult {
   response_text: string;
+  response_type?: 'clarifying_questions' | 'recommendations' | 'default';
   data?: Record<string, unknown>;
   cards?: VoiceCard[];
+  clarifying_questions?: ClarifyingQuestion[];
+  parsed_context?: Record<string, unknown>;
+  clarifying_state?: ClarifyingState;
   follow_up?: VoiceFollowUp;
   suggestions: string[];
   action?: {
@@ -60,7 +65,7 @@ export class VoiceExecutionService {
         return this.handleNavigate(parsedIntent, userRole);
 
       case 'BRIEF':
-        return this.handleBrief(parsedIntent, userId);
+        return this.handleBrief(parsedIntent, userId, conversationContext);
 
       default:
         return {
@@ -514,27 +519,135 @@ export class VoiceExecutionService {
       ],
     };
   }
-  // ─── BRIEF (Decision Engine) ────────────────────────────
+  // ─── BRIEF (Decision Engine + Clarifying Questions) ─────
 
   private async handleBrief(
     parsedIntent: VoiceParsedIntent,
     userId: string,
+    conversationContext: ConversationContext,
   ): Promise<VoiceExecutionResult> {
-    const { city, event_type, budget, date, genre } = parsedIntent.entities;
+    const existingClarifying = conversationContext.session_state?.clarifying as ClarifyingState | undefined;
 
+    // If we're already in a clarifying flow, handle the answer
+    if (existingClarifying?.phase === 'collecting') {
+      return this.handleClarifyingAnswer(parsedIntent, userId, existingClarifying);
+    }
+
+    // New BRIEF: check what's missing
+    const entities: Record<string, unknown> = { ...parsedIntent.entities };
+    const missingFields = clarifyingQuestionsService.getMissingRequiredFields(entities);
+
+    // If nothing missing, go straight to recommendations
+    if (missingFields.length === 0) {
+      return this.runDecisionEngine(entities, userId, parsedIntent.raw_text);
+    }
+
+    // Start clarifying flow
+    const state = clarifyingQuestionsService.createInitialState(parsedIntent.raw_text, entities);
+    const questions = clarifyingQuestionsService.selectQuestions(missingFields, [], 2);
+    state.asked_fields = questions.map((q) => q.field);
+
+    const acknowledgment = clarifyingQuestionsService.buildAcknowledgment(entities);
+    const parsedContext: Record<string, unknown> = {};
+    if (entities.city) parsedContext.city = entities.city;
+    if (entities.genre) parsedContext.genre = entities.genre;
+    if (entities.event_type) parsedContext.event_type = entities.event_type;
+    if (entities.audience_size) parsedContext.audience_size = entities.audience_size;
+
+    return {
+      response_text: acknowledgment,
+      response_type: 'clarifying_questions',
+      clarifying_questions: questions,
+      parsed_context: parsedContext,
+      clarifying_state: state,
+      follow_up: {
+        question: 'Or say "skip" to see results now',
+        options: ['Skip'],
+      },
+      suggestions: ['Skip, just show results'],
+    };
+  }
+
+  /**
+   * Handle an answer to a clarifying question.
+   */
+  private async handleClarifyingAnswer(
+    parsedIntent: VoiceParsedIntent,
+    userId: string,
+    state: ClarifyingState,
+  ): Promise<VoiceExecutionResult> {
+    // Check for skip
+    if (clarifyingQuestionsService.isSkipRequest(parsedIntent.raw_text)) {
+      state.user_skipped = true;
+      return this.runDecisionEngine(state.collected_entities, userId, state.original_query);
+    }
+
+    // Merge answer entities into collected set
+    const merged = await clarifyingQuestionsService.mergeEntities(
+      state.collected_entities,
+      parsedIntent.raw_text,
+    );
+    state.collected_entities = merged;
+    state.clarifying_rounds += 1;
+
+    // Check if we have enough now
+    if (clarifyingQuestionsService.hasEnoughInfo(merged, state.clarifying_rounds, false)) {
+      return this.runDecisionEngine(merged, userId, state.original_query);
+    }
+
+    // Need more info — ask next round
+    const stillMissing = clarifyingQuestionsService.getMissingRequiredFields(merged);
+    const nextQuestions = clarifyingQuestionsService.selectQuestions(stillMissing, state.asked_fields, 2);
+
+    if (nextQuestions.length === 0) {
+      // No more questions to ask, proceed with what we have
+      return this.runDecisionEngine(merged, userId, state.original_query);
+    }
+
+    state.asked_fields.push(...nextQuestions.map((q) => q.field));
+
+    // Build acknowledgment for what they just told us
+    const parts: string[] = [];
+    if (merged.event_type) parts.push(`${merged.event_type}`);
+    if (merged.budget) parts.push(`₹${(Number(merged.budget)).toLocaleString('en-IN')} budget`);
+    const ack = parts.length > 0 ? `Got it — ${parts.join(', ')}. ` : '';
+
+    return {
+      response_text: `${ack}One more thing:`,
+      response_type: 'clarifying_questions',
+      clarifying_questions: nextQuestions,
+      parsed_context: merged,
+      clarifying_state: state,
+      follow_up: {
+        question: 'Or say "skip" to see results now',
+        options: ['Skip'],
+      },
+      suggestions: ['Skip, just show results'],
+    };
+  }
+
+  /**
+   * Run the decision engine and return recommendation cards.
+   */
+  private async runDecisionEngine(
+    entities: Record<string, unknown>,
+    userId: string,
+    rawText: string,
+  ): Promise<VoiceExecutionResult> {
     try {
       const { decisionEngineService } = await import('../decision-engine/decision-engine.service.js');
 
-      // Build brief input from extracted entities
       const briefInput: Record<string, unknown> = {
-        raw_text: parsedIntent.raw_text,
+        raw_text: rawText,
         source: 'voice',
       };
-      if (event_type) briefInput.event_type = event_type;
-      if (city) briefInput.city = city;
-      if (date) briefInput.event_date = date;
-      if (budget) briefInput.budget_max_paise = Math.round(budget * 100);
-      if (genre) briefInput.genres = [genre];
+      if (entities.event_type) briefInput.event_type = entities.event_type;
+      if (entities.city) briefInput.city = entities.city;
+      if (entities.date || entities.event_date) briefInput.event_date = entities.date || entities.event_date;
+      if (entities.budget) briefInput.budget_max_paise = Math.round(Number(entities.budget) * 100);
+      if (entities.budget_max_paise) briefInput.budget_max_paise = Number(entities.budget_max_paise);
+      if (entities.genre) briefInput.genres = [entities.genre];
+      if (entities.genres) briefInput.genres = entities.genres;
 
       const result = await decisionEngineService.createBriefAndRecommend(
         userId || null,
@@ -543,20 +656,21 @@ export class VoiceExecutionService {
 
       if (!result || !result.recommendations || result.recommendations.length === 0) {
         return {
-          response_text: `I couldn't find strong matches for your event. Try adding more details like city, budget, or event type.`,
+          response_text: "I couldn't find strong matches for your event. Try adding more details.",
+          response_type: 'recommendations',
           follow_up: {
             question: 'Want me to broaden the search?',
             options: ['Yes, broaden search', 'Try different city', 'Talk to concierge'],
           },
-          suggestions: ['Find artists in Mumbai', 'Show all DJs', 'Plan a different event'],
+          suggestions: ['Find artists in Mumbai', 'Show all DJs'],
         };
       }
 
       const topArtist = result.recommendations[0];
       const topName = topArtist.artist_name || 'a highly-rated artist';
-      const response = `I found ${result.recommendations.length} great options for your event. The top recommendation is ${topName} with a ${Math.round((topArtist.confidence ?? 0) * 100)}% confidence score.`;
+      const confidence = Math.round((topArtist.confidence ?? 0) * 100);
+      const response = `Found ${result.recommendations.length} great options! The top pick is ${topName} with ${confidence}% confidence.`;
 
-      // Build recommendation cards
       const cards: VoiceCard[] = result.recommendations.map((rec: any) => ({
         type: 'artist_recommendation' as const,
         data: {
@@ -579,21 +693,18 @@ export class VoiceExecutionService {
 
       return {
         response_text: response,
+        response_type: 'recommendations',
         data: { brief_id: result.brief_id, recommendations: result.recommendations },
         cards,
         follow_up: {
           question: 'Should I generate a proposal for the top pick?',
-          options: ['Yes, send proposal', 'Show me more details', 'Lock availability'],
+          options: ['Yes, send proposal', 'Show more details', 'Lock availability'],
         },
-        suggestions: [
-          `Tell me more about ${topName}`,
-          'Generate proposal',
-          'Lock availability',
-        ],
+        suggestions: [`Tell me about ${topName}`, 'Generate proposal', 'Lock availability'],
       };
     } catch (err: any) {
       return {
-        response_text: `I had trouble processing your event brief. ${err?.message || 'Please try again.'}`,
+        response_text: `I had trouble processing your brief. ${err?.message || 'Please try again.'}`,
         suggestions: ['Try again', 'Find artists manually', 'Talk to concierge'],
       };
     }

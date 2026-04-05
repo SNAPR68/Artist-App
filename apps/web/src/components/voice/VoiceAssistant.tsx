@@ -695,8 +695,8 @@ export function VoiceAssistant() {
 
   return (
     <>
-      {/* ─── Collapsed: 3D Mascot Circles (bottom-right) ─── */}
-      {!isOpen && (
+      {/* ─── Collapsed: 3D Mascot Circles (bottom-right) — hidden on homepage ─── */}
+      {!isOpen && pathname !== '/' && (
         <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-modal animate-scale-in">
           <div className="flex items-center gap-3">
             {/* Zara — English */}
