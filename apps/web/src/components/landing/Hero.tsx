@@ -4,7 +4,7 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowUp, Mic, Building2, Guitar } from 'lucide-react';
+import { ArrowUp, Mic, Building2 } from 'lucide-react';
 import { CardRenderer } from '../voice/cards/CardRenderer';
 import { apiClient } from '../../lib/api-client';
 import type { VoiceCard, ClarifyingQuestion } from '@artist-booking/shared';
@@ -344,15 +344,22 @@ export function Hero() {
               )}
             </motion.div>
 
-            {/* ─── Secondary Links ─── */}
+            {/* ─── Two Entry Buttons ─── */}
             {!hasConversation && (
-              <motion.div variants={itemVariants} className="flex items-center justify-center gap-6 pt-2">
-                <button onClick={() => router.push('/search')} className="flex items-center gap-2 text-white/30 hover:text-white/60 transition-colors text-sm">
-                  <Guitar size={14} /> Browse Artists
+              <motion.div variants={itemVariants} className="flex items-center justify-center gap-4 pt-3">
+                <button
+                  onClick={() => router.push('/artist/onboarding')}
+                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-[#c39bff]/30 bg-[#c39bff]/10 hover:bg-[#c39bff]/20 text-[#c39bff] hover:text-white transition-all text-sm font-medium"
+                >
+                  <Mic size={15} />
+                  For Artists
                 </button>
-                <div className="w-px h-4 bg-white/10" />
-                <button onClick={() => router.push('/login')} className="flex items-center gap-2 text-white/30 hover:text-white/60 transition-colors text-sm">
-                  <Building2 size={14} /> Event Company OS
+                <button
+                  onClick={() => router.push('/login')}
+                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-[#a1faff]/30 bg-[#a1faff]/10 hover:bg-[#a1faff]/20 text-[#a1faff] hover:text-white transition-all text-sm font-medium"
+                >
+                  <Building2 size={15} />
+                  For Event Companies
                 </button>
               </motion.div>
             )}

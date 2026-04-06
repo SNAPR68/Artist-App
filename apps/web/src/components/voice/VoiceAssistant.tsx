@@ -669,6 +669,7 @@ export function VoiceAssistant() {
   // Listen for custom event from hero mascots to open with a specific language
   useEffect(() => {
     const handler = (e: Event) => {
+      if (window.location.pathname === '/') return; // Voice is inline on homepage
       const lang = (e as CustomEvent).detail?.lang as 'en' | 'hi';
       if (lang) setTtsLang(lang);
       setIsOpen(true);
