@@ -79,23 +79,6 @@ export function Navbar() {
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-1">
-            <NavLink href="/brief" isActive={activeNavLink === '/brief'} onHoverStart={() => setActiveNavLink('/brief')} onHoverEnd={() => setActiveNavLink(null)} highlight>
-              Plan Event
-            </NavLink>
-            <NavLink href="/search" isActive={activeNavLink === '/search'} onHoverStart={() => setActiveNavLink('/search')} onHoverEnd={() => setActiveNavLink(null)}>
-              Artists
-            </NavLink>
-            <NavLink href="/gigs" isActive={activeNavLink === '/gigs'} onHoverStart={() => setActiveNavLink('/gigs')} onHoverEnd={() => setActiveNavLink(null)}>
-              Live Gigs
-            </NavLink>
-
-            <motion.div
-              className="w-px h-5 bg-white/15 mx-3"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.15, duration: 0.4 }}
-            />
-
             {showAuth && isAuthenticated && user ? (
               <motion.div
                 className="flex items-center gap-2"
