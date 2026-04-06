@@ -4,8 +4,9 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowUp, Mic, Building2 } from 'lucide-react';
+import { ArrowUp, Mic } from 'lucide-react';
 import { CardRenderer } from '../voice/cards/CardRenderer';
+import { useVoiceRecognition } from '../voice/useVoiceRecognition';
 import { apiClient } from '../../lib/api-client';
 import type { VoiceCard, ClarifyingQuestion } from '@artist-booking/shared';
 
@@ -60,6 +61,20 @@ export function Hero() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [messages, setMessages] = useState<ConvoMessage[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const { isListening, transcript, interimTranscript, isSupported: micSupported, startListening, stopListening, resetTranscript } = useVoiceRecognition();
+
+  useEffect(() => { setMounted(true); }, []);
+
+  // Auto-submit when voice transcript is finalized
+  const lastTranscriptRef = useRef('');
+  useEffect(() => {
+    if (transcript && transcript !== lastTranscriptRef.current && !isListening) {
+      lastTranscriptRef.current = transcript;
+      sendMessage(transcript);
+      resetTranscript();
+    }
+  }, [transcript, isListening, resetTranscript]); // sendMessage excluded to avoid re-render loop — it's stable via useCallback
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -217,9 +232,7 @@ export function Hero() {
     sendMessage(value);
   }, [sendMessage]);
 
-  const openVoiceAssistant = useCallback(() => {
-    window.dispatchEvent(new CustomEvent('open-voice-assistant', { detail: { lang: 'en' } }));
-  }, []);
+
 
   const hasConversation = messages.length > 0;
 
@@ -273,19 +286,15 @@ export function Hero() {
               <span className="text-white/70">The industry moves — all on one platform.</span>
             </motion.p>
 
-            {/* ─── Chat-Style Input ─── */}
+            {/* ─── Chat-Style Input (White) ─── */}
             <motion.div variants={itemVariants} className="relative mx-auto">
-              <div className="absolute -inset-[1px] rounded-3xl bg-gradient-to-br from-[#c39bff]/50 via-[#a1faff]/20 to-[#c39bff]/50 blur-[1px] pointer-events-none" />
               <div
-                className="relative rounded-3xl border border-[#c39bff]/25 hover:border-[#c39bff]/40 focus-within:border-[#c39bff]/60 transition-all duration-300"
+                className="relative rounded-2xl border-2 border-[#c39bff]/60 hover:border-[#c39bff]/80 focus-within:border-[#c39bff] transition-all duration-300"
                 style={{
-                  background: 'rgba(26, 25, 27, 0.85)',
-                  backdropFilter: 'blur(20px)',
-                  boxShadow: '0 0 60px rgba(195, 155, 255, 0.08), 0 8px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+                  background: 'rgba(255, 255, 255, 0.97)',
+                  boxShadow: '0 0 40px rgba(195, 155, 255, 0.15), 0 12px 48px rgba(0, 0, 0, 0.2)',
                 }}
               >
-                <div className="absolute -inset-px rounded-3xl bg-gradient-to-b from-[#c39bff]/10 to-[#a1faff]/5 opacity-0 focus-within:opacity-100 transition-opacity pointer-events-none" />
-
                 <textarea
                   ref={textareaRef}
                   value={briefText}
@@ -293,19 +302,33 @@ export function Hero() {
                   onKeyDown={handleKeyDown}
                   placeholder={hasConversation ? 'Reply to Zara...' : EXAMPLE_BRIEFS[placeholderIndex]}
                   rows={hasConversation ? 2 : 4}
-                  className="w-full bg-transparent text-white placeholder:text-white/25 text-lg md:text-xl px-7 pt-6 pb-14 resize-none focus:outline-none leading-relaxed"
+                  className="w-full bg-transparent text-[#1a1a1d] placeholder:text-black/30 text-lg md:text-xl px-7 pt-6 pb-14 resize-none focus:outline-none leading-relaxed"
                   style={{ minHeight: hasConversation ? '80px' : '160px', maxHeight: '240px' }}
                 />
 
                 {/* Bottom toolbar */}
+                {/* Interim transcript overlay */}
+                {isListening && interimTranscript && (
+                  <div className="absolute top-4 left-7 right-7 text-black/40 text-lg italic pointer-events-none">
+                    {interimTranscript}
+                  </div>
+                )}
+
                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
                   <button
-                    onClick={openVoiceAssistant}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white/30 hover:text-[#c39bff] hover:bg-[#c39bff]/10 transition-all text-xs font-medium"
-                    title="Use voice"
+                    onClick={() => {
+                      if (!mounted || !micSupported) return;
+                      isListening ? stopListening() : startListening();
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all text-xs font-medium ${
+                      isListening
+                        ? 'bg-red-500/15 text-red-500 animate-pulse'
+                        : 'text-black/30 hover:text-[#7c3aed] hover:bg-[#7c3aed]/10'
+                    }`}
+                    title={isListening ? 'Stop recording' : 'Start voice input'}
                   >
                     <Mic size={14} />
-                    <span className="hidden sm:inline">Voice</span>
+                    <span className="hidden sm:inline">{isListening ? 'Listening...' : 'Voice'}</span>
                   </button>
 
                   <motion.button
@@ -315,8 +338,8 @@ export function Hero() {
                     whileTap={{ scale: 0.95 }}
                     className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 ${
                       briefText.trim()
-                        ? 'bg-[#c39bff] text-[#1a191b] shadow-[0_0_20px_rgba(195,155,255,0.4)] cursor-pointer'
-                        : 'bg-white/10 text-white/20 cursor-not-allowed'
+                        ? 'bg-[#1a1a1d] text-white shadow-lg cursor-pointer'
+                        : 'bg-black/10 text-black/20 cursor-not-allowed'
                     }`}
                   >
                     {isSubmitting ? (
@@ -335,7 +358,7 @@ export function Hero() {
                     <button
                       key={example}
                       onClick={() => { setBriefText(example); textareaRef.current?.focus(); }}
-                      className="px-3 py-1.5 rounded-full border border-white/8 text-white/35 hover:text-white/60 hover:border-white/15 hover:bg-white/5 transition-all text-xs"
+                      className="px-3 py-1.5 rounded-full border border-white/15 text-white/50 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all text-xs"
                     >
                       {example}
                     </button>
@@ -344,23 +367,52 @@ export function Hero() {
               )}
             </motion.div>
 
-            {/* ─── Two Entry Buttons ─── */}
+            {/* ─── Two Entry Cards ─── */}
             {!hasConversation && (
-              <motion.div variants={itemVariants} className="flex items-center justify-center gap-4 pt-3">
-                <button
+              <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4 pt-4 max-w-md mx-auto">
+                {/* Artists Card */}
+                <motion.button
                   onClick={() => router.push('/artist/onboarding')}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-[#c39bff]/30 bg-[#c39bff]/10 hover:bg-[#c39bff]/20 text-[#c39bff] hover:text-white transition-all text-sm font-medium"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="group relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 border-[#c39bff]/40 hover:border-[#c39bff]/70 transition-all duration-300 overflow-hidden"
+                  style={{ background: 'rgba(195, 155, 255, 0.08)', backdropFilter: 'blur(12px)', boxShadow: '0 0 20px rgba(195, 155, 255, 0.08)' }}
                 >
-                  <Mic size={15} />
-                  For Artists
-                </button>
-                <button
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#c39bff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative w-10 h-10 rounded-xl bg-[#c39bff]/15 flex items-center justify-center group-hover:bg-[#c39bff]/25 transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c39bff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 18V5l12-2v13" />
+                      <circle cx="6" cy="18" r="3" />
+                      <circle cx="18" cy="16" r="3" />
+                    </svg>
+                  </div>
+                  <div className="relative text-center">
+                    <p className="text-sm font-semibold text-white group-hover:text-[#c39bff] transition-colors">For Artists</p>
+                    <p className="text-[10px] text-white/30 mt-0.5">Grow your career</p>
+                  </div>
+                </motion.button>
+
+                {/* Event Companies Card */}
+                <motion.button
                   onClick={() => router.push('/login')}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-[#a1faff]/30 bg-[#a1faff]/10 hover:bg-[#a1faff]/20 text-[#a1faff] hover:text-white transition-all text-sm font-medium"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="group relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 border-[#a1faff]/40 hover:border-[#a1faff]/70 transition-all duration-300 overflow-hidden"
+                  style={{ background: 'rgba(161, 250, 255, 0.08)', backdropFilter: 'blur(12px)', boxShadow: '0 0 20px rgba(161, 250, 255, 0.08)' }}
                 >
-                  <Building2 size={15} />
-                  For Event Companies
-                </button>
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#a1faff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative w-10 h-10 rounded-xl bg-[#a1faff]/15 flex items-center justify-center group-hover:bg-[#a1faff]/25 transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a1faff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                      <path d="M2 17l10 5 10-5" />
+                      <path d="M2 12l10 5 10-5" />
+                    </svg>
+                  </div>
+                  <div className="relative text-center">
+                    <p className="text-sm font-semibold text-white group-hover:text-[#a1faff] transition-colors">For Event Companies</p>
+                    <p className="text-[10px] text-white/30 mt-0.5">Build better events</p>
+                  </div>
+                </motion.button>
               </motion.div>
             )}
           </motion.div>
