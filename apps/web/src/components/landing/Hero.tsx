@@ -95,7 +95,9 @@ export function Hero() {
   const violetOrbY = useTransform(scrollY, [0, 500], [0, 150]);
   const cyanOrbY = useTransform(scrollY, [0, 500], [0, -100]);
 
-  // ─── Send message to voice query API ──────────────────────
+  // ─── Send message to decision engine brief endpoint ───────
+  // The public /v1/decision-engine/brief endpoint handles the full
+  // conversational flow: clarifying questions → recommendations.
 
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isSubmitting) return;
@@ -106,72 +108,65 @@ export function Hero() {
     setMessages((prev) => [...prev, { role: 'user', text }]);
 
     try {
-      // Try authenticated voice query first
-      const res = await apiClient<any>('/v1/voice/query', {
+      const body: Record<string, unknown> = {
+        raw_text: text,
+        source: 'web',
+      };
+      if (sessionId) body.session_id = sessionId;
+
+      const res = await apiClient<any>('/v1/decision-engine/brief', {
         method: 'POST',
-        body: JSON.stringify({
-          text,
-          session_id: sessionId,
-          current_page: '/',
-        }),
+        body: JSON.stringify(body),
       });
 
       if (res.success && res.data) {
-        setSessionId(res.data.session_id);
-        setMessages((prev) => [...prev, {
-          role: 'assistant',
-          text: res.data.response_text,
-          cards: res.data.cards,
-          clarifying_questions: res.data.clarifying_questions,
-          parsed_context: res.data.parsed_context,
-          follow_up: res.data.follow_up,
-          response_type: res.data.response_type,
-        }]);
+        const data = res.data;
+        setSessionId(data.session_id);
 
-        // TTS
-        speakText(res.data.response_text);
-      } else {
-        // Fallback: use the brief API directly for unauthenticated users
-        const briefRes = await apiClient<any>('/v1/decision-engine/brief', {
-          method: 'POST',
-          body: JSON.stringify({ raw_text: text, source: 'web' }),
-        });
-
-        if (briefRes.success && briefRes.data) {
-          const recs = briefRes.data.recommendations || [];
-          const topName = recs[0]?.artist_name || 'a great artist';
+        if (data.response_type === 'clarifying_questions') {
+          setMessages((prev) => [...prev, {
+            role: 'assistant',
+            text: data.response_text,
+            response_type: 'clarifying_questions',
+            clarifying_questions: data.clarifying_questions,
+            parsed_context: data.parsed_context,
+          }]);
+          speakText(data.response_text);
+        } else if (data.response_type === 'recommendations') {
+          const recs = data.recommendations || [];
           const cards: VoiceCard[] = recs.map((rec: any) => ({
             type: 'artist_recommendation' as const,
             data: {
               id: rec.artist_id,
               stage_name: rec.artist_name || 'Artist',
               artist_type: rec.artist_type,
+              thumbnail_url: rec.profile_image ?? null,
               score: rec.score,
               confidence: rec.confidence,
               rank: rec.rank,
               price_min_paise: rec.price_min_paise,
               price_max_paise: rec.price_max_paise,
+              expected_close_paise: rec.expected_close_paise,
               why_fit: rec.why_fit || [],
               risk_flags: rec.risk_flags || [],
+              logistics_flags: rec.logistics_flags || [],
             },
           }));
 
           setMessages((prev) => [...prev, {
             role: 'assistant',
-            text: recs.length > 0
-              ? `Found ${recs.length} options! Top pick: ${topName}.`
-              : "I couldn't find matches. Try adding more details.",
+            text: data.response_text,
             cards: cards.length > 0 ? cards : undefined,
             response_type: 'recommendations',
             follow_up: recs.length > 0
               ? { question: 'Want a proposal for any of these?', options: ['Yes, send proposal', 'Show more details'] }
-              : undefined,
+              : { question: 'What would you like to do?', options: ['Try again', 'Broaden search'] },
           }]);
 
-          if (recs.length > 0) speakText(`Found ${recs.length} options. Top pick is ${topName}.`);
-        } else {
-          throw new Error('API error');
+          speakText(data.response_text);
         }
+      } else {
+        throw new Error('API error');
       }
     } catch {
       setMessages((prev) => [...prev, {

@@ -4,7 +4,7 @@ import { EventType } from './enums/index.js';
 // ─── Decision Engine Schemas ────────────────────────────────
 
 export const decisionBriefSchema = z.object({
-  raw_text: z.string().min(5).max(5000),
+  raw_text: z.string().min(1).max(5000),
   source: z.enum(['web', 'whatsapp', 'voice']).default('web'),
   event_type: z.nativeEnum(EventType).optional(),
   city: z.string().min(2).max(100).optional(),
@@ -16,6 +16,7 @@ export const decisionBriefSchema = z.object({
   vibe_tags: z.array(z.string().min(1).max(50)).max(10).optional(),
   is_family_safe: z.boolean().optional(),
   workspace_id: z.string().uuid().optional(),
+  session_id: z.string().uuid().optional(), // brief_id from previous turn (clarifying answer)
 });
 
 export const decisionParsedBriefSchema = z.object({
@@ -64,6 +65,44 @@ export const decisionResponseSchema = z.object({
   recommendations: z.array(decisionRecommendationSchema),
   constraints_note: z.string().nullable(),
 });
+
+// ─── Conversational Brief Response (homepage chat) ────────
+// Discriminated union: clarifying questions OR recommendations
+
+export const decisionClarifyingQuestionOptionSchema = z.object({
+  label: z.string(),
+  value: z.union([z.string(), z.number()]),
+});
+
+export const decisionClarifyingQuestionSchema = z.object({
+  field: z.string(),
+  question: z.string(),
+  question_hi: z.string(),
+  options: z.array(decisionClarifyingQuestionOptionSchema),
+});
+
+export const decisionConversationResponseSchema = z.union([
+  z.object({
+    response_type: z.literal('clarifying_questions'),
+    session_id: z.string().uuid(),
+    response_text: z.string(),
+    clarifying_questions: z.array(decisionClarifyingQuestionSchema),
+    parsed_context: z.record(z.unknown()),
+  }),
+  z.object({
+    response_type: z.literal('recommendations'),
+    session_id: z.string().uuid(),
+    response_text: z.string(),
+    brief_id: z.string().uuid(),
+    summary: z.string(),
+    parsed_brief: decisionParsedBriefSchema,
+    recommendations: z.array(decisionRecommendationSchema),
+    constraints_note: z.string().nullable(),
+  }),
+]);
+
+export type DecisionClarifyingQuestion = z.infer<typeof decisionClarifyingQuestionSchema>;
+export type DecisionConversationResponse = z.infer<typeof decisionConversationResponseSchema>;
 
 export const decisionProposalRequestSchema = z.object({
   artist_ids: z.array(z.string().uuid()).min(1).max(10),

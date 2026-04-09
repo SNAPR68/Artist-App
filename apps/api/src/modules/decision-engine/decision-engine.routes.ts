@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { decisionEngineService, DecisionEngineError } from './decision-engine.service.js';
+import { decisionEngineConversationService } from './decision-engine-conversation.service.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
 import {
@@ -40,7 +41,8 @@ export async function decisionEngineRoutes(app: FastifyInstance) {
   });
 
   /**
-   * POST /v1/decision-engine/brief — Create brief + compute recommendations.
+   * POST /v1/decision-engine/brief — Conversational brief handler.
+   * Returns either clarifying questions or final recommendations.
    * Auth optional (userId will be null for anonymous users).
    */
   app.post('/v1/decision-engine/brief', {
@@ -64,7 +66,6 @@ export async function decisionEngineRoutes(app: FastifyInstance) {
       try {
         const authHeader = request.headers.authorization;
         if (authHeader?.startsWith('Bearer ')) {
-          // Attempt to decode — don't fail if invalid
           await (authMiddleware as any)(request, reply);
           userId = request.user?.user_id ?? null;
         }
@@ -72,7 +73,19 @@ export async function decisionEngineRoutes(app: FastifyInstance) {
         // Auth is optional for this endpoint
       }
 
-      const result = await decisionEngineService.createBriefAndRecommend(userId, parsed.data);
+      const result = await decisionEngineConversationService.handleMessage({
+        raw_text: parsed.data.raw_text,
+        source: parsed.data.source,
+        session_id: parsed.data.session_id,
+        user_id: userId,
+        event_type: parsed.data.event_type,
+        city: parsed.data.city,
+        event_date: parsed.data.event_date,
+        audience_size: parsed.data.audience_size,
+        budget_max_paise: parsed.data.budget_max_paise,
+        genres: parsed.data.genres,
+      });
+
       return reply.status(201).send({ success: true, data: result, errors: [] });
     } catch (err) {
       if (err instanceof DecisionEngineError) {

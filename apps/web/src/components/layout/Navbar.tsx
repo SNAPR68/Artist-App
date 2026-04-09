@@ -23,7 +23,6 @@ export function Navbar() {
   const { scrollDirection, isAtTop } = useScrollDirection();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [activeNavLink, setActiveNavLink] = useState<string | null>(null);
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
@@ -252,41 +251,3 @@ export function Navbar() {
   );
 }
 
-function NavLink({
-  href,
-  children,
-  isActive,
-  highlight,
-  onHoverStart,
-  onHoverEnd,
-}: {
-  href: string;
-  children: React.ReactNode;
-  isActive?: boolean;
-  highlight?: boolean;
-  onHoverStart?: () => void;
-  onHoverEnd?: () => void;
-}) {
-  return (
-    <motion.div
-      onHoverStart={onHoverStart}
-      onHoverEnd={onHoverEnd}
-      className="relative"
-    >
-      <Link
-        href={href}
-        className={`text-[13px] px-3 py-2 rounded-lg transition-colors duration-200 font-medium min-h-11 flex items-center relative ${highlight ? 'text-[#c39bff] hover:text-white hover:bg-[#c39bff]/10' : 'text-nocturne-text-secondary hover:text-white hover:bg-white/[0.06]'}`}
-      >
-        {children}
-        {isActive && (
-          <motion.span
-            layoutId="navUnderline"
-            className="absolute bottom-0 left-3 right-3 h-0.5 bg-nocturne-primary rounded-full"
-            initial={false}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-          />
-        )}
-      </Link>
-    </motion.div>
-  );
-}
