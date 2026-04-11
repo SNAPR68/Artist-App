@@ -115,7 +115,7 @@ export function AgencySection() {
         {/* CTA */}
         <div className="text-center">
           <button
-            onClick={() => router.push('/login')}
+            onClick={() => router.push('/agency/join')}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-[#0e0e0f] font-semibold text-sm hover:bg-white/90 transition-colors shadow-lg"
           >
             Start Your Free Trial

@@ -389,7 +389,7 @@ export function Hero() {
 
                 {/* Event Companies Card */}
                 <motion.button
-                  onClick={() => router.push('/login')}
+                  onClick={() => router.push('/agency/join')}
                   whileHover={{ scale: 1.03, y: -2 }}
                   whileTap={{ scale: 0.97 }}
                   className="group relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 border-[#a1faff]/40 hover:border-[#a1faff]/70 transition-all duration-300 overflow-hidden"
