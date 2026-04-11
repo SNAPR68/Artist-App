@@ -8,6 +8,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Hero } from '@/components/landing/Hero';
 
 // Lazy-load below-the-fold components
+const AgencySection = dynamic(() => import('@/components/landing/AgencySection').then(m => ({ default: m.AgencySection })), { ssr: false });
 const Categories = dynamic(() => import('@/components/landing/Categories').then(m => ({ default: m.Categories })), { ssr: false });
 const FeaturedArtists = dynamic(() => import('@/components/landing/FeaturedArtists').then(m => ({ default: m.FeaturedArtists })), { ssr: false });
 const InstaBookBanner = dynamic(() => import('@/components/landing/InstaBookBanner').then(m => ({ default: m.InstaBookBanner })), { ssr: false });
@@ -42,6 +43,7 @@ export default function HomePage() {
     <main className="min-h-screen bg-[#0e0e0f] text-white font-sans">
       <Navbar />
       <Hero />
+      <AgencySection />
       <Categories />
       <FeaturedArtists />
       <InstaBookBanner />

@@ -1,12 +1,34 @@
-# Slash for Events — CLAUDE.md
-_Last updated: 2026-03-29_
+# GRID — CLAUDE.md
+_Last updated: 2026-04-10_
 
-## Product Direction (Revised 2026-03-28)
-**Slash for Events** is the decision and operations layer for India's live entertainment industry. NOT a booking marketplace. The platform leads with a decision-first workflow:
+## CRITICAL: Context Hygiene Rules
+1. **Read MEMORY.md first** — it has project state, feedback rules, and references. Don't re-explore.
+2. **Delegate heavy reads to sub-agents** — never read files >100 lines into main context. Use Agent(subagent_type="Explore") for codebase exploration, Agent(subagent_type="Plan") for design.
+3. **Targeted edits only in main context** — read specific line ranges (offset+limit), make edits, commit, deploy.
+4. **Never claim "done" without verifying** — test production API (curl) + verify frontend renders.
+5. **Production DB migrations** — run via Supabase SQL Editor, not CLI (no direct DB_URL). Generate raw SQL.
 
-**brief → recommendation → proposal → concierge lock → booking**
+## Product Direction (Revised 2026-04-09)
+**GRID** is pivoting from "decision engine for live entertainment" to **"The Operating System for India's live entertainment industry"** — the Agency OS play.
 
-The immediate product wedge is a lightweight decision engine that answers: What should I book for this event? What should it cost? What are the best-fit options? Can I lock it quickly?
+### Current Sprint: Agency OS Pivot (90-day plan)
+**Sprint 1 (Days 1-30):** Homepage pivot, /agency/join, agency dashboard with Kanban, /pricing page
+**Sprint 2 (Days 31-60):** Deal vault, team collab, proposal templates, GST invoices
+**Sprint 3 (Days 61-90):** Razorpay subscriptions, admin analytics, concierge upgrade
+**Goal:** 10 paying agencies at ₹15K/mo = ₹1.5L MRR
+
+### What's Already Built & Deployed
+- Decision engine with Myra-style clarifying questions (verified in production 2026-04-09)
+- Homepage: white chat box with inline conversation, Voice mic, two entry cards
+- Voice assistant: rich visual cards, multi-turn memory, streaming TTS, 520px panel
+- GRID branding: Inter font-black navbar, clean minimal design
+- 38 API modules, 242+ endpoints, 79 migrations on Supabase
+
+### Non-Goals (Current Sprint)
+- Broad public marketplace with browse-first discovery
+- Dashboard redesigns beyond agency workflow
+- Long-tail artist onboarding before demand flow
+- New modules unrelated to the agency OS pivot
 
 ### Strategy Documents (Single Source of Truth)
 ```
