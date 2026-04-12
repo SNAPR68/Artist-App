@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /client/
+Disallow: /artist/
+Disallow: /agent/
+Disallow: /admin/
+Disallow: /verify
+Disallow: /font-preview
+
+Sitemap: https://artist-booking-85vcbv8u2-tscllps-projects.vercel.app/sitemap.xml
