@@ -50,6 +50,7 @@ import { gamificationRoutes } from './modules/gamification/gamification.routes.j
 import { instabookInterestRoutes } from './modules/instabook-interest/instabook-interest.routes.js';
 import { decisionEngineRoutes } from './modules/decision-engine/decision-engine.routes.js';
 import { vaultRoutes } from './modules/vault/vault.routes.js';
+import { subscriptionRoutes } from './modules/subscription/subscription.routes.js';
 import { startCronJobs } from './infrastructure/cron.js';
 
 const app = Fastify({
@@ -258,6 +259,7 @@ await app.register(gamificationRoutes);
 await app.register(instabookInterestRoutes);
 await app.register(decisionEngineRoutes);
 await app.register(vaultRoutes);
+await app.register(subscriptionRoutes);
 
 // ─── Graceful Shutdown ───────────────────────────────────────
 async function shutdown(signal: string) {
