@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist';
 import {
   Search,
   Calendar,
@@ -84,6 +85,8 @@ export default function ClientDashboardPage() {
 
   return (
     <div className="space-y-8 animate-fade-in relative">
+      {/* First-run onboarding checklist */}
+      <OnboardingChecklist />
       {/* Ambient glows */}
       <div className="absolute -top-40 -right-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute -bottom-40 -left-20 w-80 h-80 bg-[#a1faff]/5 blur-[100px] rounded-full pointer-events-none" />
