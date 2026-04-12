@@ -27,7 +27,7 @@ export function ArtistRecommendationCard({ artist, onSelect }: { artist: VoiceAr
   const hasDecisionData = artist.why_fit && artist.why_fit.length > 0;
 
   return (
-    <div className="rounded-xl border border-white/10 bg-[#1a191b]/80 backdrop-blur-sm overflow-hidden hover:border-white/20 transition-all">
+    <div className="rounded-xl border border-white/10 bg-[#1a191b]/80 backdrop-blur-sm overflow-hidden hover:border-white/20 transition-all" role="article" aria-label={`Artist recommendation: ${artist.stage_name}`}>
       {/* Header: Image + Name */}
       <div className="flex gap-3 p-3">
         {/* Thumbnail */}

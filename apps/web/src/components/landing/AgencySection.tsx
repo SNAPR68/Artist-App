@@ -76,7 +76,7 @@ export function AgencySection() {
   const router = useRouter();
 
   return (
-    <section className="relative bg-[#0e0e0f] px-6 py-24 overflow-hidden">
+    <section className="relative bg-[#0e0e0f] px-6 py-24 overflow-hidden" aria-label="For Event Agencies and Planners">
       {/* Subtle gradient divider */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
@@ -116,6 +116,7 @@ export function AgencySection() {
         <div className="text-center">
           <button
             onClick={() => router.push('/agency/join')}
+            aria-label="Start your free trial on GRID"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-[#0e0e0f] font-semibold text-sm hover:bg-white/90 transition-colors shadow-lg"
           >
             Start Your Free Trial

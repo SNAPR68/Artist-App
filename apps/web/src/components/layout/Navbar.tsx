@@ -69,7 +69,7 @@ export function Navbar() {
             whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', damping: 15, stiffness: 300 }}
           >
-            <Link href="/" className="flex items-center flex-shrink-0">
+            <Link href="/" className="flex items-center flex-shrink-0" aria-label="GRID home">
               <span className="text-xl font-sans font-black tracking-[0.3em] uppercase text-white">
                 GRID
               </span>

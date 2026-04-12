@@ -268,9 +268,9 @@ export function Hero() {
 
             {/* Headline */}
             <motion.h1 variants={itemVariants} className="font-display text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter leading-[1] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
-              Plug into India&apos;s{' '}
+              Run your event business.{' '}
               <span className="bg-gradient-to-r from-[#c39bff] via-[#b68cf6] to-[#a1faff] bg-clip-text text-transparent">
-                live entertainment grid.
+                All on one platform.
               </span>
             </motion.h1>
 
@@ -295,9 +295,10 @@ export function Hero() {
                   value={briefText}
                   onChange={handleInput}
                   onKeyDown={handleKeyDown}
+                  aria-label="Describe your event to get artist recommendations"
                   placeholder={hasConversation ? 'Reply to Zara...' : EXAMPLE_BRIEFS[placeholderIndex]}
                   rows={hasConversation ? 2 : 4}
-                  className="w-full bg-transparent text-[#1a1a1d] placeholder:text-black/30 text-lg md:text-xl px-7 pt-6 pb-14 resize-none focus:outline-none leading-relaxed"
+                  className="w-full bg-transparent text-[#1a1a1d] placeholder:text-black/30 text-base md:text-lg lg:text-xl px-5 md:px-7 pt-5 md:pt-6 pb-14 resize-none focus:outline-none leading-relaxed"
                   style={{ minHeight: hasConversation ? '80px' : '160px', maxHeight: '240px' }}
                 />
 
@@ -331,6 +332,7 @@ export function Hero() {
                     disabled={!briefText.trim() || isSubmitting}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    aria-label="Submit event brief"
                     className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 ${
                       briefText.trim()
                         ? 'bg-[#1a1a1d] text-white shadow-lg cursor-pointer'
@@ -370,6 +372,7 @@ export function Hero() {
                   onClick={() => router.push('/artist/onboarding')}
                   whileHover={{ scale: 1.03, y: -2 }}
                   whileTap={{ scale: 0.97 }}
+                  aria-label="Sign up as an artist on GRID"
                   className="group relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 border-[#c39bff]/40 hover:border-[#c39bff]/70 transition-all duration-300 overflow-hidden"
                   style={{ background: 'rgba(195, 155, 255, 0.08)', backdropFilter: 'blur(12px)', boxShadow: '0 0 20px rgba(195, 155, 255, 0.08)' }}
                 >
@@ -391,6 +394,7 @@ export function Hero() {
                 <motion.button
                   onClick={() => router.push('/agency/join')}
                   whileHover={{ scale: 1.03, y: -2 }}
+                  aria-label="Set up your event company on GRID"
                   whileTap={{ scale: 0.97 }}
                   className="group relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 border-[#a1faff]/40 hover:border-[#a1faff]/70 transition-all duration-300 overflow-hidden"
                   style={{ background: 'rgba(161, 250, 255, 0.08)', backdropFilter: 'blur(12px)', boxShadow: '0 0 20px rgba(161, 250, 255, 0.08)' }}
