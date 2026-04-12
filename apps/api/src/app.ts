@@ -49,6 +49,7 @@ import { gigMarketplaceRoutes } from './modules/gig-marketplace/gig-marketplace.
 import { gamificationRoutes } from './modules/gamification/gamification.routes.js';
 import { instabookInterestRoutes } from './modules/instabook-interest/instabook-interest.routes.js';
 import { decisionEngineRoutes } from './modules/decision-engine/decision-engine.routes.js';
+import { vaultRoutes } from './modules/vault/vault.routes.js';
 import { startCronJobs } from './infrastructure/cron.js';
 
 const app = Fastify({
@@ -256,6 +257,7 @@ await app.register(gigMarketplaceRoutes);
 await app.register(gamificationRoutes);
 await app.register(instabookInterestRoutes);
 await app.register(decisionEngineRoutes);
+await app.register(vaultRoutes);
 
 // ─── Graceful Shutdown ───────────────────────────────────────
 async function shutdown(signal: string) {
