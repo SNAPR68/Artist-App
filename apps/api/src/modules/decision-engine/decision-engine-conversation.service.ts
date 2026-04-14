@@ -292,10 +292,15 @@ export class DecisionEngineConversationService {
 
   private parseMetadata(raw: unknown): Record<string, unknown> {
     if (!raw) return {};
-    if (typeof raw === 'string') {
-      try { return JSON.parse(raw); } catch { return {}; }
+    let parsed = raw;
+    // Handle double-stringified JSONB (string → parse → might still be string)
+    while (typeof parsed === 'string') {
+      try { parsed = JSON.parse(parsed); } catch { return {}; }
     }
-    return raw as Record<string, unknown>;
+    if (typeof parsed === 'object' && parsed !== null) {
+      return parsed as Record<string, unknown>;
+    }
+    return {};
   }
 
   private buildParsedContext(entities: Record<string, unknown>): Record<string, unknown> {
