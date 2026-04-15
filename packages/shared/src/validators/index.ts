@@ -387,6 +387,17 @@ export const dismissRecommendationSchema = z.object({
 });
 
 // ─── Workspace ──────────────────────────────────────────────────
+export const brandKitSchema = z.object({
+  logo_url: z.string().url().max(2048).optional(),
+  primary_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  secondary_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  font_family: z.string().max(100).optional(),
+  brand_voice: z.enum(['formal', 'casual', 'luxurious', 'youthful', 'professional']).optional(),
+  signature_tagline: z.string().max(500).optional(),
+  whatsapp_business_number: z.string().max(20).optional(),
+  business_email: z.string().email().max(200).optional(),
+}).partial();
+
 export const createWorkspaceSchema = z.object({
   name: z.string().min(2).max(255),
   description: z.string().max(2000).optional(),
@@ -395,6 +406,7 @@ export const createWorkspaceSchema = z.object({
   company_type: z.enum(['event_management', 'wedding_planner', 'corporate', 'agency']).optional(),
   logo_url: z.string().url().max(2048).optional(),
   brand_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  brand_kit: brandKitSchema.optional(),
 });
 
 export const updateWorkspaceSchema = createWorkspaceSchema.partial();

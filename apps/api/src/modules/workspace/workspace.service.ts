@@ -30,6 +30,7 @@ export class WorkspaceService {
     company_type?: string;
     logo_url?: string;
     brand_color?: string;
+    brand_kit?: Record<string, unknown>;
   }) {
     const slug = this.generateSlug(data.name, data.city);
 
@@ -43,6 +44,7 @@ export class WorkspaceService {
       company_type: data.company_type,
       logo_url: data.logo_url,
       brand_color: data.brand_color,
+      brand_kit: data.brand_kit,
     });
 
     // Add the creator as owner member with accepted_at set

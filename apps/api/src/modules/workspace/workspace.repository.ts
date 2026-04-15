@@ -12,6 +12,7 @@ export interface CreateWorkspaceData {
   company_type?: string;
   logo_url?: string;
   brand_color?: string;
+  brand_kit?: Record<string, unknown>;
 }
 
 export interface UpdateWorkspaceData {
@@ -113,6 +114,7 @@ export class WorkspaceRepository {
         company_type: data.company_type ?? null,
         logo_url: data.logo_url ?? null,
         brand_color: data.brand_color ?? null,
+        brand_kit: JSON.stringify(data.brand_kit ?? {}),
         is_active: true,
       })
       .returning('*');
