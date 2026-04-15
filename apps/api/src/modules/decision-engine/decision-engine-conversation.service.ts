@@ -66,9 +66,12 @@ export class DecisionEngineConversationService {
     // ─── Continuing a conversation ─────────────────────
     if (input.session_id) {
       const existing = await decisionEngineRepository.getBriefById(input.session_id);
+      console.log('[convo] session_id:', input.session_id, 'existing?', !!existing, 'metadata_type:', typeof existing?.metadata, 'metadata_raw:', JSON.stringify(existing?.metadata)?.slice(0, 300));
       if (existing) {
         const metadata = this.parseMetadata(existing.metadata);
+        console.log('[convo] parsed metadata keys:', Object.keys(metadata), 'has_clarifying:', 'clarifying' in metadata);
         const clarifying = metadata.clarifying as ClarifyingState | undefined;
+        console.log('[convo] clarifying phase:', clarifying?.phase, 'collected:', JSON.stringify(clarifying?.collected_entities)?.slice(0, 200));
 
         if (clarifying?.phase === 'collecting') {
           return this.handleClarifyingAnswer(existing, clarifying, rawText, input);
@@ -151,9 +154,15 @@ export class DecisionEngineConversationService {
       original_query: rawText,
     };
 
-    await decisionEngineRepository.updateBrief(brief.id, {
+    console.log('[convo] SAVE brief.id:', brief.id, 'state.phase:', state.phase);
+    const updateResult = await decisionEngineRepository.updateBrief(brief.id, {
       metadata: { clarifying: state },
     });
+    console.log('[convo] SAVED metadata_type:', typeof updateResult?.metadata, 'raw:', JSON.stringify(updateResult?.metadata)?.slice(0, 300));
+
+    // Verify by re-reading
+    const verify = await decisionEngineRepository.getBriefById(brief.id);
+    console.log('[convo] VERIFY metadata_type:', typeof verify?.metadata, 'raw:', JSON.stringify(verify?.metadata)?.slice(0, 300));
 
     const acknowledgment = clarifyingQuestionsService.buildAcknowledgment(collected);
     const parsedContext = this.buildParsedContext(collected);
