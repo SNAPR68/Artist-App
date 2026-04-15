@@ -64,27 +64,15 @@ export class DecisionEngineConversationService {
     const rawText = input.raw_text.trim();
 
     // ─── Continuing a conversation ─────────────────────
-    const _debug: Record<string, unknown> = { input_session_id: input.session_id };
     if (input.session_id) {
       const existing = await decisionEngineRepository.getBriefById(input.session_id);
-      _debug.existing_found = !!existing;
-      _debug.metadata_type = typeof existing?.metadata;
-      _debug.metadata_raw = JSON.stringify(existing?.metadata)?.slice(0, 500);
       if (existing) {
         const metadata = this.parseMetadata(existing.metadata);
-        _debug.parsed_keys = Object.keys(metadata);
-        _debug.has_clarifying = 'clarifying' in metadata;
         const clarifying = metadata.clarifying as ClarifyingState | undefined;
-        _debug.clarifying_phase = clarifying?.phase;
-
         if (clarifying?.phase === 'collecting') {
           return this.handleClarifyingAnswer(existing, clarifying, rawText, input);
         }
       }
-    }
-    // Return debug info in the response if session was provided but didn't match
-    if (input.session_id) {
-      (input as any)._debug = _debug;
     }
 
     // ─── New conversation ──────────────────────────────
@@ -161,31 +149,19 @@ export class DecisionEngineConversationService {
       original_query: rawText,
     };
 
-    console.log('[convo] SAVE brief.id:', brief.id, 'state.phase:', state.phase);
-    const updateResult = await decisionEngineRepository.updateBrief(brief.id, {
+    await decisionEngineRepository.updateBrief(brief.id, {
       metadata: { clarifying: state },
     });
-    console.log('[convo] SAVED metadata_type:', typeof updateResult?.metadata, 'raw:', JSON.stringify(updateResult?.metadata)?.slice(0, 300));
-
-    // Verify by re-reading
-    const verify = await decisionEngineRepository.getBriefById(brief.id);
-    const verifyMetaType = typeof verify?.metadata;
-    const verifyMetaRaw = JSON.stringify(verify?.metadata)?.slice(0, 500);
 
     const acknowledgment = clarifyingQuestionsService.buildAcknowledgment(collected);
     const parsedContext = this.buildParsedContext(collected);
-
-    const debugInfo = (input as any)._debug || {};
-    debugInfo.verify_meta_type = verifyMetaType;
-    debugInfo.verify_meta_raw = verifyMetaRaw;
-    debugInfo.saved_brief_id = brief.id;
 
     return {
       response_type: 'clarifying_questions',
       session_id: brief.id,
       response_text: acknowledgment,
       clarifying_questions: questions as DecisionClarifyingQuestion[],
-      parsed_context: { ...parsedContext, _debug: debugInfo },
+      parsed_context: parsedContext,
     };
   }
 

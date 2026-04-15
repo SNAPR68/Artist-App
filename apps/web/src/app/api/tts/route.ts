@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // ElevenLabs voice IDs — curated for Indian market
 // Zara = English female, Kabir = Hindi male
+// Override via env vars: ELEVENLABS_VOICE_EN, ELEVENLABS_VOICE_HI
 const VOICE_IDS: Record<string, string> = {
   'en': process.env.ELEVENLABS_VOICE_EN ?? 'EXAVITQu4vr4xnSDxMaL', // Sarah — clear female English (Zara)
-  'hi': process.env.ELEVENLABS_VOICE_HI ?? 'TX3LPaxmHKxFdv7VOQHJ', // Liam — deep male, works well with Hindi via multilingual v2
+  // For best Hindi, use ElevenLabs Hindi-optimized voices from their library
+  // Liam (TX3LPaxmHKxFdv7VOQHJ) works with eleven_multilingual_v2 but sounds accented
+  // Recommendation: clone a custom Indian Hindi voice or use Monika Sogam (mTSvIrm2hmcnOvb21nW2) if available
+  'hi': process.env.ELEVENLABS_VOICE_HI ?? 'TX3LPaxmHKxFdv7VOQHJ',
 };
 
 export async function POST(req: NextRequest) {
