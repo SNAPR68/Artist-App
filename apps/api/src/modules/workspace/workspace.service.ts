@@ -2,6 +2,7 @@ import { WorkspaceRole } from '@artist-booking/shared';
 import { workspaceRepository } from './workspace.repository.js';
 import type { UpdateWorkspaceData, PipelineFilters, DateRange } from './workspace.repository.js';
 import { db } from '../../infrastructure/database.js';
+import { decisionEngineRepository } from '../decision-engine/decision-engine.repository.js';
 
 // ─── Error Class ───────────────────────────────────────────────
 
@@ -68,6 +69,11 @@ export class WorkspaceService {
 
   async getWorkspaces(userId: string) {
     return workspaceRepository.findByMemberId(userId);
+  }
+
+  async getDecisionBriefs(workspaceId: string, userId: string) {
+    await this.verifyMembership(workspaceId, userId);
+    return decisionEngineRepository.listBriefsByWorkspace(workspaceId);
   }
 
   async getWorkspace(userId: string, workspaceId: string) {

@@ -29,6 +29,7 @@ function decodeJWTPayload(token: string): { user_id?: string; role?: string; exp
 const ROLE_ROUTES: Record<string, string[]> = {
   '/artist': ['artist'],
   '/client': ['client', 'event_company'],
+  '/event-company': ['event_company'],
   '/agent': ['agent'],
   '/admin': ['admin'],
 };
@@ -37,6 +38,7 @@ const ROLE_ROUTES: Record<string, string[]> = {
 const AUTH_REQUIRED_PREFIXES = [
   '/artist',
   '/client',
+  '/event-company',
   '/agent',
   '/admin',
   '/notifications',
@@ -52,7 +54,7 @@ function getRoleHome(role: string): string {
   switch (role) {
     case 'artist': return '/artist';
     case 'client':
-    case 'event_company': return '/client';
+    case 'event_company': return '/event-company';
     case 'agent': return '/agent';
     case 'admin': return '/admin';
     default: return '/';

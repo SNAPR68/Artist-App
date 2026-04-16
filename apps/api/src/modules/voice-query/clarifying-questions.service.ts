@@ -138,18 +138,37 @@ export class ClarifyingQuestionsService {
     existing: Record<string, unknown>,
     answerText: string,
   ): Promise<Record<string, unknown>> {
-    const parsed = await voiceIntentService.parseQuery(answerText);
     const merged = { ...existing };
 
+    // For short clarifying answers (chips like "next week", "wedding", "50k"),
+    // avoid any expensive parsing. If parsing fails for any reason, we still
+    // proceed with chip heuristics below.
+    let parsedEntities: Record<string, unknown> = {};
+    const lower = answerText.toLowerCase().trim();
+    const looksLikeChip = lower.length <= 32
+      && (/^(this_week|next_week|this_month|next_month|skip)$/.test(lower)
+        || /(this week|next week|this month|next month)\b/.test(lower)
+        || /\b(wedding|shaadi|shadi|corporate|college|concert|festival|party)\b/.test(lower)
+        || /[0-9]/.test(lower));
+
+    if (!looksLikeChip) {
+      try {
+        const parsed = await voiceIntentService.parseQuery(answerText);
+        parsedEntities = parsed.entities as unknown as Record<string, unknown>;
+      } catch {
+        parsedEntities = {};
+      }
+    }
+
     // Merge extracted entities (only non-null)
-    for (const [key, val] of Object.entries(parsed.entities)) {
+    for (const [key, val] of Object.entries(parsedEntities)) {
       if (val !== undefined && val !== null) {
         merged[key] = val;
       }
     }
 
     // Handle option chip values directly (e.g., "wedding", "50000")
-    const lower = answerText.toLowerCase().trim();
+    // lower defined above
 
     // Event type from chip tap
     if (!merged.event_type) {

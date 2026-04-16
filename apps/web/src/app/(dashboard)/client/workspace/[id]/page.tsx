@@ -229,6 +229,7 @@ export default function WorkspaceDetailPage() {
               { href: `/client/workspace/${workspaceId}/team`, label: 'Team' },
               { href: `/client/workspace/${workspaceId}/analytics`, label: 'Analytics' },
               { href: `/client/workspace/${workspaceId}/presentations`, label: 'Presentations' },
+              { href: `/client/workspace/${workspaceId}/briefs`, label: 'Decision Briefs' },
               { href: `/client/workspace/${workspaceId}/settings`, label: 'Settings' },
             ].map((link) => (
               <Link

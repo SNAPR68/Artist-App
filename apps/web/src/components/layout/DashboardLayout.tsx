@@ -20,7 +20,6 @@ import {
   Search,
   Bell,
   LogOut,
-  DollarSign,
   Sparkle,
 } from 'lucide-react';
 
@@ -63,8 +62,9 @@ const ADMIN_NAV: NavItem[] = [
 const EVENT_COMPANY_NAV: NavItem[] = [
   { href: '/event-company', labelKey: 'nav.home', icon: <Home size={18} /> },
   { href: '/client/bookings', labelKey: 'nav.bookings', icon: <Calendar size={18} /> },
+  { href: '/gigs', labelKey: 'nav.gigs', icon: <Target size={18} /> },
   { href: '/client/workspace', labelKey: 'nav.workspace', icon: <Building2 size={18} /> },
-  { href: '/client/payments', labelKey: 'nav.payments', icon: <DollarSign size={18} /> },
+  { href: '/client/recommendations', labelKey: 'nav.discover', icon: <Sparkles size={18} /> },
   { href: '/search', labelKey: 'nav.search', icon: <Search size={18} /> },
 ];
 

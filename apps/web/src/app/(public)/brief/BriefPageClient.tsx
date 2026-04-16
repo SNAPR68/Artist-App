@@ -9,10 +9,13 @@ import {
   type DecisionRecommendation,
   type DecisionResponse,
 } from '@/lib/api/decision-engine';
+import { analytics } from '@/lib/analytics';
 
 // ─── Main Page ──────────────────────────────────────────────
 
 type PageState = 'idle' | 'submitting' | 'results' | 'proposing' | 'locking';
+
+type ProposalResult = { presentation_web_url?: string } | null;
 
 export default function BriefPageClient() {
   const searchParams = useSearchParams();
@@ -38,6 +41,10 @@ export default function BriefPageClient() {
     setError(null);
     setSuccessMessage(null);
     setState('submitting');
+    analytics.trackEvent('brief_created', {
+      source: 'web',
+      has_structured_fields: Boolean(fields.event_type || fields.city || fields.event_date || fields.budget_max || fields.genres),
+    });
 
     const input: Record<string, unknown> = {
       raw_text: rawText,
@@ -55,9 +62,18 @@ export default function BriefPageClient() {
       setResult(res.data);
       setSelectedIds(new Set());
       setState('results');
+      analytics.trackEvent('recommendation_returned', {
+        brief_id: res.data.brief_id,
+        recommendations_count: res.data.recommendations?.length ?? 0,
+        source: 'web',
+      });
     } else {
       setError(res.errors?.[0]?.message ?? 'Something went wrong');
       setState('idle');
+      analytics.trackEvent('brief_parse_failed', {
+        source: 'web',
+        error: res.errors?.[0]?.message ?? 'unknown',
+      });
     }
   }, [rawText, fields]);
 
@@ -85,9 +101,24 @@ export default function BriefPageClient() {
       artist_ids: Array.from(selectedIds),
     });
     if (res.success) {
-      setSuccessMessage('Proposal generated! Check your dashboard for the full document.');
+      const webUrl = ((res.data as ProposalResult)?.presentation_web_url) ?? null;
+      setSuccessMessage(
+        webUrl
+          ? `Proposal generated! View it here: ${webUrl}`
+          : 'Proposal generated! Check your dashboard for the full document.',
+      );
+      analytics.trackEvent('proposal_generated', {
+        brief_id: result.brief_id,
+        artist_count: selectedIds.size,
+        source: 'web',
+      });
     } else {
       setError(res.errors?.[0]?.message ?? 'Failed to generate proposal. Please log in and try again.');
+      analytics.trackEvent('proposal_generate_failed', {
+        brief_id: result.brief_id,
+        source: 'web',
+        error: res.errors?.[0]?.message ?? 'unknown',
+      });
     }
     setState('results');
   }, [result, selectedIds]);
@@ -99,8 +130,20 @@ export default function BriefPageClient() {
     const res = await lockAvailability(result.brief_id, { artist_id: artistId });
     if (res.success && res.data) {
       setSuccessMessage(res.data.message);
+      analytics.trackEvent('lock_requested', {
+        brief_id: result.brief_id,
+        artist_id: artistId,
+        booking_id: res.data.booking_id,
+        source: 'web',
+      });
     } else {
       setError(res.errors?.[0]?.message ?? 'Failed to lock availability. Please log in and try again.');
+      analytics.trackEvent('lock_request_failed', {
+        brief_id: result.brief_id,
+        artist_id: artistId,
+        source: 'web',
+        error: res.errors?.[0]?.message ?? 'unknown',
+      });
     }
     setState('results');
   }, [result, selectedIds]);

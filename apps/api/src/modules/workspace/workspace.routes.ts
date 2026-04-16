@@ -318,6 +318,23 @@ export async function workspaceRoutes(app: FastifyInstance) {
   });
 
   // ─── Presentations ─────────────────────────────────────────
+  // ─── Decision Briefs ───────────────────────────────────────
+
+  /**
+   * GET /v1/workspaces/:id/decision-briefs — List decision briefs for a workspace
+   */
+  app.get('/v1/workspaces/:id/decision-briefs', {
+    preHandler: [authMiddleware, requirePermission('workspace:read')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const briefs = await workspaceService.getDecisionBriefs(id, request.user!.user_id);
+
+    return reply.send({
+      success: true,
+      data: briefs,
+      errors: [],
+    });
+  });
 
   /**
    * POST /v1/workspaces/:id/presentations — Generate a presentation

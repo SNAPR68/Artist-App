@@ -14,6 +14,7 @@ interface ParsedIntent {
     budget?: number;
     artist_name?: string;
     booking_id?: string;
+    lock_index?: number;
   };
   confidence: number;
 }
@@ -85,6 +86,21 @@ export class WhatsAppIntentService {
     }
 
     const lower = text.toLowerCase().trim();
+
+    // ─── Explicit command intents (highest priority) ──────────
+    // "proposal" / "pdf"
+    if (/^(proposal|pdf|send\s+proposal|generate\s+proposal)/i.test(lower)) {
+      return { intent: 'decision_proposal', entities: {}, confidence: 0.95 };
+    }
+    // "lock 2"
+    const lockMatch = lower.match(/^lock\s+(\d{1,2})/i);
+    if (lockMatch) {
+      return { intent: 'decision_lock', entities: { lock_index: Number(lockMatch[1]) }, confidence: 0.95 };
+    }
+    // "refine ..." or "change ..." to rerun brief
+    if (/^(refine|change|update)\b/i.test(lower)) {
+      return { intent: 'decision_refine', entities: {}, confidence: 0.8 };
+    }
 
     // Detect intent from keywords
     let bestIntent = 'unknown';

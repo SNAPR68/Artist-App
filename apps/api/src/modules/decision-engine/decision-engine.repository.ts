@@ -1,6 +1,101 @@
 import { db } from '../../infrastructure/database.js';
 
 export class DecisionEngineRepository {
+  async listBriefsByWorkspace(workspaceId: string) {
+    const briefs = await db('decision_briefs as b')
+      .leftJoin('users as u', 'u.id', 'b.created_by_user_id')
+      .where({ 'b.workspace_id': workspaceId })
+      .orderBy('b.created_at', 'desc')
+      .select(
+        'b.id',
+        'b.source',
+        'b.status',
+        'b.raw_text',
+        'b.structured_brief',
+        'b.created_at',
+        'b.created_by_user_id',
+        'u.phone as owner_phone',
+      );
+
+    const briefIds = briefs.map((b: Record<string, unknown>) => b.id as string).filter(Boolean);
+    if (briefIds.length === 0) return [];
+
+    const recCountsRaw = await db('decision_recommendations')
+      .whereIn('brief_id', briefIds)
+      .groupBy('brief_id')
+      .select('brief_id')
+      .count('id as count');
+    const recCountByBrief = new Map<string, number>();
+    for (const row of recCountsRaw as unknown as Array<{ brief_id: string; count: string | number }>) {
+      recCountByBrief.set(row.brief_id, Number(row.count ?? 0));
+    }
+
+    const events = await db('decision_events')
+      .whereIn('brief_id', briefIds)
+      .orderBy('created_at', 'asc')
+      .select('brief_id', 'event_type', 'payload', 'created_at');
+
+    const eventByBrief: Record<string, Array<{ event_type: string; payload: unknown; created_at: string }>> = {};
+    for (const e of events as Array<Record<string, unknown>>) {
+      const bid = e.brief_id as string;
+      if (!eventByBrief[bid]) eventByBrief[bid] = [];
+      eventByBrief[bid].push({
+        event_type: String(e.event_type ?? ''),
+        payload: typeof e.payload === 'string' ? (() => { try { return JSON.parse(e.payload as string); } catch { return {}; } })() : (e.payload ?? {}),
+        created_at: String(e.created_at ?? ''),
+      });
+    }
+
+    function buildSummary(structured: Record<string, unknown>, rawText?: string | null): string {
+      const parts: string[] = [];
+      const eventType = structured.event_type as string | undefined;
+      const city = structured.city as string | undefined;
+      const audience = structured.audience_size as number | undefined;
+      const budgetMax = structured.budget_max_paise as number | undefined;
+      if (eventType) parts.push(`${eventType} event`);
+      if (city) parts.push(`in ${city}`);
+      if (audience) parts.push(`${audience} guests`);
+      if (budgetMax) parts.push(`budget up to ₹${Math.round(budgetMax / 100).toLocaleString('en-IN')}`);
+      const summary = parts.join(' · ');
+      if (summary) return summary;
+      return (rawText ?? '').slice(0, 120) || 'Event brief';
+    }
+
+    return briefs.map((b: Record<string, unknown>) => {
+      const briefId = b.id as string;
+      const structured = typeof b.structured_brief === 'string'
+        ? (() => { try { return JSON.parse(b.structured_brief as string); } catch { return {}; } })()
+        : (b.structured_brief ?? {});
+
+      const evs = eventByBrief[briefId] ?? [];
+      const hasProposal = evs.some((e) => e.event_type === 'proposal_generated');
+      const hasLock = evs.some((e) => e.event_type === 'lock_requested');
+      const proposalEvent = [...evs].reverse().find((e) => e.event_type === 'proposal_generated');
+      const lockEvent = [...evs].reverse().find((e) => e.event_type === 'lock_requested');
+
+      const proposalPayload = (proposalEvent?.payload ?? {}) as Record<string, unknown>;
+      const lockPayload = (lockEvent?.payload ?? {}) as Record<string, unknown>;
+
+      const presentation_slug = (proposalPayload.presentation_slug as string | undefined) ?? null;
+      const booking_id = (lockPayload.booking_id as string | undefined) ?? null;
+
+      return {
+        id: briefId,
+        source: b.source,
+        status: b.status,
+        created_at: b.created_at,
+        created_by_user_id: b.created_by_user_id,
+        owner_phone: b.owner_phone ?? null,
+        summary: buildSummary(structured as Record<string, unknown>, (b.raw_text as string | null) ?? null),
+        structured_brief: structured,
+        recommendations_count: recCountByBrief.get(briefId) ?? 0,
+        proposal_generated: hasProposal,
+        presentation_slug,
+        lock_requested: hasLock,
+        booking_id,
+      };
+    });
+  }
   async createBrief(data: {
     source: string;
     raw_text: string;

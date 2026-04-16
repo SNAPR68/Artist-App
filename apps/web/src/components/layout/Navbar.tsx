@@ -11,7 +11,7 @@ function getDashboardHref(role?: string): string {
   switch (role) {
     case 'artist': return '/artist';
     case 'client':
-    case 'event_company': return '/client';
+    case 'event_company': return '/event-company';
     case 'agent': return '/agent';
     case 'admin': return '/admin';
     default: return '/';

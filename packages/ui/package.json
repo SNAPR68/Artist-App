@@ -7,7 +7,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc",
-    "lint": "eslint src/",
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\"",
     "type-check": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist"

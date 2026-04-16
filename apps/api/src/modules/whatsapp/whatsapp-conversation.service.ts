@@ -4,6 +4,8 @@ import { whatsAppProviderService } from './whatsapp-provider.service.js';
 import { db } from '../../infrastructure/database.js';
 import { WHATSAPP_SESSION_TIMEOUT_HOURS } from '@artist-booking/shared';
 import { decisionEngineService } from '../decision-engine/decision-engine.service.js';
+import { decisionEngineConversationService } from '../decision-engine/decision-engine-conversation.service.js';
+import { config } from '../../config/index.js';
 
 /**
  * Conversation state machine for WhatsApp booking flow.
@@ -48,6 +50,7 @@ export class WhatsAppConversationService {
           : conversation.conversation_state),
         ...parsed.entities,
         last_intent: parsed.intent,
+        __last_inbound_text: content,
       }),
     });
 
@@ -90,6 +93,15 @@ export class WhatsAppConversationService {
 
       case 'create_brief':
         return this.handleBriefFlow(conversation, parsed.entities);
+
+      case 'decision_proposal':
+        return this.handleDecisionProposal(conversation);
+
+      case 'decision_lock':
+        return this.handleDecisionLock(conversation, parsed.entities);
+
+      case 'decision_refine':
+        return this.handleDecisionRefine(conversation);
 
       case 'general_question':
         return 'Thanks for reaching out! I can help you:\n\n'
@@ -196,14 +208,50 @@ export class WhatsAppConversationService {
   private async handleBriefFlow(conversation: Record<string, unknown>, entities: Record<string, unknown>): Promise<string> {
     try {
       const userId = conversation.user_id as string | null;
-      // Build raw text from available entities
-      const parts: string[] = [];
-      if (entities.city) parts.push(`in ${entities.city}`);
-      if (entities.date) parts.push(`on ${entities.date}`);
-      if (entities.budget) parts.push(`budget ${entities.budget}`);
-      if (entities.genre) parts.push(entities.genre as string);
+      const state = typeof conversation.conversation_state === 'string'
+        ? JSON.parse(conversation.conversation_state as string)
+        : (conversation.conversation_state || {});
 
-      const rawText = parts.length > 0 ? parts.join(', ') : 'entertainment options';
+      const rawText = (state.__last_inbound_text as string | undefined)
+        ?? this.buildRawTextFallback(entities);
+
+      // PRD rule: ask at most ONE clarifying question on WhatsApp.
+      const alreadyAsked = Boolean(state.__decision_clarifier_asked);
+      const existingSessionId = state.__decision_session_id as string | undefined;
+
+      if (!alreadyAsked) {
+        const convo = await decisionEngineConversationService.handleMessage({
+          raw_text: rawText,
+          source: 'whatsapp',
+          session_id: existingSessionId ?? null,
+          user_id: userId ?? null,
+          city: entities.city as string | undefined,
+          event_date: entities.date as string | undefined,
+          budget_max_paise: entities.budget ? Number(entities.budget) * 100 : undefined,
+          genres: entities.genre ? [String(entities.genre)] : undefined,
+        });
+
+        if (convo.response_type === 'clarifying_questions' && convo.clarifying_questions.length > 0) {
+          await whatsAppRepository.updateConversation(conversation.id as string, {
+            conversation_state: JSON.stringify({
+              ...state,
+              __decision_session_id: convo.session_id,
+              __decision_clarifier_asked: true,
+              __decision_last_action: 'awaiting_clarifier',
+            }),
+          });
+
+          const q = convo.clarifying_questions[0];
+          const prompt = (q as any).question_en || 'One quick question:';
+          const opts = (q as any).options?.map((o: any) => o.label_en).filter(Boolean);
+          const optionsLine = opts && opts.length > 0 ? `\nOptions: ${opts.join(' / ')}` : '';
+          return `${convo.response_text}\n\n${prompt}${optionsLine}\n\nReply with your answer (or type "skip").`;
+        }
+
+        if (convo.response_type === 'recommendations') {
+          return await this.respondWithRecommendations(conversation, state, convo.brief_id, convo.recommendations);
+        }
+      }
 
       const result = await decisionEngineService.createBriefAndRecommend(userId, {
         raw_text: rawText,
@@ -213,26 +261,142 @@ export class WhatsAppConversationService {
         budget_max_paise: entities.budget ? Number(entities.budget) * 100 : undefined,
       });
 
-      if (result.recommendations.length === 0) {
-        return 'I couldn\'t find matching artists for your event right now. Try telling me more details like city, budget, or genre.';
-      }
-
-      let response = `Here are my top picks for your event:\n\n`;
-      for (const rec of result.recommendations.slice(0, 3)) {
-        const priceMin = `₹${Math.round(rec.price_min_paise / 100).toLocaleString('en-IN')}`;
-        const priceMax = `₹${Math.round(rec.price_max_paise / 100).toLocaleString('en-IN')}`;
-        response += `*${rec.rank}. ${rec.artist_name}* — ${rec.artist_type}\n`;
-        response += `   ${priceMin} – ${priceMax}\n`;
-        if (rec.why_fit.length > 0) response += `   ✓ ${rec.why_fit[0]}\n`;
-        response += '\n';
-      }
-      response += `Brief ID: ${result.brief_id.slice(0, 8)}...\n`;
-      response += 'Reply "lock [number]" to book, or "proposal" to get a PDF proposal.';
-
-      return response;
+      return await this.respondWithRecommendations(conversation, state, result.brief_id, result.recommendations);
     } catch {
       return 'I had trouble processing your brief. Could you describe your event again? Include details like city, budget, and type of entertainment.';
     }
+  }
+
+  private buildRawTextFallback(entities: Record<string, unknown>): string {
+    const parts: string[] = [];
+    if (entities.city) parts.push(`in ${entities.city}`);
+    if (entities.date) parts.push(`on ${entities.date}`);
+    if (entities.budget) parts.push(`budget ${entities.budget}`);
+    if (entities.genre) parts.push(String(entities.genre));
+    return parts.length > 0 ? parts.join(', ') : 'event entertainment options';
+  }
+
+  private async respondWithRecommendations(
+    conversation: Record<string, unknown>,
+    state: Record<string, unknown>,
+    briefId: string,
+    recommendations: Array<Record<string, unknown>>,
+  ): Promise<string> {
+    if (!recommendations || recommendations.length === 0) {
+      return 'I couldn\'t find matching artists for your event right now. Try telling me more details like city, budget, or genre.';
+    }
+
+    const top = recommendations.slice(0, 3).map((r, idx) => ({
+      rank: idx + 1,
+      artist_id: String((r as any).artist_id ?? ''),
+      artist_name: String((r as any).artist_name ?? 'Unknown'),
+      artist_type: String((r as any).artist_type ?? 'Artist'),
+      price_min_paise: Number((r as any).price_min_paise ?? 0),
+      price_max_paise: Number((r as any).price_max_paise ?? 0),
+      why_fit: Array.isArray((r as any).why_fit) ? (r as any).why_fit : [],
+    }));
+
+    await whatsAppRepository.updateConversation(conversation.id as string, {
+      conversation_state: JSON.stringify({
+        ...state,
+        __decision_last_brief_id: briefId,
+        __decision_last_recs: top.map((t) => ({ rank: t.rank, artist_id: t.artist_id })),
+        __decision_last_action: 'recommendations',
+      }),
+    });
+
+    let response = `Here are my top picks for your event:\n\n`;
+    top.forEach((rec) => {
+      const priceMin = `₹${Math.round(rec.price_min_paise / 100).toLocaleString('en-IN')}`;
+      const priceMax = `₹${Math.round(rec.price_max_paise / 100).toLocaleString('en-IN')}`;
+      response += `*${rec.rank}. ${rec.artist_name}* — ${rec.artist_type}\n`;
+      response += `   ${priceMin} – ${priceMax}\n`;
+      if (rec.why_fit?.length > 0) response += `   ✓ ${rec.why_fit[0]}\n`;
+      response += '\n';
+    });
+
+    response += `Reply:\n`;
+    response += `• "lock 1" (or 2/3) to request a lock\n`;
+    response += `• "proposal" to get a PDF proposal link\n`;
+    response += `• "refine" + details to adjust the brief`;
+
+    return response;
+  }
+
+  private async handleDecisionProposal(conversation: Record<string, unknown>): Promise<string> {
+    const userId = conversation.user_id as string | null;
+    if (!userId) {
+      return 'To generate a proposal, please log in to the platform first using this number. Then message "proposal" again.';
+    }
+
+    const state = typeof conversation.conversation_state === 'string'
+      ? JSON.parse(conversation.conversation_state as string)
+      : (conversation.conversation_state || {});
+
+    const briefId = state.__decision_last_brief_id as string | undefined;
+    const recs = (state.__decision_last_recs as Array<{ rank: number; artist_id: string }> | undefined) ?? [];
+    const artistIds = recs.slice(0, 3).map((r) => r.artist_id).filter(Boolean);
+
+    if (!briefId || artistIds.length === 0) {
+      return 'I don’t have a recent brief to generate a proposal for. Send your event brief first.';
+    }
+
+    try {
+      const proposal = await decisionEngineService.generateProposal(briefId, userId, { artist_ids: artistIds });
+      const slug = (proposal as any).presentation_slug as string | undefined;
+      if (!slug) {
+        return 'Proposal generated, but I couldn’t create a shareable link. Please check your dashboard.';
+      }
+
+      const link = `${config.WEB_BASE_URL.replace(/\/$/, '')}/presentations/${slug}`;
+      const pdf = `${config.API_BASE_URL.replace(/\/$/, '')}/v1/presentations/${slug}/pdf`;
+
+      return `Your proposal is ready:\n\n• View: ${link}\n• PDF: ${pdf}\n\nReply "lock 1" if you want us to lock availability for a pick.`;
+    } catch {
+      return 'I couldn’t generate the proposal right now. Please try again in a minute.';
+    }
+  }
+
+  private async handleDecisionLock(conversation: Record<string, unknown>, entities: Record<string, unknown>): Promise<string> {
+    const userId = conversation.user_id as string | null;
+    if (!userId) {
+      return 'To request a lock, please log in to the platform first using this number. Then message "lock 1" again.';
+    }
+
+    const state = typeof conversation.conversation_state === 'string'
+      ? JSON.parse(conversation.conversation_state as string)
+      : (conversation.conversation_state || {});
+    const briefId = state.__decision_last_brief_id as string | undefined;
+    const recs = (state.__decision_last_recs as Array<{ rank: number; artist_id: string }> | undefined) ?? [];
+
+    const idx = Number((entities.lock_index as number | undefined) ?? 0);
+    const chosen = idx >= 1 ? recs[idx - 1] : null;
+
+    if (!briefId || !chosen?.artist_id) {
+      return 'I don’t have a recent shortlist to lock. Send your event brief first, then reply "lock 1".';
+    }
+
+    try {
+      const lock = await decisionEngineService.lockAvailability(briefId, userId, { artist_id: chosen.artist_id });
+      return `${lock.message}\nBooking ID: ${(lock.booking_id ?? '').slice(0, 8)}...`;
+    } catch {
+      return 'I couldn’t request a lock right now. Please try again in a minute.';
+    }
+  }
+
+  private async handleDecisionRefine(conversation: Record<string, unknown>): Promise<string> {
+    const state = typeof conversation.conversation_state === 'string'
+      ? JSON.parse(conversation.conversation_state as string)
+      : (conversation.conversation_state || {});
+
+    await whatsAppRepository.updateConversation(conversation.id as string, {
+      conversation_state: JSON.stringify({
+        ...state,
+        __decision_last_action: 'refine_prompt',
+      }),
+    });
+
+    return 'Sure — reply with the updated event brief (city, budget, vibe, and date if possible). I’ll regenerate the shortlist.';
   }
 
   /**

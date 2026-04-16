@@ -6,18 +6,23 @@ import { useRouter } from 'next/navigation';
 import {
   Search,
   Calendar,
+  Heart,
+  Star,
   Users,
   Building2,
   ArrowRight,
   Briefcase,
-  DollarSign,
   AlertTriangle,
   FolderKanban,
   Presentation,
-  TrendingUp,
-  Mic,
 } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
+
+interface EventCompanyProfile {
+  id: string;
+  company_name?: string;
+  client_type?: string;
+}
 
 interface WorkspaceSummary {
   id: string;
@@ -27,24 +32,32 @@ interface WorkspaceSummary {
   event_count: number;
 }
 
+interface ShortlistSummary {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
 export default function EventCompanyDashboard() {
   const router = useRouter();
+  const [profile, setProfile] = useState<EventCompanyProfile | null>(null);
   const [workspaces, setWorkspaces] = useState<WorkspaceSummary[]>([]);
-  const [bookingCount, setBookingCount] = useState(0);
+  const [shortlists, setShortlists] = useState<ShortlistSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
+      apiClient<EventCompanyProfile>('/v1/clients/profile'),
       apiClient<WorkspaceSummary[]>('/v1/workspaces'),
-      apiClient<{ data: unknown[]; meta: { total: number } }>('/v1/bookings?per_page=1'),
-    ]).then(([wsRes, bookRes]) => {
-      if (!wsRes.success && wsRes.errors?.[0]?.code === 'PROFILE_NOT_FOUND') {
+      apiClient<ShortlistSummary[]>('/v1/shortlists'),
+    ]).then(([profileRes, wsRes, shortlistRes]) => {
+      if (!profileRes.success) {
         router.push('/event-company/onboarding');
         return;
       }
+      setProfile(profileRes.data);
       if (wsRes.success) setWorkspaces(wsRes.data || []);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (bookRes.success) setBookingCount((bookRes.data as any)?.meta?.total ?? 0);
+      if (shortlistRes.success) setShortlists(shortlistRes.data || []);
     }).catch(() => {}).finally(() => setLoading(false));
   }, [router]);
 
@@ -65,8 +78,7 @@ export default function EventCompanyDashboard() {
     );
   }
 
-  const totalMembers = workspaces.reduce((sum, ws) => sum + (ws.member_count || 0), 0);
-  const totalEvents = workspaces.reduce((sum, ws) => sum + (ws.event_count || 0), 0);
+  const companyName = profile?.company_name || 'Event Company';
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -74,82 +86,50 @@ export default function EventCompanyDashboard() {
       <section className="relative">
         <div className="absolute -top-40 -left-20 w-96 h-96 bg-[#c39bff]/10 blur-[120px] rounded-full pointer-events-none" />
         <div className="relative z-10">
-          <h1 className="text-4xl md:text-5xl font-display font-extrabold tracking-tighter text-white leading-tight mb-2">
-            Your events, <span className="text-[#c39bff] italic">sorted</span>
+          <h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter text-white leading-tight mb-1">
+            Welcome, {companyName}
           </h1>
-          <p className="text-white/50 text-lg max-w-xl">
-            Find artists, manage bookings, create proposals — everything for your next event.
+          <p className="text-white/50 text-base md:text-lg max-w-xl">
+            Find and book artists for your events
           </p>
         </div>
       </section>
 
-      {/* ─── Bento Grid: Voice + Insights ─── */}
+      {/* ─── Primary Tiles (match mock) ─── */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Zara & Kabir — Voice Assistant Card */}
-        <div className="md:col-span-8 glass-card rounded-xl p-6 border border-white/5 relative overflow-hidden flex flex-col">
-          <div className="absolute -top-20 -right-20 w-48 h-48 bg-[#c39bff]/8 blur-[80px] rounded-full pointer-events-none" />
-          <div className="flex justify-between items-start relative z-10">
-            <div>
-              <h3 className="text-lg font-display font-bold text-white mb-0.5">Zara & Kabir</h3>
-              <p className="text-white/40 text-xs">Your voice assistants — try &ldquo;Find me a singer for a corporate event in Delhi&rdquo;</p>
+        {/* Find Artists */}
+        <Link
+          href="/search"
+          className="md:col-span-8 rounded-2xl p-10 border border-[#3B82F6]/30 bg-[#3B82F6] hover:bg-[#2F74F2] transition-colors relative overflow-hidden group"
+        >
+          <div className="relative z-10">
+            <div className="w-11 h-11 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center mb-6">
+              <Search className="w-5 h-5 text-white/95" />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-white/30 uppercase tracking-widest">Click below</span>
-              <div className="w-8 h-8 bg-[#c39bff]/20 rounded-full flex items-center justify-center border border-[#c39bff]/30">
-                <Mic className="w-4 h-4 text-[#c39bff]" />
-              </div>
-            </div>
+            <h3 className="text-2xl font-display font-extrabold tracking-tight text-white mb-2">
+              Find Artists
+            </h3>
+            <p className="text-white/80 text-sm">
+              Search by genre, city, budget
+            </p>
           </div>
-          <div className="flex gap-3 mt-4 overflow-x-auto scrollbar-hide relative z-10">
-            <Link href="/search" className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-white/60 whitespace-nowrap hover:bg-white/10 transition-colors">
-              Find artists
-            </Link>
-            <Link href="/client/workspace" className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-white/60 whitespace-nowrap hover:bg-white/10 transition-colors">
-              Open workspace
-            </Link>
-            <Link href="/client/bookings" className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-white/60 whitespace-nowrap hover:bg-white/10 transition-colors">
-              Check bookings
-            </Link>
-          </div>
-        </div>
+        </Link>
 
-        {/* Quick Stats */}
-        <div className="md:col-span-4 glass-card rounded-xl p-8 border border-white/5 flex flex-col justify-between">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-display font-bold text-white">Overview</h3>
-            <TrendingUp className="w-5 h-5 text-[#a1faff]" />
+        {/* My Shortlists */}
+        <Link
+          href="/client/shortlists"
+          className="md:col-span-4 rounded-2xl p-10 bg-white border border-black/5 hover:border-black/10 transition-all group shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+        >
+          <div className="relative">
+            <div className="w-11 h-11 rounded-xl bg-[#ffbf00]/15 border border-[#ffbf00]/25 flex items-center justify-center mb-6">
+              <Star className="w-5 h-5 text-[#ffbf00]" />
+            </div>
+            <h3 className="text-2xl font-display font-extrabold tracking-tight text-black mb-2">
+              My Shortlists
+            </h3>
+            <p className="text-black/50 text-sm">{shortlists.length} shortlists</p>
           </div>
-          <div className="space-y-5">
-            <div className="flex justify-between items-end border-b border-white/5 pb-4">
-              <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest">Workspaces</p>
-                <p className="text-2xl font-bold text-white">{workspaces.length}</p>
-              </div>
-              <Building2 className="w-5 h-5 text-[#c39bff]" />
-            </div>
-            <div className="flex justify-between items-end border-b border-white/5 pb-4">
-              <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest">Bookings</p>
-                <p className="text-2xl font-bold text-white">{bookingCount}</p>
-              </div>
-              <Calendar className="w-5 h-5 text-[#a1faff]" />
-            </div>
-            <div className="flex justify-between items-end border-b border-white/5 pb-4">
-              <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest">Team</p>
-                <p className="text-2xl font-bold text-white">{totalMembers}</p>
-              </div>
-              <Users className="w-5 h-5 text-green-400" />
-            </div>
-            <div className="flex justify-between items-end">
-              <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest">Events</p>
-                <p className="text-2xl font-bold text-white">{totalEvents}</p>
-              </div>
-              <Briefcase className="w-5 h-5 text-yellow-400" />
-            </div>
-          </div>
-        </div>
+        </Link>
       </div>
 
       {/* ─── Quick Actions Bento ─── */}
@@ -157,10 +137,10 @@ export default function EventCompanyDashboard() {
         <h2 className="text-xl font-display font-bold text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <ActionCard href="/search" icon={Search} title="Find Artists" desc="Search by genre, city, budget" accent />
+          <ActionCard href="/client/shortlists" icon={Heart} title="My Shortlists" desc={`${shortlists.length} shortlist${shortlists.length !== 1 ? 's' : ''}`} />
           <ActionCard href="/client/workspace" icon={FolderKanban} title="Workspace CRM" desc="Pipeline & team management" />
           <ActionCard href="/client/bookings" icon={Calendar} title="All Bookings" desc="Track & manage bookings" />
           <ActionCard href="/client/workspace" icon={Presentation} title="Presentations" desc="Create artist proposals" />
-          <ActionCard href="/client/payments" icon={DollarSign} title="Payments" desc="Invoices & escrow" />
           <ActionCard href="/client/substitutions" icon={AlertTriangle} title="Emergency Sub" desc="Last-minute replacements" />
         </div>
       </div>

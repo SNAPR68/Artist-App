@@ -7,7 +7,7 @@
     "dev": "tsx watch src/app.ts",
     "build": "tsc && tsc-alias",
     "start": "node dist/app.js",
-    "lint": "eslint src/",
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\"",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

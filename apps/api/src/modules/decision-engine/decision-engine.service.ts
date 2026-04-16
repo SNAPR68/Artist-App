@@ -8,6 +8,7 @@ import {
 import { db } from '../../infrastructure/database.js';
 import { decisionEngineRepository } from './decision-engine.repository.js';
 import { conciergeService } from '../concierge/concierge.service.js';
+import { workspaceService } from '../workspace/workspace.service.js';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -670,43 +671,64 @@ export class DecisionEngineService {
       throw new DecisionEngineError('BRIEF_NOT_FOUND', 'Brief not found', 404);
     }
 
-    // Fetch full artist profiles for selected artists
-    const artists = await db('artist_profiles')
-      .whereIn('id', request.artist_ids)
-      .select('*');
+    // Find the user's primary workspace (needed for presentation/proposal PDF)
+    const clientProfile = await db('client_profiles')
+      .where({ user_id: userId })
+      .select('workspace_id', 'company_name')
+      .first();
+    const workspaceId = clientProfile?.workspace_id as string | undefined;
+    if (!workspaceId) {
+      throw new DecisionEngineError(
+        'WORKSPACE_REQUIRED',
+        'Please create a workspace before generating proposals.',
+        400,
+      );
+    }
 
     const structured_brief = typeof briefData.structured_brief === 'string'
       ? JSON.parse(briefData.structured_brief)
       : briefData.structured_brief;
 
-    // Match recommendations to artists
-    const selectedRecs = briefData.recommendations
-      .filter((r: Record<string, unknown>) => request.artist_ids.includes(r.artist_id as string));
+    const titleParts = [
+      structured_brief.city ? `${structured_brief.city}` : null,
+      structured_brief.event_type ? `${structured_brief.event_type}` : null,
+      'Proposal',
+    ].filter(Boolean);
+    const presentationTitle = titleParts.join(' — ');
+
+    const customHeader = [
+      clientProfile?.company_name ? `Prepared for ${clientProfile.company_name}` : null,
+      this.buildSummary(structured_brief),
+    ].filter(Boolean).join('\n');
+
+    const presentation = await workspaceService.generatePresentation(
+      workspaceId,
+      userId,
+      {
+        title: presentationTitle,
+        artist_ids: request.artist_ids,
+        include_pricing: request.include_pricing ?? true,
+        include_media: true,
+        custom_header: customHeader || undefined,
+      },
+    );
 
     await decisionEngineRepository.insertEvent(briefId, 'proposal_generated', {
       artist_ids: request.artist_ids,
       user_id: userId,
+      workspace_id: workspaceId,
+      presentation_id: (presentation as any)?.id,
+      presentation_slug: (presentation as any)?.slug,
     });
 
     return {
       brief_id: briefId,
       proposal_type: 'decision_engine',
-      event_summary: structured_brief,
-      artists: artists.map((a) => ({
-        id: a.id,
-        stage_name: a.stage_name,
-        genres: a.genres,
-        base_city: a.base_city,
-        pricing: parsePricing(a.pricing),
-      })),
-      recommendations: selectedRecs.map((r: Record<string, unknown>) => ({
-        artist_id: r.artist_id,
-        score: Number(r.score ?? 0),
-        reasons: typeof r.reasons === 'string' ? JSON.parse(r.reasons) : r.reasons,
-        risk_flags: typeof r.risk_flags === 'string' ? JSON.parse(r.risk_flags) : r.risk_flags,
-        price_min_paise: Number(r.price_min_paise ?? 0),
-        price_max_paise: Number(r.price_max_paise ?? 0),
-      })),
+      workspace_id: workspaceId,
+      presentation_slug: (presentation as any)?.slug,
+      presentation_api_url: `/v1/presentations/${(presentation as any)?.slug}`,
+      pdf_api_url: `/v1/presentations/${(presentation as any)?.slug}/pdf`,
+      presentation_web_url: `/presentations/${(presentation as any)?.slug}`,
       contact: {
         name: request.contact_name ?? null,
         email: request.contact_email ?? null,
