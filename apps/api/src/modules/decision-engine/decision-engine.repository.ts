@@ -130,7 +130,8 @@ export class DecisionEngineRepository {
     if (updates.status) updateData.status = updates.status;
     if (updates.structured_brief) updateData.structured_brief = JSON.stringify(updates.structured_brief);
     if (updates.selected_recommendation_id) updateData.selected_recommendation_id = updates.selected_recommendation_id;
-    if (updates.metadata !== undefined) updateData.metadata = updates.metadata;
+    // Store JSON consistently across environments (jsonb or text)
+    if (updates.metadata !== undefined) updateData.metadata = JSON.stringify(updates.metadata ?? {});
     if (updates.raw_text) updateData.raw_text = updates.raw_text;
 
     const [brief] = await db('decision_briefs')
