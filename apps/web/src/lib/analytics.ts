@@ -27,22 +27,22 @@ function initPostHog() {
 export const analytics = {
   init: initPostHog,
 
-  trackPageView(pageName: string, properties?: Record<string, any>) {
+  trackPageView(pageName: string, properties?: Record<string, unknown>) {
     if (!initialized) return;
     posthog.capture('$pageview', { page_name: pageName, ...properties });
   },
 
-  identifyUser(userId: string, properties?: Record<string, any>) {
+  identifyUser(userId: string, properties?: Record<string, unknown>) {
     if (!initialized) return;
     posthog.identify(userId, properties);
   },
 
-  trackEvent(eventName: string, properties?: Record<string, any>) {
+  trackEvent(eventName: string, properties?: Record<string, unknown>) {
     if (!initialized) return;
     posthog.capture(eventName, properties);
   },
 
-  setUserProperties(properties: Record<string, any>) {
+  setUserProperties(properties: Record<string, unknown>) {
     if (!initialized) return;
     posthog.setPersonProperties(properties);
   },

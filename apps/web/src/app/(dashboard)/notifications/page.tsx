@@ -117,7 +117,7 @@ export default function NotificationsPage() {
         <div className="glass-card border border-white/10 p-16 text-center space-y-4">
           <Bell className="w-12 h-12 text-white/30 mx-auto" />
           <p className="text-white text-lg font-semibold">No notifications</p>
-          <p className="text-sm text-white/50">You're all caught up!</p>
+          <p className="text-sm text-white/50">You&apos;re all caught up!</p>
         </div>
       ) : (
         <div className="space-y-3">

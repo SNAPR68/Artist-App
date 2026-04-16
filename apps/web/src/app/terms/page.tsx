@@ -24,7 +24,7 @@ export default function TermsOfServicePage() {
           <div className="space-y-8 text-white/70 leading-relaxed">
             <section>
               <h2 className="text-xl font-display font-bold text-white mb-4">1. Acceptance of Terms</h2>
-              <p>By accessing or using ArtistBook Platform ("Platform"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Platform.</p>
+              <p>By accessing or using ArtistBook Platform (&quot;Platform&quot;), you agree to be bound by these Terms of Service. If you do not agree, do not use the Platform.</p>
             </section>
 
             <section className="border-t border-white/10 pt-8">
@@ -90,7 +90,7 @@ export default function TermsOfServicePage() {
                 <li>Perform for the agreed duration with professionalism</li>
                 <li>Bring necessary equipment unless specified otherwise</li>
                 <li>Maintain appropriate conduct and language at all times</li>
-                <li>Comply with Client's reasonable requests regarding performance type</li>
+                <li>Comply with Client&apos;s reasonable requests regarding performance type</li>
               </ul>
             </section>
 

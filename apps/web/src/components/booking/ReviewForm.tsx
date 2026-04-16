@@ -132,7 +132,7 @@ export function ReviewForm({ bookingId, onSubmitSuccess }: ReviewFormProps) {
       } else {
         setError(res.errors?.[0]?.message ?? 'Failed to submit review');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to submit review. Please try again.');
     } finally {
       setSubmitting(false);

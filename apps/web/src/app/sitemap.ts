@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       next: { revalidate: 3600 },
     });
     const data = await res.json();
-    artistPages = (data?.data?.artists || data?.data || []).map((a: any) => ({
+    artistPages = (data?.data?.artists || data?.data || []).map((a: { id: string }) => ({
       url: `${baseUrl}/artists/${a.id}`,
       lastModified: new Date(),
       changeFrequency: 'daily' as const,

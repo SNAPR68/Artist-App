@@ -76,7 +76,28 @@ export function Hero() {
       const body: Record<string, unknown> = { raw_text: text, source: 'web' };
       if (sessionId) body.session_id = sessionId;
 
-      const res = await apiClient<any>('/v1/decision-engine/brief', {
+      const res = await apiClient<{
+        session_id: string;
+        response_type: 'clarifying_questions' | 'recommendations';
+        response_text: string;
+        clarifying_questions?: ClarifyingQuestion[];
+        parsed_context?: Record<string, unknown>;
+        recommendations?: Array<{
+          artist_id: string;
+          artist_name?: string;
+          artist_type?: string;
+          profile_image?: string | null;
+          score?: number;
+          confidence?: number;
+          rank?: number;
+          price_min_paise?: number;
+          price_max_paise?: number;
+          expected_close_paise?: number;
+          why_fit?: string[];
+          risk_flags?: string[];
+          logistics_flags?: string[];
+        }>;
+      }>('/v1/decision-engine/brief', {
         method: 'POST',
         body: JSON.stringify(body),
       });
@@ -95,7 +116,7 @@ export function Hero() {
           speakText(data.response_text);
         } else if (data.response_type === 'recommendations') {
           const recs = data.recommendations || [];
-          const cards: VoiceCard[] = recs.map((rec: any) => ({
+          const cards: VoiceCard[] = recs.map((rec) => ({
             type: 'artist_recommendation' as const,
             data: {
               id: rec.artist_id, stage_name: rec.artist_name || 'Artist',
@@ -206,7 +227,7 @@ export function Hero() {
                   />
                   <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
                     <button
-                      onClick={() => { if (!mounted || !micSupported) return; isListening ? stopListening() : startListening(); }}
+                      onClick={() => { if (!mounted || !micSupported) return; if (isListening) { stopListening(); } else { startListening(); } }}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all text-xs font-medium ${isListening ? 'bg-red-500/20 text-red-400 animate-pulse' : 'text-white/30 hover:text-white/60 hover:bg-white/5'}`}
                       title={isListening ? 'Stop recording' : 'Start voice input'}
                     >

@@ -97,7 +97,7 @@ export default function IntelligenceHubPage() {
             <div className="w-3 h-3 rounded-full bg-[#a1faff] animate-pulse shadow-[0_0_12px_rgba(161,250,255,0.5)]" />
             <h3 className="text-xs font-black uppercase tracking-widest text-[#a1faff]">Backstage AI</h3>
           </div>
-          <p className="text-sm text-white/40 italic">"Your booking velocity is trending up. Keep accepting gigs in your top cities to maintain momentum."</p>
+          <p className="text-sm text-white/40 italic">&quot;Your booking velocity is trending up. Keep accepting gigs in your top cities to maintain momentum.&quot;</p>
           <Brain className="w-5 h-5 text-[#c39bff] mt-4 opacity-50" />
         </div>
       </div>

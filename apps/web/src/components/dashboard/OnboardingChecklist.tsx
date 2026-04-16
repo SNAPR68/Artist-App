@@ -55,22 +55,22 @@ export function OnboardingChecklist() {
 
       try {
         // Check if workspace exists
-        const wsRes = await apiClient<any>('/v1/workspaces');
+        const wsRes = await apiClient<Array<{ member_count?: number }>>('/v1/workspaces');
         if (wsRes.success && Array.isArray(wsRes.data) && wsRes.data.length > 0) {
           done.add('workspace');
 
           // Check team members
           const ws = wsRes.data[0];
-          if (ws.member_count > 1) done.add('team');
+          if ((ws.member_count ?? 0) > 1) done.add('team');
         }
 
         // Check if any briefs exist
-        const briefRes = await apiClient<any>('/v1/vault/history?source=briefs&per_page=1');
-        if (briefRes.success && briefRes.data?.total > 0) done.add('brief');
+        const briefRes = await apiClient<{ total?: number }>('/v1/vault/history?source=briefs&per_page=1');
+        if (briefRes.success && (briefRes.data?.total ?? 0) > 0) done.add('brief');
 
         // Check if any presentations exist
-        const bookRes = await apiClient<any>('/v1/vault/history?source=bookings&per_page=1');
-        if (bookRes.success && briefRes.data?.total > 0 && bookRes.data?.total > 0) done.add('proposal');
+        const bookRes = await apiClient<{ total?: number }>('/v1/vault/history?source=bookings&per_page=1');
+        if (bookRes.success && (briefRes.data?.total ?? 0) > 0 && (bookRes.data?.total ?? 0) > 0) done.add('proposal');
       } catch {
         // Non-fatal
       }

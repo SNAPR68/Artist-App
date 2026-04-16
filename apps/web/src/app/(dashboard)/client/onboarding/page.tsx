@@ -199,7 +199,7 @@ export default function ClientOnboardingPage() {
                     </h2>
 
                     <div>
-                      <label className="block text-sm font-medium text-white/60 mb-3">Event Types You're Interested In *</label>
+                      <label className="block text-sm font-medium text-white/60 mb-3">Event Types You&apos;re Interested In *</label>
                       <div className="flex flex-wrap gap-2">
                         {EVENT_TYPES.map((type) => (
                           <button

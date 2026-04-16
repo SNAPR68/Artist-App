@@ -65,7 +65,7 @@ export default function AgencyJoinPage() {
       }
 
       // Create workspace
-      const res = await apiClient<any>('/v1/workspaces', {
+      const res = await apiClient<{ id: string }>('/v1/workspaces', {
         method: 'POST',
         body: JSON.stringify({
           name: companyName,
@@ -81,8 +81,9 @@ export default function AgencyJoinPage() {
       } else {
         setError(res.errors?.[0]?.message || 'Failed to create workspace');
       }
-    } catch (err: any) {
-      setError(err?.message || 'Something went wrong');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Something went wrong';
+      setError(message);
     }
 
     setSubmitting(false);
@@ -280,7 +281,7 @@ export default function AgencyJoinPage() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-bold text-white mb-1">Invite your team</h2>
-                <p className="text-white/30 text-sm">Add team members by phone number. They'll get an invite to join your workspace.</p>
+                <p className="text-white/30 text-sm">Add team members by phone number. They&apos;ll get an invite to join your workspace.</p>
               </div>
 
               {invitePhones.map((phone, i) => (
@@ -330,7 +331,7 @@ export default function AgencyJoinPage() {
                 </svg>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white mb-2">You're all set!</h2>
+                <h2 className="text-xl font-bold text-white mb-2">You&apos;re all set!</h2>
                 <p className="text-white/30 text-sm">Your workspace <strong className="text-white/60">{companyName}</strong> is ready. Start by submitting your first event brief.</p>
               </div>
 

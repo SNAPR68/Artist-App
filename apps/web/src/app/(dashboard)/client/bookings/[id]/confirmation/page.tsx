@@ -76,7 +76,7 @@ export default function PaymentConfirmationPage() {
       if (bookingRes.success) {
         setBooking(bookingRes.data);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to load confirmation details');
     } finally {
       setLoading(false);
@@ -291,7 +291,7 @@ export default function PaymentConfirmationPage() {
 
         {/* Next Steps */}
         <div className="glass-card bg-gradient-to-br from-[#c39bff]/10 to-transparent p-6 space-y-3 animate-fade-in-up border border-white/10 rounded-xl">
-          <h2 className="text-lg font-display font-semibold text-white">What's Next?</h2>
+          <h2 className="text-lg font-display font-semibold text-white">What&apos;s Next?</h2>
           <ul className="space-y-2 text-sm text-white/60">
             <li className="flex gap-3">
               <span className="text-[#a1faff] font-bold">1</span>

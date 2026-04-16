@@ -9,7 +9,7 @@ import React from 'react';
 export interface PWAState {
   isInstallable: boolean;
   isOnline: boolean;
-  deferredPrompt: any;
+  deferredPrompt: Event | null;
 }
 
 let serviceWorkerRegistration: ServiceWorkerRegistration | null = null;
@@ -80,7 +80,7 @@ export async function unregisterServiceWorker(): Promise<void> {
 /**
  * Check if the app is installable as a PWA
  */
-export function useInstallPrompt(onInstallPrompt?: (event: any) => void): {
+export function useInstallPrompt(onInstallPrompt?: (event: Event) => void): {
   isInstallable: boolean;
   install: () => Promise<void>;
 } {
@@ -161,7 +161,7 @@ export async function checkForUpdates(): Promise<boolean> {
 /**
  * Send message to service worker
  */
-export async function sendMessageToServiceWorker(message: any): Promise<any> {
+export async function sendMessageToServiceWorker(message: unknown): Promise<unknown> {
   const controller = navigator.serviceWorker?.controller;
   if (!controller) {
     throw new Error('Service Worker not available');
@@ -193,8 +193,8 @@ export async function clearCaches(): Promise<void> {
 
     // Also clear IndexedDB if needed
     if ('indexedDB' in window) {
-      const idb = (window as any).indexedDB as IDBFactory;
-      const databases = await (idb.databases?.() as Promise<Array<{ name: string }>>).catch(
+      const idb = window.indexedDB;
+      const databases = await ((idb as IDBFactory & { databases?: () => Promise<Array<{ name: string }>> }).databases?.() as Promise<Array<{ name: string }>>).catch(
         () => [],
       );
       if (databases && databases.length > 0) {

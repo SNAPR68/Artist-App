@@ -173,7 +173,7 @@ export default function ReputationPage() {
             {disputes.map((d) => (
               <div key={d.id} className="glass-card rounded-xl border border-white/5 p-4">
                 <div className="flex items-start justify-between mb-2">
-                  <p className="text-sm text-white/60 italic line-clamp-2">"{ d.review_excerpt}"</p>
+                  <p className="text-sm text-white/60 italic line-clamp-2">&quot;{ d.review_excerpt}&quot;</p>
                   {statusBadge(d.status)}
                 </div>
                 <p className="text-sm text-white/60 mt-1"><span className="font-bold">Reason:</span> {d.reason}</p>

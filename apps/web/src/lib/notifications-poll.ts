@@ -87,7 +87,7 @@ export function useUnreadCount(pollInterval = 30000) {
  * Attempts WebSocket connection, falls back to polling if unavailable
  */
 export function useNotifications(pollInterval = 30000) {
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Array<Record<string, unknown>>>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);

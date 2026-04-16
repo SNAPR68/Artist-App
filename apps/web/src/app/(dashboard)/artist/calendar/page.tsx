@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Check, Lock, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Lock, Calendar, type LucideIcon } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
 interface CalendarEntry {
@@ -19,7 +19,7 @@ interface BookingRecord {
   client_name?: string;
 }
 
-const STATUS_CONFIG: Record<string, { icon: any; bgGlass: string; textColor: string; label: string }> = {
+const STATUS_CONFIG: Record<string, { icon: LucideIcon; bgGlass: string; textColor: string; label: string }> = {
   available: {
     icon: Check,
     bgGlass: 'bg-gradient-to-br from-green-500/20 to-transparent border border-green-400/30',

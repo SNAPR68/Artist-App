@@ -1,7 +1,7 @@
 'use client';
 
 import { initializeApp, getApps } from 'firebase/app';
-import { getMessaging, getToken, onMessage, type Messaging } from 'firebase/messaging';
+import { getMessaging, getToken, onMessage, type Messaging, type MessagePayload } from 'firebase/messaging';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -62,7 +62,7 @@ export async function requestPushPermission(): Promise<string | null> {
 /**
  * Register a callback for foreground push messages.
  */
-export function onForegroundMessage(callback: (payload: any) => void) {
+export function onForegroundMessage(callback: (payload: MessagePayload) => void) {
   const msg = getFirebaseMessaging();
   if (!msg) return () => {};
   return onMessage(msg, callback);

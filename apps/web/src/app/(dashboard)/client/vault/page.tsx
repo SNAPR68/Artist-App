@@ -41,7 +41,7 @@ export default function VaultPage() {
     params.set('page', String(page));
     params.set('per_page', '20');
 
-    const res = await apiClient<any>(`/v1/vault/history?${params.toString()}`);
+    const res = await apiClient<{ results?: VaultItem[]; total?: number }>(`/v1/vault/history?${params.toString()}`);
     if (res.success && res.data) {
       setItems(res.data.results || []);
       setTotal(res.data.total || 0);

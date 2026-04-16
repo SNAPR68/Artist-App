@@ -71,8 +71,8 @@ export default function WorkspaceTeamPage() {
   const fetchMembers = useCallback(() => {
     setLoading(true);
     apiClient<WorkspaceMember[]>(`/v1/workspaces/${workspaceId}/members`)
-      .then((res: any) => {
-        if (res.success) {
+      .then((res) => {
+        if (res.success && res.data) {
           setMembers(res.data);
         }
       })

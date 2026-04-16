@@ -17,7 +17,7 @@ type PaymentStatus = 'idle' | 'loading' | 'checkout' | 'verifying' | 'success' |
 
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay: new (options: Record<string, unknown>) => { open: () => void; on?: (event: string, handler: (response: Record<string, unknown>) => void) => void };
   }
 }
 

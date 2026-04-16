@@ -77,7 +77,7 @@ export default function BackupPreferencesPage() {
           <div>
             <p className="font-bold text-white text-sm">Available as backup artist</p>
             <p className="text-xs text-white/50 mt-1">
-              You'll be notified when short-notice gigs match your profile.
+              You&apos;ll be notified when short-notice gigs match your profile.
             </p>
           </div>
           <button
@@ -114,7 +114,7 @@ export default function BackupPreferencesPage() {
               className="w-32 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#c39bff] bg-white/5 text-white placeholder-white/30"
             />
             <p className="text-xs text-white/50 mt-2">
-              You'll earn {prefs.backup_premium_pct}% more than the original booking amount for accepting short-notice gigs.
+              You&apos;ll earn {prefs.backup_premium_pct}% more than the original booking amount for accepting short-notice gigs.
             </p>
           </div>
         )}

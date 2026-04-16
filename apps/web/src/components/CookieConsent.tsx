@@ -20,7 +20,9 @@ export function CookieConsent() {
   const handleAccept = () => {
     try {
       localStorage.setItem('cookie_consent', 'accepted');
-    } catch {}
+    } catch {
+      /* localStorage unavailable */
+    }
     setVisible(false);
   };
 
@@ -29,7 +31,9 @@ export function CookieConsent() {
       localStorage.setItem('cookie_consent', 'declined');
       // Disable PostHog analytics if user declines
       posthog.opt_out_capturing();
-    } catch {}
+    } catch {
+      /* localStorage or posthog unavailable */
+    }
     setVisible(false);
   };
 

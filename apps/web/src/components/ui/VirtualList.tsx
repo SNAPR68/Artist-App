@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useCallback, useRef, useEffect, ReactNode } from 'react';
+import { useMemo, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
 
 interface VirtualListProps<T> {
   items: T[];
@@ -102,7 +102,7 @@ export function useVirtualList<T>({
   overscan = 3,
 }: Omit<VirtualListProps<T>, 'renderItem'>) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [scrollTop, setScrollTop] = require('react').useState(0);
+  const [scrollTop, setScrollTop] = useState(0);
 
   const handleScroll = useCallback(() => {
     if (containerRef.current) {

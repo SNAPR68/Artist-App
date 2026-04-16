@@ -147,7 +147,7 @@ export default function VoicePage() {
             <div className="flex items-center justify-center h-full text-white/50 text-sm py-20">
               <div className="text-center">
                 <p className="mb-2">Start a conversation...</p>
-                <p className="text-xs text-white/40">e.g., "How many gigs am I shortlisted for?" or "What's my balance?"</p>
+                <p className="text-xs text-white/40">e.g., &quot;How many gigs am I shortlisted for?&quot; or &quot;What&apos;s my balance?&quot;</p>
               </div>
             </div>
           )}
