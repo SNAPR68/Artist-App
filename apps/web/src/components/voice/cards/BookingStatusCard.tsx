@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import type { VoiceBookingCard } from '@artist-booking/shared';
 
@@ -27,7 +28,7 @@ export function BookingStatusCard({ booking }: { booking: VoiceBookingCard }) {
         {/* Artist thumbnail */}
         <div className="w-10 h-10 rounded-lg bg-white/5 flex-shrink-0 overflow-hidden">
           {booking.artist_thumbnail ? (
-            <img src={booking.artist_thumbnail} alt={booking.artist_name} className="w-full h-full object-cover" />
+            <Image src={booking.artist_thumbnail} alt={booking.artist_name} width={40} height={40} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-white/20 text-sm font-bold">
               {booking.artist_name.charAt(0)}

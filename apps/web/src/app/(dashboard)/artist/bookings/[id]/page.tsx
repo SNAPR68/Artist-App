@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Calendar, MapPin, Clock, FileText, CheckCircle, XCircle, Lightbulb, Send, Zap } from 'lucide-react';
 import { apiClient } from '../../../../../lib/api-client';
@@ -64,11 +64,7 @@ export default function ArtistBookingDetailPage() {
   const [quoteNotes, setQuoteNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    loadBooking();
-  }, [id]);
-
-  const loadBooking = async () => {
+  const loadBooking = useCallback(async () => {
     const [bookingRes, quoteRes] = await Promise.all([
       apiClient<BookingDetail>(`/v1/bookings/${id}`),
       apiClient<AutoQuote>(`/v1/bookings/${id}/auto-quote`),
@@ -76,7 +72,11 @@ export default function ArtistBookingDetailPage() {
     if (bookingRes.success) setBooking(bookingRes.data);
     if (quoteRes.success) setAutoQuote(quoteRes.data);
     setLoading(false);
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadBooking();
+  }, [loadBooking]);
 
   const handleSubmitQuote = async (e: React.FormEvent) => {
     e.preventDefault();

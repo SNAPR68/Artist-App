@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Calendar, MapPin, Clock, FileText, CheckCircle, XCircle, Download, Send } from 'lucide-react';
 import { apiClient } from '../../../../../lib/api-client';
@@ -63,15 +63,15 @@ export default function ClientBookingDetailPage() {
   // Cancellation modal state
   const [showCancellationModal, setShowCancellationModal] = useState(false);
 
-  useEffect(() => {
-    loadBooking();
-  }, [id]);
-
-  const loadBooking = async () => {
+  const loadBooking = useCallback(async () => {
     const res = await apiClient<BookingDetail>(`/v1/bookings/${id}`);
     if (res.success) setBooking(res.data);
     setLoading(false);
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadBooking();
+  }, [loadBooking]);
 
   const handleCounterOffer = async (e: React.FormEvent) => {
     e.preventDefault();

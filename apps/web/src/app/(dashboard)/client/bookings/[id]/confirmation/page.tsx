@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { apiClient } from '../../../../../../lib/api-client';
 import { Download, Check, AlertCircle, Home, FileText } from 'lucide-react';
@@ -56,11 +56,7 @@ export default function PaymentConfirmationPage() {
   const [downloadingContract, setDownloadingContract] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadData();
-  }, [bookingId]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       const [paymentRes, bookingRes] = await Promise.all([
         apiClient<PaymentConfirmation>(`/v1/payments/booking/${bookingId}`),
@@ -81,7 +77,11 @@ export default function PaymentConfirmationPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [bookingId]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleDownloadInvoice = async () => {
     if (!confirmation) return;

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import type { VoiceArtistCard } from '@artist-booking/shared';
 
@@ -33,7 +34,7 @@ export function ArtistRecommendationCard({ artist, onSelect }: { artist: VoiceAr
         {/* Thumbnail */}
         <div className="w-14 h-14 rounded-lg bg-white/5 flex-shrink-0 overflow-hidden">
           {artist.thumbnail_url ? (
-            <img src={artist.thumbnail_url} alt={artist.stage_name} className="w-full h-full object-cover" />
+            <Image src={artist.thumbnail_url} alt={artist.stage_name} width={56} height={56} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-white/20 text-lg font-bold">
               {artist.stage_name.charAt(0)}

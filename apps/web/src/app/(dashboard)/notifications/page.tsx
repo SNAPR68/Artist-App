@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Mail, Wallet, CheckCircle, CreditCard, XCircle, Bell, Building2, Star } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 
@@ -43,17 +43,17 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     setLoading(true);
     const unreadParam = filter === 'unread' ? '&unread=true' : '';
     const res = await apiClient<Notification[]>(`/v1/notifications?per_page=50${unreadParam}`);
     if (res.success) setNotifications(res.data);
     setLoading(false);
-  };
+  }, [filter]);
 
   useEffect(() => {
     loadNotifications();
-  }, [filter]);
+  }, [loadNotifications]);
 
   const handleMarkRead = async (id: string) => {
     await apiClient(`/v1/notifications/${id}/read`, { method: 'PUT' });

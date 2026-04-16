@@ -111,6 +111,13 @@ export function useNotifications(pollInterval = 30000) {
     }
   }, []);
 
+  const startPolling = useCallback(() => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+    }
+    pollIntervalRef.current = setInterval(fetchNotifications, pollInterval);
+  }, [fetchNotifications, pollInterval]);
+
   // Try WebSocket connection first
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -158,14 +165,7 @@ export function useNotifications(pollInterval = 30000) {
         wsRef.current.close();
       }
     };
-  }, []);
-
-  const startPolling = useCallback(() => {
-    if (pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current);
-    }
-    pollIntervalRef.current = setInterval(fetchNotifications, pollInterval);
-  }, [fetchNotifications, pollInterval]);
+  }, [startPolling]);
 
   // Initial fetch
   useEffect(() => {

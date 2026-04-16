@@ -523,7 +523,7 @@ export function VoiceAssistant() {
         setState('idle');
       }
     },
-    [router, speakResponse]
+    [router, speakResponse, ttsLang]
   );
 
   // When transcript is finalized, send query

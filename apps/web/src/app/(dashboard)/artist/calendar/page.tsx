@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Check, Lock, Calendar, type LucideIcon } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
@@ -53,11 +53,7 @@ export default function CalendarPage() {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  useEffect(() => {
-    loadCalendar();
-  }, [year, month]);
-
-  const loadCalendar = async () => {
+  const loadCalendar = useCallback(async () => {
     setLoading(true);
     const startDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
     const endDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
@@ -95,7 +91,11 @@ export default function CalendarPage() {
 
     setEntries(calEntries);
     setLoading(false);
-  };
+  }, [year, month, daysInMonth]);
+
+  useEffect(() => {
+    loadCalendar();
+  }, [loadCalendar]);
 
   const getEntryForDate = (day: number) => {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;

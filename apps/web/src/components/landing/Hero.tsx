@@ -46,15 +46,7 @@ export function Hero() {
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { const t = setInterval(() => setActiveSlide(p => (p + 1) % 4), 5000); return () => clearInterval(t); }, []);
 
-  // Auto-submit when voice transcript is finalized
   const lastTranscriptRef = useRef('');
-  useEffect(() => {
-    if (transcript && transcript !== lastTranscriptRef.current && !isListening) {
-      lastTranscriptRef.current = transcript;
-      sendMessage(transcript);
-      resetTranscript();
-    }
-  }, [transcript, isListening, resetTranscript]);
 
   // Rotate placeholder examples
   useEffect(() => {
@@ -64,6 +56,12 @@ export function Hero() {
     }, 4000);
     return () => clearInterval(interval);
   }, [briefText, messages.length]);
+
+  const speakText = useCallback((text: string) => {
+    fetch('/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, lang: 'en', stream: true }) })
+      .then(async (res) => { if (!res.ok) return; const blob = await res.blob(); const url = URL.createObjectURL(blob); const audio = new Audio(url); audio.onended = () => URL.revokeObjectURL(url); audio.play().catch(() => {}); })
+      .catch(() => {});
+  }, []);
 
   // ─── Send message to decision engine ──────────────────────
   const sendMessage = useCallback(async (text: string) => {
@@ -150,13 +148,16 @@ export function Hero() {
 
     setIsSubmitting(false);
     setTimeout(() => { resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
-  }, [isSubmitting, sessionId]);
+  }, [isSubmitting, sessionId, speakText]);
 
-  const speakText = useCallback((text: string) => {
-    fetch('/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, lang: 'en', stream: true }) })
-      .then(async (res) => { if (!res.ok) return; const blob = await res.blob(); const url = URL.createObjectURL(blob); const audio = new Audio(url); audio.onended = () => URL.revokeObjectURL(url); audio.play().catch(() => {}); })
-      .catch(() => {});
-  }, []);
+  // Auto-submit when voice transcript is finalized
+  useEffect(() => {
+    if (transcript && transcript !== lastTranscriptRef.current && !isListening) {
+      lastTranscriptRef.current = transcript;
+      sendMessage(transcript);
+      resetTranscript();
+    }
+  }, [transcript, isListening, resetTranscript, sendMessage]);
 
   const handleSubmit = useCallback(() => { sendMessage(briefText.trim()); }, [briefText, sendMessage]);
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }, [handleSubmit]);
