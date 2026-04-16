@@ -48,3 +48,6 @@ pnpm-debug.log*
 apps/web/tmp/
 *.bak
 _tmp_*
+
+# Local-only legacy design blueprints (reference artifacts, not runtime deps)
+archive/legacy-blueprints/**
