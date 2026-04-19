@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { UserRole } from '@artist-booking/shared';
 
 // Mock api-client before importing auth store
 vi.mock('@/lib/api-client', () => ({
@@ -38,10 +39,10 @@ describe('Auth Store - Smoke Tests', () => {
     // Create a mock JWT with expected payload
     const payload = { user_id: 'test-123', role: 'client', phone: '9876543210' };
     const fakeJWT = `header.${btoa(JSON.stringify(payload))}.signature`;
-    localStorageMock.getItem.mockImplementation((key: string) => {
+    localStorageMock.getItem.mockImplementation(((key: string) => {
       if (key === 'access_token') return fakeJWT;
       return null;
-    });
+    }) as (key: string) => string);
 
     // Force re-initialization
     vi.resetModules();
@@ -59,7 +60,7 @@ describe('Auth Store - Smoke Tests', () => {
 
     // Manually set authenticated state
     useAuthStore.setState({
-      user: { id: 'u1', phone: '123', role: 'client' as const, is_new: false },
+      user: { id: 'u1', phone: '123', role: UserRole.CLIENT, is_new: false },
       isAuthenticated: true,
     });
 
