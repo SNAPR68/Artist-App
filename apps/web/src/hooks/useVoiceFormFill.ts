@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-type SpeechRecognition = any;
-type SpeechRecognitionEvent = any;
-
 /**
  * useVoiceFormFill — voice-powered form filling for any page.
  *
@@ -18,6 +14,10 @@ type SpeechRecognitionEvent = any;
  *   });
  */
 'use client';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type SpeechRecognition = any;
+type SpeechRecognitionEvent = any;
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 
