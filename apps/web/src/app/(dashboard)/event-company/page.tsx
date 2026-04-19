@@ -19,6 +19,8 @@ import {
   FileText,
   Receipt,
   CreditCard,
+  CheckCircle2,
+  Circle,
 } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 
@@ -150,6 +152,48 @@ export default function EventCompanyDashboard() {
           </div>
         </Link>
       </div>
+
+      {/* ─── Activation Checklist ─── */}
+      {workspaces.length > 0 && (() => {
+        const steps = [
+          { done: workspaces.length > 0, label: 'Create workspace', href: '/event-company' },
+          { done: (workspaces[0]?.member_count ?? 0) > 1, label: 'Invite a teammate', href: '/event-company/team' },
+          { done: agencyKpis.deals > 0, label: 'Create your first deal', href: '/event-company/deals' },
+          { done: agencyKpis.templates > 0, label: 'Save a proposal template', href: '/event-company/templates' },
+          { done: agencyKpis.unpaidInvoices > 0 || agencyKpis.deals > 0, label: 'Generate a GST invoice', href: '/event-company/invoices' },
+        ];
+        const completed = steps.filter((s) => s.done).length;
+        if (completed === steps.length) return null;
+        return (
+          <div className="glass-card rounded-xl p-6 border border-[#c39bff]/20 relative overflow-hidden">
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+            <div className="relative flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-display font-bold text-white">Get set up</h2>
+                <p className="text-xs text-white/50">{completed} of {steps.length} complete</p>
+              </div>
+              <div className="w-32 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#c39bff] to-[#a1faff]" style={{ width: `${(completed / steps.length) * 100}%` }} />
+              </div>
+            </div>
+            <ul className="relative space-y-2">
+              {steps.map((s) => (
+                <li key={s.label}>
+                  <Link href={s.href} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors group">
+                    {s.done ? (
+                      <CheckCircle2 className="w-4 h-4 text-[#a1faff] flex-shrink-0" />
+                    ) : (
+                      <Circle className="w-4 h-4 text-white/30 flex-shrink-0" />
+                    )}
+                    <span className={`text-sm ${s.done ? 'text-white/40 line-through' : 'text-white/80 group-hover:text-white'}`}>{s.label}</span>
+                    {!s.done && <ArrowRight className="w-3 h-3 text-white/30 ml-auto group-hover:text-[#c39bff] group-hover:translate-x-0.5 transition-all" />}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })()}
 
       {/* ─── Agency KPIs ─── */}
       {workspaces.length > 0 && (
