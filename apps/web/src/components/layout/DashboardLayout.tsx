@@ -22,6 +22,9 @@ import {
   ShieldCheck,
   FileText,
   Receipt,
+  BarChart3,
+  Zap,
+  CreditCard,
   Search,
   Bell,
   LogOut,
@@ -65,6 +68,9 @@ const AGENT_NAV: NavItem[] = [
 
 const ADMIN_NAV: NavItem[] = [
   { href: '/admin', labelKey: 'nav.home', icon: <Home size={18} /> },
+  { href: '/admin/analytics', labelKey: 'nav.analytics', icon: <BarChart3 size={18} /> },
+  { href: '/admin/concierge', labelKey: 'nav.concierge', icon: <Sparkles size={18} /> },
+  { href: '/admin/instabook', labelKey: 'nav.instabook', icon: <Zap size={18} /> },
 ];
 
 const EVENT_COMPANY_NAV: NavItem[] = [
@@ -76,6 +82,7 @@ const EVENT_COMPANY_NAV: NavItem[] = [
   { href: '/event-company/team', labelKey: 'nav.team', icon: <Users size={18} /> },
   { href: '/event-company/templates', labelKey: 'nav.templates', icon: <FileText size={18} /> },
   { href: '/event-company/invoices', labelKey: 'nav.invoices', icon: <Receipt size={18} /> },
+  { href: '/event-company/billing', labelKey: 'nav.billing', icon: <CreditCard size={18} /> },
   { href: '/client/recommendations', labelKey: 'nav.discover', icon: <Sparkles size={18} /> },
   { href: '/search', labelKey: 'nav.search', icon: <Search size={18} /> },
 ];

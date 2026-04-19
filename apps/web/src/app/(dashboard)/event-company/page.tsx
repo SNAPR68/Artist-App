@@ -15,6 +15,10 @@ import {
   AlertTriangle,
   FolderKanban,
   Presentation,
+  Kanban,
+  FileText,
+  Receipt,
+  CreditCard,
 } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 
@@ -43,6 +47,7 @@ export default function EventCompanyDashboard() {
   const [profile, setProfile] = useState<EventCompanyProfile | null>(null);
   const [workspaces, setWorkspaces] = useState<WorkspaceSummary[]>([]);
   const [shortlists, setShortlists] = useState<ShortlistSummary[]>([]);
+  const [agencyKpis, setAgencyKpis] = useState({ deals: 0, templates: 0, unpaidInvoices: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,14 +55,28 @@ export default function EventCompanyDashboard() {
       apiClient<EventCompanyProfile>('/v1/clients/profile'),
       apiClient<WorkspaceSummary[]>('/v1/workspaces'),
       apiClient<ShortlistSummary[]>('/v1/shortlists'),
-    ]).then(([profileRes, wsRes, shortlistRes]) => {
+    ]).then(async ([profileRes, wsRes, shortlistRes]) => {
       if (!profileRes.success) {
         router.push('/event-company/onboarding');
         return;
       }
       setProfile(profileRes.data);
-      if (wsRes.success) setWorkspaces(wsRes.data || []);
+      const workspacesData = wsRes.success ? (wsRes.data || []) : [];
+      setWorkspaces(workspacesData);
       if (shortlistRes.success) setShortlists(shortlistRes.data || []);
+
+      const firstWs = workspacesData[0];
+      if (firstWs) {
+        const [dealsRes, templatesRes, invoicesRes] = await Promise.all([
+          apiClient<{ rows?: unknown[] } | unknown[]>(`/v1/workspaces/${firstWs.id}/bookings`).catch(() => ({ success: false } as const)),
+          apiClient<unknown[]>(`/v1/workspaces/${firstWs.id}/proposal-templates`).catch(() => ({ success: false } as const)),
+          apiClient<{ rows: Array<{ status: string }> }>(`/v1/workspaces/${firstWs.id}/gst-invoices`).catch(() => ({ success: false } as const)),
+        ]);
+        const deals = dealsRes.success ? (Array.isArray(dealsRes.data) ? dealsRes.data.length : (dealsRes.data as { rows?: unknown[] })?.rows?.length ?? 0) : 0;
+        const templates = templatesRes.success ? (templatesRes.data?.length ?? 0) : 0;
+        const unpaid = invoicesRes.success ? (invoicesRes.data?.rows?.filter((r) => r.status === 'issued').length ?? 0) : 0;
+        setAgencyKpis({ deals, templates, unpaidInvoices: unpaid });
+      }
     }).catch(() => {}).finally(() => setLoading(false));
   }, [router]);
 
@@ -132,6 +151,19 @@ export default function EventCompanyDashboard() {
         </Link>
       </div>
 
+      {/* ─── Agency KPIs ─── */}
+      {workspaces.length > 0 && (
+        <div>
+          <h2 className="text-xl font-display font-bold text-white mb-4">Run Your Agency</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <KpiCard href="/event-company/deals" icon={Kanban} label="Active Deals" value={agencyKpis.deals} accent="#c39bff" />
+            <KpiCard href="/event-company/templates" icon={FileText} label="Proposal Templates" value={agencyKpis.templates} accent="#a1faff" />
+            <KpiCard href="/event-company/invoices" icon={Receipt} label="Unpaid Invoices" value={agencyKpis.unpaidInvoices} accent="#ffbf00" />
+            <KpiCard href="/event-company/billing" icon={CreditCard} label="Subscription" value="Manage" accent="#c39bff" />
+          </div>
+        </div>
+      )}
+
       {/* ─── Quick Actions Bento ─── */}
       <div>
         <h2 className="text-xl font-display font-bold text-white mb-4">Quick Actions</h2>
@@ -190,6 +222,22 @@ export default function EventCompanyDashboard() {
         </div>
       )}
     </div>
+  );
+}
+
+function KpiCard({ href, icon: Icon, label, value, accent }: {
+  href: string; icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>; label: string; value: string | number; accent: string;
+}) {
+  return (
+    <Link href={href}>
+      <div className="glass-card rounded-xl p-5 border border-white/5 hover:border-white/15 transition-all group cursor-pointer h-full">
+        <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style={{ background: `${accent}20` }}>
+          <Icon className="w-4 h-4" style={{ color: accent }} />
+        </div>
+        <div className="text-2xl font-display font-extrabold text-white mb-0.5">{value}</div>
+        <div className="text-xs text-white/50">{label}</div>
+      </div>
+    </Link>
   );
 }
 

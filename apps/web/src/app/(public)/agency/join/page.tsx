@@ -349,16 +349,16 @@ export default function AgencyJoinPage() {
 
               <div className="space-y-3">
                 <button
-                  onClick={() => router.push('/client/workspace')}
+                  onClick={() => router.push('/event-company')}
                   className="w-full py-3.5 rounded-xl bg-white text-[#0e0e0f] font-semibold text-sm hover:bg-white/90 transition-colors"
                 >
-                  Go to Dashboard
+                  Go to Agency Dashboard
                 </button>
                 <button
-                  onClick={() => router.push('/')}
+                  onClick={() => router.push('/event-company/deals')}
                   className="w-full py-3 rounded-xl border border-white/10 text-white/40 text-sm hover:text-white hover:border-white/20 transition-colors"
                 >
-                  Submit Your First Brief
+                  Open Deals Kanban
                 </button>
               </div>
             </div>
