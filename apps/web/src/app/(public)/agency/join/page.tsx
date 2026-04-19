@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/auth';
 import VoiceFillButton from '@/components/voice/VoiceFillButton';
+import { analytics } from '@/lib/analytics';
 
 const AGENCY_FORM_CONTEXT = {
   page: 'agency registration form',
@@ -46,6 +47,10 @@ export default function AgencyJoinPage() {
 
   // Step 2 fields
   const [invitePhones, setInvitePhones] = useState(['', '', '']);
+
+  useEffect(() => {
+    analytics.trackEvent('agency_join_viewed');
+  }, []);
 
   const handleCreateWorkspace = useCallback(async () => {
     if (!companyName.trim() || !companyType) return;
@@ -89,6 +94,11 @@ export default function AgencyJoinPage() {
 
       if (res.success && res.data) {
         setWorkspaceId(res.data.id);
+        analytics.trackEvent('agency_workspace_created', {
+          company_type: companyType,
+          team_size: teamSize,
+          events_per_month: eventsPerMonth,
+        });
         setStep('team');
       } else {
         setError(res.errors?.[0]?.message || 'Failed to create workspace');
@@ -119,10 +129,12 @@ export default function AgencyJoinPage() {
     }
 
     setSubmitting(false);
+    analytics.trackEvent('agency_team_invited', { invite_count: phones.length });
     setStep('done');
   }, [workspaceId, invitePhones]);
 
   const handleSkipInvite = useCallback(() => {
+    analytics.trackEvent('agency_team_invite_skipped');
     setStep('done');
   }, []);
 

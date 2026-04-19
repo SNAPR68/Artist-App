@@ -1,7 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { analytics } from '@/lib/analytics';
 
 const PLANS = [
   {
@@ -65,6 +67,10 @@ const PLANS = [
 export default function PricingPage() {
   const router = useRouter();
 
+  useEffect(() => {
+    analytics.trackEvent('pricing_viewed', { source: 'marketing' });
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#0e0e0f] px-6 py-20">
       {/* Header */}
@@ -121,6 +127,11 @@ export default function PricingPage() {
             {/* CTA */}
             <button
               onClick={() => {
+                analytics.trackEvent('pricing_cta_clicked', {
+                  plan: plan.name,
+                  price: plan.price,
+                  destination: plan.ctaHref,
+                });
                 if (plan.ctaHref.startsWith('mailto:')) {
                   window.location.href = plan.ctaHref;
                 } else {
