@@ -14,6 +14,11 @@ const VOICE_IDS: Record<string, string> = {
 export async function POST(req: NextRequest) {
   const apiKey = process.env.ELEVENLABS_API_KEY;
 
+  // If no API key, return 503 immediately so health-check probes don't get 400
+  if (!apiKey) {
+    return NextResponse.json({ error: 'TTS not configured' }, { status: 503 });
+  }
+
   const body = await req.json() as { text: string; lang?: string; stream?: boolean };
   const { text, lang = 'en', stream = false } = body;
 
@@ -23,11 +28,6 @@ export async function POST(req: NextRequest) {
 
   // Truncate to avoid excessive API costs
   const truncated = text.slice(0, 500);
-
-  // If no API key, return 503 so client falls back to browser TTS
-  if (!apiKey) {
-    return NextResponse.json({ error: 'TTS not configured' }, { status: 503 });
-  }
 
   const voiceId = lang === 'hi' ? VOICE_IDS.hi : VOICE_IDS.en;
   const modelId = 'eleven_multilingual_v2'; // supports Hindi + English

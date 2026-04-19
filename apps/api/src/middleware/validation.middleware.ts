@@ -8,6 +8,7 @@ import { ZodError, type ZodSchema } from 'zod';
  */
 export function validateBody(schema: ZodSchema) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
+    if (reply.sent) return;
     try {
       request.body = schema.parse(request.body);
     } catch (error) {
@@ -32,6 +33,7 @@ export function validateBody(schema: ZodSchema) {
  */
 export function validateQuery(schema: ZodSchema) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
+    if (reply.sent) return;
     try {
       request.query = schema.parse(request.query);
     } catch (error) {
