@@ -55,10 +55,10 @@ export class ReputationExportService {
     }
 
     // Ratings from completed bookings
-    const ratingRow = await db('reviews')
+    const ratingRow = await (db('reviews')
       .where({ reviewee_id: profile.user_id })
       .select(db.raw('AVG(overall_rating)::float as avg_rating'), db.raw('COUNT(*)::int as count'))
-      .first()
+      .first() as unknown as Promise<{ avg_rating: number | null; count: number } | undefined>)
       .catch(() => ({ avg_rating: null, count: 0 }));
 
     // Disputes lost (resolved against the artist)

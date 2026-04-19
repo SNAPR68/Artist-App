@@ -143,7 +143,10 @@ class DealVaultService {
       .select(db.raw("COUNT(DISTINCT CASE WHEN b.state = 'completed' THEN b.id END)::int as completed_deals"))
       .select(db.raw('COALESCE(SUM(b.final_amount_paise), 0)::bigint as gross_volume_paise'))
       .select(db.raw('COUNT(DISTINCT b.artist_id)::int as unique_artists'))
-      .select(db.raw('COUNT(DISTINCT we.client_phone)::int as unique_clients'));
+      .select(db.raw('COUNT(DISTINCT we.client_phone)::int as unique_clients')) as unknown as Array<{
+        total_deals: string; completed_deals: string; gross_volume_paise: string;
+        unique_artists: string; unique_clients: string;
+      }>;
 
     return {
       total_deals: Number(stats?.total_deals ?? 0),

@@ -105,7 +105,7 @@ export class AttributionService {
         db.raw('COALESCE(SUM(commission_paise), 0)::bigint as total_paise'),
         db.raw('COUNT(*)::int as booking_count'),
       )
-      .first();
+      .first() as unknown as { total_paise: string; booking_count: string } | undefined;
     return {
       total_paise: Number(row?.total_paise ?? 0),
       booking_count: Number(row?.booking_count ?? 0),

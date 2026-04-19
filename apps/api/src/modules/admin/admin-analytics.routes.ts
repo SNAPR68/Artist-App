@@ -159,12 +159,12 @@ export async function adminAnalyticsRoutes(app: FastifyInstance) {
       const [subs, briefCounts, bookingCounts, lastActivity, memberCounts] = await Promise.all([
         db('agency_subscriptions').whereIn('workspace_id', ids).select('*'),
         db('decision_briefs').whereIn('workspace_id', ids).where('created_at', '>=', thirtyDaysAgo.toISOString())
-          .select('workspace_id').count<{ count: string }[]>('* as count').groupBy('workspace_id'),
+          .select('workspace_id').count<{ workspace_id: string; count: string }[]>('* as count').groupBy('workspace_id'),
         db('bookings').whereIn('workspace_id', ids).where('created_at', '>=', thirtyDaysAgo.toISOString())
-          .select('workspace_id').count<{ count: string }[]>('* as count').groupBy('workspace_id'),
+          .select('workspace_id').count<{ workspace_id: string; count: string }[]>('* as count').groupBy('workspace_id'),
         db('workspace_activity').whereIn('workspace_id', ids).max<{ workspace_id: string; last_at: string }[]>('created_at as last_at').select('workspace_id').groupBy('workspace_id').catch(() => [] as Array<{ workspace_id: string; last_at: string }>),
         db('workspace_members').whereIn('workspace_id', ids).where('is_active', true)
-          .select('workspace_id').count<{ count: string }[]>('* as count').groupBy('workspace_id'),
+          .select('workspace_id').count<{ workspace_id: string; count: string }[]>('* as count').groupBy('workspace_id'),
       ]);
 
       const subByWs = new Map<string, (typeof subs)[number]>();
