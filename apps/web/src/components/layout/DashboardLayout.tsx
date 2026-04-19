@@ -21,6 +21,7 @@ import {
   Link2,
   ShieldCheck,
   FileText,
+  Receipt,
   Search,
   Bell,
   LogOut,
@@ -73,6 +74,8 @@ const EVENT_COMPANY_NAV: NavItem[] = [
   { href: '/gigs', labelKey: 'nav.gigs', icon: <Target size={18} /> },
   { href: '/client/workspace', labelKey: 'nav.workspace', icon: <Building2 size={18} /> },
   { href: '/event-company/team', labelKey: 'nav.team', icon: <Users size={18} /> },
+  { href: '/event-company/templates', labelKey: 'nav.templates', icon: <FileText size={18} /> },
+  { href: '/event-company/invoices', labelKey: 'nav.invoices', icon: <Receipt size={18} /> },
   { href: '/client/recommendations', labelKey: 'nav.discover', icon: <Sparkles size={18} /> },
   { href: '/search', labelKey: 'nav.search', icon: <Search size={18} /> },
 ];
