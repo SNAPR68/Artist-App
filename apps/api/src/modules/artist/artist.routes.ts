@@ -12,6 +12,7 @@ import {
   PAGINATION,
 } from '@artist-booking/shared';
 import { bankAccountService } from './bank-account.service.js';
+import { db } from '../../infrastructure/database.js';
 export async function artistRoutes(app: FastifyInstance) {
   /**
    * POST /v1/artists/profile — Create artist profile
@@ -188,5 +189,43 @@ export async function artistRoutes(app: FastifyInstance) {
       data: result,
       errors: [],
     });
+  });
+
+  /**
+   * GET /v1/artists/oath/signers — Public list of artists who signed the Commission-Free Oath.
+   */
+  app.get('/v1/artists/oath/signers', async (_request, reply) => {
+    const rows = await db('artist_oath_signers as aos')
+      .join('artist_profiles as ap', 'ap.id', 'aos.artist_id')
+      .select('aos.id', 'ap.stage_name', 'aos.signed_at')
+      .orderBy('aos.signed_at', 'desc')
+      .limit(500);
+    return reply.send({ success: true, data: rows, errors: [] });
+  });
+
+  /**
+   * POST /v1/artists/oath/sign — Artist signs the Commission-Free Oath.
+   * Idempotent — signing twice is a no-op.
+   */
+  app.post('/v1/artists/oath/sign', {
+    preHandler: [authMiddleware],
+  }, async (request, reply) => {
+    const userId = request.user!.user_id;
+    const profile = await db('artist_profiles').where({ user_id: userId }).first();
+    if (!profile) {
+      return reply.status(400).send({ success: false, errors: [{ code: 'NOT_ARTIST', message: 'Only artists can sign the oath' }] });
+    }
+
+    const existing = await db('artist_oath_signers').where({ artist_id: profile.id }).first();
+    if (existing) return reply.send({ success: true, data: existing, errors: [] });
+
+    const [created] = await db('artist_oath_signers').insert({
+      artist_id: profile.id,
+      user_id: userId,
+      ip_address: (request.headers['x-forwarded-for'] as string)?.split(',')[0] ?? request.ip ?? null,
+      user_agent: (request.headers['user-agent'] as string) ?? null,
+    }).returning('*');
+
+    return reply.send({ success: true, data: created, errors: [] });
   });
 }

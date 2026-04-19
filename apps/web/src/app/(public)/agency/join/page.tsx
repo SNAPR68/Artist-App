@@ -5,6 +5,18 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/auth';
+import VoiceFillButton from '@/components/voice/VoiceFillButton';
+
+const AGENCY_FORM_CONTEXT = {
+  page: 'agency registration form',
+  fields: [
+    { name: 'companyName', label: 'Company name', type: 'text' as const },
+    { name: 'companyType', label: 'Company type', type: 'select' as const, options: ['wedding_planner', 'corporate', 'agency', 'event_management'] },
+    { name: 'city', label: 'City', type: 'text' as const },
+    { name: 'teamSize', label: 'Team size', type: 'select' as const, options: ['Just me', '2-5', '6-15', '16-50', '50+'] },
+    { name: 'eventsPerMonth', label: 'Events per month', type: 'number' as const },
+  ],
+};
 
 const COMPANY_TYPES = [
   { value: 'wedding_planner', label: 'Wedding Planner', emoji: '💒' },
@@ -353,6 +365,19 @@ export default function AgencyJoinPage() {
           )}
         </div>
       </div>
+
+      {step === 'info' && (
+        <VoiceFillButton
+          formContext={AGENCY_FORM_CONTEXT}
+          onFieldUpdate={(updated) => {
+            if (updated.companyName) setCompanyName(updated.companyName);
+            if (updated.companyType) setCompanyType(updated.companyType);
+            if (updated.city) setCity(updated.city);
+            if (updated.teamSize) setTeamSize(updated.teamSize);
+            if (updated.eventsPerMonth) setEventsPerMonth(updated.eventsPerMonth);
+          }}
+        />
+      )}
     </div>
   );
 }

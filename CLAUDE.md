@@ -38,13 +38,6 @@ docs/strategy/system-architecture.md    — Technical architecture
 docs/strategy/ui.md                     — UI/UX specification
 ```
 
-### Non-Goals (Current Sprint)
-- Broad public marketplace with browse-first discovery
-- Dashboard redesigns beyond decision workflow
-- Autonomous negotiation (human-assisted lock only)
-- Long-tail artist onboarding before demand flow
-- New modules unrelated to the decision wedge
-
 ## Project Overview
 India's live entertainment decision and operations platform. Monorepo with Fastify API backend, Next.js frontend, and shared packages. 79 migrations, 38 API modules (including decision-engine), 247+ endpoints, 23 cron jobs, 50+ frontend pages.
 

@@ -1,4 +1,5 @@
 import Fastify from 'fastify';
+import rawBody from 'fastify-raw-body';
 import cors from '@fastify/cors';
 import compress from '@fastify/compress';
 import helmet from '@fastify/helmet';
@@ -36,6 +37,11 @@ import { riderRoutes } from './modules/rider/rider.routes.js';
 import { pricingBrainRoutes } from './modules/pricing-brain/pricing-brain.routes.js';
 import { whatsappRoutes } from './modules/whatsapp/whatsapp.routes.js';
 import { workspaceRoutes } from './modules/workspace/workspace.routes.js';
+import { attributionRoutes } from './modules/attribution/attribution.routes.js';
+import { dealVaultRoutes } from './modules/deal-vault/deal-vault.routes.js';
+import { collaborationRoutes } from './modules/collaboration/collaboration.routes.js';
+import { proposalTemplatesRoutes } from './modules/proposal-templates/proposal-templates.routes.js';
+import { gstInvoiceRoutes } from './modules/gst-invoice/gst-invoice.routes.js';
 import { recommendationRoutes } from './modules/recommendation/recommendation.routes.js';
 import { artistIntelligenceRoutes } from './modules/artist-intelligence/artist-intelligence.routes.js';
 import { dynamicPricingRoutes } from './modules/pricing-brain/dynamic-pricing.routes.js';
@@ -70,6 +76,9 @@ const app = Fastify({
 } as any);
 
 // ─── Plugins ─────────────────────────────────────────────────
+// Capture raw request body for Razorpay webhook signature verification
+await app.register(rawBody, { field: 'rawBody', global: true, encoding: 'utf8', runFirst: true });
+
 await app.register(cors, {
   origin: config.NODE_ENV === 'production'
     ? [
@@ -246,6 +255,11 @@ await app.register(riderRoutes);
 await app.register(pricingBrainRoutes);
 await app.register(whatsappRoutes);
 await app.register(workspaceRoutes);
+await app.register(attributionRoutes);
+await app.register(dealVaultRoutes);
+await app.register(collaborationRoutes);
+await app.register(proposalTemplatesRoutes);
+await app.register(gstInvoiceRoutes);
 await app.register(recommendationRoutes);
 await app.register(artistIntelligenceRoutes);
 await app.register(dynamicPricingRoutes);

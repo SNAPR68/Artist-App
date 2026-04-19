@@ -44,6 +44,13 @@ const envSchema = z.object({
   // PII Encryption
   PII_ENCRYPTION_KEY: z.string().min(32),
 
+  // Google Calendar OAuth (2-way sync — moat #1)
+  GOOGLE_OAUTH_CLIENT_ID: z.string().optional(),
+  GOOGLE_OAUTH_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_OAUTH_REDIRECT_URI: z.string().optional(),
+  PUBLIC_API_URL: z.string().optional(),
+  PUBLIC_WEB_URL: z.string().optional(),
+
   // Razorpay
   RAZORPAY_KEY_ID: z.string().optional(),
   RAZORPAY_KEY_SECRET: z.string().optional(),

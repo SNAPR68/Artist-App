@@ -12,11 +12,13 @@
     "clean": "rm -rf .next out"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.90.0",
     "@artist-booking/shared": "workspace:*",
     "@artist-booking/ui": "workspace:*",
     "@hookform/resolvers": "^3.9.0",
     "@phosphor-icons/react": "^2.1.0",
     "@sentry/nextjs": "^10.43.0",
+    "@supabase/supabase-js": "^2.103.3",
     "@tanstack/react-query": "^5.50.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.6.0",

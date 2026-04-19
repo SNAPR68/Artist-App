@@ -119,9 +119,11 @@ const STATUS_COLORS: Record<string, string> = {
   failed: 'bg-nocturne-error/15 text-nocturne-error',
 };
 
-export default function AdminDashboardPage() {
+type AdminDashboardProps = { initialTab?: Tab };
+
+export default function AdminDashboardPage({ initialTab = 'overview' }: AdminDashboardProps = {}) {
   const { user } = useAuthStore();
-  const [tab, setTab] = useState<Tab>('overview');
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [bookings, setBookings] = useState<BookingRecord[]>([]);

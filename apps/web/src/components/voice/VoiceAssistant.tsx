@@ -310,9 +310,110 @@ export function VoiceAssistant() {
       });
   }, [ttsLang, speakBrowser]);
 
+  // ─── AI chat bridge: stream /api/chat SSE and update Message list ───
+  // Returns true if handled by AI, false if caller should fall through to legacy path.
+  const callAIChat = useCallback(
+    async (text: string, surface: 'hero' | 'voice'): Promise<boolean> => {
+      try {
+        const history = [...messages, { role: 'user' as const, text: text }].map((m) => ({
+          role: m.role,
+          content: m.text,
+        }));
+
+        let assistantIndex = 0;
+        setMessages((prev) => {
+          assistantIndex = prev.length;
+          return [...prev, { role: 'assistant', text: '' }];
+        });
+
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: history, sessionId, surface }),
+        });
+        if (!res.ok || !res.body) return false;
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let streamedText = '';
+
+        let streamDone = false;
+        while (!streamDone) {
+          const { done, value } = await reader.read();
+          if (done) { streamDone = true; break; }
+          buffer += decoder.decode(value, { stream: true });
+          const frames = buffer.split('\n\n');
+          buffer = frames.pop() ?? '';
+
+          for (const frame of frames) {
+            const eventMatch = frame.match(/^event: (\w+)$/m);
+            const dataMatch = frame.match(/^data: (.+)$/m);
+            if (!eventMatch || !dataMatch) continue;
+            const event = eventMatch[1];
+            let data: unknown;
+            try { data = JSON.parse(dataMatch[1]); } catch { continue; }
+
+            if (event === 'text') {
+              const delta = (data as { delta?: string }).delta ?? '';
+              streamedText += delta;
+              const current = streamedText;
+              setMessages((prev) => {
+                const next = [...prev];
+                if (next[assistantIndex]) next[assistantIndex] = { ...next[assistantIndex], text: current };
+                return next;
+              });
+            } else if (event === 'done') {
+              const final = data as {
+                text?: string;
+                cards?: VoiceCard[];
+                follow_up?: VoiceFollowUp;
+                suggestions?: string[];
+                action?: VoiceResponse['action'];
+                sessionId?: string;
+              };
+              if (final.sessionId) setSessionId(final.sessionId);
+              setMessages((prev) => {
+                const next = [...prev];
+                if (next[assistantIndex]) {
+                  next[assistantIndex] = {
+                    ...next[assistantIndex],
+                    text: final.text ?? streamedText,
+                    cards: final.cards,
+                    follow_up: final.follow_up,
+                    suggestions: final.suggestions,
+                    action: final.action,
+                  };
+                }
+                return next;
+              });
+              if (final.text) speakResponse(final.text);
+              if (final.action?.type === 'navigate' && final.action.route) {
+                const route = final.action.route;
+                setTimeout(() => { router.push(route); setIsOpen(false); }, 1500);
+              }
+            }
+          }
+        }
+        setState('idle');
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [messages, sessionId, speakResponse, router],
+  );
+
   // ─── Unauthenticated discovery via public search API ───
   const handleGuestQuery = useCallback(
     async (text: string) => {
+      // ── AI-first path when enabled ────────────────────────
+      if (process.env.NEXT_PUBLIC_CHAT_AI_ENABLED === 'true') {
+        const handled = await callAIChat(text, 'voice');
+        if (handled) return;
+        // else fall through to legacy below
+      }
+
       // Check if query requires auth → redirect to login
       if (isAuthRequiredQuery(text)) {
         setMessages((prev) => [
@@ -523,7 +624,7 @@ export function VoiceAssistant() {
         setState('idle');
       }
     },
-    [router, speakResponse, ttsLang]
+    [router, speakResponse, ttsLang, callAIChat]
   );
 
   // When transcript is finalized, send query
@@ -531,6 +632,12 @@ export function VoiceAssistant() {
     async (text: string) => {
       setState('processing');
       setMessages((prev) => [...prev, { role: 'user', text }]);
+
+      // ── AI-first path when enabled (covers both guest + auth) ──
+      if (process.env.NEXT_PUBLIC_CHAT_AI_ENABLED === 'true') {
+        const handled = await callAIChat(text, 'voice');
+        if (handled) return;
+      }
 
       // If user is NOT logged in, use guest discovery mode
       if (!user) {
@@ -594,7 +701,7 @@ export function VoiceAssistant() {
         setState('idle');
       }
     },
-    [sessionId, pathname, router, user, handleGuestQuery, speakResponse]
+    [sessionId, pathname, router, user, handleGuestQuery, speakResponse, callAIChat]
   );
 
   useEffect(() => {

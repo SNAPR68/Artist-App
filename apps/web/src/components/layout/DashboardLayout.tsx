@@ -17,6 +17,9 @@ import {
   Users,
   Building2,
   Sparkles,
+  Link2,
+  ShieldCheck,
+  FileText,
   Search,
   Bell,
   LogOut,
@@ -36,6 +39,9 @@ const ARTIST_NAV: NavItem[] = [
   { href: '/artist/intelligence', labelKey: 'nav.intelligence', icon: <Brain size={18} /> },
   { href: '/artist/financial', labelKey: 'nav.finances', icon: <Wallet size={18} /> },
   { href: '/artist/calendar', labelKey: 'nav.calendar', icon: <CalendarDays size={18} /> },
+  { href: '/artist/reputation', labelKey: 'nav.reputation', icon: <ShieldCheck size={18} /> },
+  { href: '/artist/earnings/tds', labelKey: 'nav.tds', icon: <FileText size={18} /> },
+  { href: '/artist/settings/integrations', labelKey: 'nav.integrations', icon: <Link2 size={18} /> },
 ];
 
 const CLIENT_NAV: NavItem[] = [

@@ -26,6 +26,7 @@ interface PresentationPdfData {
     title: string;
     custom_header: string | null;
     custom_footer: string | null;
+    terms_and_conditions: string | null;
     include_pricing: boolean;
     include_media: boolean;
     created_at: string;
@@ -34,6 +35,7 @@ interface PresentationPdfData {
     name: string;
     logo_url: string | null;
     brand_color: string | null;
+    white_label?: boolean;
   } | null;
   artists: PresentationArtist[];
 }
@@ -83,6 +85,7 @@ export async function generatePresentationPdf(data: PresentationPdfData): Promis
     doc.on('error', reject);
 
     const brandColor = data.workspace_branding?.brand_color ?? '#1A3C6D';
+    const whiteLabel = data.workspace_branding?.white_label === true;
     const pageWidth = doc.page.width;
     const margin = 50;
     const contentWidth = pageWidth - margin * 2;
@@ -132,7 +135,7 @@ export async function generatePresentationPdf(data: PresentationPdfData): Promis
     data.artists.forEach((artist, index) => {
       // Check if we need a new page (leave room for at least 180pt of content)
       if (doc.y > doc.page.height - 220) {
-        addFooter(doc, margin, contentWidth, brandColor);
+        addFooter(doc, margin, contentWidth, brandColor, whiteLabel);
         doc.addPage();
         // Accent bar on new pages
         doc.rect(0, 0, pageWidth, 8).fill(brandColor);
@@ -226,7 +229,7 @@ export async function generatePresentationPdf(data: PresentationPdfData): Promis
 
     if (data.presentation.custom_footer) {
       if (doc.y > doc.page.height - 160) {
-        addFooter(doc, margin, contentWidth, brandColor);
+        addFooter(doc, margin, contentWidth, brandColor, whiteLabel);
         doc.addPage();
         doc.rect(0, 0, pageWidth, 8).fill(brandColor);
         doc.y = 40;
@@ -242,9 +245,27 @@ export async function generatePresentationPdf(data: PresentationPdfData): Promis
         });
     }
 
+    // ── Terms & Conditions ───────────────────────────────────
+    if (data.presentation.terms_and_conditions) {
+      addFooter(doc, margin, contentWidth, brandColor, whiteLabel);
+      doc.addPage();
+      doc.rect(0, 0, pageWidth, 8).fill(brandColor);
+      doc.y = 40;
+      doc.fontSize(16).fillColor(COLORS.text).font('Helvetica-Bold')
+        .text('Terms & Conditions', margin, doc.y, { width: contentWidth });
+      doc.moveDown(0.6);
+      drawDivider(doc, margin, contentWidth);
+      doc.moveDown(0.6);
+      doc.fontSize(9).fillColor(COLORS.text).font('Helvetica')
+        .text(data.presentation.terms_and_conditions, margin, doc.y, {
+          width: contentWidth,
+          lineGap: 3,
+        });
+    }
+
     // ── Final Footer ──────────────────────────────────────────
 
-    addFooter(doc, margin, contentWidth, brandColor);
+    addFooter(doc, margin, contentWidth, brandColor, whiteLabel);
 
     doc.end();
   });
@@ -257,19 +278,21 @@ function drawDivider(doc: InstanceType<typeof PDFDocument>, x: number, width: nu
     .strokeColor(COLORS.border).lineWidth(0.5).stroke();
 }
 
-function addFooter(doc: InstanceType<typeof PDFDocument>, margin: number, contentWidth: number, brandColor: string) {
+function addFooter(doc: InstanceType<typeof PDFDocument>, margin: number, contentWidth: number, brandColor: string, whiteLabel = false) {
   const pageHeight = doc.page.height;
   const footerY = pageHeight - 35;
 
   // Bottom accent bar
   doc.rect(0, pageHeight - 12, doc.page.width, 12).fill(brandColor);
 
-  // Footer text
-  doc.fontSize(8).fillColor(COLORS.light)
-    .text('Powered by Artist Booking Platform', margin, footerY, {
-      width: contentWidth / 2,
-      align: 'left',
-    });
+  // Footer text (omitted entirely for white-label agencies)
+  if (!whiteLabel) {
+    doc.fontSize(8).fillColor(COLORS.light)
+      .text('Powered by GRID', margin, footerY, {
+        width: contentWidth / 2,
+        align: 'left',
+      });
+  }
 
   // Page number
   const pageRange = doc.bufferedPageRange();

@@ -14,5 +14,13 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['framer-motion', 'lucide-react'],
   },
+  async rewrites() {
+    return [
+      // Brand alias: /agency/* → /client/workspace/*
+      { source: '/agency', destination: '/client/workspace' },
+      { source: '/agency/:id', destination: '/client/workspace/:id' },
+      { source: '/agency/:id/:path*', destination: '/client/workspace/:id/:path*' },
+    ];
+  },
 };
 module.exports = nextConfig;

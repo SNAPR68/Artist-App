@@ -6,6 +6,8 @@ import { negotiationService } from './negotiation.service.js';
 import { calendarRepository } from '../calendar/calendar.repository.js';
 import { artistRepository } from '../artist/artist.repository.js';
 import { clientRepository } from '../client/client.repository.js';
+import { attributionService } from '../attribution/attribution.service.js';
+import { workspaceRepository } from '../workspace/workspace.repository.js';
 
 export class BookingService {
   /**
@@ -35,6 +37,24 @@ export class BookingService {
       ...data,
       client_id: userId,
     });
+
+    // Agent-of-record attribution: tag the artist↔client pair to the booker's
+    // workspace on FIRST booking. Any future booking between the same pair
+    // auto-flows commission back to that workspace — DB-level moat.
+    try {
+      const workspaces = await workspaceRepository.findByMemberId(userId);
+      const workspaceId = workspaces?.[0]?.id ?? null;
+      if (workspaceId) {
+        await attributionService.findOrCreateAttribution(
+          data.artist_id,
+          userId,
+          workspaceId,
+          booking.id,
+        );
+      }
+    } catch {
+      // Never block booking creation on attribution failures
+    }
 
     // Place hold on the date (48 hours)
     const holdExpiry = new Date();
@@ -84,6 +104,9 @@ export class BookingService {
     }
     if (newState === BookingState.EVENT_DAY) {
       await this.onEventDay(booking);
+    }
+    if (newState === BookingState.COMPLETED) {
+      await this.onCompleted(booking);
     }
 
     const updated = await bookingRepository.updateStatus(bookingId, newState);
@@ -216,6 +239,21 @@ export class BookingService {
         gst_amount_paise: latestQuote.breakdown.gst_on_platform_fee_paise,
       });
     }
+
+    // Push to Google Calendar if artist has connected. Never block confirmation.
+    try {
+      const { googleCalendarService } = await import('../calendar/google-calendar.service.js');
+      await googleCalendarService.pushBooking(booking.artist_id as string, {
+        id: booking.id as string,
+        event_date: booking.event_date as string,
+        event_type: (booking.event_type as string) ?? 'Event',
+        event_city: (booking.event_city as string) ?? null,
+        event_venue: (booking.event_venue as string) ?? null,
+        duration_hours: Number(booking.duration_hours ?? 0) || null,
+      });
+    } catch {
+      // Google push is best-effort
+    }
   }
 
   private async onCancelled(booking: Record<string, unknown>) {
@@ -224,6 +262,17 @@ export class BookingService {
       booking.artist_id as string,
       booking.event_date as string,
     );
+
+    // Remove any pushed Google event. Best-effort.
+    try {
+      const { googleCalendarService } = await import('../calendar/google-calendar.service.js');
+      await googleCalendarService.deleteBookingEvent(
+        booking.artist_id as string,
+        booking.id as string,
+      );
+    } catch {
+      // ignore
+    }
   }
 
   private async onPreEvent(booking: Record<string, unknown>) {
@@ -234,6 +283,27 @@ export class BookingService {
   private async onEventDay(booking: Record<string, unknown>) {
     const { eventDayService } = await import('../event-day/event-day.service.js');
     await eventDayService.initializeEventDay(booking.id as string);
+  }
+
+  /**
+   * On completed: record attributed commission for the agent-of-record workspace.
+   * Idempotent — safe on replay.
+   */
+  private async onCompleted(booking: Record<string, unknown>) {
+    try {
+      const total = Number(
+        booking.final_amount_paise ?? booking.quoted_amount_paise ?? 0,
+      );
+      if (!total) return;
+      await attributionService.recordAttributedCommission(
+        booking.id as string,
+        booking.artist_id as string,
+        booking.client_user_id as string,
+        total,
+      );
+    } catch {
+      // Never block completion on accrual failures
+    }
   }
 }
 

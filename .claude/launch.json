@@ -11,7 +11,7 @@
     {
       "name": "Web App (Next.js)",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@artist-booking/web", "dev"],
+      "runtimeArgs": ["--filter", "@artist-booking/web", "exec", "next", "dev"],
       "port": 3000,
       "autoPort": false
     }

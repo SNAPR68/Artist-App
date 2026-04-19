@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Check, Lock, Calendar, type LucideIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Lock, Calendar, Link2, Copy, type LucideIcon } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
 interface CalendarEntry {
@@ -247,7 +247,55 @@ export default function CalendarPage() {
             Tap a date to toggle between available and blocked. Booked dates cannot be changed.
           </p>
         </div>
+
+        {/* iCal subscription */}
+        <ICalSyncBlock />
       </div>
+    </div>
+  );
+}
+
+function ICalSyncBlock() {
+  const [url, setUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const generate = async () => {
+    setLoading(true);
+    const res = await apiClient<{ ical_url: string }>('/v1/calendar/ical/token', { method: 'POST' });
+    if (res.success && res.data) setUrl(res.data.ical_url);
+    setLoading(false);
+  };
+
+  const copy = async () => {
+    if (!url) return;
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  return (
+    <div className="glass-card rounded-xl p-5 border border-white/10 space-y-3">
+      <div className="flex items-center gap-2">
+        <Link2 size={14} className="text-[#c39bff]" />
+        <p className="text-sm font-bold text-white">Sync to Google / Apple Calendar</p>
+      </div>
+      <p className="text-xs text-white/50">
+        Subscribe from any calendar app — bookings appear automatically. Rotating the link invalidates old subscriptions.
+      </p>
+      {url ? (
+        <div className="flex items-center gap-2">
+          <input readOnly value={url} className="input-nocturne text-xs flex-1" />
+          <button onClick={copy} className="px-3 py-2 bg-white/[0.06] border border-white/10 rounded-lg text-xs font-bold hover:bg-white/10 flex items-center gap-1">
+            <Copy size={12} /> {copied ? 'Copied' : 'Copy'}
+          </button>
+        </div>
+      ) : (
+        <button onClick={generate} disabled={loading}
+          className="bg-[#c39bff] text-black text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#b48af0] disabled:opacity-40">
+          {loading ? 'Generating…' : 'Generate Subscription Link'}
+        </button>
+      )}
     </div>
   );
 }

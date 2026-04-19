@@ -10,6 +10,20 @@ import {
   type DecisionResponse,
 } from '@/lib/api/decision-engine';
 import { analytics } from '@/lib/analytics';
+import VoiceFillButton from '@/components/voice/VoiceFillButton';
+import ClientDetailsModal from '@/components/proposal/ClientDetailsModal';
+
+const BRIEF_FORM_CONTEXT = {
+  page: 'event brief form',
+  fields: [
+    { name: 'event_type', label: 'Event type', type: 'select' as const, options: ['wedding', 'wedding_sangeet', 'wedding_reception', 'corporate', 'college_fest', 'birthday', 'house_party', 'concert'] },
+    { name: 'city', label: 'City', type: 'text' as const },
+    { name: 'event_date', label: 'Event date', type: 'date' as const },
+    { name: 'budget_max', label: 'Max budget in rupees', type: 'number' as const },
+    { name: 'genres', label: 'Music genres (comma separated)', type: 'text' as const },
+    { name: 'rawText', label: 'Event description', type: 'text' as const },
+  ],
+};
 
 // ─── Main Page ──────────────────────────────────────────────
 
@@ -35,6 +49,7 @@ export default function BriefPageClient() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showClientModal, setShowClientModal] = useState(false);
 
   const handleSubmit = useCallback(async () => {
     if (rawText.trim().length < 5) return;
@@ -94,11 +109,21 @@ export default function BriefPageClient() {
     });
   }, []);
 
-  const handleProposal = useCallback(async () => {
+  const handleProposal = useCallback(async (clientDetails?: {
+    contact_name: string;
+    contact_email: string;
+    client_notes: string;
+    include_pricing: boolean;
+  }) => {
     if (!result || selectedIds.size === 0) return;
+    setShowClientModal(false);
     setState('proposing');
     const res = await generateProposal(result.brief_id, {
       artist_ids: Array.from(selectedIds),
+      include_pricing: clientDetails?.include_pricing ?? false,
+      contact_name: clientDetails?.contact_name || undefined,
+      contact_email: clientDetails?.contact_email || undefined,
+      client_notes: clientDetails?.client_notes || undefined,
     });
     if (res.success) {
       const webUrl = ((res.data as ProposalResult)?.presentation_web_url) ?? null;
@@ -337,7 +362,7 @@ export default function BriefPageClient() {
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={handleProposal}
+                onClick={() => setShowClientModal(true)}
                 disabled={state === 'proposing' || state === 'locking'}
                 className="px-5 py-2 rounded-lg font-bold text-sm bg-gradient-to-r from-[#c39bff] to-[#8A2BE2] text-white hover:opacity-90 disabled:opacity-40 transition-all"
               >
@@ -356,6 +381,33 @@ export default function BriefPageClient() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Client details modal — shown before proposal generation */}
+      {showClientModal && result && (
+        <ClientDetailsModal
+          artistCount={selectedIds.size}
+          onConfirm={(details) => handleProposal(details)}
+          onCancel={() => setShowClientModal(false)}
+        />
+      )}
+
+      {/* Voice form-fill — only show on idle/input state */}
+      {state === 'idle' && (
+        <VoiceFillButton
+          formContext={BRIEF_FORM_CONTEXT}
+          onFieldUpdate={(updated) => {
+            if (updated.rawText) setRawText(updated.rawText);
+            setFields((prev) => ({
+              ...prev,
+              ...(updated.event_type ? { event_type: updated.event_type } : {}),
+              ...(updated.city ? { city: updated.city } : {}),
+              ...(updated.event_date ? { event_date: updated.event_date } : {}),
+              ...(updated.budget_max ? { budget_max: updated.budget_max } : {}),
+              ...(updated.genres ? { genres: updated.genres } : {}),
+            }));
+          }}
+        />
       )}
     </div>
   );

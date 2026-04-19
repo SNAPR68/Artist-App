@@ -64,13 +64,133 @@ export function Hero() {
       .catch(() => {});
   }, []);
 
-  // ─── Send message to decision engine ──────────────────────
+  // ─── Send message — AI-powered when flag enabled, decision-engine fallback ──
+  const AI_ENABLED = process.env.NEXT_PUBLIC_CHAT_AI_ENABLED === 'true';
+
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isSubmitting) return;
     setIsSubmitting(true);
     setBriefText('');
     setMessages((prev) => [...prev, { role: 'user', text }]);
 
+    // ═══════════════════════════════════════════════════════════
+    // AI PATH — POST to /api/chat and stream SSE
+    // ═══════════════════════════════════════════════════════════
+    if (AI_ENABLED) {
+      try {
+        // Build conversation history from current messages + new user turn
+        const history = [...messages, { role: 'user' as const, text }].map((m) => ({
+          role: m.role,
+          content: m.text,
+        }));
+
+        // Insert an empty assistant message we'll mutate as chunks arrive
+        let assistantIndex = 0;
+        setMessages((prev) => {
+          assistantIndex = prev.length;
+          return [...prev, { role: 'assistant', text: '' }];
+        });
+
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: history,
+            sessionId,
+            surface: 'hero',
+          }),
+        });
+
+        if (!res.ok || !res.body) throw new Error(`chat ${res.status}`);
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let streamedText = '';
+
+        let streamDone = false;
+        while (!streamDone) {
+          const { done, value } = await reader.read();
+          if (done) { streamDone = true; break; }
+          buffer += decoder.decode(value, { stream: true });
+
+          // Parse SSE frames: event: X\ndata: Y\n\n
+          const frames = buffer.split('\n\n');
+          buffer = frames.pop() ?? '';
+
+          for (const frame of frames) {
+            const eventMatch = frame.match(/^event: (\w+)$/m);
+            const dataMatch = frame.match(/^data: (.+)$/m);
+            if (!eventMatch || !dataMatch) continue;
+
+            const event = eventMatch[1];
+            let data: unknown;
+            try {
+              data = JSON.parse(dataMatch[1]);
+            } catch {
+              continue;
+            }
+
+            if (event === 'text') {
+              const delta = (data as { delta?: string }).delta ?? '';
+              streamedText += delta;
+              const currentText = streamedText;
+              setMessages((prev) => {
+                const next = [...prev];
+                if (next[assistantIndex]) {
+                  next[assistantIndex] = { ...next[assistantIndex], text: currentText };
+                }
+                return next;
+              });
+            } else if (event === 'done') {
+              const final = data as {
+                text?: string;
+                cards?: VoiceCard[];
+                follow_up?: { question: string; options: string[] };
+                suggestions?: string[];
+                action?: { type: string; route?: string };
+                sessionId?: string;
+              };
+              if (final.sessionId) setSessionId(final.sessionId);
+              setMessages((prev) => {
+                const next = [...prev];
+                if (next[assistantIndex]) {
+                  next[assistantIndex] = {
+                    ...next[assistantIndex],
+                    text: final.text ?? streamedText,
+                    cards: final.cards,
+                    follow_up: final.follow_up,
+                  };
+                }
+                return next;
+              });
+              if (final.text) speakText(final.text);
+              // Handle navigation action if present
+              if (final.action?.type === 'navigate' && final.action.route) {
+                setTimeout(() => router.push(final.action!.route!), 800);
+              }
+            }
+          }
+        }
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            text: "Something hiccupped. Mind trying again?",
+            follow_up: { question: 'What would you like to do?', options: ['Try again', 'Browse artists'] },
+          },
+        ]);
+      }
+
+      setIsSubmitting(false);
+      setTimeout(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, 300);
+      return;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // LEGACY PATH — decision engine (zero-regression when flag off)
+    // ═══════════════════════════════════════════════════════════
     try {
       const body: Record<string, unknown> = { raw_text: text, source: 'web' };
       if (sessionId) body.session_id = sessionId;
@@ -149,7 +269,7 @@ export function Hero() {
 
     setIsSubmitting(false);
     setTimeout(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, 300);
-  }, [isSubmitting, sessionId, speakText]);
+  }, [isSubmitting, sessionId, speakText, AI_ENABLED, messages, router]);
 
   // Auto-submit when voice transcript is finalized
   useEffect(() => {
@@ -167,67 +287,68 @@ export function Hero() {
 
   const hasConversation = messages.length > 0;
 
-  if (hasConversation) {
-    // ═══════════════════════════════════════════════════════════
-    // CHAT MODE — full-screen: messages above, input pinned bottom
-    // ═══════════════════════════════════════════════════════════
-    return (
-      <section className="relative h-screen flex flex-col bg-[#0a0a0a]">
-        {/* ─── Chat Header ─── */}
-        <div className="shrink-0 px-6 py-3 border-b border-white/10 bg-white/[0.03] backdrop-blur-sm flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#c39bff]/20 flex items-center justify-center">
-              <span className="text-sm font-bold text-[#c39bff]">Z</span>
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-white">Zara</h2>
-              <p className="text-[10px] text-white/40">GRID AI Assistant</p>
-            </div>
+  // ═══════════════════════════════════════════════════════════
+  // HERO MODE — always shown; chat box replaces textarea inline
+  // ═══════════════════════════════════════════════════════════
+  {/* NOTE: no early return — chat stays inside the hero */}
+
+  // Inline chat widget (rendered below instead of full-screen takeover)
+  const InlineChatBox = hasConversation ? (
+    <div className="w-full rounded-2xl border border-white/[0.12] bg-black/60 backdrop-blur-xl overflow-hidden flex flex-col" style={{ height: '560px' }}>
+      {/* Header */}
+      <div className="shrink-0 px-5 py-3.5 border-b border-white/10 flex items-center justify-between bg-white/[0.03]">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-[#c39bff]/20 flex items-center justify-center">
+            <span className="text-xs font-bold text-[#c39bff]">Z</span>
           </div>
-          <button
-            onClick={() => { setMessages([]); setSessionId(null); }}
-            className="text-xs text-white/30 hover:text-white/60 transition-colors px-3 py-1.5 rounded-md hover:bg-white/5"
-          >
-            New chat
-          </button>
+          <div>
+            <span className="text-sm font-semibold text-white">Zara</span>
+            <span className="text-xs text-white/30 ml-2">GRID AI</span>
+          </div>
         </div>
+        <button
+          onClick={() => { setMessages([]); setSessionId(null); }}
+          className="text-xs text-white/30 hover:text-white/60 transition-colors px-3 py-1.5 rounded-md hover:bg-white/5"
+        >
+          New chat
+        </button>
+      </div>
 
-        {/* ─── Messages (scrollable) ─── */}
-        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4 scrollbar-hide">
-          <div className="max-w-3xl mx-auto space-y-4">
-            {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start gap-2.5'}`}
-                style={{ animation: `fadeIn 0.3s ease-out ${i * 0.05}s both` }}
-              >
-                {msg.role === 'assistant' && (
-                  <div className="shrink-0 mt-1 w-7 h-7 rounded-full bg-[#c39bff]/20 flex items-center justify-center">
-                    <span className="text-xs font-bold text-[#c39bff]">Z</span>
-                  </div>
-                )}
-                <div className={`max-w-[85%] space-y-3`}>
-                  <div className={`rounded-2xl px-4 py-3 ${msg.role === 'user' ? 'bg-[#c39bff] text-white' : 'bg-white/[0.06] border border-white/10 text-white'}`}>
-                    <p className="text-sm leading-relaxed whitespace-pre-line">{msg.text}</p>
-                  </div>
+      {/* Messages (scrollable) */}
+      <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4 scrollbar-hide">
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start gap-2'}`}
+            style={{ animation: `fadeIn 0.3s ease-out ${i * 0.05}s both` }}
+          >
+            {msg.role === 'assistant' && (
+              <div className="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-[#c39bff]/20 flex items-center justify-center">
+                <span className="text-[9px] font-bold text-[#c39bff]">Z</span>
+              </div>
+            )}
+            <div className="max-w-[85%] space-y-2">
+              <div className={`rounded-xl px-3 py-2 ${msg.role === 'user' ? 'bg-[#c39bff] text-white' : 'bg-white/[0.08] border border-white/10 text-white'}`}>
+                <p className="text-sm leading-relaxed whitespace-pre-line">{msg.text}</p>
+              </div>
 
-                  {msg.parsed_context && Object.keys(msg.parsed_context).length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {Object.entries(msg.parsed_context).map(([key, val]) => (
-                        <span key={key} className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-white/40 border border-white/8">{key}: {String(val)}</span>
-                      ))}
-                    </div>
+              {msg.parsed_context && Object.keys(msg.parsed_context).length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {Object.entries(msg.parsed_context).map(([key, val]) => (
+                    <span key={key} className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-white/40 border border-white/8">{key}: {String(val)}</span>
+                  ))}
+                </div>
                   )}
 
                   {msg.clarifying_questions && msg.clarifying_questions.length > 0 && (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {msg.clarifying_questions.map((q, qi) => (
                         <div key={qi}>
-                          <p className="text-xs text-white/50 mb-2">{q.question}</p>
-                          <div className="flex flex-wrap gap-2">
+                          <p className="text-xs text-white/50 mb-1.5">{q.question}</p>
+                          <div className="flex flex-wrap gap-1.5">
                             {q.options.map((opt) => (
                               <button key={String(opt.value)} onClick={() => handleChipClick(String(opt.value === 'skip' ? 'skip' : opt.label))}
-                                className="text-xs bg-white/5 text-white/60 hover:bg-[#c39bff]/15 hover:text-[#c39bff] rounded-full px-3 py-1.5 transition-all border border-white/10 hover:border-[#c39bff]/30 font-medium">
+                                className="text-xs bg-white/5 text-white/60 hover:bg-[#c39bff]/15 hover:text-[#c39bff] rounded-full px-2.5 py-1 transition-all border border-white/10 hover:border-[#c39bff]/30 font-medium">
                                 {opt.label}
                               </button>
                             ))}
@@ -240,7 +361,7 @@ export function Hero() {
                   {msg.cards && msg.cards.length > 0 && <CardRenderer cards={msg.cards} />}
 
                   {msg.follow_up && !msg.clarifying_questions && (
-                    <div className="rounded-xl border border-[#c39bff]/20 bg-[#c39bff]/5 px-3 py-2.5 space-y-2">
+                    <div className="rounded-lg border border-[#c39bff]/20 bg-[#c39bff]/5 px-3 py-2 space-y-1.5">
                       <p className="text-xs text-white/50">{msg.follow_up.question}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {msg.follow_up.options.map((opt, j) => (
@@ -254,81 +375,78 @@ export function Hero() {
                   )}
                 </div>
               </div>
-            ))}
+        ))}
 
-            {isSubmitting && (
-              <div className="flex justify-start gap-2.5" style={{ animation: 'fadeIn 0.3s ease-out' }}>
-                <div className="shrink-0 mt-1 w-7 h-7 rounded-full bg-[#c39bff]/20 flex items-center justify-center">
-                  <span className="text-xs font-bold text-[#c39bff]">Z</span>
+        {isSubmitting && (
+          <div className="flex justify-start gap-2" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+            <div className="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-[#c39bff]/20 flex items-center justify-center">
+              <span className="text-[9px] font-bold text-[#c39bff]">Z</span>
+            </div>
+            <div className="bg-white/[0.08] border border-white/10 rounded-xl px-3 py-2">
+              <div className="flex items-center gap-1.5">
+                <div className="flex gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c39bff]/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c39bff]/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c39bff]/60 animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
-                <div className="bg-white/[0.06] border border-white/10 rounded-2xl px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#c39bff]/60 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#c39bff]/60 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#c39bff]/60 animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                    <span className="text-xs text-white/30">Zara is thinking...</span>
-                  </div>
-                </div>
+                <span className="text-xs text-white/30">Zara is thinking...</span>
               </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
-
-        {/* ─── Listening indicator ─── */}
-        {isListening && (
-          <div className="shrink-0 px-4 py-2 text-center border-t border-white/10 bg-white/5">
-            {interimTranscript && <p className="text-xs text-white/50 italic">{interimTranscript}</p>}
-            <p className="text-xs text-[#c39bff] mt-0.5">Listening...</p>
-          </div>
-        )}
-
-        {/* ─── Input Bar (pinned bottom) ─── */}
-        <div className="shrink-0 border-t border-white/10 bg-white/[0.03] backdrop-blur-sm px-4 md:px-6 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
-          <div className="max-w-3xl mx-auto flex items-center gap-2">
-            <button
-              onClick={() => { if (!mounted || !micSupported) return; if (isListening) { stopListening(); } else { startListening(); } }}
-              className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all ${isListening ? 'bg-red-500 text-white animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-white/[0.06] text-white/40 hover:text-white/70 hover:bg-white/10'}`}
-              title={isListening ? 'Stop recording' : 'Start voice input'}
-            >
-              <Mic size={18} />
-            </button>
-            <div className="flex-1 flex items-center gap-2 rounded-full bg-white/[0.06] border border-white/10 focus-within:border-[#c39bff]/40 transition-all px-4">
-              <input
-                ref={chatInputRef}
-                type="text"
-                value={briefText}
-                onChange={(e) => setBriefText(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSubmit(); } }}
-                placeholder="Reply to Zara..."
-                className="flex-1 bg-transparent text-white placeholder:text-white/25 text-sm py-2.5 focus:outline-none"
-              />
-              <button
-                onClick={handleSubmit}
-                disabled={!briefText.trim() || isSubmitting}
-                className="text-[#c39bff] hover:text-[#b48af0] disabled:text-white/10 transition-colors shrink-0"
-                aria-label="Send message"
-              >
-                <Send size={18} />
-              </button>
             </div>
           </div>
-        </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
 
-        <style jsx>{`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        `}</style>
-      </section>
-    );
-  }
+      {/* ─── Listening indicator ─── */}
+      {isListening && (
+        <div className="shrink-0 px-3 py-1.5 text-center border-t border-white/10 bg-white/5">
+          {interimTranscript && <p className="text-xs text-white/40 italic truncate">{interimTranscript}</p>}
+          <p className="text-xs text-[#c39bff]">Listening...</p>
+        </div>
+      )}
+
+      {/* ─── Input bar (pinned to bottom of chat box) ─── */}
+      <div className="shrink-0 border-t border-white/10 bg-white/[0.03] px-5 py-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => { if (!mounted || !micSupported) return; if (isListening) { stopListening(); } else { startListening(); } }}
+            className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all ${isListening ? 'bg-red-500 text-white animate-pulse shadow-[0_0_16px_rgba(239,68,68,0.5)]' : 'bg-white/[0.06] text-white/40 hover:text-white/70 hover:bg-white/10 border border-white/10'}`}
+            title={isListening ? 'Stop' : 'Voice input'}
+          >
+            <Mic size={17} />
+          </button>
+          <div className="flex-1 flex items-center gap-2 rounded-full bg-white/[0.06] border border-white/10 focus-within:border-[#c39bff]/50 transition-all px-4">
+            <input
+              ref={chatInputRef}
+              type="text"
+              value={briefText}
+              onChange={(e) => setBriefText(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSubmit(); } }}
+              placeholder="Reply to Zara..."
+              className="flex-1 bg-transparent text-white placeholder:text-white/25 text-sm py-3 focus:outline-none"
+            />
+            <button
+              onClick={handleSubmit}
+              disabled={!briefText.trim() || isSubmitting}
+              className="text-[#c39bff] hover:text-[#b48af0] disabled:text-white/10 transition-colors shrink-0"
+            >
+              <Send size={17} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
+  ) : null;
 
   // ═══════════════════════════════════════════════════════════
-  // HERO MODE — landing page with headline + search bar
+  // HERO — background images + headline + inline chat or textarea
   // ═══════════════════════════════════════════════════════════
   return (
     <section ref={containerRef} className="relative min-h-screen flex flex-col overflow-hidden bg-[#0a0a0a]">
@@ -349,30 +467,38 @@ export function Hero() {
       <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/95 via-[#0a0a0a]/80 to-transparent z-[1]" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/40 z-[1]" />
 
-      {/* ─── Main Content ─── */}
-      <div className="relative z-10 flex-1 flex items-end pb-20 md:pb-28">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-16 w-full flex flex-col md:flex-row justify-between items-end gap-12">
+      {/* ─── Main Content — always centered ─── */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-16">
+        <div className="w-full max-w-[860px] flex flex-col items-center gap-8">
 
-          {/* Left — headline + input */}
-          <div className="max-w-[800px]">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-[72px] font-light leading-[1.1] mb-6 tracking-[-2px] text-white">
+          {/* Headline */}
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl lg:text-[64px] font-light leading-[1.1] tracking-[-2px] text-white mb-4">
               Run your event
-              <br />
-              <span className="text-white/60">business on </span>
+              <span className="text-white/50"> business on </span>
               <span className="font-medium text-white">GRID</span>
             </h1>
-
-            <p className="text-base md:text-lg leading-relaxed text-[#b8b8b8] mb-10 max-w-xl">
-              The operating system for India&apos;s live entertainment industry.
-              <br />
+            <p className="text-base md:text-lg text-[#b8b8b8] max-w-lg mx-auto">
               Brief → Recommendation → Proposal → Booking — all in one place.
             </p>
+          </div>
 
-            {/* ─── Chat Input ─── */}
-            <div className="max-w-2xl mb-6">
-              <div className="relative rounded-xl bg-white/[0.08] border border-white/[0.12] backdrop-blur-sm hover:border-white/20 focus-within:border-[#c39bff]/50 transition-all">
+          {/* ─── Chat box — always visible, messages appear inside ─── */}
+          {hasConversation ? InlineChatBox : (
+            <div className="w-full rounded-2xl border border-white/[0.12] bg-black/60 backdrop-blur-xl overflow-hidden">
+              {/* Zara label */}
+              <div className="px-5 pt-4 pb-2 flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-[#c39bff]/20 flex items-center justify-center">
+                  <span className="text-xs font-bold text-[#c39bff]">Z</span>
+                </div>
+                <span className="text-sm font-semibold text-white">Zara</span>
+                <span className="text-xs text-white/30">GRID AI · Ask me anything about your event</span>
+              </div>
+
+              {/* Textarea */}
+              <div className="relative px-5 pb-2">
                 {isListening && interimTranscript && (
-                  <div className="absolute top-3.5 left-5 right-16 text-white/30 text-base italic pointer-events-none truncate">
+                  <div className="absolute top-2 left-8 right-8 text-white/30 text-base italic pointer-events-none truncate">
                     {interimTranscript}
                   </div>
                 )}
@@ -381,80 +507,78 @@ export function Hero() {
                   value={briefText}
                   onChange={handleInput}
                   onKeyDown={handleKeyDown}
-                  aria-label="Describe your event to get artist recommendations"
+                  aria-label="Describe your event"
                   placeholder={EXAMPLE_BRIEFS[placeholderIndex]}
-                  rows={2}
-                  className="w-full bg-transparent text-white placeholder:text-white/25 text-base px-5 pt-4 pb-12 resize-none focus:outline-none leading-relaxed"
-                  style={{ minHeight: '100px', maxHeight: '160px' }}
+                  rows={4}
+                  className="w-full bg-transparent text-white placeholder:text-white/25 text-base resize-none focus:outline-none leading-relaxed py-2"
+                  style={{ minHeight: '110px', maxHeight: '200px' }}
                 />
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                  <button
-                    onClick={() => { if (!mounted || !micSupported) return; if (isListening) { stopListening(); } else { startListening(); } }}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all text-xs font-medium ${isListening ? 'bg-red-500/20 text-red-400 animate-pulse' : 'text-white/30 hover:text-white/60 hover:bg-white/5'}`}
-                    title={isListening ? 'Stop recording' : 'Start voice input'}
-                  >
-                    <Mic size={14} />
-                    <span className="hidden sm:inline">{isListening ? 'Listening...' : 'Voice'}</span>
-                  </button>
-                  <button
-                    onClick={handleSubmit}
-                    disabled={!briefText.trim() || isSubmitting}
-                    aria-label="Submit event brief"
-                    className={`flex items-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-all ${briefText.trim() ? 'bg-[#c39bff] text-black hover:bg-[#b48af0]' : 'bg-white/5 text-white/15 cursor-not-allowed'}`}
-                  >
-                    {isSubmitting ? (
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <>Get Recommendations <ArrowRight size={14} /></>
-                    )}
-                  </button>
+              </div>
+
+              {/* Input bar */}
+              <div className="border-t border-white/10 px-4 py-3 flex items-center justify-between">
+                <button
+                  onClick={() => { if (!mounted || !micSupported) return; if (isListening) { stopListening(); } else { startListening(); } }}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm font-medium ${isListening ? 'bg-red-500/20 text-red-400 animate-pulse' : 'text-white/40 hover:text-white/70 hover:bg-white/5'}`}
+                >
+                  <Mic size={16} />
+                  <span>{isListening ? 'Listening...' : 'Voice'}</span>
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={!briefText.trim() || isSubmitting}
+                  className={`flex items-center gap-2 py-2.5 px-5 rounded-lg text-sm font-medium transition-all ${briefText.trim() ? 'bg-[#c39bff] text-black hover:bg-[#b48af0]' : 'bg-white/5 text-white/20 cursor-not-allowed'}`}
+                >
+                  {isSubmitting
+                    ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    : <><span>Get Recommendations</span><ArrowRight size={15} /></>
+                  }
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Suggestion chips */}
+          {!hasConversation && (
+            <div className="flex flex-wrap justify-center gap-2">
+              {['Wedding sangeet in Delhi', 'Corporate event Mumbai', 'College fest band'].map((ex) => (
+                <button key={ex} onClick={() => { setBriefText(ex); textareaRef.current?.focus(); }}
+                  className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/40 hover:text-white/70 hover:bg-white/8 transition-all text-xs">
+                  {ex}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* CTA + stats row */}
+          {!hasConversation && (
+            <div className="flex items-center justify-between w-full pt-2">
+              <div className="flex items-center gap-3 flex-wrap">
+                <button onClick={() => router.push('/brief')}
+                  className="flex items-center gap-2 bg-[#c39bff] text-black py-3 px-6 rounded-lg text-sm font-medium hover:bg-[#b48af0] transition-all">
+                  Hire an Artist <ArrowRight size={16} />
+                </button>
+                <button onClick={() => router.push('/agency/join')}
+                  className="flex items-center gap-2 border border-white/15 bg-white/[0.04] text-white py-3 px-5 rounded-lg text-sm font-medium hover:bg-white/[0.08] hover:border-[#c39bff]/40 transition-all">
+                  Event Company OS <span className="text-[10px] text-white/40">· CRM</span>
+                </button>
+                <button onClick={() => router.push('/artist/onboarding')}
+                  className="text-[#b8b8b8] text-sm font-medium hover:text-white transition-colors px-3">
+                  Join as Artist
+                </button>
+              </div>
+              <div className="hidden md:flex gap-10 items-center">
+                <div className="text-center">
+                  <div className="text-3xl font-light text-white">5K+</div>
+                  <div className="text-xs text-[#b8b8b8]">Verified artists</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-light text-white">30+</div>
+                  <div className="text-xs text-[#b8b8b8]">Indian cities</div>
                 </div>
               </div>
-
-              {/* Suggestion chips */}
-              <div className="flex flex-wrap gap-2 mt-3">
-                {['Wedding sangeet in Delhi', 'Corporate event Mumbai', 'College fest band'].map((example) => (
-                  <button
-                    key={example}
-                    onClick={() => { setBriefText(example); textareaRef.current?.focus(); }}
-                    className="px-3 py-1.5 rounded-md bg-white/5 border border-white/8 text-white/40 hover:text-white/70 hover:bg-white/8 transition-all text-xs"
-                  >
-                    {example}
-                  </button>
-                ))}
-              </div>
             </div>
-
-            {/* CTA buttons */}
-            <div className="flex items-center gap-5">
-              <button
-                onClick={() => router.push('/agency/join')}
-                className="flex items-center gap-2 bg-[#c39bff] text-black py-3.5 px-7 rounded-md text-base font-medium hover:bg-[#b48af0] transition-all"
-                aria-label="Set up your event company on GRID"
-              >
-                Get Started <ArrowRight size={18} />
-              </button>
-              <button
-                onClick={() => router.push('/artist/onboarding')}
-                className="text-[#b8b8b8] py-3.5 px-7 text-base font-medium hover:text-white transition-colors"
-                aria-label="Sign up as an artist on GRID"
-              >
-                Join as Artist
-              </button>
-            </div>
-          </div>
-
-          {/* Right — stats */}
-          <div className="hidden md:flex gap-16 items-end pb-2">
-            <div className="text-center">
-              <div className="text-[64px] font-light leading-none mb-2 text-white">5K+</div>
-              <div className="text-sm text-[#b8b8b8]">Verified artists</div>
-            </div>
-            <div className="text-center">
-              <div className="text-[64px] font-light leading-none mb-2 text-white">30+</div>
-              <div className="text-sm text-[#b8b8b8]">Indian cities</div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </section>

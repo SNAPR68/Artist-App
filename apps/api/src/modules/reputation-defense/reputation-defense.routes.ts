@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { reputationDefenseService, ReputationDefenseError } from './reputation-defense.service.js';
+import { reputationExportService, ReputationExportError } from './reputation-export.service.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { validateBody } from '../../middleware/validation.middleware.js';
@@ -18,13 +19,56 @@ export async function reputationDefenseRoutes(app: FastifyInstance) {
   // ─── Error handler ────────────────────────────────────────────
 
   app.addHook('onError', async (_request, reply, error) => {
-    if (error instanceof ReputationDefenseError) {
+    if (error instanceof ReputationDefenseError || error instanceof ReputationExportError) {
       return reply.status(error.statusCode).send({
         success: false,
         data: null,
         errors: [{ code: error.code, message: error.message }],
       });
     }
+  });
+
+  // ─── Signed Reputation Export (moat #4 — portable trust) ──────
+
+  /**
+   * GET /v1/reputation/export — Artist pulls their own signed reputation card.
+   * Returns a JWT that agencies can verify with GRID's public key.
+   */
+  app.get('/v1/reputation/export', {
+    preHandler: [authMiddleware, requirePermission('reputation:dispute')],
+  }, async (request, reply) => {
+    const { artistRepository } = await import('../artist/artist.repository.js');
+    const profile = await artistRepository.findByUserId(request.user!.user_id);
+    if (!profile) {
+      return reply.status(404).send({ success: false, data: null, errors: [{ code: 'NOT_ARTIST', message: 'Artist profile not found' }] });
+    }
+    const result = await reputationExportService.exportForArtist(profile.id);
+    return reply.send({ success: true, data: result, errors: [] });
+  });
+
+  /**
+   * GET /v1/reputation/export/public-key — PEM-encoded RS256 public key for verification.
+   * Returns 404 in dev (HS256 symmetric mode).
+   * MUST be registered before /:artistId so the literal path wins route matching.
+   */
+  app.get('/v1/reputation/export/public-key', async (_request, reply) => {
+    const key = reputationExportService.getPublicKey();
+    if (!key) {
+      return reply.status(404).send({ success: false, data: null, errors: [{ code: 'NO_PUBLIC_KEY', message: 'Server running in HS256 mode — no public key to expose' }] });
+    }
+    return reply.send({ success: true, data: key, errors: [] });
+  });
+
+  /**
+   * GET /v1/reputation/export/:artistId — Public signed reputation card.
+   * Anyone (agencies, other platforms) can pull and verify.
+   */
+  app.get<{ Params: { artistId: string } }>('/v1/reputation/export/:artistId', {
+    preHandler: [rateLimit('READ')],
+  }, async (request, reply) => {
+    const { artistId } = request.params;
+    const result = await reputationExportService.exportForArtist(artistId);
+    return reply.send({ success: true, data: result, errors: [] });
   });
 
   // ─── User Routes ──────────────────────────────────────────────

@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react';
 import { Check, ArrowRight, ArrowLeft } from 'lucide-react';
 import { apiClient } from '../../lib/api-client';
 import { BookingStepIndicator } from './BookingStepIndicator';
+import VoiceFillButton from '@/components/voice/VoiceFillButton';
 
 interface BookingInquiryFormProps {
   artistId: string;
@@ -305,6 +306,33 @@ export default function BookingInquiryForm({ artistId, artistName, eventTypes }:
           color: rgba(255, 255, 255, 0.4);
         }
       `}</style>
+
+      <VoiceFillButton
+        formContext={{
+          page: `booking inquiry for ${artistName}`,
+          fields: [
+            { name: 'event_type', label: 'Event type', type: 'select', options: eventTypes },
+            { name: 'event_date', label: 'Event date', type: 'date' },
+            { name: 'event_city', label: 'City', type: 'text' },
+            { name: 'event_venue', label: 'Venue (optional)', type: 'text' },
+            { name: 'duration_hours', label: 'Duration in hours', type: 'number' },
+            { name: 'budget', label: 'Budget in rupees', type: 'number' },
+            { name: 'message', label: 'Message to artist', type: 'text' },
+          ],
+        }}
+        onFieldUpdate={(updated) => {
+          setFormData((prev) => ({
+            ...prev,
+            ...(updated.event_type ? { event_type: updated.event_type } : {}),
+            ...(updated.event_date ? { event_date: updated.event_date } : {}),
+            ...(updated.event_city ? { event_city: updated.event_city } : {}),
+            ...(updated.event_venue ? { event_venue: updated.event_venue } : {}),
+            ...(updated.duration_hours ? { duration_hours: parseFloat(updated.duration_hours) || 2 } : {}),
+            ...(updated.budget ? { budget: updated.budget } : {}),
+            ...(updated.message ? { message: updated.message } : {}),
+          }));
+        }}
+      />
     </div>
   );
 }

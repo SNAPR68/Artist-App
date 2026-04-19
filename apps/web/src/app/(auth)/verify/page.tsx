@@ -44,27 +44,28 @@ function VerifyContent() {
       await verifyOTP(phone, otp, selectedRole);
 
       const currentUser = useAuthStore.getState().user;
+      // Use window.location.href (full reload) so the auth_token cookie
+      // just written in setTokens() is guaranteed visible to Next.js middleware
+      // on the next request. router.push() can race the cookie write.
+      const go = (path: string) => { window.location.href = path; };
       if (currentUser?.is_new) {
-        // New users always go to onboarding regardless of redirect param
         switch (currentUser.role) {
-          case UserRole.ARTIST: router.push('/artist/onboarding'); break;
-          case UserRole.EVENT_COMPANY: router.push('/event-company/onboarding'); break;
-          case UserRole.CLIENT: router.push('/client/onboarding'); break;
-          case UserRole.AGENT: router.push('/agent/onboarding'); break;
-          default: router.push('/');
+          case UserRole.ARTIST: go('/artist/onboarding'); break;
+          case UserRole.EVENT_COMPANY: go('/event-company/onboarding'); break;
+          case UserRole.CLIENT: go('/client/onboarding'); break;
+          case UserRole.AGENT: go('/agent/onboarding'); break;
+          default: go('/');
         }
       } else if (redirectTo) {
-        // Returning user with a redirect param — go back to where they were
-        router.push(redirectTo);
+        go(redirectTo);
       } else {
-        // Returning user — go to role dashboard
         switch (currentUser?.role) {
-          case UserRole.ARTIST: router.push('/artist'); break;
-          case UserRole.EVENT_COMPANY: router.push('/event-company'); break;
-          case UserRole.CLIENT: router.push('/client'); break;
-          case UserRole.AGENT: router.push('/agent'); break;
-          case UserRole.ADMIN: router.push('/admin'); break;
-          default: router.push('/');
+          case UserRole.ARTIST: go('/artist'); break;
+          case UserRole.EVENT_COMPANY: go('/event-company'); break;
+          case UserRole.CLIENT: go('/client'); break;
+          case UserRole.AGENT: go('/agent'); break;
+          case UserRole.ADMIN: go('/admin'); break;
+          default: go('/');
         }
       }
     } catch (err) {

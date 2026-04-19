@@ -105,6 +105,99 @@ export class RazorpayClient {
     return razorpay!.payments.fetch(paymentId);
   }
 
+  // ─── Subscriptions ──────────────────────────────────────
+  async createPlan(params: {
+    period: 'monthly' | 'yearly';
+    interval: number;
+    item: { name: string; amount_paise: number; currency: string; description?: string };
+    notes?: Record<string, string>;
+  }) {
+    if (isMockMode) {
+      console.log(`[RAZORPAY MOCK] Creating plan: ${params.item.name} ₹${params.item.amount_paise / 100}/${params.period}`);
+      return {
+        id: `plan_mock_${Date.now()}`,
+        entity: 'plan',
+        period: params.period,
+        interval: params.interval,
+        item: { ...params.item, amount: params.item.amount_paise },
+      };
+    }
+    return (razorpay as unknown as { plans: { create: (p: unknown) => Promise<unknown> } }).plans.create({
+      period: params.period,
+      interval: params.interval,
+      item: {
+        name: params.item.name,
+        amount: params.item.amount_paise,
+        currency: params.item.currency,
+        description: params.item.description,
+      },
+      notes: params.notes,
+    });
+  }
+
+  async createCustomer(params: { name: string; email?: string; contact?: string; notes?: Record<string, string> }) {
+    if (isMockMode) {
+      console.log(`[RAZORPAY MOCK] Creating customer: ${params.name}`);
+      return { id: `cust_mock_${Date.now()}`, entity: 'customer', name: params.name, email: params.email };
+    }
+    return (razorpay as unknown as { customers: { create: (p: unknown) => Promise<unknown> } }).customers.create({
+      name: params.name,
+      email: params.email,
+      contact: params.contact,
+      notes: params.notes,
+    });
+  }
+
+  async createSubscription(params: {
+    plan_id: string;
+    customer_id?: string;
+    total_count?: number;
+    quantity?: number;
+    start_at?: number;
+    notes?: Record<string, string>;
+  }) {
+    if (isMockMode) {
+      const id = `sub_mock_${Date.now()}`;
+      console.log(`[RAZORPAY MOCK] Creating subscription ${id} for plan ${params.plan_id}`);
+      return {
+        id,
+        entity: 'subscription',
+        plan_id: params.plan_id,
+        customer_id: params.customer_id,
+        status: 'created',
+        total_count: params.total_count ?? 12,
+        paid_count: 0,
+        short_url: `https://rzp.io/i/mock-${id}`,
+      };
+    }
+    return (razorpay as unknown as { subscriptions: { create: (p: unknown) => Promise<unknown> } }).subscriptions.create({
+      plan_id: params.plan_id,
+      customer_id: params.customer_id,
+      total_count: params.total_count ?? 12,
+      quantity: params.quantity ?? 1,
+      start_at: params.start_at,
+      customer_notify: 1,
+      notes: params.notes,
+    });
+  }
+
+  async fetchSubscription(subscriptionId: string) {
+    if (isMockMode) {
+      return { id: subscriptionId, status: 'active', paid_count: 1, remaining_count: 11 };
+    }
+    return (razorpay as unknown as { subscriptions: { fetch: (id: string) => Promise<unknown> } }).subscriptions.fetch(subscriptionId);
+  }
+
+  async cancelSubscription(subscriptionId: string, cancelAtCycleEnd = true) {
+    if (isMockMode) {
+      console.log(`[RAZORPAY MOCK] Cancelling subscription ${subscriptionId} (at_cycle_end=${cancelAtCycleEnd})`);
+      return { id: subscriptionId, status: cancelAtCycleEnd ? 'active' : 'cancelled', cancel_at_cycle_end: cancelAtCycleEnd };
+    }
+    return (razorpay as unknown as {
+      subscriptions: { cancel: (id: string, cancelAtCycleEnd: boolean) => Promise<unknown> };
+    }).subscriptions.cancel(subscriptionId, cancelAtCycleEnd);
+  }
+
   async initiateRefund(paymentId: string, amountPaise: number, notes?: Record<string, string>) {
     if (isMockMode) {
       console.log(`[RAZORPAY MOCK] Refund ₹${amountPaise / 100} for payment ${paymentId}`);

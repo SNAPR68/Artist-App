@@ -4,6 +4,7 @@ import { requirePermission, requireRole } from '../../middleware/rbac.middleware
 import { db } from '../../infrastructure/database.js';
 import { hashForSearch, encryptPII } from '../../infrastructure/encryption.js';
 import { UserRole } from '@artist-booking/shared';
+import { workspaceRepository } from '../workspace/workspace.repository.js';
 
 export async function adminRoutes(app: FastifyInstance) {
 
@@ -417,4 +418,20 @@ export async function adminRoutes(app: FastifyInstance) {
       errors: [],
     });
   });
+
+  /**
+   * POST /v1/admin/workspaces/:id/white-label — Toggle white-label tier for an agency.
+   * When enabled, the workspace's proposals, portal, and WhatsApp templates hide
+   * GRID branding. Optional custom_domain for future DNS mapping.
+   */
+  app.post<{ Params: { id: string }; Body: { enabled: boolean; custom_domain?: string | null } }>(
+    '/v1/admin/workspaces/:id/white-label',
+    { preHandler: [authMiddleware, requireRole(UserRole.ADMIN)] },
+    async (request, reply) => {
+      const { id } = request.params;
+      const { enabled, custom_domain } = request.body ?? { enabled: false };
+      const updated = await workspaceRepository.setWhiteLabel(id, !!enabled, custom_domain ?? null);
+      return reply.send({ success: true, data: updated, errors: [] });
+    },
+  );
 }

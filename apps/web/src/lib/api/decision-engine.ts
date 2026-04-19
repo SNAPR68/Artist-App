@@ -70,6 +70,7 @@ export function generateProposal(briefId: string, data: {
   include_pricing?: boolean;
   contact_name?: string;
   contact_email?: string;
+  client_notes?: string;
 }) {
   return apiClient<Record<string, unknown>>(`/v1/decision-engine/${briefId}/proposal`, {
     method: 'POST',

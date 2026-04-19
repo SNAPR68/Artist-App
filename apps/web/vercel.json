@@ -3,5 +3,11 @@
   "framework": "nextjs",
   "buildCommand": "cd ../.. && pnpm turbo build --filter=@artist-booking/web",
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "crons": [
+    {
+      "path": "/api/cron/keep-alive",
+      "schedule": "*/5 * * * *"
+    }
+  ]
 }

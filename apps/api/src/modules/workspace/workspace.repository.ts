@@ -77,9 +77,11 @@ export interface CreatePresentationData {
   notes_per_artist?: Record<string, string>;
   custom_header?: string;
   custom_footer?: string;
+  terms_and_conditions?: string;
   include_pricing?: boolean;
   include_media?: boolean;
   expires_at?: string;
+  template_id?: string;
   created_by: string;
 }
 
@@ -137,6 +139,22 @@ export class WorkspaceRepository {
     return db('workspaces')
       .where({ owner_user_id: userId, is_active: true })
       .orderBy('created_at', 'desc');
+  }
+
+  /**
+   * Toggle white-label tier. When true, GRID branding is hidden from
+   * proposals, client portal, and WhatsApp messages. Admin-only.
+   */
+  async setWhiteLabel(workspaceId: string, whiteLabel: boolean, customDomain?: string | null) {
+    const [updated] = await db('workspaces')
+      .where({ id: workspaceId })
+      .update({
+        white_label: whiteLabel,
+        custom_domain: customDomain ?? null,
+        updated_at: new Date(),
+      })
+      .returning('*');
+    return updated;
   }
 
   async findByMemberId(userId: string) {
@@ -395,12 +413,14 @@ export class WorkspaceRepository {
         notes_per_artist: JSON.stringify(data.notes_per_artist ?? {}),
         custom_header: data.custom_header ?? null,
         custom_footer: data.custom_footer ?? null,
+        terms_and_conditions: data.terms_and_conditions ?? null,
         include_pricing: data.include_pricing ?? false,
         include_media: data.include_media ?? true,
         is_active: true,
         view_count: 0,
         created_by: data.created_by,
         expires_at: data.expires_at ?? null,
+        template_id: data.template_id ?? null,
       })
       .returning('*');
     return presentation;

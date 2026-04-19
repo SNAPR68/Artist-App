@@ -230,6 +230,7 @@ export default function WorkspaceDetailPage() {
               { href: `/client/workspace/${workspaceId}/analytics`, label: 'Analytics' },
               { href: `/client/workspace/${workspaceId}/presentations`, label: 'Presentations' },
               { href: `/client/workspace/${workspaceId}/briefs`, label: 'Decision Briefs' },
+              { href: `/client/workspace/${workspaceId}/billing`, label: 'Billing' },
               { href: `/client/workspace/${workspaceId}/settings`, label: 'Settings' },
             ].map((link) => (
               <Link
@@ -267,45 +268,76 @@ export default function WorkspaceDetailPage() {
         </div>
       ) : (
         <>
-          {/* Pipeline Tab */}
+          {/* Pipeline Tab — drag-and-drop Kanban */}
           {activeTab === 'pipeline' && (
             <div className="overflow-x-auto">
               <div className="flex gap-4 min-w-max pb-4">
                 {PIPELINE_COLUMNS.map((col) => (
-                  <div key={col.key} className="w-64 flex-shrink-0">
+                  <div
+                    key={col.key}
+                    onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('ring-2', 'ring-[#c39bff]/40'); }}
+                    onDragLeave={(e) => e.currentTarget.classList.remove('ring-2', 'ring-[#c39bff]/40')}
+                    onDrop={async (e) => {
+                      e.preventDefault();
+                      e.currentTarget.classList.remove('ring-2', 'ring-[#c39bff]/40');
+                      const bookingId = e.dataTransfer.getData('text/booking-id');
+                      const fromStatus = e.dataTransfer.getData('text/from-status');
+                      if (!bookingId || fromStatus === col.key) return;
+                      // Optimistic update
+                      setPipeline((prev) => prev.map((b) => b.id === bookingId ? { ...b, status: col.key } : b));
+                      // API call
+                      const res = await apiClient(`/v1/bookings/${bookingId}/transition`, {
+                        method: 'POST',
+                        body: JSON.stringify({ to_state: col.key }),
+                      });
+                      if (!res.success) {
+                        // Revert on failure
+                        setPipeline((prev) => prev.map((b) => b.id === bookingId ? { ...b, status: fromStatus } : b));
+                      }
+                    }}
+                    className="w-64 flex-shrink-0 rounded-lg transition-all"
+                  >
                     <div className={`rounded-t-lg px-3 py-2 text-sm font-semibold text-nocturne-text-secondary ${col.color}`}>
                       {col.label}
                       <span className="ml-1 text-xs text-nocturne-text-tertiary">({groupedPipeline[col.key].length})</span>
                     </div>
-                    <div className="space-y-2 mt-2">
+                    <div className="space-y-2 mt-2 min-h-[100px]">
                       {groupedPipeline[col.key].length === 0 ? (
-                        <p className="text-xs text-nocturne-text-tertiary text-center py-4">No bookings</p>
+                        <p className="text-xs text-nocturne-text-tertiary text-center py-4">Drop here</p>
                       ) : (
                         groupedPipeline[col.key].map((b) => (
-                          <Link
+                          <div
                             key={b.id}
-                            href={`/client/bookings/${b.id}`}
-                            className="block bg-nocturne-surface border border-white/5 rounded-lg p-3 hover:border-primary-300 transition-colors"
+                            draggable
+                            onDragStart={(e) => {
+                              e.dataTransfer.setData('text/booking-id', b.id);
+                              e.dataTransfer.setData('text/from-status', b.status);
+                              e.dataTransfer.effectAllowed = 'move';
+                            }}
+                            className="bg-nocturne-surface border border-white/5 rounded-lg p-3 hover:border-primary-300 transition-colors cursor-grab active:cursor-grabbing"
                           >
-                            <p className="font-medium text-sm text-nocturne-text-primary">{b.artist_name}</p>
-                            <p className="text-xs text-nocturne-text-tertiary mt-1">{b.event_type}</p>
-                            <div className="flex items-center justify-between mt-2">
-                              <span className="text-xs text-nocturne-text-tertiary">
-                                {new Date(b.event_date).toLocaleDateString('en-IN')}
-                              </span>
-                              {(b.final_amount_paise ?? b.quoted_amount_paise) && (
-                                <span className="text-xs font-medium text-nocturne-text-secondary">
-                                  ₹{((b.final_amount_paise ?? b.quoted_amount_paise ?? 0) / 100).toLocaleString('en-IN')}
+                            <Link href={`/client/bookings/${b.id}`} className="block">
+                              <p className="font-medium text-sm text-nocturne-text-primary">{b.artist_name}</p>
+                              <p className="text-xs text-nocturne-text-tertiary mt-1">{b.event_type}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <span className="text-xs text-nocturne-text-tertiary">
+                                  {new Date(b.event_date).toLocaleDateString('en-IN')}
                                 </span>
-                              )}
-                            </div>
-                          </Link>
+                                {(b.final_amount_paise ?? b.quoted_amount_paise) && (
+                                  <span className="text-xs font-medium text-nocturne-text-secondary">
+                                    ₹{((b.final_amount_paise ?? b.quoted_amount_paise ?? 0) / 100).toLocaleString('en-IN')}
+                                  </span>
+                                )}
+                              </div>
+                            </Link>
+                          </div>
                         ))
                       )}
                     </div>
                   </div>
                 ))}
               </div>
+              <p className="text-[10px] text-white/30 mt-3 text-center">Drag cards between columns to change booking status.</p>
             </div>
           )}
 

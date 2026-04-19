@@ -335,13 +335,25 @@ export class WorkspaceService {
     notes_per_artist?: Record<string, string>;
     custom_header?: string;
     custom_footer?: string;
+    terms_and_conditions?: string;
     include_pricing?: boolean;
     include_media?: boolean;
     expires_at?: string;
+    template_id?: string;
   }) {
     await this.verifyMembership(workspaceId, userId);
 
     const slug = this.generatePresentationSlug();
+
+    // If a template is referenced, pull defaults; explicit fields override template.
+    let tpl: { custom_header: string | null; custom_footer: string | null; terms_and_conditions: string | null; include_pricing: boolean; include_media: boolean } | null = null;
+    if (data.template_id) {
+      const row = await db('proposal_templates')
+        .where({ id: data.template_id, workspace_id: workspaceId })
+        .whereNull('deleted_at')
+        .first();
+      if (row) tpl = row as never;
+    }
 
     return workspaceRepository.createPresentation({
       workspace_id: workspaceId,
@@ -350,11 +362,13 @@ export class WorkspaceService {
       slug,
       artist_ids: data.artist_ids,
       notes_per_artist: data.notes_per_artist,
-      custom_header: data.custom_header,
-      custom_footer: data.custom_footer,
-      include_pricing: data.include_pricing,
-      include_media: data.include_media,
+      custom_header: data.custom_header ?? tpl?.custom_header ?? undefined,
+      custom_footer: data.custom_footer ?? tpl?.custom_footer ?? undefined,
+      terms_and_conditions: data.terms_and_conditions ?? tpl?.terms_and_conditions ?? undefined,
+      include_pricing: data.include_pricing ?? tpl?.include_pricing,
+      include_media: data.include_media ?? tpl?.include_media,
       expires_at: data.expires_at,
+      template_id: data.template_id,
       created_by: userId,
     });
   }
@@ -429,6 +443,7 @@ export class WorkspaceService {
         title: presentation.title,
         custom_header: presentation.custom_header,
         custom_footer: presentation.custom_footer,
+        terms_and_conditions: presentation.terms_and_conditions,
         include_pricing: presentation.include_pricing,
         include_media: presentation.include_media,
         created_at: presentation.created_at,
@@ -437,6 +452,7 @@ export class WorkspaceService {
         name: workspace.name,
         logo_url: workspace.logo_url,
         brand_color: workspace.brand_color,
+        white_label: workspace.white_label === true,
       } : null,
       artists: artists.map((artist) => ({
         id: artist.id,
