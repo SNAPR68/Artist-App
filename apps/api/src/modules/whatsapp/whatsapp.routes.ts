@@ -16,31 +16,48 @@ export async function whatsappRoutes(app: FastifyInstance) {
       || request.headers['x-whatsapp-signature'] as string
       || '';
 
-    const rawBody = JSON.stringify(request.body);
+    const rawBody = (request as unknown as { rawBody?: string }).rawBody ?? JSON.stringify(request.body);
     if (!whatsAppProviderService.verifyWebhookSignature(rawBody, signature)) {
       return reply.status(401).send({ success: false, data: null, errors: [{ code: 'INVALID_SIGNATURE', message: 'Webhook signature verification failed' }] });
     }
 
-    // Extract message data (format depends on provider)
     const body = request.body as Record<string, unknown>;
+    const provider = process.env.WHATSAPP_PROVIDER || 'stub';
 
-    // Meta Cloud API format
-    const entry = (body.entry as Record<string, unknown>[])?.[0];
-    const changes = (entry?.changes as Record<string, unknown>[])?.[0];
-    const value = changes?.value as Record<string, unknown>;
-    const messages = (value?.messages as Record<string, unknown>[]) || [];
+    // Normalise inbound messages across providers into { phone, text, msgId }
+    type InboundMsg = { phone: string; text: string; msgId: string };
+    const inbound: InboundMsg[] = [];
 
-    for (const msg of messages) {
-      const phone = msg.from as string;
-      const text = (msg.text as Record<string, unknown>)?.body as string || msg.body as string || '';
-      const msgId = msg.id as string;
+    if (provider === 'interakt') {
+      // Interakt webhook payload: { type, data: { message: { id, from, type, text: { body } } } }
+      const data = body.data as Record<string, unknown> | undefined;
+      const msg = data?.message as Record<string, unknown> | undefined;
+      if (msg) {
+        const phone = msg.from as string;
+        const text = (msg.text as Record<string, unknown>)?.body as string
+          || msg.body as string || '';
+        const msgId = msg.id as string || `interakt_${Date.now()}`;
+        if (phone && text) inbound.push({ phone, text, msgId });
+      }
+    } else {
+      // Meta Cloud API format (default / future)
+      const entry = (body.entry as Record<string, unknown>[])?.[0];
+      const changes = (entry?.changes as Record<string, unknown>[])?.[0];
+      const value = changes?.value as Record<string, unknown>;
+      for (const msg of (value?.messages as Record<string, unknown>[]) ?? []) {
+        const phone = msg.from as string;
+        const text = (msg.text as Record<string, unknown>)?.body as string
+          || msg.body as string || '';
+        const msgId = msg.id as string;
+        if (phone && text) inbound.push({ phone, text, msgId });
+      }
+    }
 
-      if (phone && text) {
-        try {
-          await whatsAppConversationService.handleInboundMessage(phone, text, msgId);
-        } catch (err) {
-          console.error(`[WHATSAPP] Error processing message from ${phone}:`, err);
-        }
+    for (const { phone, text, msgId } of inbound) {
+      try {
+        await whatsAppConversationService.handleInboundMessage(phone, text, msgId);
+      } catch (err) {
+        console.error(`[WHATSAPP] Error processing message from ${phone}:`, err);
       }
     }
 
