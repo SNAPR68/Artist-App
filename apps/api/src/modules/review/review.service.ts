@@ -1,5 +1,6 @@
 import { reviewRepository } from './review.repository.js';
 import { bookingRepository } from '../booking/booking.repository.js';
+import { trustService } from '../trust/trust.service.js';
 import { BookingState } from '@artist-booking/shared';
 
 export class ReviewService {
@@ -43,7 +44,7 @@ export class ReviewService {
       throw new ReviewError('INVALID_RATING', 'Rating must be between 1 and 5', 400);
     }
 
-    return reviewRepository.create({
+    const review = await reviewRepository.create({
       booking_id: data.booking_id,
       reviewer_id: userId,
       reviewee_id: revieweeId,
@@ -52,6 +53,15 @@ export class ReviewService {
       dimensions: data.dimensions,
       comment: data.comment,
     });
+
+    // Recompute trust score for the artist being reviewed
+    if (reviewerRole === 'client') {
+      trustService.recompute(booking.artist_id).catch((err) =>
+        console.error('[TRUST] recompute failed after review:', err)
+      );
+    }
+
+    return review;
   }
 
   async getBookingReviews(bookingId: string, userId: string) {

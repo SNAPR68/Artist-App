@@ -184,8 +184,12 @@ async function searchAndFormat(params: { q?: string; city?: string; genre?: stri
     };
   } catch {
     return {
-      text: "Can't reach the catalog right now. What type of event are you planning? I can still help you spec it out.",
-      suggestions: ['Wedding', 'Corporate', 'Birthday', 'College fest'],
+      text: "I'd love to help you find the right artist! Let me ask a few quick questions.\n\nWhat kind of event are you planning?",
+      suggestions: ['Wedding / Sangeet', 'Corporate event', 'Birthday party', 'College fest'],
+      follow_up: {
+        question: 'What kind of event are you planning?',
+        options: ['Wedding / Sangeet', 'Corporate event', 'Birthday party', 'College fest'],
+      },
     };
   }
 }

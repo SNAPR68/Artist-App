@@ -3,11 +3,8 @@
 import { useEffect, useState } from 'react';
 import { apiClient } from '../../../../../lib/api-client';
 
-interface ArtistMe {
-  pan?: string;
-}
-
 interface TdsSummary {
+  pan: string | null;
   total_gross_paise: number;
   total_tds_paise: number;
   total_payout_paise: number;
@@ -29,9 +26,6 @@ function formatINR(paise: number): string {
   return '₹' + new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(paise / 100);
 }
 
-function maskPan(pan: string): string {
-  return pan.slice(0, 5) + '****' + pan.slice(-1);
-}
 
 function getCurrentFY(): number {
   const now = new Date();
@@ -57,22 +51,19 @@ export default function TdsPage() {
   const [summary, setSummary] = useState<TdsSummary | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(true);
 
-  // Load PAN on mount
-  useEffect(() => {
-    apiClient<ArtistMe>('/v1/artists/me')
-      .then((res) => {
-        if (res.success && res.data.pan) setPan(res.data.pan);
-      })
-      .catch(() => {});
-  }, []);
+  // PAN is loaded from the TDS summary response (already masked)
 
-  // Load TDS summary when FY changes
+  // Load TDS summary when FY changes; also refreshes PAN status
   useEffect(() => {
     setSummaryLoading(true);
     apiClient<TdsSummary>(`/v1/artists/me/tds/summary?fy=${selectedFY}`)
       .then((res) => {
-        if (res.success) setSummary(res.data);
-        else setSummary(null);
+        if (res.success) {
+          setSummary(res.data);
+          if (res.data.pan) setPan(res.data.pan);
+        } else {
+          setSummary(null);
+        }
       })
       .catch(() => setSummary(null))
       .finally(() => setSummaryLoading(false));
@@ -124,7 +115,7 @@ export default function TdsPage() {
         {pan && !editingPan ? (
           <div className="flex items-center justify-between">
             <span className="font-display text-lg font-extrabold tracking-tighter text-white">
-              {maskPan(pan)}
+              {pan}
             </span>
             <button
               className="text-[#c39bff] text-xs hover:text-white transition-colors"
@@ -236,10 +227,24 @@ export default function TdsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <p className="text-white/30 text-xs">Section 194J · 10% TDS · Issued by GRID</p>
             <button
-              className="btn-nocturne-secondary opacity-40 cursor-not-allowed px-5 py-2 rounded-lg text-sm"
-              disabled
+              className="btn-nocturne-secondary px-5 py-2 rounded-lg text-sm"
+              onClick={async () => {
+                const base = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+                const token = localStorage.getItem('access_token');
+                const res = await fetch(`${base}/v1/artists/me/tds/certificate.pdf?fy=${selectedFY}`, {
+                  headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!res.ok) return;
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tds-certificate-FY${selectedFY}-${selectedFY + 1}.pdf`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
             >
-              Download PDF (coming soon)
+              Download PDF
             </button>
           </div>
         </div>

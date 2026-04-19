@@ -154,10 +154,11 @@ export function classifyIntent(text: string): Intent {
     }
   }
 
-  // Simple artist search? Only if we extracted structured params AND the
-  // message is short, conversational-artist-query shaped.
+  // Simple artist search? Only shortcut if the message is specific enough
+  // (has both artist type AND city) — otherwise let Claude ask the missing
+  // clarifying questions (date, budget, guest count, etc.)
   const params = extractSearchParams(trimmed);
-  const hasSearchParams = Boolean(params.q || params.city);
+  const hasSearchParams = Boolean(params.q && params.city);
   const looksLikeSearch = /\b(find|show|search|looking for|need|want|get me)\b/i.test(trimmed);
 
   if (hasSearchParams && looksLikeSearch && trimmed.length < 100) {

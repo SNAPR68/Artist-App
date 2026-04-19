@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Building2, Users, Calendar, Mic, ArrowRight, Check } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
+import VoiceFillButton from '../../../../components/voice/VoiceFillButton';
 
 const COMPANY_TYPES = [
   { value: 'wedding_planner', label: 'Wedding Planner', emoji: '💍' },
@@ -117,11 +118,26 @@ export default function EventCompanyOnboarding() {
                 {/* Step 1: Company Setup */}
                 {step === 1 && (
                   <div className="animate-fade-in space-y-6">
-                    <div>
-                      <h2 className="text-2xl font-display font-extrabold tracking-tighter text-white mb-2">
-                        Set up your Event Company
-                      </h2>
-                      <p className="text-white/60">Tell us about your company so we can personalize your experience</p>
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h2 className="text-2xl font-display font-extrabold tracking-tighter text-white mb-2">
+                          Set up your Event Company
+                        </h2>
+                        <p className="text-white/60">Tell us about your company so we can personalize your experience</p>
+                      </div>
+                      <VoiceFillButton
+                        formContext={{
+                          page: 'event company onboarding',
+                          fields: [
+                            { name: 'company_name', label: 'Company name', type: 'text' },
+                            { name: 'company_type', label: 'Company type', type: 'select', options: ['wedding_planner', 'corporate', 'college', 'festival', 'agency', 'club_venue'] },
+                          ],
+                        }}
+                        onFieldUpdate={(fields) => {
+                          if (fields.company_name) setCompanyName(fields.company_name);
+                          if (fields.company_type) setCompanyType(fields.company_type);
+                        }}
+                      />
                     </div>
 
                     <div className="space-y-4">

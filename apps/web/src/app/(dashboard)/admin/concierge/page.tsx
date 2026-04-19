@@ -122,7 +122,7 @@ export default function ConciergePage() {
 
       <div className="glass-card rounded-xl p-5 border border-white/10 text-xs text-white/50">
         <p className="font-bold text-white/70 mb-1">Book on behalf of a client</p>
-        <p>Use <code className="text-[#a1faff]">/v1/concierge/bookings</code> with <code className="text-[#a1faff]">client_user_id</code> after confirming the artist with the client on call/WhatsApp. Full client-pipeline view coming soon at <code className="text-[#a1faff]">/v1/concierge/clients/:id/pipeline</code>.</p>
+        <p>Use <code className="text-[#a1faff]">/v1/concierge/bookings</code> with <code className="text-[#a1faff]">client_user_id</code> after confirming the artist with the client on call/WhatsApp.</p>
       </div>
     </div>
   );

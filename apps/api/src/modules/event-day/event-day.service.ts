@@ -1,6 +1,7 @@
 import { eventDayRepository } from './event-day.repository.js';
 import { bookingRepository } from '../booking/booking.repository.js';
 import { db } from '../../infrastructure/database.js';
+import { trustService } from '../trust/trust.service.js';
 import { BookingState, ARRIVAL_VERIFICATION_RADIUS_M } from '@artist-booking/shared';
 
 class EventDayError extends Error {
@@ -174,6 +175,11 @@ export class EventDayService {
             client_confirmed_at: updated.completion_client_at,
           },
         });
+
+        // Recompute trust score asynchronously
+        trustService.recompute(booking.artist_id).catch((err) =>
+          console.error('[TRUST] recompute failed after completion:', err)
+        );
 
         // Create venue_artist_history stub if booking has a venue
         if (booking.venue_id) {

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FileText, Plus, Download, Settings as SettingsIcon, Check, X, Trash2, ExternalLink } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
+import VoiceFillButton from '../../../../components/voice/VoiceFillButton';
 
 interface Workspace { id: string; name: string }
 
@@ -351,6 +352,25 @@ function SettingsDrawer({
   return (
     <Drawer title="GST settings" onClose={onClose}>
       <div className="space-y-4">
+        <div className="flex justify-end">
+          <VoiceFillButton
+            formContext={{
+              page: 'GST settings',
+              fields: [
+                { name: 'legal_name', label: 'Legal name', type: 'text' },
+                { name: 'gstin', label: 'GSTIN', type: 'text' },
+                { name: 'pan', label: 'PAN', type: 'text' },
+                { name: 'state_code', label: 'State code', type: 'text' },
+                { name: 'address_line1', label: 'Address', type: 'text' },
+                { name: 'city', label: 'City', type: 'text' },
+                { name: 'state', label: 'State', type: 'text' },
+                { name: 'pincode', label: 'Pincode', type: 'text' },
+                { name: 'invoice_prefix', label: 'Invoice prefix', type: 'text' },
+              ],
+            }}
+            onFieldUpdate={(fields) => setForm((prev) => ({ ...prev, ...fields }))}
+          />
+        </div>
         <Input label="Legal name *" value={form.legal_name ?? ''} onChange={(v) => setForm({ ...form, legal_name: v })} />
         <div className="grid grid-cols-2 gap-3">
           <Input label="GSTIN" value={form.gstin ?? ''} onChange={(v) => setForm({ ...form, gstin: v })} placeholder="22AAAAA0000A1Z5" />
@@ -469,7 +489,22 @@ function CreateInvoiceDrawer({
     <Drawer title="New GST invoice" onClose={onClose}>
       <div className="space-y-4">
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-white/50 font-bold mb-2">Recipient</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] uppercase tracking-widest text-white/50 font-bold">Recipient</p>
+            <VoiceFillButton
+              formContext={{
+                page: 'create GST invoice',
+                fields: [
+                  { name: 'recipient_name', label: 'Recipient name', type: 'text' },
+                  { name: 'recipient_gstin', label: 'Recipient GSTIN', type: 'text' },
+                  { name: 'recipient_state_code', label: 'Recipient state code', type: 'text' },
+                  { name: 'recipient_email', label: 'Recipient email', type: 'text' },
+                  { name: 'recipient_address', label: 'Recipient address', type: 'text' },
+                ],
+              }}
+              onFieldUpdate={(fields) => setRecipient((prev) => ({ ...prev, ...fields }))}
+            />
+          </div>
           <div className="space-y-3">
             <Input label="Name *" value={recipient.recipient_name} onChange={(v) => setRecipient({ ...recipient, recipient_name: v })} />
             <div className="grid grid-cols-2 gap-3">

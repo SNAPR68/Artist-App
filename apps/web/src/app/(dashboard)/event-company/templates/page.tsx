@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FileText, Plus, Star, Trash2, Save, X } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
+import VoiceFillButton from '../../../../components/voice/VoiceFillButton';
 
 interface Template {
   id: string;
@@ -121,9 +122,24 @@ export default function TemplatesPage() {
             <h2 className="text-lg font-display font-bold text-white">
               {editing.id ? 'Edit template' : 'New template'}
             </h2>
-            <button onClick={cancel} className="text-white/40 hover:text-white" title="Cancel">
-              <X size={18} />
-            </button>
+            <div className="flex items-center gap-2">
+              <VoiceFillButton
+                formContext={{
+                  page: 'proposal template editor',
+                  fields: [
+                    { name: 'name', label: 'Template name', type: 'text' },
+                    { name: 'description', label: 'Description', type: 'text' },
+                    { name: 'custom_header', label: 'Header text', type: 'text' },
+                    { name: 'custom_footer', label: 'Footer text', type: 'text' },
+                    { name: 'terms_and_conditions', label: 'Terms and conditions', type: 'text' },
+                  ],
+                }}
+                onFieldUpdate={(fields) => setEditing((prev) => prev ? { ...prev, ...fields } : prev)}
+              />
+              <button onClick={cancel} className="text-white/40 hover:text-white" title="Cancel">
+                <X size={18} />
+              </button>
+            </div>
           </div>
 
           <Field label="Name *">

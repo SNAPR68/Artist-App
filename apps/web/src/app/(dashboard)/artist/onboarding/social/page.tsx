@@ -11,7 +11,6 @@ interface ProfileData {
   suggested_genres: string[];
   suggested_bio: string;
   top_content: Array<{ title: string; views: number }>;
-  _stub_notice: string;
 }
 
 interface AnalysisResult {
@@ -179,11 +178,6 @@ export default function SocialAnalyzerPage() {
                 {/* Results Section */}
                 {result && profileData && (
                   <div className="space-y-6">
-                    {/* Stub Notice */}
-                    <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 px-4 py-3 rounded-xl text-sm">
-                      This is a preview. Full social media analysis coming soon.
-                    </div>
-
                     {/* Profile Summary */}
                     <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
                       <div className="flex items-start justify-between">
