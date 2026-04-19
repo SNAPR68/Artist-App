@@ -4,6 +4,8 @@ import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
 import { workspaceRepository } from '../workspace/workspace.repository.js';
 import { dealVaultService, dealsToCsv, type DealSearchFilters } from './deal-vault.service.js';
 import { db } from '../../infrastructure/database.js';
+import { bookingService } from '../booking/booking.service.js';
+import { BookingState } from '@artist-booking/shared';
 
 /**
  * Deal Vault routes — workspace-scoped.
@@ -115,6 +117,58 @@ export async function dealVaultRoutes(app: FastifyInstance) {
       reply.header('Content-Type', 'text/csv; charset=utf-8');
       reply.header('Content-Disposition', `attachment; filename="grid-deals-${stamp}.csv"`);
       return reply.send(csv);
+    },
+  );
+
+  /**
+   * PATCH /v1/workspaces/:id/deals/:bookingId/state — workspace-scoped deal state transition.
+   * Used by the agency Kanban to drag cards between columns.
+   * Guarded by workspace membership + existing booking state machine.
+   */
+  app.patch<{ Params: { id: string; bookingId: string }; Body: { state: string } }>(
+    '/v1/workspaces/:id/deals/:bookingId/state',
+    { preHandler: [authMiddleware, rateLimit('WRITE')] },
+    async (request, reply) => {
+      const { id: workspaceId, bookingId } = request.params;
+      const userId = request.user!.user_id;
+
+      const member = await workspaceRepository.getMember(workspaceId, userId);
+      if (!member || !member.is_active) {
+        return reply.status(403).send({ success: false, errors: [{ code: 'NOT_WORKSPACE_MEMBER', message: 'Not a member of this workspace' }] });
+      }
+
+      const { state } = request.body ?? ({} as { state?: string });
+      if (!state || !Object.values(BookingState).includes(state as BookingState)) {
+        return reply.status(400).send({ success: false, errors: [{ code: 'INVALID_STATE', message: 'Invalid booking state' }] });
+      }
+
+      // Confirm the booking belongs to this workspace (via its event)
+      const booking = await db('bookings')
+        .join('events', 'bookings.event_id', 'events.id')
+        .where('bookings.id', bookingId)
+        .andWhere('events.workspace_id', workspaceId)
+        .select('bookings.id')
+        .first();
+      if (!booking) {
+        return reply.status(404).send({ success: false, errors: [{ code: 'DEAL_NOT_FOUND', message: 'Deal not in this workspace' }] });
+      }
+
+      try {
+        // Use system: prefix to bypass participant check — workspace membership is the auth boundary here.
+        const updated = await bookingService.transitionState(
+          bookingId,
+          `system:workspace-member:${userId}`,
+          state as BookingState,
+          { source: 'agency_kanban', workspace_id: workspaceId },
+        );
+        return reply.send({ success: true, data: updated, errors: [] });
+      } catch (err: unknown) {
+        const e = err as { code?: string; message?: string; statusCode?: number };
+        return reply.status(e.statusCode ?? 400).send({
+          success: false,
+          errors: [{ code: e.code ?? 'TRANSITION_FAILED', message: e.message ?? 'Could not update deal state' }],
+        });
+      }
     },
   );
 }
