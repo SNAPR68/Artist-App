@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type SpeechRecognition = any;
+type SpeechRecognitionEvent = any;
+
 /**
  * useVoiceFormFill — voice-powered form filling for any page.
  *
@@ -51,7 +55,7 @@ export function useVoiceFormFill({ formContext, onFieldUpdate, onSpeak }: UseVoi
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || (window as Window & { webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     setMicSupported(!!SpeechRecognition);
   }, []);
 
@@ -147,7 +151,7 @@ export function useVoiceFormFill({ formContext, onFieldUpdate, onSpeak }: UseVoi
   }, [isProcessing, messages, sessionId, formContext, onFieldUpdate, speakText]);
 
   const startListening = useCallback(() => {
-    const SpeechRecognition = window.SpeechRecognition || (window as Window & { webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-IN';

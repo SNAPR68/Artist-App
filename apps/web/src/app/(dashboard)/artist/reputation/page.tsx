@@ -25,7 +25,7 @@ export default function ReputationPage() {
     apiClient<ReputationExport>('/v1/reputation/export')
       .then((res) => {
         if (res.success) setData(res.data);
-        else if (res.error?.code === 'NOT_ARTIST') setNotArtist(true);
+        else if (res.errors?.[0]?.code === 'NOT_ARTIST') setNotArtist(true);
       })
       .catch(() => setNotArtist(true))
       .finally(() => setLoading(false));
