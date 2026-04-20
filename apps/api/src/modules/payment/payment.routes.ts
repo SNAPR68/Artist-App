@@ -353,42 +353,8 @@ export async function paymentRoutes(app: FastifyInstance) {
   });
 
   // ─── TDS (moat #5 — compliance lock-in) ─────────────────────────
-
-  /**
-   * PUT /v1/artists/me/pan — Store encrypted PAN for TDS certificate issuance.
-   */
-  app.put('/v1/artists/me/pan', {
-    preHandler: [authMiddleware, requirePermission('payment:view_own'), rateLimit('WRITE')],
-  }, async (request, reply) => {
-    const { pan } = request.body as { pan: string };
-    if (!pan) return reply.status(400).send({ success: false, errors: [{ code: 'MISSING_PAN', message: 'pan required' }] });
-    const artist = await db('artist_profiles').where({ user_id: request.user!.user_id }).first();
-    if (!artist) return reply.status(404).send({ success: false, errors: [{ code: 'NOT_ARTIST', message: 'Artist profile not found' }] });
-    try {
-      await tdsService.savePAN(artist.id, pan);
-      return reply.send({ success: true, data: { saved: true }, errors: [] });
-    } catch (err) {
-      if (err instanceof TDSError) return reply.status(err.statusCode).send({ success: false, errors: [{ code: err.code, message: err.message }] });
-      throw err;
-    }
-  });
-
-  /**
-   * GET /v1/artists/me/tds/summary?fy=2025 — Current artist's TDS FY summary.
-   * fy is the starting calendar year (2025 → FY 2025-26, Apr 2025 – Mar 2026).
-   */
-  app.get('/v1/artists/me/tds/summary', {
-    preHandler: [authMiddleware, requirePermission('payment:view_own')],
-  }, async (request, reply) => {
-    const q = request.query as { fy?: string };
-    const now = new Date();
-    const defaultFY = now.getUTCMonth() >= 3 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
-    const fyStartYear = Number(q.fy ?? defaultFY);
-    const artist = await db('artist_profiles').where({ user_id: request.user!.user_id }).first();
-    if (!artist) return reply.status(404).send({ success: false, errors: [{ code: 'NOT_ARTIST', message: 'Artist profile not found' }] });
-    const summary = await tdsService.getFYSummary(artist.id, fyStartYear);
-    return reply.send({ success: true, data: summary, errors: [] });
-  });
+  // Note: PUT /v1/artists/me/pan and GET /v1/artists/me/tds/summary are
+  // declared in artist.routes.ts (canonical). Only admin TDS view lives here.
 
   /**
    * GET /v1/admin/tds/:artistId/summary?fy=2025 — Admin/agency view of any artist.
