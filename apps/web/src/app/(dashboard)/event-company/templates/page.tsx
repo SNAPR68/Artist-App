@@ -230,9 +230,35 @@ export default function TemplatesPage() {
       ) : loading ? (
         <p className="text-white/40 text-center py-12">Loading…</p>
       ) : templates.length === 0 ? (
-        <div className="glass-card p-10 rounded-xl border border-white/5 text-center relative z-10">
-          <FileText className="mx-auto text-white/30 mb-3" size={32} />
-          <p className="text-white/50 text-sm">No templates yet. Create one to auto-fill proposals.</p>
+        <div className="glass-card p-10 rounded-xl border border-[#c39bff]/20 text-center relative z-10 overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="relative max-w-md mx-auto">
+            <div className="w-12 h-12 mx-auto rounded-full bg-[#c39bff]/15 flex items-center justify-center mb-4">
+              <FileText className="text-[#c39bff]" size={22} />
+            </div>
+            <h3 className="text-lg font-display font-bold text-white mb-1">Build your first proposal template</h3>
+            <p className="text-white/50 text-sm mb-6">
+              Save your standard intro, terms, payment schedule, and cancellation policy once — auto-apply to every pitch deck.
+            </p>
+            <div className="grid grid-cols-3 gap-2 mb-6 text-left">
+              {[
+                { label: 'Corporate', desc: 'Pvt. Ltd. clients' },
+                { label: 'Weddings', desc: 'Family events' },
+                { label: 'Colleges', desc: 'Fests & festivals' },
+              ].map((ex) => (
+                <div key={ex.label} className="rounded-lg border border-white/10 bg-white/[0.02] p-2.5">
+                  <div className="text-xs font-semibold text-white">{ex.label}</div>
+                  <div className="text-[10px] text-white/40">{ex.desc}</div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={startNew}
+              className="px-4 py-2.5 bg-[#c39bff] text-black rounded-lg text-sm font-bold inline-flex items-center gap-2 hover:bg-[#b48af0] transition-colors"
+            >
+              <Plus size={14} /> Create template
+            </button>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">

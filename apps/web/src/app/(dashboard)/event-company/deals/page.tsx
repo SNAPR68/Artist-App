@@ -314,8 +314,45 @@ export default function DealVaultPage() {
         )}
       </div>
 
+      {/* First-run empty state — only when truly no deals (not filtered) */}
+      {!loading && deals.length === 0 && !query && !stateFilter && (
+        <div className="relative z-10 glass-card p-10 rounded-xl border border-[#c39bff]/20 overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="relative max-w-lg mx-auto text-center">
+            <div className="w-12 h-12 mx-auto rounded-full bg-[#c39bff]/15 flex items-center justify-center mb-4">
+              <LayoutGrid className="text-[#c39bff]" size={22} />
+            </div>
+            <h3 className="text-lg font-display font-bold text-white mb-1">Your deal pipeline starts here</h3>
+            <p className="text-white/50 text-sm mb-6">
+              Every artist inquiry, quote, and confirmed booking lives here. Drag deals across stages as they move forward.
+            </p>
+            <div className="grid grid-cols-4 gap-2 mb-6 text-left">
+              {KANBAN_COLUMNS.slice(0, 4).map((c) => (
+                <div key={c.state} className="rounded-lg border border-white/10 bg-white/[0.02] p-2.5">
+                  <div className={`text-[10px] uppercase tracking-widest font-bold ${c.accent}`}>{c.label}</div>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-center gap-3">
+              <a
+                href="/search"
+                className="px-4 py-2.5 bg-[#c39bff] text-black rounded-lg text-sm font-bold inline-flex items-center gap-2 hover:bg-[#b48af0] transition-colors"
+              >
+                <Search size={14} /> Find an artist to start a deal
+              </a>
+              <a
+                href="/client/workspace"
+                className="px-4 py-2.5 border border-white/15 text-white/70 rounded-lg text-sm font-semibold inline-flex items-center gap-2 hover:text-white hover:border-white/30 transition-colors"
+              >
+                Import existing pipeline
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main workspace: board (or table) + optional assistant rail */}
-      <div className={`relative z-10 grid gap-4 ${assistantOpen ? 'lg:grid-cols-[1fr_320px]' : 'grid-cols-1'}`}>
+      <div className={`relative z-10 grid gap-4 ${assistantOpen ? 'lg:grid-cols-[1fr_320px]' : 'grid-cols-1'} ${!loading && deals.length === 0 && !query && !stateFilter ? 'hidden' : ''}`}>
         <div>
           {view === 'kanban' ? (
             <div className="overflow-x-auto pb-2">
