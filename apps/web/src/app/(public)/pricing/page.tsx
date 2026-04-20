@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { analytics } from '@/lib/analytics';
+import { apiClient } from '@/lib/api-client';
 
 const PLANS = [
   {
@@ -64,12 +65,50 @@ const PLANS = [
   },
 ];
 
+type CheckoutResp = {
+  subscription_id: string;
+  razorpay_subscription_id: string;
+  razorpay_key_id: string;
+  short_url?: string;
+  amount_paise: number;
+  plan: string;
+};
+
 export default function PricingPage() {
   const router = useRouter();
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     analytics.trackEvent('pricing_viewed', { source: 'marketing' });
   }, []);
+
+  const isLoggedIn = () =>
+    typeof window !== 'undefined' && !!localStorage.getItem('grid_access_token');
+
+  const startCheckout = async (plan: 'pro' | 'enterprise') => {
+    if (!isLoggedIn()) {
+      router.push(`/agency/join?plan=${plan}`);
+      return;
+    }
+    setLoadingPlan(plan);
+    setError(null);
+    const res = await apiClient<CheckoutResp>('/v1/subscription/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ plan }),
+    });
+    setLoadingPlan(null);
+    if (!res.success) {
+      setError(res.errors?.[0]?.message ?? 'Checkout failed — please try again');
+      return;
+    }
+    analytics.trackEvent('subscription_checkout_started', { plan, amount_paise: res.data.amount_paise });
+    if (res.data.short_url) {
+      window.location.href = res.data.short_url;
+    } else {
+      setError('Checkout link unavailable — our team will reach out.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0e0e0f] px-6 py-20">
@@ -126,29 +165,41 @@ export default function PricingPage() {
 
             {/* CTA */}
             <button
+              disabled={loadingPlan === plan.name.toLowerCase()}
               onClick={() => {
                 analytics.trackEvent('pricing_cta_clicked', {
                   plan: plan.name,
                   price: plan.price,
                   destination: plan.ctaHref,
                 });
-                if (plan.ctaHref.startsWith('mailto:')) {
+                const key = plan.name.toLowerCase();
+                if (key === 'pro') {
+                  startCheckout('pro');
+                } else if (key === 'enterprise') {
+                  startCheckout('enterprise');
+                } else if (plan.ctaHref.startsWith('mailto:')) {
                   window.location.href = plan.ctaHref;
                 } else {
                   router.push(plan.ctaHref);
                 }
               }}
-              className={`w-full py-3 rounded-xl text-sm font-semibold transition-colors ${
+              className={`w-full py-3 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 ${
                 plan.highlight
                   ? 'bg-white text-[#0e0e0f] hover:bg-white/90'
                   : 'border border-white/15 text-white/60 hover:text-white hover:border-white/30'
               }`}
             >
-              {plan.cta}
+              {loadingPlan === plan.name.toLowerCase() ? 'Opening checkout…' : plan.cta}
             </button>
           </div>
         ))}
       </div>
+
+      {error && (
+        <div className="max-w-2xl mx-auto mb-8 text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-center">
+          {error}
+        </div>
+      )}
 
       {/* FAQ */}
       <div className="max-w-2xl mx-auto">
