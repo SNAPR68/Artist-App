@@ -21,8 +21,10 @@ import {
   CreditCard,
   CheckCircle2,
   Circle,
+  Sparkles,
 } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
+import { ConciergeRequestModal } from '@/components/agency/ConciergeRequestModal';
 
 interface EventCompanyProfile {
   id: string;
@@ -51,6 +53,7 @@ export default function EventCompanyDashboard() {
   const [shortlists, setShortlists] = useState<ShortlistSummary[]>([]);
   const [agencyKpis, setAgencyKpis] = useState({ deals: 0, templates: 0, unpaidInvoices: 0 });
   const [loading, setLoading] = useState(true);
+  const [conciergeOpen, setConciergeOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -208,6 +211,29 @@ export default function EventCompanyDashboard() {
         </div>
       )}
 
+      {/* ─── Concierge CTA ─── */}
+      {workspaces.length > 0 && (
+        <button
+          onClick={() => setConciergeOpen(true)}
+          className="w-full group relative overflow-hidden rounded-xl border border-[#c39bff]/30 bg-gradient-to-r from-[#c39bff]/10 via-[#c39bff]/5 to-transparent p-5 text-left hover:border-[#c39bff]/50 transition-all"
+        >
+          <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#c39bff]/20 blur-[80px] rounded-full pointer-events-none" />
+          <div className="relative flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-[#c39bff]/20 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-5 h-5 text-[#c39bff]" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-white">Need hands-on help?</h3>
+                <span className="text-[9px] uppercase tracking-widest text-[#c39bff] font-bold px-1.5 py-0.5 rounded bg-[#c39bff]/10">Pro</span>
+              </div>
+              <p className="text-xs text-white/50 mt-0.5">Have our concierge team source, negotiate, or run a live deal for you — reply in 24h.</p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-[#c39bff] group-hover:translate-x-0.5 transition-all" />
+          </div>
+        </button>
+      )}
+
       {/* ─── Quick Actions Bento ─── */}
       <div>
         <h2 className="text-xl font-display font-bold text-white mb-4">Quick Actions</h2>
@@ -220,6 +246,13 @@ export default function EventCompanyDashboard() {
           <ActionCard href="/client/substitutions" icon={AlertTriangle} title="Emergency Sub" desc="Last-minute replacements" />
         </div>
       </div>
+
+      {conciergeOpen && workspaces[0] && (
+        <ConciergeRequestModal
+          workspaceId={workspaces[0].id}
+          onClose={() => setConciergeOpen(false)}
+        />
+      )}
 
       {/* ─── Active Workspaces ─── */}
       {workspaces.length > 0 ? (
