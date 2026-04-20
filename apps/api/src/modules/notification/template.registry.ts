@@ -343,6 +343,40 @@ export const NOTIFICATION_TEMPLATES: Record<string, NotificationTemplate> = {
     email_body: 'Great news! Your application for <strong>"{{gig_title}}"</strong> has been accepted. The <strong>{{event_type}}</strong> is on <strong>{{event_date}}</strong> in <strong>{{event_city}}</strong>. Log in to view details and next steps.',
   },
 
+  // ─── Activation Nudges (Agency OS) ────────────────────────
+  activation_no_first_brief_d3: {
+    whatsapp_template_id: 'act_no_brief_d3_v1',
+    sms_flow_id: 'flow_act_no_brief_d3',
+    push_title: 'Try your first brief on GRID',
+    push_body: 'Drop any event idea in the chat — GRID will find the right artists in seconds.',
+    email_subject: 'Your first brief is a paste away',
+    email_body: 'You signed up for GRID {{days_since}} days ago but haven\'t submitted a brief yet. Just paste any event description — "birthday in Bandra, 100 guests, sufi vibe, ₹2L" — and the decision engine does the rest. <a href="https://artist-booking-web.vercel.app/brief">Try a brief →</a>',
+  },
+  activation_no_first_deal_d7: {
+    whatsapp_template_id: 'act_no_deal_d7_v1',
+    sms_flow_id: 'flow_act_no_deal_d7',
+    push_title: 'Turn a brief into a deal',
+    push_body: 'You\'ve run briefs but no deal yet. Want our team to close one for you?',
+    email_subject: 'Let us run a deal for you',
+    email_body: 'It\'s been {{days_since}} days and no deal closed yet. Our concierge team can pick up any live brief and handle sourcing + negotiation for you — zero extra cost on Pro. <a href="https://artist-booking-web.vercel.app/agency/dashboard">Request concierge →</a>',
+  },
+  activation_concierge_stuck_48h: {
+    whatsapp_template_id: 'act_conc_stuck_v1',
+    sms_flow_id: 'flow_act_conc_stuck',
+    push_title: 'Your concierge request is moving',
+    push_body: 'Our team is working on your request — expect an update shortly.',
+    email_subject: 'Quick update on your concierge request',
+    email_body: 'Your concierge request submitted {{hours_since}}h ago is being handled. A specialist will reach out on WhatsApp/email shortly. If urgent, reply to this email and we\'ll escalate.',
+  },
+  activation_trial_ending_t3: {
+    whatsapp_template_id: 'act_trial_end_v1',
+    sms_flow_id: 'flow_act_trial_end',
+    push_title: 'Your GRID Pro trial ends in 3 days',
+    push_body: 'Keep unlimited briefs, branded PDFs & concierge — continue on Pro.',
+    email_subject: 'Your 14-day GRID Pro trial ends on {{trial_end_date}}',
+    email_body: 'Your GRID Pro trial ends in 3 days. Keep unlimited briefs, branded proposal PDFs, deal pipeline, and concierge support for ₹15K/mo. <a href="https://artist-booking-web.vercel.app/pricing">Continue on Pro →</a>',
+  },
+
   financial_light_month_alert: {
     whatsapp_template_id: 'financial_light_v1',
     sms_flow_id: 'flow_financial_light',

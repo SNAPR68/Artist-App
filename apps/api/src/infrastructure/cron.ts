@@ -17,6 +17,7 @@ import { reputationDefenseService } from '../modules/reputation-defense/reputati
 import { emergencySubstitutionService } from '../modules/emergency-substitution/emergency-substitution.service.js';
 import { gigMarketplaceService } from '../modules/gig-marketplace/gig-marketplace.service.js';
 import { gamificationService } from '../modules/gamification/gamification.service.js';
+import { activationNudgeService } from '../modules/notification/activation-nudge.service.js';
 
 const PAYMENT_RECONCILIATION_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
 const HOLD_EXPIRY_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
@@ -41,6 +42,7 @@ const SUBSTITUTION_EXPIRY_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
 const GIG_EXPIRY_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
 const GAMIFICATION_STREAK_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const GAMIFICATION_BADGE_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
+const ACTIVATION_NUDGE_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 /**
  * Start background cron jobs for hold expiry and review publishing.
@@ -363,4 +365,17 @@ export function startCronJobs() {
       console.error('[CRON] Gamification badge check failed:', err);
     }
   }, GAMIFICATION_BADGE_INTERVAL_MS);
+
+  // 24. Activation nudges — WhatsApp/email nudges for stuck agencies (every 6h)
+  setInterval(async () => {
+    try {
+      const result = await activationNudgeService.runAll();
+      const total = Object.values(result.sent).reduce((a, b) => a + b, 0);
+      if (total > 0) {
+        console.log(`[CRON] Sent ${total} activation nudges:`, result.sent);
+      }
+    } catch (err) {
+      console.error('[CRON] Activation nudges failed:', err);
+    }
+  }, ACTIVATION_NUDGE_INTERVAL_MS);
 }
