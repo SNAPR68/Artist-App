@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Search, Users, TrendingUp, Briefcase, Phone } from 'lucide-react';
+import { Search, Users, TrendingUp, Briefcase, Phone, Inbox, Check, X, Play } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
 interface ConciergeStats {
@@ -21,6 +21,30 @@ interface ArtistHit {
   base_fee_paise?: number;
 }
 
+type ReqStatus = 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
+
+interface ConciergeReq {
+  id: string;
+  workspace_id: string;
+  workspace_name?: string;
+  requester_phone?: string;
+  topic: string;
+  notes: string;
+  event_date?: string | null;
+  budget_paise?: number | null;
+  status: ReqStatus;
+  assigned_to?: string | null;
+  created_at: string;
+}
+
+const TOPIC_LABELS: Record<string, string> = {
+  deal_help: 'Deal help',
+  artist_sourcing: 'Artist sourcing',
+  negotiation: 'Negotiation',
+  compliance: 'Compliance',
+  other: 'Other',
+};
+
 export default function ConciergePage() {
   const [stats, setStats] = useState<ConciergeStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,6 +54,9 @@ export default function ConciergePage() {
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<ArtistHit[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [requests, setRequests] = useState<ConciergeReq[]>([]);
+  const [reqLoading, setReqLoading] = useState(true);
+  const [patching, setPatching] = useState<string | null>(null);
 
   const loadStats = useCallback(async () => {
     const res = await apiClient<ConciergeStats>('/v1/concierge/stats');
@@ -37,7 +64,24 @@ export default function ConciergePage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { loadStats(); }, [loadStats]);
+  const loadRequests = useCallback(async () => {
+    setReqLoading(true);
+    const res = await apiClient<ConciergeReq[]>('/v1/admin/concierge/requests');
+    if (res.success && Array.isArray(res.data)) setRequests(res.data);
+    setReqLoading(false);
+  }, []);
+
+  useEffect(() => { loadStats(); loadRequests(); }, [loadStats, loadRequests]);
+
+  const patchReq = async (id: string, status: ReqStatus, resolution_notes?: string) => {
+    setPatching(id);
+    const res = await apiClient<ConciergeReq>(`/v1/admin/concierge/requests/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status, resolution_notes }),
+    });
+    setPatching(null);
+    if (res.success) loadRequests();
+  };
 
   const doSearch = async () => {
     setSearching(true); setError(null);
@@ -74,6 +118,99 @@ export default function ConciergePage() {
             value={stats.conversion_rate_pct != null ? `${stats.conversion_rate_pct.toFixed(0)}%` : '—'} />
         </div>
       )}
+
+      {/* Requests Queue */}
+      <div className="glass-card rounded-2xl p-6 border border-white/10 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+            <Inbox size={14} className="text-[#c39bff]" /> Agency Requests Queue
+            {requests.length > 0 && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#c39bff]/20 text-[#c39bff] font-bold">
+                {requests.filter(r => r.status === 'pending').length} pending
+              </span>
+            )}
+          </h2>
+          <button onClick={loadRequests} className="text-xs text-white/40 hover:text-white">
+            Refresh
+          </button>
+        </div>
+
+        {reqLoading ? (
+          <p className="text-sm text-white/40">Loading queue…</p>
+        ) : requests.length === 0 ? (
+          <p className="text-sm text-white/40">No open requests. Agencies ping the team via the dashboard CTA.</p>
+        ) : (
+          <div className="space-y-2">
+            {requests.map((r) => (
+              <div key={r.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="text-sm font-bold text-white">
+                        {r.workspace_name ?? r.workspace_id.slice(0, 8)}
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#a1faff]/10 text-[#a1faff] font-bold uppercase tracking-wider">
+                        {TOPIC_LABELS[r.topic] ?? r.topic}
+                      </span>
+                      <StatusPill status={r.status} />
+                    </div>
+                    <p className="text-xs text-white/60 line-clamp-2 mb-2">{r.notes}</p>
+                    <div className="flex items-center gap-3 text-[11px] text-white/40">
+                      {r.requester_phone && <span>📱 {r.requester_phone}</span>}
+                      {r.event_date && <span>📅 {new Date(r.event_date).toLocaleDateString('en-IN')}</span>}
+                      {r.budget_paise && (
+                        <span>💰 ₹{(r.budget_paise / 100).toLocaleString('en-IN')}</span>
+                      )}
+                      <span>{new Date(r.created_at).toLocaleDateString('en-IN')}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    {r.status === 'pending' && (
+                      <button
+                        onClick={() => patchReq(r.id, 'accepted')}
+                        disabled={patching === r.id}
+                        className="px-3 py-1.5 rounded-lg bg-[#c39bff] text-black text-xs font-bold hover:bg-[#b48af0] disabled:opacity-40 flex items-center gap-1"
+                      >
+                        <Check size={12} /> Claim
+                      </button>
+                    )}
+                    {r.status === 'accepted' && (
+                      <button
+                        onClick={() => patchReq(r.id, 'in_progress')}
+                        disabled={patching === r.id}
+                        className="px-3 py-1.5 rounded-lg border border-[#a1faff]/40 text-[#a1faff] text-xs font-bold hover:bg-[#a1faff]/10 disabled:opacity-40 flex items-center gap-1"
+                      >
+                        <Play size={12} /> Start
+                      </button>
+                    )}
+                    {(r.status === 'accepted' || r.status === 'in_progress') && (
+                      <>
+                        <button
+                          onClick={() => {
+                            const notes = prompt('Resolution notes (optional):') ?? undefined;
+                            patchReq(r.id, 'completed', notes || undefined);
+                          }}
+                          disabled={patching === r.id}
+                          className="px-3 py-1.5 rounded-lg border border-green-500/40 text-green-400 text-xs font-bold hover:bg-green-500/10 disabled:opacity-40 flex items-center gap-1"
+                        >
+                          <Check size={12} /> Done
+                        </button>
+                        <button
+                          onClick={() => patchReq(r.id, 'cancelled')}
+                          disabled={patching === r.id}
+                          className="px-3 py-1.5 rounded-lg border border-white/15 text-white/50 text-xs hover:text-white hover:border-white/30 disabled:opacity-40 flex items-center gap-1"
+                        >
+                          <X size={12} /> Cancel
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Assisted search */}
       <div className="glass-card rounded-2xl p-6 border border-white/10 space-y-4">
@@ -125,6 +262,21 @@ export default function ConciergePage() {
         <p>Use <code className="text-[#a1faff]">/v1/concierge/bookings</code> with <code className="text-[#a1faff]">client_user_id</code> after confirming the artist with the client on call/WhatsApp.</p>
       </div>
     </div>
+  );
+}
+
+function StatusPill({ status }: { status: ReqStatus }) {
+  const styles: Record<ReqStatus, string> = {
+    pending: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+    accepted: 'bg-[#c39bff]/15 text-[#c39bff] border-[#c39bff]/30',
+    in_progress: 'bg-[#a1faff]/15 text-[#a1faff] border-[#a1faff]/30',
+    completed: 'bg-green-500/15 text-green-300 border-green-500/30',
+    cancelled: 'bg-white/10 text-white/40 border-white/15',
+  };
+  return (
+    <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold uppercase tracking-wider ${styles[status]}`}>
+      {status.replace('_', ' ')}
+    </span>
   );
 }
 
