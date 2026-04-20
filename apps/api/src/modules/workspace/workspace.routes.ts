@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { workspaceService } from './workspace.service.js';
 import { generatePresentationPdf } from './presentation-pdf.service.js';
+import { db } from '../../infrastructure/database.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { validateBody, validateQuery } from '../../middleware/validation.middleware.js';
@@ -84,6 +85,57 @@ export async function workspaceRoutes(app: FastifyInstance) {
       data: workspace,
       errors: [],
     });
+  });
+
+  // ─── Onboarding checklist ───────────────────────────────────
+
+  /**
+   * GET /v1/workspaces/:id/onboarding — Read onboarding state from metadata
+   */
+  app.get('/v1/workspaces/:id/onboarding', {
+    preHandler: [authMiddleware, requirePermission('workspace:read')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const row = await db('workspaces').where({ id }).first('metadata');
+    const state = (row?.metadata?.onboarding as Record<string, unknown> | undefined) ?? {
+      dismissed: false,
+      completed_steps: [],
+    };
+    return reply.send({ success: true, data: state, errors: [] });
+  });
+
+  /**
+   * PATCH /v1/workspaces/:id/onboarding — Update onboarding state
+   * Body: { step?: string, completed?: boolean, dismissed?: boolean }
+   */
+  app.patch('/v1/workspaces/:id/onboarding', {
+    preHandler: [authMiddleware, requirePermission('workspace:manage'), rateLimit('WRITE')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const { step, completed, dismissed } = request.body as {
+      step?: string; completed?: boolean; dismissed?: boolean;
+    };
+
+    const row = await db('workspaces').where({ id }).first('metadata');
+    const metadata = (row?.metadata as Record<string, unknown>) ?? {};
+    const onboarding = (metadata.onboarding as {
+      dismissed?: boolean; completed_steps?: string[];
+    }) ?? { dismissed: false, completed_steps: [] };
+
+    const completedSteps = new Set(onboarding.completed_steps ?? []);
+    if (step && completed === true) completedSteps.add(step);
+    if (step && completed === false) completedSteps.delete(step);
+
+    const next = {
+      dismissed: dismissed ?? onboarding.dismissed ?? false,
+      completed_steps: Array.from(completedSteps),
+    };
+
+    await db('workspaces')
+      .where({ id })
+      .update({ metadata: { ...metadata, onboarding: next } });
+
+    return reply.send({ success: true, data: next, errors: [] });
   });
 
   // ─── Members ────────────────────────────────────────────────

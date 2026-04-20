@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   Circle,
   Sparkles,
+  X,
 } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
 import { ConciergeRequestModal } from '@/components/agency/ConciergeRequestModal';
@@ -51,9 +52,10 @@ export default function EventCompanyDashboard() {
   const [profile, setProfile] = useState<EventCompanyProfile | null>(null);
   const [workspaces, setWorkspaces] = useState<WorkspaceSummary[]>([]);
   const [shortlists, setShortlists] = useState<ShortlistSummary[]>([]);
-  const [agencyKpis, setAgencyKpis] = useState({ deals: 0, templates: 0, unpaidInvoices: 0 });
+  const [agencyKpis, setAgencyKpis] = useState({ deals: 0, templates: 0, unpaidInvoices: 0, briefs: 0 });
   const [loading, setLoading] = useState(true);
   const [conciergeOpen, setConciergeOpen] = useState(false);
+  const [onboardingState, setOnboardingState] = useState<{ dismissed: boolean; completed_steps: string[] }>({ dismissed: false, completed_steps: [] });
 
   useEffect(() => {
     Promise.all([
@@ -72,15 +74,18 @@ export default function EventCompanyDashboard() {
 
       const firstWs = workspacesData[0];
       if (firstWs) {
-        const [dealsRes, templatesRes, invoicesRes] = await Promise.all([
+        const [dealsRes, templatesRes, invoicesRes, onboardingRes] = await Promise.all([
           apiClient<{ rows?: unknown[] } | unknown[]>(`/v1/workspaces/${firstWs.id}/bookings`).catch(() => ({ success: false } as const)),
           apiClient<unknown[]>(`/v1/workspaces/${firstWs.id}/proposal-templates`).catch(() => ({ success: false } as const)),
           apiClient<{ rows: Array<{ status: string }> }>(`/v1/workspaces/${firstWs.id}/gst-invoices`).catch(() => ({ success: false } as const)),
+          apiClient<{ dismissed: boolean; completed_steps: string[] }>(`/v1/workspaces/${firstWs.id}/onboarding`).catch(() => ({ success: false } as const)),
         ]);
         const deals = dealsRes.success ? (Array.isArray(dealsRes.data) ? dealsRes.data.length : (dealsRes.data as { rows?: unknown[] })?.rows?.length ?? 0) : 0;
         const templates = templatesRes.success ? (templatesRes.data?.length ?? 0) : 0;
         const unpaid = invoicesRes.success ? (invoicesRes.data?.rows?.filter((r) => r.status === 'issued').length ?? 0) : 0;
-        setAgencyKpis({ deals, templates, unpaidInvoices: unpaid });
+        const briefs = 0; // Derived from onboarding.completed_steps (no list endpoint)
+        setAgencyKpis({ deals, templates, unpaidInvoices: unpaid, briefs });
+        if (onboardingRes.success && onboardingRes.data) setOnboardingState(onboardingRes.data);
       }
     }).catch(() => {}).finally(() => setLoading(false));
   }, [router]);
@@ -157,31 +162,49 @@ export default function EventCompanyDashboard() {
       </div>
 
       {/* ─── Activation Checklist ─── */}
-      {workspaces.length > 0 && (() => {
+      {workspaces.length > 0 && !onboardingState.dismissed && (() => {
+        const firstWs = workspaces[0];
         const steps = [
-          { done: workspaces.length > 0, label: 'Create workspace', href: '/event-company' },
-          { done: (workspaces[0]?.member_count ?? 0) > 1, label: 'Invite a teammate', href: '/event-company/team' },
-          { done: agencyKpis.deals > 0, label: 'Create your first deal', href: '/event-company/deals' },
-          { done: agencyKpis.templates > 0, label: 'Save a proposal template', href: '/event-company/templates' },
-          { done: agencyKpis.unpaidInvoices > 0 || agencyKpis.deals > 0, label: 'Generate a GST invoice', href: '/event-company/invoices' },
+          { key: 'workspace', done: workspaces.length > 0, label: 'Create workspace', href: '/event-company' },
+          { key: 'first_brief', done: onboardingState.completed_steps.includes('first_brief'), label: 'Create your first brief', href: '/brief' },
+          { key: 'invite_teammate', done: (firstWs?.member_count ?? 0) > 1, label: 'Invite a teammate', href: '/event-company/team' },
+          { key: 'first_deal', done: agencyKpis.deals > 0, label: 'Create your first deal', href: '/event-company/deals' },
+          { key: 'proposal_template', done: agencyKpis.templates > 0, label: 'Save a proposal template', href: '/event-company/templates' },
+          { key: 'gst_invoice', done: agencyKpis.unpaidInvoices > 0 || agencyKpis.deals > 0, label: 'Generate a GST invoice', href: '/event-company/invoices' },
         ];
         const completed = steps.filter((s) => s.done).length;
-        if (completed === steps.length) return null;
+        const allDone = completed === steps.length;
+        const dismiss = async () => {
+          setOnboardingState((s) => ({ ...s, dismissed: true }));
+          if (firstWs) {
+            await apiClient(`/v1/workspaces/${firstWs.id}/onboarding`, {
+              method: 'PATCH',
+              body: JSON.stringify({ dismissed: true }),
+            }).catch(() => {});
+          }
+        };
         return (
           <div className="glass-card rounded-xl p-6 border border-[#c39bff]/20 relative overflow-hidden">
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />
             <div className="relative flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-lg font-display font-bold text-white">Get set up</h2>
+                <h2 className="text-lg font-display font-bold text-white">{allDone ? 'You\u2019re all set' : 'Get set up'}</h2>
                 <p className="text-xs text-white/50">{completed} of {steps.length} complete</p>
               </div>
-              <div className="w-32 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-[#c39bff] to-[#a1faff]" style={{ width: `${(completed / steps.length) * 100}%` }} />
+              <div className="flex items-center gap-3">
+                <div className="w-32 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-[#c39bff] to-[#a1faff]" style={{ width: `${(completed / steps.length) * 100}%` }} />
+                </div>
+                {allDone && (
+                  <button onClick={dismiss} className="p-1 rounded-md hover:bg-white/5 transition-colors" aria-label="Dismiss checklist">
+                    <X className="w-4 h-4 text-white/40 hover:text-white/70" />
+                  </button>
+                )}
               </div>
             </div>
             <ul className="relative space-y-2">
               {steps.map((s) => (
-                <li key={s.label}>
+                <li key={s.key}>
                   <Link href={s.href} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors group">
                     {s.done ? (
                       <CheckCircle2 className="w-4 h-4 text-[#a1faff] flex-shrink-0" />
