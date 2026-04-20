@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { TrendingUp, Users, CreditCard, AlertTriangle, Activity, Crown, Search } from 'lucide-react';
+import { TrendingUp, Users, CreditCard, AlertTriangle, Activity, Crown, Search, Inbox } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
 interface FunnelData {
@@ -83,6 +83,7 @@ export default function AdminAnalyticsPage() {
   const [funnel, setFunnel] = useState<FunnelData | null>(null);
   const [revenue, setRevenue] = useState<RevenueData | null>(null);
   const [agencies, setAgencies] = useState<AgencyRow[]>([]);
+  const [conciergeQueue, setConciergeQueue] = useState<{ pending: number; active: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [planFilter, setPlanFilter] = useState<'all' | 'free' | 'pro' | 'enterprise'>('all');
@@ -90,14 +91,21 @@ export default function AdminAnalyticsPage() {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const [f, r, a] = await Promise.all([
+      const [f, r, a, c] = await Promise.all([
         apiClient<FunnelData>('/v1/admin/analytics/funnel'),
         apiClient<RevenueData>('/v1/admin/analytics/revenue'),
         apiClient<AgencyRow[]>('/v1/admin/analytics/agencies?limit=100'),
+        apiClient<Array<{ status: string }>>('/v1/admin/concierge/requests'),
       ]);
       if (f.success) setFunnel(f.data ?? null);
       if (r.success) setRevenue(r.data ?? null);
       if (a.success) setAgencies(Array.isArray(a.data) ? a.data : []);
+      if (c.success && Array.isArray(c.data)) {
+        setConciergeQueue({
+          pending: c.data.filter((x) => x.status === 'pending').length,
+          active: c.data.filter((x) => x.status === 'accepted' || x.status === 'in_progress').length,
+        });
+      }
       setLoading(false);
     })();
   }, []);
@@ -143,7 +151,7 @@ export default function AdminAnalyticsPage() {
       </section>
 
       {/* Revenue stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-8">
         <Stat icon={Crown} label="Pro" value={String(revenue?.by_plan?.pro?.count ?? 0)}
           sub={revenue?.by_plan?.pro ? rupeesShort(revenue.by_plan.pro.mrr_paise) + ' MRR' : '—'} tone="purple" />
         <Stat icon={Crown} label="Enterprise" value={String(revenue?.by_plan?.enterprise?.count ?? 0)}
@@ -153,6 +161,10 @@ export default function AdminAnalyticsPage() {
           sub={(revenue?.scheduled_cancels ?? 0) > 0 ? `${revenue?.scheduled_cancels} scheduled` : 'no cancels scheduled'}
           tone={revenue?.churned_30d ? 'warn' : 'default'} />
         <Stat icon={Activity} label="Trials" value={String(revenue?.active_trials ?? 0)} sub="in 14-day window" tone="gold" />
+        <Stat icon={Inbox} label="Concierge queue"
+          value={String((conciergeQueue?.pending ?? 0) + (conciergeQueue?.active ?? 0))}
+          sub={conciergeQueue ? `${conciergeQueue.pending} pending · ${conciergeQueue.active} active` : '—'}
+          tone={conciergeQueue && conciergeQueue.pending > 3 ? 'warn' : 'cyan'} />
       </div>
 
       {/* Funnel */}
