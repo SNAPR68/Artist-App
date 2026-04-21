@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../../lib/api-client';
+import VoiceFillButton from '../../../../components/voice/VoiceFillButton';
 
 export default function AgentOnboarding() {
   const router = useRouter();
@@ -83,7 +84,25 @@ export default function AgentOnboarding() {
               <div className="bg-[#ff6b9d]/10 border border-[#ff6b9d]/30 text-[#ff6b9d] px-4 py-3 rounded-lg text-sm font-medium">{error}</div>
             )}
 
-            <h2 className="text-lg font-bold text-white">Setup Your Agency Profile</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-white">Setup Your Agency Profile</h2>
+              <VoiceFillButton
+                formContext={{
+                  page: 'agency profile setup',
+                  fields: [
+                    { name: 'agency_name', label: 'Agency Name', type: 'text' },
+                    { name: 'contact_person', label: 'Contact Person', type: 'text' },
+                    { name: 'phone', label: 'Phone', type: 'text' },
+                    { name: 'email', label: 'Email', type: 'text' },
+                    { name: 'city', label: 'City', type: 'text' },
+                    { name: 'bio', label: 'Bio', type: 'text' },
+                  ],
+                }}
+                onFieldUpdate={(fields) => {
+                  setForm((prev) => ({ ...prev, ...fields }));
+                }}
+              />
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
