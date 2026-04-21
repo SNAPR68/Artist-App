@@ -93,33 +93,44 @@ export class NotificationService {
   }
 
   private async sendWhatsApp(phone: string, template: string, variables: Record<string, string>) {
-    // Gupshup WhatsApp Business API integration
-    // In development, log to console
+    // Interakt WhatsApp Business API
     if (process.env.NODE_ENV === 'development') {
       console.log(`[WhatsApp] To: ${maskPhoneNumber(phone)}, Template: ${template}`, variables);
       return { status: 'sent', channel: 'whatsapp' };
     }
 
-    const apiKey = process.env.GUPSHUP_API_KEY;
+    const apiKey = process.env.INTERAKT_API_KEY;
     if (!apiKey) {
       console.log(`[WHATSAPP BYPASS] To: ${maskPhoneNumber(phone)}, Template: ${template}`, variables);
       return { status: 'bypassed', channel: 'whatsapp' };
     }
 
-    const response = await fetch('https://api.gupshup.io/wa/api/v1/template/msg', {
+    // Normalise phone: strip leading +, ensure 91 country code
+    const e164 = phone.replace(/^\+/, '').replace(/^0/, '91');
+
+    const response = await fetch('https://api.interakt.ai/v1/public/message/', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        apikey: apiKey,
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${Buffer.from(apiKey).toString('base64')}`,
       },
-      body: new URLSearchParams({
-        channel: 'whatsapp',
-        source: process.env.GUPSHUP_SOURCE_NUMBER ?? '',
-        destination: phone,
-        'src.name': process.env.GUPSHUP_APP_NAME ?? 'ArtistBooking',
-        template: JSON.stringify({ id: template, params: Object.values(variables) }),
+      body: JSON.stringify({
+        countryCode: '+91',
+        phoneNumber: e164.startsWith('91') ? e164.slice(2) : e164,
+        callbackData: template,
+        type: 'Template',
+        template: {
+          name: template,
+          languageCode: 'en',
+          bodyValues: Object.values(variables),
+        },
       }),
     });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Interakt error ${response.status}: ${text}`);
+    }
 
     return response.json();
   }
@@ -242,14 +253,14 @@ export class NotificationService {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        from: process.env.EMAIL_FROM ?? 'Artist Booking <noreply@artistbooking.in>',
+        from: process.env.EMAIL_FROM ?? 'GRID <noreply@grid.live>',
         to: [to],
         subject,
         html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;">
           <h2 style="color:#6366f1;">${subject}</h2>
           <p style="color:#374151;line-height:1.6;">${body}</p>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;" />
-          <p style="color:#9ca3af;font-size:12px;">Artist Booking Platform · India's Live Entertainment Marketplace</p>
+          <p style="color:#9ca3af;font-size:12px;">GRID · India&apos;s Live Entertainment OS</p>
         </div>`,
       }),
     });
