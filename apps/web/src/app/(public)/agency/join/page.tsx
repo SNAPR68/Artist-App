@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
@@ -30,7 +30,7 @@ const TEAM_SIZES = ['Just me', '2-5', '6-15', '16-50', '50+'];
 
 type Step = 'info' | 'team' | 'done';
 
-export default function AgencyJoinPage() {
+function AgencyJoinContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated } = useAuthStore();
@@ -118,7 +118,7 @@ export default function AgencyJoinPage() {
     }
 
     setSubmitting(false);
-  }, [companyName, companyType, city, teamSize, eventsPerMonth, isAuthenticated, router]);
+  }, [companyName, companyType, city, teamSize, eventsPerMonth, isAuthenticated, router, referralCode]);
 
   const handleInviteTeam = useCallback(async () => {
     if (!workspaceId) return;
@@ -400,5 +400,13 @@ export default function AgencyJoinPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function AgencyJoinPage() {
+  return (
+    <Suspense fallback={null}>
+      <AgencyJoinContent />
+    </Suspense>
   );
 }
