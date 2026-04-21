@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Search, Users, TrendingUp, Briefcase, Phone, Inbox, Check, X, Play } from 'lucide-react';
+import { Search, Users, TrendingUp, Briefcase, Phone, Inbox, Check, X, Play, AlertTriangle, Clock } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
 interface ConciergeStats {
@@ -22,6 +22,17 @@ interface ArtistHit {
 }
 
 type ReqStatus = 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
+type SlaFilter = 'all' | 'breaching' | 'pending' | 'active';
+
+interface SlaMetrics {
+  pending_count: number;
+  breaching_24h: number;
+  breaching_48h: number;
+  active_count: number;
+  avg_accept_hours: number | null;
+  avg_resolve_hours: number | null;
+  completed_7d: number;
+}
 
 interface ConciergeReq {
   id: string;
@@ -57,6 +68,8 @@ export default function ConciergePage() {
   const [requests, setRequests] = useState<ConciergeReq[]>([]);
   const [reqLoading, setReqLoading] = useState(true);
   const [patching, setPatching] = useState<string | null>(null);
+  const [sla, setSla] = useState<SlaMetrics | null>(null);
+  const [slaFilter, setSlaFilter] = useState<SlaFilter>('all');
 
   const loadStats = useCallback(async () => {
     const res = await apiClient<ConciergeStats>('/v1/concierge/stats');
@@ -66,12 +79,27 @@ export default function ConciergePage() {
 
   const loadRequests = useCallback(async () => {
     setReqLoading(true);
-    const res = await apiClient<ConciergeReq[]>('/v1/admin/concierge/requests');
-    if (res.success && Array.isArray(res.data)) setRequests(res.data);
+    const [reqRes, slaRes] = await Promise.all([
+      apiClient<ConciergeReq[]>('/v1/admin/concierge/requests'),
+      apiClient<SlaMetrics>('/v1/admin/concierge/sla').catch(() => ({ success: false } as const)),
+    ]);
+    if (reqRes.success && Array.isArray(reqRes.data)) setRequests(reqRes.data);
+    if (slaRes.success) setSla(slaRes.data);
     setReqLoading(false);
   }, []);
 
   useEffect(() => { loadStats(); loadRequests(); }, [loadStats, loadRequests]);
+
+  const filteredRequests = requests.filter((r) => {
+    if (slaFilter === 'all') return true;
+    if (slaFilter === 'pending') return r.status === 'pending';
+    if (slaFilter === 'active') return r.status === 'accepted' || r.status === 'in_progress';
+    if (slaFilter === 'breaching') {
+      const ageHours = (Date.now() - new Date(r.created_at).getTime()) / 3_600_000;
+      return r.status === 'pending' && ageHours >= 48;
+    }
+    return true;
+  });
 
   const patchReq = async (id: string, status: ReqStatus, resolution_notes?: string) => {
     setPatching(id);
@@ -119,9 +147,37 @@ export default function ConciergePage() {
         </div>
       )}
 
+      {/* SLA Metrics */}
+      {sla && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <StatCard
+            icon={AlertTriangle}
+            label="Breaching >48h"
+            value={String(sla.breaching_48h)}
+            tone={sla.breaching_48h > 0 ? 'danger' : 'default'}
+          />
+          <StatCard
+            icon={Clock}
+            label="Breaching >24h"
+            value={String(sla.breaching_24h)}
+            tone={sla.breaching_24h > 0 ? 'warn' : 'default'}
+          />
+          <StatCard
+            icon={TrendingUp}
+            label="Avg accept time"
+            value={sla.avg_accept_hours != null ? `${sla.avg_accept_hours}h` : '—'}
+          />
+          <StatCard
+            icon={Check}
+            label="Resolved (7d)"
+            value={String(sla.completed_7d)}
+          />
+        </div>
+      )}
+
       {/* Requests Queue */}
       <div className="glass-card rounded-2xl p-6 border border-white/10 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-3">
           <h2 className="text-sm font-bold text-white flex items-center gap-2">
             <Inbox size={14} className="text-[#c39bff]" /> Agency Requests Queue
             {requests.length > 0 && (
@@ -130,19 +186,48 @@ export default function ConciergePage() {
               </span>
             )}
           </h2>
-          <button onClick={loadRequests} className="text-xs text-white/40 hover:text-white">
-            Refresh
-          </button>
+          <div className="flex items-center gap-1">
+            {(['all', 'breaching', 'pending', 'active'] as SlaFilter[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => setSlaFilter(f)}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider transition-colors ${
+                  slaFilter === f
+                    ? 'bg-[#c39bff] text-black'
+                    : 'text-white/50 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+            <button onClick={loadRequests} className="ml-2 text-xs text-white/40 hover:text-white">
+              Refresh
+            </button>
+          </div>
         </div>
 
         {reqLoading ? (
           <p className="text-sm text-white/40">Loading queue…</p>
-        ) : requests.length === 0 ? (
-          <p className="text-sm text-white/40">No open requests. Agencies ping the team via the dashboard CTA.</p>
+        ) : filteredRequests.length === 0 ? (
+          <p className="text-sm text-white/40">
+            {slaFilter === 'breaching'
+              ? 'No SLA breaches. Queue is healthy.'
+              : 'No open requests. Agencies ping the team via the dashboard CTA.'}
+          </p>
         ) : (
           <div className="space-y-2">
-            {requests.map((r) => (
-              <div key={r.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            {filteredRequests.map((r) => {
+              const ageHours = (Date.now() - new Date(r.created_at).getTime()) / 3_600_000;
+              const isPending = r.status === 'pending';
+              const breach48 = isPending && ageHours >= 48;
+              const breach24 = isPending && ageHours >= 24 && ageHours < 48;
+              const rowBorder = breach48
+                ? 'border-red-500/40 bg-red-500/[0.04]'
+                : breach24
+                ? 'border-amber-500/40 bg-amber-500/[0.04]'
+                : 'border-white/10 bg-white/[0.02]';
+              return (
+              <div key={r.id} className={`rounded-xl border ${rowBorder} p-4`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -153,6 +238,16 @@ export default function ConciergePage() {
                         {TOPIC_LABELS[r.topic] ?? r.topic}
                       </span>
                       <StatusPill status={r.status} />
+                      {breach48 && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 font-bold uppercase tracking-wider flex items-center gap-1">
+                          <AlertTriangle size={10} /> {Math.floor(ageHours)}h
+                        </span>
+                      )}
+                      {breach24 && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold uppercase tracking-wider flex items-center gap-1">
+                          <Clock size={10} /> {Math.floor(ageHours)}h
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-white/60 line-clamp-2 mb-2">{r.notes}</p>
                     <div className="flex items-center gap-3 text-[11px] text-white/40">
@@ -207,7 +302,8 @@ export default function ConciergePage() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -280,14 +376,17 @@ function StatusPill({ status }: { status: ReqStatus }) {
   );
 }
 
-function StatCard({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+function StatCard({ icon: Icon, label, value, tone = 'default' }: { icon: React.ElementType; label: string; value: string; tone?: 'default' | 'warn' | 'danger' }) {
+  const toneBorder = tone === 'danger' ? 'border-red-500/40' : tone === 'warn' ? 'border-amber-500/40' : 'border-white/10';
+  const toneIcon = tone === 'danger' ? 'text-red-400' : tone === 'warn' ? 'text-amber-400' : 'text-white/40';
+  const toneValue = tone === 'danger' ? 'text-red-300' : tone === 'warn' ? 'text-amber-300' : 'text-white';
   return (
-    <div className="glass-card rounded-xl p-4 border border-white/10">
-      <div className="flex items-center gap-2 text-white/40">
+    <div className={`glass-card rounded-xl p-4 border ${toneBorder}`}>
+      <div className={`flex items-center gap-2 ${toneIcon}`}>
         <Icon size={12} />
         <span className="text-[10px] uppercase tracking-widest font-bold">{label}</span>
       </div>
-      <p className="text-2xl font-bold text-white mt-2">{value}</p>
+      <p className={`text-2xl font-bold ${toneValue} mt-2`}>{value}</p>
     </div>
   );
 }

@@ -167,6 +167,7 @@ export async function conciergeRoutes(app: FastifyInstance) {
 
   /**
    * GET /v1/admin/concierge/requests — Admin queue (all pending/active requests).
+   * Sorted by oldest pending first so SLA breaches surface at the top.
    */
   app.get('/v1/admin/concierge/requests', {
     preHandler: [authMiddleware, requirePermission('concierge:manage')],
@@ -180,8 +181,49 @@ export async function conciergeRoutes(app: FastifyInstance) {
         'w.name as workspace_name',
         'u.phone as requester_phone',
       )
-      .orderBy('cr.created_at', 'desc');
+      .orderByRaw(`
+        CASE cr.status
+          WHEN 'pending' THEN 1
+          WHEN 'accepted' THEN 2
+          WHEN 'in_progress' THEN 3
+          ELSE 4
+        END ASC,
+        cr.created_at ASC
+      `);
     return reply.send({ success: true, data: rows, errors: [] });
+  });
+
+  /**
+   * GET /v1/admin/concierge/sla — SLA metrics for concierge queue.
+   */
+  app.get('/v1/admin/concierge/sla', {
+    preHandler: [authMiddleware, requirePermission('concierge:manage')],
+  }, async (_request, reply) => {
+    const result = await db.raw(`
+      SELECT
+        COUNT(*) FILTER (WHERE status = 'pending')::int AS pending_count,
+        COUNT(*) FILTER (WHERE status = 'pending' AND created_at < NOW() - INTERVAL '24 hours')::int AS breaching_24h,
+        COUNT(*) FILTER (WHERE status = 'pending' AND created_at < NOW() - INTERVAL '48 hours')::int AS breaching_48h,
+        COUNT(*) FILTER (WHERE status IN ('accepted', 'in_progress'))::int AS active_count,
+        ROUND(AVG(EXTRACT(EPOCH FROM (accepted_at - created_at)) / 3600)::numeric, 1) AS avg_accept_hours,
+        ROUND(AVG(EXTRACT(EPOCH FROM (completed_at - created_at)) / 3600)::numeric, 1) AS avg_resolve_hours,
+        COUNT(*) FILTER (WHERE status = 'completed' AND completed_at > NOW() - INTERVAL '7 days')::int AS completed_7d
+      FROM concierge_requests
+    `);
+    const row = result.rows?.[0] ?? {};
+    return reply.send({
+      success: true,
+      data: {
+        pending_count: row.pending_count ?? 0,
+        breaching_24h: row.breaching_24h ?? 0,
+        breaching_48h: row.breaching_48h ?? 0,
+        active_count: row.active_count ?? 0,
+        avg_accept_hours: row.avg_accept_hours != null ? Number(row.avg_accept_hours) : null,
+        avg_resolve_hours: row.avg_resolve_hours != null ? Number(row.avg_resolve_hours) : null,
+        completed_7d: row.completed_7d ?? 0,
+      },
+      errors: [],
+    });
   });
 
   /**
