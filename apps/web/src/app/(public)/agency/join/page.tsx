@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/auth';
@@ -32,8 +32,10 @@ type Step = 'info' | 'team' | 'done';
 
 export default function AgencyJoinPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated } = useAuthStore();
   const [step, setStep] = useState<Step>('info');
+  const [referralCode] = useState<string | null>(() => searchParams.get('ref'));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
@@ -99,6 +101,13 @@ export default function AgencyJoinPage() {
           team_size: teamSize,
           events_per_month: eventsPerMonth,
         });
+        // Apply referral code silently if present
+        if (referralCode) {
+          apiClient('/v1/referral/apply', {
+            method: 'POST',
+            body: JSON.stringify({ referral_code: referralCode }),
+          }).catch(() => {});
+        }
         setStep('team');
       } else {
         setError(res.errors?.[0]?.message || 'Failed to create workspace');

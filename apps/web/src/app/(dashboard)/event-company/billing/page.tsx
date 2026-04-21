@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Sparkles, Check, X, CreditCard, Zap, Crown } from 'lucide-react';
+import { Sparkles, Check, X, CreditCard, Zap, Crown, Gift, Copy, CheckCircle2 } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
 declare global {
@@ -89,14 +89,18 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true);
   const [checkingOut, setCheckingOut] = useState<PlanKey | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [referral, setReferral] = useState<{ referral_code: string; credits_paise: number; referrals_count: number } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const refresh = useCallback(async () => {
-    const [s, inv] = await Promise.all([
+    const [s, inv, ref] = await Promise.all([
       apiClient<StatusData>('/v1/subscription/status'),
       apiClient<InvoiceRow[]>('/v1/subscription/invoices'),
+      apiClient<{ referral_code: string; credits_paise: number; referrals_count: number }>('/v1/referral').catch(() => ({ success: false } as const)),
     ]);
     if (s.success) setStatus(s.data ?? null);
     if (inv.success) setInvoices(Array.isArray(inv.data) ? inv.data : []);
+    if (ref.success && ref.data) setReferral(ref.data);
   }, []);
 
   useEffect(() => { (async () => { setLoading(true); await refresh(); setLoading(false); })(); }, [refresh]);
@@ -318,6 +322,48 @@ export default function BillingPage() {
           </div>
         )}
       </section>
+
+      {/* ─── Referral ─── */}
+      {referral && (
+        <section>
+          <h2 className="font-display text-xl font-extrabold text-white mb-4">Refer &amp; earn</h2>
+          <div className="glass-card rounded-xl p-6 border border-[#c39bff]/20 relative overflow-hidden">
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#c39bff]/10 blur-[80px] rounded-full pointer-events-none" />
+            <div className="relative flex flex-col md:flex-row md:items-center gap-6">
+              <div className="w-12 h-12 rounded-xl bg-[#c39bff]/20 border border-[#c39bff]/30 flex items-center justify-center flex-shrink-0">
+                <Gift className="w-6 h-6 text-[#c39bff]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-bold text-white mb-1">Get ₹500 credit per referral</h3>
+                <p className="text-sm text-white/50">Share your code — both you and the new agency get ₹500 off your next bill when they sign up.</p>
+                {referral.credits_paise > 0 && (
+                  <p className="text-xs text-[#a1faff] mt-1 font-semibold">
+                    You have ₹{(referral.credits_paise / 100).toLocaleString('en-IN')} in credits · {referral.referrals_count} {referral.referrals_count === 1 ? 'referral' : 'referrals'}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 font-mono text-sm font-bold text-white tracking-widest">
+                  {referral.referral_code}
+                </div>
+                <button
+                  onClick={() => {
+                    const url = `${window.location.origin}/agency/join?ref=${referral.referral_code}`;
+                    navigator.clipboard.writeText(url).then(() => {
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    });
+                  }}
+                  className="px-3 py-2.5 rounded-lg bg-[#c39bff] text-black font-bold text-sm hover:bg-[#b48af0] transition-colors flex items-center gap-1.5"
+                >
+                  {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {copied ? 'Copied!' : 'Copy link'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="mt-10 text-xs text-white/30 flex items-center gap-2">
         <X size={12} />

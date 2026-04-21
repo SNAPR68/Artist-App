@@ -58,6 +58,7 @@ import { decisionEngineRoutes } from './modules/decision-engine/decision-engine.
 import { vaultRoutes } from './modules/vault/vault.routes.js';
 import { subscriptionRoutes } from './modules/subscription/subscription.routes.js';
 import { adminAnalyticsRoutes } from './modules/admin/admin-analytics.routes.js';
+import { referralRoutes } from './modules/referral/referral.routes.js';
 import { startCronJobs } from './infrastructure/cron.js';
 
 const app = Fastify({
@@ -276,6 +277,7 @@ await app.register(decisionEngineRoutes);
 await app.register(vaultRoutes);
 await app.register(subscriptionRoutes);
 await app.register(adminAnalyticsRoutes);
+await app.register(referralRoutes);
 
 // ─── Graceful Shutdown ───────────────────────────────────────
 async function shutdown(signal: string) {
