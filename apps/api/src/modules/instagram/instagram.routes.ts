@@ -80,7 +80,7 @@ export async function instagramRoutes(app: FastifyInstance) {
         const result = await instagramService.connect(profile.id, userId, code);
         const webBase = process.env.PUBLIC_WEB_URL ?? 'http://localhost:3100';
         return reply.redirect(
-          `${webBase}/artist/settings?instagram=connected&username=${encodeURIComponent(result.ig_username)}`,
+          `${webBase}/artist/settings/integrations?instagram=connected&username=${encodeURIComponent(result.ig_username)}`,
         );
       } catch (e: any) {
         return reply.status(400).send({
