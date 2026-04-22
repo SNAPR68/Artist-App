@@ -78,7 +78,7 @@ check "GET /v1/vendors?category=av" "$(curl -s -o /dev/null -w '%{http_code}' "$
 # microsite public read
 SLUG=$(curl -s "$API/v1/artists?limit=1" | node -e 'let s="";process.stdin.on("data",c=>s+=c).on("end",()=>{try{console.log(JSON.parse(s).data?.[0]?.slug||"")}catch{console.log("")}})')
 if [ -n "$SLUG" ]; then
-  check "GET /v1/public/a/$SLUG (microsite)" "$(curl -s -o /dev/null -w '%{http_code}' "$API/v1/public/a/$SLUG")"
+  check "GET /v1/artists/by-slug/$SLUG (microsite)" "$(curl -s -o /dev/null -w '%{http_code}' "$API/v1/artists/by-slug/$SLUG")"
 fi
 
 # Instagram OAuth entry URL
