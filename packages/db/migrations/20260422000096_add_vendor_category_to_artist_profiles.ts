@@ -37,8 +37,8 @@ export async function up(knex: Knex): Promise<void> {
   `);
 
   await knex.raw(`
-    CREATE INDEX IF NOT EXISTS artist_profiles_category_city_idx
-      ON artist_profiles(category, city);
+    CREATE INDEX IF NOT EXISTS artist_profiles_category_base_city_idx
+      ON artist_profiles(category, base_city);
   `);
 }
 
