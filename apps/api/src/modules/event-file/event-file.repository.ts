@@ -73,7 +73,7 @@ export class EventFileRepository {
         'ap.stage_name',
         'ap.category',
         'ap.base_city',
-        'b.status as booking_status',
+        'b.state as booking_status',
         'b.agreed_amount as booking_amount',
       );
 
