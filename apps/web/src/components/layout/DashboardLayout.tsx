@@ -28,6 +28,8 @@ import {
   Search,
   Bell,
   LogOut,
+  FolderKanban,
+  Store,
   Sparkle,
 } from 'lucide-react';
 
@@ -76,16 +78,15 @@ const ADMIN_NAV: NavItem[] = [
 
 const EVENT_COMPANY_NAV: NavItem[] = [
   { href: '/event-company', labelKey: 'nav.home', icon: <Home size={18} /> },
+  { href: '/event-company/event-files', labelKey: 'nav.eventFiles', icon: <FolderKanban size={18} /> },
+  { href: '/event-company/vendors', labelKey: 'nav.vendors', icon: <Store size={18} /> },
   { href: '/event-company/deals', labelKey: 'nav.deals', icon: <Kanban size={18} /> },
   { href: '/client/bookings', labelKey: 'nav.bookings', icon: <Calendar size={18} /> },
-  { href: '/gigs', labelKey: 'nav.gigs', icon: <Target size={18} /> },
   { href: '/client/workspace', labelKey: 'nav.workspace', icon: <Building2 size={18} /> },
   { href: '/event-company/team', labelKey: 'nav.team', icon: <Users size={18} /> },
   { href: '/event-company/templates', labelKey: 'nav.templates', icon: <FileText size={18} /> },
   { href: '/event-company/invoices', labelKey: 'nav.invoices', icon: <Receipt size={18} /> },
   { href: '/event-company/billing', labelKey: 'nav.billing', icon: <CreditCard size={18} /> },
-  { href: '/client/recommendations', labelKey: 'nav.discover', icon: <Sparkles size={18} /> },
-  { href: '/search', labelKey: 'nav.search', icon: <Search size={18} /> },
 ];
 
 function getNavItems(role?: string): NavItem[] {

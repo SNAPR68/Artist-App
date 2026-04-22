@@ -24,6 +24,10 @@ import {
   Download,
   Plus,
   CheckCircle2,
+  Pencil,
+  Trash2,
+  Loader2,
+  X,
   type LucideIcon,
 } from 'lucide-react';
 import { apiClient } from '../../../../../lib/api-client';
@@ -408,39 +412,341 @@ function RiderTab({ fileId }: { fileId: string }) {
 }
 
 // ─── BOQ tab ─────────────────────────────────────────────────────────────────
-interface BOQData { pdf_url?: string; xlsx_url?: string }
+interface BOQItem {
+  id: string;
+  category: string;
+  description: string;
+  quantity: number;
+  unit_price_inr: number;
+  gst_rate_pct: number | null;
+  sort_order: number;
+  vendor_profile_id: string | null;
+}
+interface BOQDoc { pdf_url?: string; xlsx_url?: string }
+
+const CATEGORY_OPTIONS = ['artist', 'av', 'photo', 'decor', 'license', 'promoters', 'transport', 'other'];
+
+const EMPTY_FORM = { category: 'artist', description: '', quantity: 1, unit_price_inr: 0, gst_rate_pct: 18 };
+
+function boqTotal(items: BOQItem[]): number {
+  return items.reduce((sum, it) => {
+    const base = it.quantity * it.unit_price_inr;
+    const gst = base * ((it.gst_rate_pct ?? 0) / 100);
+    return sum + base + gst;
+  }, 0);
+}
+
 function BOQTab({ fileId }: { fileId: string }) {
-  const [data, setData] = useState<BOQData | null>(null);
+  const [items, setItems] = useState<BOQItem[]>([]);
+  const [doc, setDoc] = useState<BOQDoc | null>(null);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [form, setForm] = useState({ ...EMPTY_FORM });
+  const [saving, setSaving] = useState(false);
+
+  async function refresh() {
+    const [itemsRes, docRes] = await Promise.all([
+      apiClient<BOQItem[]>(`/v1/event-files/${fileId}/boq/items`),
+      apiClient<BOQDoc>(`/v1/event-files/${fileId}/boq`),
+    ]);
+    if (itemsRes.success) setItems((itemsRes.data as BOQItem[] | null) ?? []);
+    if (docRes.success) setDoc(docRes.data as BOQDoc | null);
+  }
 
   useEffect(() => {
-    apiClient<BOQData>(`/v1/event-files/${fileId}/boq`)
-      .then((res) => res.success && setData(res.data))
-      .finally(() => setLoading(false));
+    refresh().finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileId]);
 
-  if (loading) return <div className="nocturne-skeleton h-48 rounded-xl" />;
+  async function handleSeed() {
+    setSeeding(true);
+    try {
+      await apiClient(`/v1/event-files/${fileId}/boq/seed`, { method: 'POST' });
+      await refresh();
+    } catch { /* silent */ } finally { setSeeding(false); }
+  }
+
+  async function handleGenerate() {
+    setGenerating(true);
+    try {
+      await apiClient(`/v1/event-files/${fileId}/boq`, { method: 'POST' });
+      await refresh();
+    } catch { /* silent */ } finally { setGenerating(false); }
+  }
+
+  async function handleAdd() {
+    setSaving(true);
+    try {
+      await apiClient(`/v1/event-files/${fileId}/boq/items`, {
+        method: 'POST',
+        body: JSON.stringify({ ...form, quantity: Number(form.quantity), unit_price_inr: Number(form.unit_price_inr), gst_rate_pct: Number(form.gst_rate_pct) }),
+      });
+      setShowAdd(false);
+      setForm({ ...EMPTY_FORM });
+      await refresh();
+    } catch { /* silent */ } finally { setSaving(false); }
+  }
+
+  async function handleUpdate(id: string) {
+    setSaving(true);
+    try {
+      await apiClient(`/v1/event-files/${fileId}/boq/items/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ ...form, quantity: Number(form.quantity), unit_price_inr: Number(form.unit_price_inr), gst_rate_pct: Number(form.gst_rate_pct) }),
+      });
+      setEditId(null);
+      await refresh();
+    } catch { /* silent */ } finally { setSaving(false); }
+  }
+
+  async function handleDelete(id: string) {
+    await apiClient(`/v1/event-files/${fileId}/boq/items/${id}`, { method: 'DELETE' });
+    setItems((prev) => prev.filter((it) => it.id !== id));
+  }
+
+  function startEdit(item: BOQItem) {
+    setEditId(item.id);
+    setShowAdd(false);
+    setForm({
+      category: item.category,
+      description: item.description,
+      quantity: item.quantity,
+      unit_price_inr: item.unit_price_inr,
+      gst_rate_pct: item.gst_rate_pct ?? 18,
+    });
+  }
+
+  if (loading) return <div className="nocturne-skeleton h-64 rounded-xl" />;
+
+  const grandTotal = boqTotal(items);
 
   return (
-    <div className="glass-card rounded-xl p-8 border border-white/5">
-      <h3 className="font-display text-xl font-extrabold tracking-tight mb-4">Bill of Quantities</h3>
-      <p className="text-white/50 text-sm mb-6">Line-item budget rollup across all vendors.</p>
-      {data?.pdf_url || data?.xlsx_url ? (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-display text-xl font-extrabold tracking-tight">Bill of Quantities</h3>
+          <p className="text-white/50 text-sm mt-0.5">Line-item budget rollup across all vendors.</p>
+        </div>
+        <div className="flex gap-2">
+          {items.length === 0 && (
+            <button
+              onClick={handleSeed}
+              disabled={seeding}
+              className="btn-nocturne-secondary flex items-center gap-2 text-sm px-4 py-2 rounded-lg"
+            >
+              {seeding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Receipt className="w-3.5 h-3.5" />}
+              Seed from Roster
+            </button>
+          )}
+          <button
+            onClick={() => { setShowAdd(true); setEditId(null); setForm({ ...EMPTY_FORM }); }}
+            className="btn-nocturne-secondary flex items-center gap-2 text-sm px-4 py-2 rounded-lg"
+          >
+            <Plus className="w-3.5 h-3.5" /> Add Line
+          </button>
+          {items.length > 0 && (
+            <button
+              onClick={handleGenerate}
+              disabled={generating}
+              className="btn-nocturne-primary flex items-center gap-2 text-sm px-4 py-2 rounded-lg"
+            >
+              {generating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
+              Generate BOQ
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Add row form */}
+      {showAdd && (
+        <BOQItemForm
+          form={form}
+          setForm={setForm}
+          saving={saving}
+          onSave={handleAdd}
+          onCancel={() => setShowAdd(false)}
+          title="Add Line Item"
+        />
+      )}
+
+      {/* Line items */}
+      {items.length === 0 && !showAdd ? (
+        <div className="glass-card rounded-xl p-12 text-center border border-white/5">
+          <Receipt className="w-10 h-10 text-[#c39bff] mx-auto mb-4" />
+          <h3 className="font-display text-xl font-extrabold">No line items yet</h3>
+          <p className="text-white/50 mt-2 text-sm">Seed from your vendor roster or add items manually.</p>
+        </div>
+      ) : (
+        <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-white/5 text-white/40 text-xs tracking-widest uppercase">
+                <th className="text-left p-4">Category</th>
+                <th className="text-left p-4">Description</th>
+                <th className="text-right p-4">Qty</th>
+                <th className="text-right p-4">Unit Price</th>
+                <th className="text-right p-4">GST %</th>
+                <th className="text-right p-4">Total (incl. GST)</th>
+                <th className="p-4 w-20" />
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item) => {
+                const base = item.quantity * item.unit_price_inr;
+                const gst = base * ((item.gst_rate_pct ?? 0) / 100);
+                const lineTotal = base + gst;
+                return editId === item.id ? (
+                  <tr key={item.id} className="border-b border-white/5 bg-white/[0.02]">
+                    <td colSpan={7} className="p-4">
+                      <BOQItemForm
+                        form={form}
+                        setForm={setForm}
+                        saving={saving}
+                        onSave={() => handleUpdate(item.id)}
+                        onCancel={() => setEditId(null)}
+                        title="Edit Line Item"
+                      />
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={item.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition">
+                    <td className="p-4">
+                      <span className="nocturne-chip text-xs capitalize">{item.category}</span>
+                    </td>
+                    <td className="p-4 text-white/80">{item.description}</td>
+                    <td className="p-4 text-right text-white/60">{item.quantity}</td>
+                    <td className="p-4 text-right text-white/60">₹{item.unit_price_inr.toLocaleString('en-IN')}</td>
+                    <td className="p-4 text-right text-white/60">{item.gst_rate_pct ?? 0}%</td>
+                    <td className="p-4 text-right font-semibold text-[#a1faff]">
+                      ₹{lineTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => startEdit(item)} className="text-white/30 hover:text-white transition">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleDelete(item.id)} className="text-white/30 hover:text-red-400 transition">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            {items.length > 0 && (
+              <tfoot>
+                <tr className="border-t border-white/10 bg-white/[0.02]">
+                  <td colSpan={5} className="p-4 text-right text-white/40 text-xs tracking-widest uppercase font-bold">Grand Total (incl. GST)</td>
+                  <td className="p-4 text-right font-extrabold text-[#ffbf00] text-base">
+                    ₹{grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                  </td>
+                  <td />
+                </tr>
+              </tfoot>
+            )}
+          </table>
+        </div>
+      )}
+
+      {/* Download links */}
+      {(doc?.pdf_url || doc?.xlsx_url) && (
         <div className="flex gap-3">
-          {data.pdf_url && (
-            <a href={data.pdf_url} target="_blank" rel="noreferrer" className="btn-nocturne-primary inline-flex items-center gap-2 px-5 py-2.5">
+          {doc.pdf_url && (
+            <a href={doc.pdf_url} target="_blank" rel="noreferrer" className="btn-nocturne-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm">
               <Download className="w-4 h-4" /> BOQ PDF
             </a>
           )}
-          {data.xlsx_url && (
-            <a href={data.xlsx_url} target="_blank" rel="noreferrer" className="btn-nocturne-secondary inline-flex items-center gap-2 px-5 py-2.5">
+          {doc.xlsx_url && (
+            <a href={doc.xlsx_url} target="_blank" rel="noreferrer" className="btn-nocturne-secondary inline-flex items-center gap-2 px-5 py-2.5 text-sm">
               <Download className="w-4 h-4" /> BOQ Excel
             </a>
           )}
         </div>
-      ) : (
-        <p className="text-white/40 italic">No BOQ generated yet.</p>
       )}
+    </div>
+  );
+}
+
+function BOQItemForm({
+  form, setForm, saving, onSave, onCancel, title,
+}: {
+  form: typeof EMPTY_FORM;
+  setForm: React.Dispatch<React.SetStateAction<typeof EMPTY_FORM>>;
+  saving: boolean;
+  onSave: () => void;
+  onCancel: () => void;
+  title: string;
+}) {
+  return (
+    <div className="glass-card rounded-xl p-5 border border-white/10 space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-semibold text-white/70">{title}</span>
+        <button onClick={onCancel} className="text-white/30 hover:text-white"><X className="w-4 h-4" /></button>
+      </div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div>
+          <label className="text-xs text-white/40 uppercase tracking-widest mb-1 block">Category</label>
+          <select
+            className="input-nocturne w-full text-sm"
+            value={form.category}
+            onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+          >
+            {CATEGORY_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="col-span-2">
+          <label className="text-xs text-white/40 uppercase tracking-widest mb-1 block">Description</label>
+          <input
+            className="input-nocturne w-full text-sm"
+            placeholder="e.g. DJ Setup & Performance – 4 hrs"
+            value={form.description}
+            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+          />
+        </div>
+        <div>
+          <label className="text-xs text-white/40 uppercase tracking-widest mb-1 block">Qty</label>
+          <input
+            type="number" min={1}
+            className="input-nocturne w-full text-sm"
+            value={form.quantity}
+            onChange={(e) => setForm((f) => ({ ...f, quantity: Number(e.target.value) }))}
+          />
+        </div>
+        <div>
+          <label className="text-xs text-white/40 uppercase tracking-widest mb-1 block">Unit Price (₹)</label>
+          <input
+            type="number" min={0}
+            className="input-nocturne w-full text-sm"
+            value={form.unit_price_inr}
+            onChange={(e) => setForm((f) => ({ ...f, unit_price_inr: Number(e.target.value) }))}
+          />
+        </div>
+        <div>
+          <label className="text-xs text-white/40 uppercase tracking-widest mb-1 block">GST %</label>
+          <input
+            type="number" min={0} max={100}
+            className="input-nocturne w-full text-sm"
+            value={form.gst_rate_pct}
+            onChange={(e) => setForm((f) => ({ ...f, gst_rate_pct: Number(e.target.value) }))}
+          />
+        </div>
+      </div>
+      <div className="flex gap-2 justify-end">
+        <button onClick={onCancel} className="text-sm px-4 py-2 rounded-lg border border-white/10 text-white/50 hover:text-white transition">Cancel</button>
+        <button
+          onClick={onSave}
+          disabled={saving || !form.description.trim()}
+          className="btn-nocturne-primary text-sm px-5 py-2 rounded-lg flex items-center gap-2"
+        >
+          {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+          Save
+        </button>
+      </div>
     </div>
   );
 }
