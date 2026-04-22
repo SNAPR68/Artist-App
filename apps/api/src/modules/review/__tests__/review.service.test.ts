@@ -18,7 +18,7 @@ vi.mock('../../booking/booking.repository.js', () => ({
 
 import { reviewRepository } from '../review.repository.js';
 import { bookingRepository } from '../../booking/booking.repository.js';
-import { ReviewService, ReviewError } from '../review.service.js';
+import { ReviewService } from '../review.service.js';
 
 const mockReviewRepo = reviewRepository as unknown as Record<string, ReturnType<typeof vi.fn>>;
 const mockBookingRepo = bookingRepository as unknown as Record<string, ReturnType<typeof vi.fn>>;

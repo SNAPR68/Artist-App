@@ -5,8 +5,7 @@ import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
 import { razorpayClient } from './razorpay.client.js';
 import { payoutService } from './payout.service.js';
-import { tdsService, TDSError } from './tds.service.js';
-import { db } from '../../infrastructure/database.js';
+import { tdsService } from './tds.service.js';
 import {
   createPaymentOrderSchema,
   verifyPaymentSchema,

@@ -1,6 +1,6 @@
 import { db } from '../../infrastructure/database.js';
 
-interface InstabookInterestRow {
+export interface InstabookInterestRow {
   id: string;
   role: string;
   name: string;

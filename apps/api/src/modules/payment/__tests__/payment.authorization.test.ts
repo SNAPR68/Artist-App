@@ -20,7 +20,7 @@ vi.mock('../../document/invoice.generator.js', () => ({
 
 import { paymentRepository } from '../payment.repository.js';
 import { bookingRepository } from '../../booking/booking.repository.js';
-import { PaymentService, PaymentError } from '../payment.service.js';
+import { PaymentService } from '../payment.service.js';
 
 const mockPaymentRepo = paymentRepository as unknown as Record<string, ReturnType<typeof vi.fn>>;
 const mockBookingRepo = bookingRepository as unknown as Record<string, ReturnType<typeof vi.fn>>;

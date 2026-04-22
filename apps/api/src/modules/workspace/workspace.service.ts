@@ -346,13 +346,20 @@ export class WorkspaceService {
     const slug = this.generatePresentationSlug();
 
     // If a template is referenced, pull defaults; explicit fields override template.
-    let tpl: { custom_header: string | null; custom_footer: string | null; terms_and_conditions: string | null; include_pricing: boolean; include_media: boolean } | null = null;
+    type TplRow = {
+      custom_header: string | null;
+      custom_footer: string | null;
+      terms_and_conditions: string | null;
+      include_pricing: boolean;
+      include_media: boolean;
+    };
+    let tpl: TplRow | null = null;
     if (data.template_id) {
       const row = await db('proposal_templates')
         .where({ id: data.template_id, workspace_id: workspaceId })
         .whereNull('deleted_at')
         .first();
-      if (row) tpl = row as never;
+      if (row) tpl = row as TplRow;
     }
 
     return workspaceRepository.createPresentation({

@@ -256,25 +256,6 @@ export class BookingService {
     }
   }
 
-  private async onCancelled(booking: Record<string, unknown>) {
-    // Release the calendar date
-    await calendarRepository.releaseDate(
-      booking.artist_id as string,
-      booking.event_date as string,
-    );
-
-    // Remove any pushed Google event. Best-effort.
-    try {
-      const { googleCalendarService } = await import('../calendar/google-calendar.service.js');
-      await googleCalendarService.deleteBookingEvent(
-        booking.artist_id as string,
-        booking.id as string,
-      );
-    } catch {
-      // ignore
-    }
-  }
-
   private async onPreEvent(booking: Record<string, unknown>) {
     const { coordinationService } = await import('../coordination/coordination.service.js');
     await coordinationService.initializeChecklist(booking.id as string);

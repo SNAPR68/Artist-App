@@ -5,7 +5,6 @@ import {
   DISPUTE_EVIDENCE_WINDOW_HOURS,
   DISPUTE_APPEAL_WINDOW_DAYS,
   DISPUTE_STATUS_TRANSITIONS,
-  BOOKING_STATE_TRANSITIONS,
 } from '@artist-booking/shared';
 import { disputeRepository } from './dispute.repository.js';
 import { bookingRepository } from '../booking/booking.repository.js';
@@ -107,7 +106,7 @@ export class DisputeService {
     return evidence;
   }
 
-  async updateStatus(disputeId: string, adminUserId: string, newStatus: DisputeStatus) {
+  async updateStatus(disputeId: string, _adminUserId: string, newStatus: DisputeStatus) {
     const dispute = await disputeRepository.findById(disputeId);
     if (!dispute) {
       throw new DisputeError('NOT_FOUND', 'Dispute not found', 404);

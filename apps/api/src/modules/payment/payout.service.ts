@@ -1,4 +1,4 @@
-import { PayoutStatus, PAYOUT_MAX_RETRY_COUNT } from '@artist-booking/shared';
+import { PayoutStatus } from '@artist-booking/shared';
 import { payoutRepository } from './payout.repository.js';
 import { paymentRepository } from './payment.repository.js';
 import { bookingRepository } from '../booking/booking.repository.js';
