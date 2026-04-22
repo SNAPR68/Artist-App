@@ -72,34 +72,52 @@ export async function loadEpkInputs(vendorProfileId: string): Promise<EpkInputs>
     .first(
       'ap.id',
       'ap.stage_name',
-      'ap.vendor_category as category',
-      'ap.city',
+      db.raw('ap.category::text as category'),
+      'ap.base_city as city',
       'ap.bio',
-      'ap.base_price_inr',
-      'ap.rating_avg',
-      'ap.review_count',
-      'ap.booking_count',
+      'ap.pricing',
+      'ap.trust_score',
+      'ap.total_bookings',
       'u.email as contact_email',
       'u.phone as contact_phone',
     );
   if (!profile) throw new Error('VENDOR_NOT_FOUND');
 
+  // `pricing` is a JSONB array of tiers: [{ price_inr: number, ... }]. Use min.
+  let basePriceInr: number | null = null;
+  try {
+    const tiers = Array.isArray(profile.pricing) ? profile.pricing : JSON.parse(profile.pricing ?? '[]');
+    const prices = tiers
+      .map((t: any) => Number(t?.price_inr ?? t?.base_price ?? t?.amount))
+      .filter((n: number) => Number.isFinite(n) && n > 0);
+    if (prices.length) basePriceInr = Math.min(...prices);
+  } catch {
+    basePriceInr = null;
+  }
+
   const media = await db('media_items')
-    .where({ owner_id: vendorProfileId, owner_type: 'artist_profile' })
-    .whereIn('transcode_status', ['completed', 'skipped'])
-    .orderBy('created_at', 'desc')
+    .where({ artist_id: vendorProfileId })
+    .whereNull('deleted_at')
+    .where('transcode_status', 'completed')
+    .orderBy([{ column: 'sort_order', order: 'asc' }, { column: 'created_at', order: 'desc' }])
     .limit(12)
-    .select('id', 'media_type', 'preview_url as url', 'thumbnail_url');
+    .select(
+      'id',
+      db.raw('type::text as media_type'),
+      db.raw('COALESCE(preview_url, cdn_url, original_url) as url'),
+      'thumbnail_url',
+    );
 
   const ig = await db('instagram_connections')
     .where({ vendor_profile_id: vendorProfileId, is_active: true })
     .first('ig_username', 'follower_count', 'media_count');
 
   const recent = await db('bookings')
-    .where({ artist_profile_id: vendorProfileId, status: 'completed' })
+    .where({ artist_id: vendorProfileId, state: 'completed' })
+    .whereNull('deleted_at')
     .orderBy('event_date', 'desc')
     .limit(8)
-    .select('event_date', 'venue', 'city')
+    .select('event_date', 'event_venue as venue', 'event_city as city')
     .catch(() => []);
 
   return {
@@ -108,10 +126,13 @@ export async function loadEpkInputs(vendorProfileId: string): Promise<EpkInputs>
     category: profile.category ?? null,
     city: profile.city ?? null,
     bio: profile.bio ?? null,
-    base_price_inr: profile.base_price_inr === null ? null : Number(profile.base_price_inr),
-    rating_avg: profile.rating_avg === null ? null : Number(profile.rating_avg),
-    review_count: profile.review_count ?? null,
-    booking_count: profile.booking_count ?? null,
+    base_price_inr: basePriceInr,
+    // trust_score is 0-100 (decimal); surface as a 0-5 star equivalent for the EPK stat card.
+    rating_avg: profile.trust_score === null || profile.trust_score === undefined
+      ? null
+      : Math.min(5, Number(profile.trust_score) / 20),
+    review_count: null,
+    booking_count: profile.total_bookings ?? null,
     contact_email: profile.contact_email ?? null,
     contact_phone: profile.contact_phone ?? null,
     media: media ?? [],
