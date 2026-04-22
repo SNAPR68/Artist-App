@@ -54,7 +54,7 @@ class InstabookInterestService {
     return { id: row.id, created_at: row.created_at };
   }
 
-  async list(filters: { page: number; per_page: number; role?: string; city?: string }) {
+  async list(filters: { page: number; per_page: number; role?: string; city?: string; pilot?: boolean }) {
     return instabookInterestRepository.list(filters);
   }
 

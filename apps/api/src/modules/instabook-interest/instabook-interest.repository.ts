@@ -23,6 +23,7 @@ interface ListFilters {
   per_page: number;
   role?: string;
   city?: string;
+  pilot?: boolean;
 }
 
 export class InstabookInterestRepository {
@@ -41,6 +42,7 @@ export class InstabookInterestRepository {
 
     if (filters.role) query.where('role', filters.role);
     if (filters.city) query.whereILike('city', `%${filters.city}%`);
+    if (filters.pilot) query.whereRaw(`role_specific_data->>'pilot' = 'true'`);
 
     const countResult = await query.clone().count('* as count').first();
     const total = Number(countResult?.count ?? 0);

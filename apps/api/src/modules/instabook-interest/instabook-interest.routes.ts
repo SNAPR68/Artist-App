@@ -66,6 +66,7 @@ export async function instabookInterestRoutes(app: FastifyInstance) {
         per_page,
         role: query.role || undefined,
         city: query.city || undefined,
+        pilot: query.pilot === 'true' ? true : undefined,
       });
 
       return reply.send({
