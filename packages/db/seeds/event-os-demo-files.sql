@@ -24,11 +24,12 @@ DELETE FROM event_files WHERE client_id IN (
 DELETE FROM users WHERE email LIKE 'demo-eos+%@grid.test';
 
 -- ─── 1. Demo client (event company) ──────────────────────────────────────────
-INSERT INTO users (id, email, phone, role, is_active, created_at)
+INSERT INTO users (id, email, phone, phone_hash, role, is_active, created_at)
 VALUES (
   uuid_generate_v4(),
   'demo-eos+pilot-company@grid.test',
   '9999100001',
+  'hash_9999100001',
   'event_company',
   true,
   NOW()
