@@ -26,11 +26,12 @@ DELETE FROM users WHERE email LIKE 'seed-eos+%@grid.test';
 
 -- ─── 1. ARTIST (20) — extra live performers beyond existing 100 seed ────────
 WITH inserted_users AS (
-  INSERT INTO users (id, email, phone, role, is_active, created_at)
+  INSERT INTO users (id, email, phone, phone_hash, role, is_active, created_at)
   SELECT
     gen_random_uuid(),
     'seed-eos+artist' || gs || '@grid.test',
     '+9199990' || LPAD(gs::text, 5, '0'),
+    'hash_9199990' || LPAD(gs::text, 5, '0'),
     'artist',
     true,
     now()
@@ -71,11 +72,12 @@ FROM (
 
 -- ─── 2. AV (20) — bundled sound+lights+stage vendors ─────────────────────────
 WITH inserted_users AS (
-  INSERT INTO users (id, email, phone, role, is_active, created_at)
+  INSERT INTO users (id, email, phone, phone_hash, role, is_active, created_at)
   SELECT
     gen_random_uuid(),
     'seed-eos+av' || gs || '@grid.test',
     '+9199991' || LPAD(gs::text, 5, '0'),
+    'hash_9199991' || LPAD(gs::text, 5, '0'),
     'artist', true, now()
   FROM generate_series(1, 20) gs
   RETURNING id, email
@@ -114,11 +116,12 @@ FROM (
 
 -- ─── 3. PHOTO (15) — photo + video vendors ───────────────────────────────────
 WITH inserted_users AS (
-  INSERT INTO users (id, email, phone, role, is_active, created_at)
+  INSERT INTO users (id, email, phone, phone_hash, role, is_active, created_at)
   SELECT
     gen_random_uuid(),
     'seed-eos+photo' || gs || '@grid.test',
     '+9199992' || LPAD(gs::text, 5, '0'),
+    'hash_9199992' || LPAD(gs::text, 5, '0'),
     'artist', true, now()
   FROM generate_series(1, 15) gs
   RETURNING id, email
@@ -156,11 +159,12 @@ FROM (
 
 -- ─── 4. DECOR (15) — florals, themed setup, custom fab ──────────────────────
 WITH inserted_users AS (
-  INSERT INTO users (id, email, phone, role, is_active, created_at)
+  INSERT INTO users (id, email, phone, phone_hash, role, is_active, created_at)
   SELECT
     gen_random_uuid(),
     'seed-eos+decor' || gs || '@grid.test',
     '+9199993' || LPAD(gs::text, 5, '0'),
+    'hash_9199993' || LPAD(gs::text, 5, '0'),
     'artist', true, now()
   FROM generate_series(1, 15) gs
   RETURNING id, email
@@ -198,11 +202,12 @@ FROM (
 
 -- ─── 5. LICENSE (10) — PPL/IPRS/Novex/permit agents ─────────────────────────
 WITH inserted_users AS (
-  INSERT INTO users (id, email, phone, role, is_active, created_at)
+  INSERT INTO users (id, email, phone, phone_hash, role, is_active, created_at)
   SELECT
     gen_random_uuid(),
     'seed-eos+license' || gs || '@grid.test',
     '+9199994' || LPAD(gs::text, 5, '0'),
+    'hash_9199994' || LPAD(gs::text, 5, '0'),
     'artist', true, now()
   FROM generate_series(1, 10) gs
   RETURNING id, email
