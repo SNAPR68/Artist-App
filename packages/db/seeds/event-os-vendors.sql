@@ -12,6 +12,8 @@
 --   photo    : 15
 --   decor    : 15
 --   license  : 10
+--   promoters: 10  (Sprint D wk1 add)
+--   transport: 10  (Sprint D wk1 add)
 -- ─────────────────────────────────────────────────────────────────────────────
 
 BEGIN;
@@ -234,6 +236,91 @@ SELECT
     'cities_covered', ARRAY['Mumbai','Delhi','Bangalore'],
     'turnaround_days', 3 + (idx % 7),
     'govt_fees_included', (idx % 2 = 0)
+  ),
+  now()
+FROM (
+  SELECT u.id, u.email, row_number() OVER (ORDER BY u.email) AS idx
+  FROM inserted_users u
+) u;
+
+-- ─── 6. PROMOTERS (10) — Sprint D wk1 ────────────────────────────────────────
+WITH inserted_users AS (
+  INSERT INTO users (id, email, phone, phone_hash, role, is_active, created_at)
+  SELECT
+    gen_random_uuid(),
+    'seed-eos+promoters' || gs || '@grid.test',
+    '+9199995' || LPAD(gs::text, 5, '0'),
+    'hash_9199995' || LPAD(gs::text, 5, '0'),
+    'artist', true, now()
+  FROM generate_series(1, 10) gs
+  RETURNING id, email
+)
+INSERT INTO artist_profiles (
+  id, user_id, stage_name, bio, genres, languages, base_city,
+  travel_radius_km, event_types, performance_duration_min,
+  performance_duration_max, pricing, profile_completion_pct,
+  category, category_attributes, created_at
+)
+SELECT
+  gen_random_uuid(),
+  u.id,
+  (ARRAY['SoundWave Promotions','Nocturne Nights','LiveLoop Agency','CityPulse Promoters',
+         'Encore Events','Backbeat Promotions','Afterglow Agency','Stagecraft Promoters',
+         'Marquee Nights','Beatfront Agency'])[idx],
+  'Event promoter — ticketing, pre-event marketing, influencer seeding.',
+  ARRAY[]::text[], ARRAY['Hindi','English']::text[],
+  (ARRAY['Mumbai','Delhi','Bangalore','Pune','Hyderabad'])[(idx % 5) + 1],
+  500, ARRAY['concert','festival','corporate']::event_type[], 0, 0,
+  '[{"event_type":"concert","price_min":75000,"price_max":500000}]'::jsonb,
+  60, 'promoters'::vendor_category,
+  jsonb_build_object(
+    'ticketing_platforms', ARRAY['BookMyShow','District','Paytm Insider'],
+    'reach_followers', 50000 + (idx * 25000),
+    'past_events_count', 20 + (idx * 5),
+    'cities_covered', ARRAY['Mumbai','Delhi','Bangalore']
+  ),
+  now()
+FROM (
+  SELECT u.id, u.email, row_number() OVER (ORDER BY u.email) AS idx
+  FROM inserted_users u
+) u;
+
+-- ─── 7. TRANSPORT (10) — Sprint D wk1 ────────────────────────────────────────
+WITH inserted_users AS (
+  INSERT INTO users (id, email, phone, phone_hash, role, is_active, created_at)
+  SELECT
+    gen_random_uuid(),
+    'seed-eos+transport' || gs || '@grid.test',
+    '+9199996' || LPAD(gs::text, 5, '0'),
+    'hash_9199996' || LPAD(gs::text, 5, '0'),
+    'artist', true, now()
+  FROM generate_series(1, 10) gs
+  RETURNING id, email
+)
+INSERT INTO artist_profiles (
+  id, user_id, stage_name, bio, genres, languages, base_city,
+  travel_radius_km, event_types, performance_duration_min,
+  performance_duration_max, pricing, profile_completion_pct,
+  category, category_attributes, created_at
+)
+SELECT
+  gen_random_uuid(),
+  u.id,
+  (ARRAY['Roadstar Logistics','StageRoll Cartage','Venue Move Co','GearShip India',
+         'TourTruck Partners','SetHaul Logistics','LiveLoad Transport','Curtain Cartage',
+         'BigWheel Events','RiggerRoad Co'])[idx],
+  'Tour + gear transport — sound/light rigs, instrument freight, band vans.',
+  ARRAY[]::text[], ARRAY['Hindi','English']::text[],
+  (ARRAY['Mumbai','Delhi','Bangalore','Chennai','Kolkata'])[(idx % 5) + 1],
+  2000, ARRAY['concert','corporate','festival']::event_type[], 0, 0,
+  '[{"event_type":"concert","price_min":15000,"price_max":200000}]'::jsonb,
+  55, 'transport'::vendor_category,
+  jsonb_build_object(
+    'vehicle_types', ARRAY['Tempo Traveller','Mini Container','22-ft Truck','Sedan'],
+    'fleet_size', 5 + (idx * 2),
+    'gst_registered', true,
+    'intercity_capable', (idx % 3 != 0),
+    'per_km_rate_inr', 25 + (idx * 5)
   ),
   now()
 FROM (
