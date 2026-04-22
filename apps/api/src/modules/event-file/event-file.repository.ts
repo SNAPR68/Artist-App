@@ -74,7 +74,7 @@ export class EventFileRepository {
         'ap.category',
         'ap.base_city',
         'b.status as booking_status',
-        'b.total_amount as booking_amount',
+        'b.agreed_amount as booking_amount',
       );
 
     return { ...file, vendors };

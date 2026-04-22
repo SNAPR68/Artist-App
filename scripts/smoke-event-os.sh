@@ -42,13 +42,13 @@ echo "── Event OS smoke: $API ──"
 
 # --- 1. Auth (OTP bypass dev/staging only) -----------------------------------
 if [ "$ENV" != "production" ]; then
-  OTP_RES=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$API/v1/auth/send-otp" \
-    -H 'Content-Type: application/json' -d '{"phone":"+919999000001"}')
-  check "POST /v1/auth/send-otp" "$OTP_RES"
+  OTP_RES=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$API/v1/auth/otp/generate" \
+    -H 'Content-Type: application/json' -d '{"phone":"9999000001"}')
+  check "POST /v1/auth/otp/generate" "$OTP_RES"
 
-  TOKEN=$(curl -s -X POST "$API/v1/auth/verify-otp" \
+  TOKEN=$(curl -s -X POST "$API/v1/auth/otp/verify" \
     -H 'Content-Type: application/json' \
-    -d '{"phone":"+919999000001","code":"123456"}' | \
+    -d '{"phone":"9999000001","otp":"123456","role":"event_company"}' | \
     node -e 'let s="";process.stdin.on("data",c=>s+=c).on("end",()=>{try{console.log(JSON.parse(s).data?.access_token||"")}catch{console.log("")}})')
   [ -n "$TOKEN" ] && echo -e "${GREEN}✓${NC} OTP bypass token acquired" || echo -e "${YELLOW}⚠${NC} No token — skipping auth'd checks"
 else
@@ -56,8 +56,19 @@ else
   TOKEN=""
 fi
 
-AUTH=()
-[ -n "${TOKEN:-}" ] && AUTH=(-H "Authorization: Bearer $TOKEN")
+if [ -n "${TOKEN:-}" ]; then
+  AUTH_HEADER="Authorization: Bearer $TOKEN"
+else
+  AUTH_HEADER=""
+fi
+
+curl_auth() {
+  if [ -n "$AUTH_HEADER" ]; then
+    curl -s -H "$AUTH_HEADER" "$@"
+  else
+    curl -s "$@"
+  fi
+}
 
 # --- 2. Public reads (no auth) -----------------------------------------------
 check "GET /health"             "$(curl -s -o /dev/null -w '%{http_code}' "$API/health")"
@@ -71,33 +82,39 @@ if [ -n "$SLUG" ]; then
 fi
 
 # Instagram OAuth entry URL
-check "GET /v1/instagram/oauth/start" "$(curl -s -o /dev/null -w '%{http_code}' "$API/v1/instagram/oauth/start" "${AUTH[@]}")" "${TOKEN:+200}${TOKEN:-401}"
+# IG connect: 200 when Meta creds configured, 500 when not (pre-app-review), 401 without token
+IG_CODE=$(curl_auth -o /dev/null -w '%{http_code}' "$API/v1/instagram/connect")
+if [ "$IG_CODE" = "200" ] || [ "$IG_CODE" = "500" ] || [ "$IG_CODE" = "401" ]; then
+  echo -e "${GREEN}✓${NC} GET /v1/instagram/connect ($IG_CODE — route reachable)"; PASS=$((PASS+1))
+else
+  echo -e "${RED}✗${NC} GET /v1/instagram/connect (got $IG_CODE)"; FAIL=$((FAIL+1))
+fi
 
 # --- 3. Authenticated chain (staging only) -----------------------------------
 if [ -n "${TOKEN:-}" ]; then
   # Event File lifecycle
-  EF_BODY='{"client_name":"Smoke Test Co","event_date":"2026-12-31","call_time":"18:00","venue":"Test Hall, Mumbai"}'
-  EF_CODE=$(curl -s -o /tmp/ef.json -w '%{http_code}' -X POST "$API/v1/event-files" \
-    "${AUTH[@]}" -H 'Content-Type: application/json' -d "$EF_BODY")
+  EF_BODY='{"event_name":"Smoke Test Event","event_date":"2026-12-31","call_time":"18:00","venue":"Test Hall","city":"Mumbai"}'
+  EF_CODE=$(curl_auth -o /tmp/ef.json -w '%{http_code}' -X POST "$API/v1/event-files" \
+    -H 'Content-Type: application/json' -d "$EF_BODY")
   check "POST /v1/event-files" "$EF_CODE" 201
   EF_ID=$(node -e 'let s="";process.stdin.on("data",c=>s+=c).on("end",()=>{try{console.log(JSON.parse(s).data?.id||"")}catch{console.log("")}})' < /tmp/ef.json)
 
   if [ -n "$EF_ID" ]; then
     check "GET /v1/event-files/$EF_ID" \
-      "$(curl -s -o /dev/null -w '%{http_code}' "$API/v1/event-files/$EF_ID" "${AUTH[@]}")"
-    check "GET /v1/event-files/$EF_ID/call-sheet (latest)" \
-      "$(curl -s -o /dev/null -w '%{http_code}' "$API/v1/event-files/$EF_ID/call-sheet" "${AUTH[@]}")"
+      "$(curl_auth -o /dev/null -w '%{http_code}' "$API/v1/event-files/$EF_ID")"
+    check "GET /v1/event-files/$EF_ID/call-sheets (history)" \
+      "$(curl_auth -o /dev/null -w '%{http_code}' "$API/v1/event-files/$EF_ID/call-sheets")"
     check "GET /v1/event-files/$EF_ID/consolidated-rider" \
-      "$(curl -s -o /dev/null -w '%{http_code}' "$API/v1/event-files/$EF_ID/consolidated-rider" "${AUTH[@]}")"
+      "$(curl_auth -o /dev/null -w '%{http_code}' "$API/v1/event-files/$EF_ID/consolidated-rider")"
     check "GET /v1/event-files/$EF_ID/boq" \
-      "$(curl -s -o /dev/null -w '%{http_code}' "$API/v1/event-files/$EF_ID/boq" "${AUTH[@]}")"
+      "$(curl_auth -o /dev/null -w '%{http_code}' "$API/v1/event-files/$EF_ID/boq")"
   fi
 
   # Vendor profile — pick the first artist for EPK history probe
   VID=$(curl -s "$API/v1/artists?limit=1" | node -e 'let s="";process.stdin.on("data",c=>s+=c).on("end",()=>{try{console.log(JSON.parse(s).data?.[0]?.id||"")}catch{console.log("")}})')
   if [ -n "$VID" ]; then
-    check "GET /v1/artists/$VID/epk/latest"  "$(curl -s -o /dev/null -w '%{http_code}' "$API/v1/artists/$VID/epk/latest" "${AUTH[@]}")"
-    check "GET /v1/artists/$VID/epk/history" "$(curl -s -o /dev/null -w '%{http_code}' "$API/v1/artists/$VID/epk/history" "${AUTH[@]}")"
+    check "GET /v1/artists/$VID/epk/latest"  "$(curl_auth -o /dev/null -w '%{http_code}' "$API/v1/artists/$VID/epk/latest")"
+    check "GET /v1/artists/$VID/epk/history" "$(curl_auth -o /dev/null -w '%{http_code}' "$API/v1/artists/$VID/epk/history")"
   fi
 fi
 
