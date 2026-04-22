@@ -99,6 +99,30 @@ export async function artistRoutes(app: FastifyInstance) {
   });
 
   /**
+   * GET /v1/artists/by-slug/:slug — Public artist profile by short-link slug.
+   * Used by the /a/[slug] microsite route. Returns the same shape as /v1/artists/:id.
+   */
+  app.get('/v1/artists/by-slug/:slug', {
+    preHandler: [rateLimit('READ')],
+  }, async (request, reply) => {
+    const { slug } = request.params as { slug: string };
+    const row = await db('artist_profiles')
+      .where({ slug })
+      .select('id')
+      .first();
+    if (!row) {
+      return reply.status(404).send({
+        success: false,
+        errors: [{ code: 'NOT_FOUND', message: 'Artist not found' }],
+      });
+    }
+    const profile = await artistService.getPublicProfile(row.id);
+    return reply
+      .header('Cache-Control', 'public, max-age=300, s-maxage=300')
+      .send({ success: true, data: profile, errors: [] });
+  });
+
+  /**
    * GET /v1/artists/:id — Public artist profile
    */
   app.get('/v1/artists/:id', {

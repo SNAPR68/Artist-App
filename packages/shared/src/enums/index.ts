@@ -6,6 +6,18 @@ export enum UserRole {
   ADMIN = 'admin',
 }
 
+// Event Company OS pivot (2026-04-22): multi-vendor categories on artist_profiles.
+// Shortcut: we reuse artist_profiles as the vendors table until month 3+.
+export enum VendorCategory {
+  ARTIST = 'artist',
+  AV = 'av',
+  PHOTO = 'photo',
+  DECOR = 'decor',
+  LICENSE = 'license',
+  PROMOTERS = 'promoters',
+  TRANSPORT = 'transport',
+}
+
 export enum BookingState {
   INQUIRY = 'inquiry',
   SHORTLISTED = 'shortlisted',

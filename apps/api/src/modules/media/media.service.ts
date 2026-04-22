@@ -1,4 +1,5 @@
 import { mediaRepository } from './media.repository.js';
+import { transcodeService } from './transcode.service.js';
 import { artistRepository } from '../artist/artist.repository.js';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -99,7 +100,23 @@ export class MediaService {
       sort_order: count,
     });
 
+    // Fire-and-forget transcode. Never block upload confirmation on it — a
+    // failed transcode leaves the row in 'failed' state for manual retrigger.
+    transcodeService.transcodeMediaItem(item.id).catch(() => {});
+
     return item;
+  }
+
+  async retriggerTranscode(userId: string, mediaId: string) {
+    const artist = await artistRepository.findByUserId(userId);
+    if (!artist) {
+      throw new MediaError('PROFILE_NOT_FOUND', 'Artist profile not found', 404);
+    }
+    const item = await mediaRepository.findById(mediaId);
+    if (!item || item.artist_id !== artist.id) {
+      throw new MediaError('NOT_FOUND', 'Media item not found', 404);
+    }
+    return transcodeService.transcodeMediaItem(mediaId);
   }
 
   async deleteMedia(userId: string, mediaId: string) {

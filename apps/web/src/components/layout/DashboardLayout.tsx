@@ -46,6 +46,7 @@ const ARTIST_NAV: NavItem[] = [
   { href: '/artist/calendar', labelKey: 'nav.calendar', icon: <CalendarDays size={18} /> },
   { href: '/artist/reputation', labelKey: 'nav.reputation', icon: <ShieldCheck size={18} /> },
   { href: '/artist/earnings/tds', labelKey: 'nav.tds', icon: <FileText size={18} /> },
+  { href: '/artist/epk', labelKey: 'nav.epk', icon: <Sparkle size={18} /> },
   { href: '/artist/settings/integrations', labelKey: 'nav.integrations', icon: <Link2 size={18} /> },
 ];
 

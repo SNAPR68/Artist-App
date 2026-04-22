@@ -355,3 +355,123 @@ The revision is successful when:
 - proposal generation works from a brief without manual copy-paste
 - lock requests create usable concierge/booking handoff objects
 - engineering can ship this without restructuring the monorepo or replacing existing modules
+
+---
+
+# PART 2 — EVENT COMPANY OS EXPANSION (Appended 2026-04-22)
+
+## 22. Strategic Pivot Summary
+
+GRID v1 = artist booking automation via voice.
+GRID v2 = **Event Company Operating System** — one file per event, all vendors, all coordination.
+
+**Trigger for pivot:** Audit of event-company operations identified 10 domains of work; GRID currently covers ~15% of one (artist booking). "Agency OS" positioning is not credible without broader coverage.
+
+## 23. The 10 Operational Domains (event company reality)
+
+1. Client/lead intake → proposal → contract → deposit
+2. Venue sourcing, RFPs, BEOs, floor plans
+3. Vendor management across 10+ categories (caterer, AV, lighting, photo, video, florist, decor, rentals, transport, security, staffing, artist)
+4. Production & logistics — run-of-show, call sheets, load-in/out, permits, insurance
+5. Budget & financial ops — quotes, markups, milestone billing, per-event P&L (10–20% revenue leakage here)
+6. Guest/attendee — RSVPs, ticketing, check-in, seating, dietary
+7. Creative & design — mood boards, approvals, 3D plans
+8. Crew/freelancer ops — roster, availability polling, shifts, timesheets
+9. Post-event — debrief, assets, testimonials, referrals
+10. Marketing/sales pipeline — portfolio, win/loss
+
+## 24. Voice-First Leverage Ranking (all OUTBOUND)
+
+| Rank | Use case | Current tool | GRID fit |
+|---|---|---|---|
+| 1 | Multi-category vendor booking/availability calls | Email/phone threads | Direct reuse of artist booking engine |
+| 2 | Crew/freelancer availability polling | Spreadsheet + SMS | Same engine, different roster |
+| 3 | Day-of "ETA?" check-ins | Coordinator personal phone | ROS-triggered automated calls |
+| 4 | Post-event debrief + referral | Nothing / email | 48h-out automated call |
+
+**Inbound voice (public agency number → AI answers client calls): NOT BUILT.** Cut from roadmap. Rationale: agencies want humans on first client touch; intake has 4 surfaces already (/brief, WhatsApp, Zara/Kabir, referrals); adding a fifth is redundant and damages trust.
+
+## 25. MVP Definition (30–35 days)
+
+The minimum where an agency says "this replaces 3 tools" and pays:
+
+1. **Multi-vendor booking** — extend existing voice engine to 5 categories (artist + caterer + AV + photo + decor). Category-specific intake fields (catering=guest count+dietary, AV=gear list, photo=hours+deliverables).
+2. **Unified Event File** — `workspace_events` gets `client_id`; `workspace_event_bookings` shows N vendors of M categories under one event.
+3. **Auto call sheet** — PDF generator (extend existing `document` module) + SMS broadcast (existing `notification` module).
+4. **Day-of check-in calls** — outbound voice triggered by ROS times, "on your way?" flow, result logged to event file.
+
+## 26. Explicitly NOT in MVP
+
+- Inbound voice / public phone number
+- Financial reconciliation / per-event P&L
+- Live run-of-show editor (PDF call sheet only)
+- Crew/freelancer voice polling (v2)
+- Post-event debrief voice calls (v2)
+- Venue RFP/BEO workflows
+- Guest RSVP/ticketing
+- Creative/mood board tooling
+- Marketing/sales pipeline
+
+## 27. Data Model Strategy
+
+**Shortcut (MVP path):** Add `category` enum to `artist_profiles`: artist | caterer | av | photo | decor. Keep `bookings.artist_id` FK as-is. Reskin UI to say "vendors" not "artists." All 13+ artist_* tables remain until month 3.
+
+**Clean refactor (post-MVP):** Introduce polymorphic `vendors` table + `vendor_id/vendor_type` on bookings. Migrate artist_profiles → vendors. Renames all artist_* tables. +3 weeks. Defer until paying customers surface edge cases.
+
+## 28. Codebase Audit Findings (2026-04-22)
+
+| Question | Answer | Effort |
+|---|---|---|
+| Inbound voice infra exists? | NO | CUT from scope |
+| Vendor model generic? | NO — hardcoded to artists (13+ tables reference artist_*) | Shortcut: add category column (days) |
+| Event File model supports N vendors? | PARTIAL — `workspace_events` + `workspace_event_bookings` exist; missing client_id + category | 1 week |
+
+**Reusable existing infra:**
+- ✅ `workspace_events` + `workspace_event_bookings`
+- ✅ `notification` module (WhatsApp, SMS, Push, Email)
+- ✅ `document` module (PDF generation)
+- ✅ `decision-engine` + `clarifying-questions.service.ts`
+- ✅ 92 permissions / 5 roles RBAC
+- ✅ Outbound voice infra (Zara/Kabir, voice-query, 6 intents)
+
+## 29. MVP Sprint Plan (35 days)
+
+**Sprint A — Weeks 1–2: Vendor Category Foundation**
+- Migration: add `category` enum to `artist_profiles` (default 'artist')
+- Shared types: update vendor type union in `@artist-booking/shared`
+- UI: rename "Artists" → "Vendors" in event-company routes; category filter chips; category-specific profile fields
+- Seed: 20 vendors per non-artist category (caterer, av, photo, decor)
+- Acceptance: event company can browse and shortlist non-artist vendors
+
+**Sprint B — Weeks 3–4: Unified Event File + Voice Extension**
+- Migration: `workspace_events.client_id` (FK to client_profiles)
+- UI: event detail page shows all bookings grouped by category
+- Voice: extend outbound booking engine with category-specific intake scripts
+- Acceptance: agency books one event with 1 artist + 1 caterer + 1 AV via voice, all 3 appear under the event
+
+**Sprint C — Week 5: Call Sheet + Day-of Check-ins**
+- Document module: call sheet PDF template (all vendors + call times + venue + client contact)
+- Notification module: call sheet broadcast endpoint (SMS + WhatsApp + email, one payload)
+- ROS check-in worker: cron reads event booking call times, triggers outbound voice calls 60min before each
+- Acceptance: 2 pilot agencies run a real event end-to-end through GRID
+
+**Sprint D — Polish & Pilot (post-day-35)**
+- Bug fixes from pilot
+- Onboard 2 more agencies
+- Metrics instrumentation (vendor bookings/event, call sheet sends, check-in response rate)
+
+## 30. Success Metrics (MVP)
+
+- **Coverage:** % of events where agency books ≥2 vendor categories through GRID (target: 60%)
+- **Call sheets:** events with auto-sent call sheet / total events (target: 80%)
+- **Check-ins:** vendors confirmed via voice / vendors scheduled (target: 70%)
+- **Commercial:** 5 paying agencies at ₹15K/mo within 60 days of MVP ship
+
+## 31. Acceptance Criteria (Part 2)
+
+Expansion is successful when:
+- An event company creates one event and books at least 3 different vendor categories under it via voice
+- Call sheet PDF auto-generates from event file with zero manual data entry
+- Day-of check-in calls fire on schedule and log responses to the event file
+- An agency running GRID replaces ≥3 tools they were using before (e.g., spreadsheet rosters, manual vendor calls, Canva call sheets)
+- Schema is not painted into a corner — polymorphic vendor refactor remains feasible in month 3

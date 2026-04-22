@@ -20,6 +20,7 @@ export interface VoiceParsedIntent {
     event_type?: string;
     action_verb?: string;
     page_target?: string;
+    category?: string;
   };
   confidence: number;
   raw_text: string;
@@ -114,6 +115,24 @@ const UUID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{1
 
 const ACTION_VERBS = ['book', 'confirm', 'cancel', 'hold', 'accept', 'reject', 'schedule'];
 
+// Event Company OS pivot (2026-04-22): vendor category keyword map.
+// Maps spoken words to canonical VendorCategory enum values.
+const VENDOR_CATEGORY_KEYWORDS: Record<string, string> = {
+  'artist': 'artist', 'artists': 'artist', 'singer': 'artist', 'band': 'artist',
+  'dj': 'artist', 'performer': 'artist', 'musician': 'artist', 'comedian': 'artist',
+  'av': 'av', 'sound': 'av', 'lights': 'av', 'lighting': 'av', 'stage': 'av',
+  'audio visual': 'av', 'pa system': 'av',
+  'photo': 'photo', 'photographer': 'photo', 'photography': 'photo',
+  'video': 'photo', 'videographer': 'photo', 'cinematographer': 'photo',
+  'decor': 'decor', 'decorator': 'decor', 'florist': 'decor', 'flowers': 'decor',
+  'theming': 'decor', 'fabrication': 'decor',
+  'license': 'license', 'licenses': 'license', 'ppl': 'license', 'iprs': 'license',
+  'novex': 'license', 'permit': 'license', 'permits': 'license',
+};
+const SORTED_VENDOR_CATEGORY_KEYS = Object.keys(VENDOR_CATEGORY_KEYWORDS).sort(
+  (a, b) => b.length - a.length,
+);
+
 const GENRE_KEYWORDS = [
   'bollywood', 'sufi', 'rock', 'pop', 'classical', 'hip hop', 'hip-hop',
   'electronic', 'edm', 'folk', 'ghazal', 'jazz', 'fusion', 'indie',
@@ -148,6 +167,10 @@ const PAGE_TARGETS: Record<string, string> = {
   'backup': 'backup', 'data backup': 'backup',
   'voice': 'voice', 'voice assistant': 'voice',
   'achievements': 'gamification', 'rewards': 'gamification', 'streaks': 'gamification',
+  'vendors': 'vendors', 'find vendors': 'vendors', 'vendor directory': 'vendors',
+  'all vendors': 'vendors', 'browse vendors': 'vendors',
+  'event files': 'event-files', 'event file': 'event-files', 'my events': 'event-files',
+  'event roster': 'event-files',
   'brief': 'brief', 'plan event': 'brief', 'plan my event': 'brief',
   'event brief': 'brief', 'recommend artists': 'brief', 'suggest artists': 'brief',
   'what should i book': 'brief', 'help me decide': 'brief', 'entertainment options': 'brief',
@@ -162,15 +185,18 @@ const CACHE_REFRESH_MS = 60 * 60 * 1000; // 1 hour
 
 export class VoiceIntentService {
   private knownCities: string[] = [];
-  private knownArtistNames: string[] = [];
+  private knownVendorNames: string[] = [];
   private citiesCacheTime = 0;
-  private artistNamesCacheTime = 0;
+  private vendorNamesCacheTime = 0;
 
   // ─── Cache loaders ──────────────────────────────────────
 
   private async loadCities(): Promise<void> {
     if (Date.now() - this.citiesCacheTime < CACHE_REFRESH_MS && this.knownCities.length > 0) return;
 
+    // Event Company OS pivot (2026-04-22): artist_profiles holds all vendor
+    // categories now (artist, av, photo, decor, license, promoters, transport).
+    // Cities come from every category.
     const cities = await db('artist_profiles')
       .distinct('base_city')
       .whereNotNull('base_city')
@@ -179,15 +205,25 @@ export class VoiceIntentService {
     this.citiesCacheTime = Date.now();
   }
 
-  private async loadArtistNames(): Promise<void> {
-    if (Date.now() - this.artistNamesCacheTime < CACHE_REFRESH_MS && this.knownArtistNames.length > 0) return;
+  /**
+   * Cache all vendor display names across every category. Named
+   * `knownVendorNames` to reflect post-pivot reality; callers that need
+   * per-category filtering should query directly, not use this cache.
+   */
+  private async loadVendorNames(): Promise<void> {
+    if (Date.now() - this.vendorNamesCacheTime < CACHE_REFRESH_MS && this.knownVendorNames.length > 0) return;
 
     const names = await db('artist_profiles')
       .distinct('stage_name')
       .whereNotNull('stage_name')
       .pluck('stage_name');
-    this.knownArtistNames = names.map((n: string) => n.toLowerCase());
-    this.artistNamesCacheTime = Date.now();
+    this.knownVendorNames = names.map((n: string) => n.toLowerCase());
+    this.vendorNamesCacheTime = Date.now();
+  }
+
+  /** @deprecated use loadVendorNames(); kept for transitional call sites */
+  private async loadArtistNames(): Promise<void> {
+    return this.loadVendorNames();
   }
 
   // ─── Main parser ────────────────────────────────────────
@@ -264,6 +300,16 @@ export class VoiceIntentService {
       }
     }
 
+    // Vendor category detection (artist/av/photo/decor/license)
+    for (const key of SORTED_VENDOR_CATEGORY_KEYS) {
+      // Word boundary match to avoid substrings like "dj" matching "adjust".
+      const re = new RegExp(`\\b${key.replace(/\s+/g, '\\s+')}\\b`);
+      if (re.test(lower)) {
+        entities.category = VENDOR_CATEGORY_KEYWORDS[key];
+        break;
+      }
+    }
+
     // Genre detection
     for (const genre of GENRE_KEYWORDS) {
       if (lower.includes(genre)) {
@@ -272,10 +318,10 @@ export class VoiceIntentService {
       }
     }
 
-    // Artist name detection
-    for (const name of this.knownArtistNames) {
+    // Vendor name detection (artist/av/photo/decor/license/promoters/transport)
+    for (const name of this.knownVendorNames) {
       if (lower.includes(name)) {
-        entities.artist_name = name;
+        entities.artist_name = name; // kept as `artist_name` for downstream compat
         break;
       }
     }

@@ -77,6 +77,25 @@ export async function mediaRoutes(app: FastifyInstance) {
   });
 
   /**
+   * POST /v1/media/:id/transcode — Retrigger transcode for a failed/stale item
+   */
+  app.post('/v1/media/:id/transcode', {
+    preHandler: [
+      authMiddleware,
+      requirePermission('media:upload'),
+      rateLimit('WRITE'),
+    ],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const result = await mediaService.retriggerTranscode(request.user!.user_id, id);
+    return reply.send({
+      success: true,
+      data: result,
+      errors: [],
+    });
+  });
+
+  /**
    * PUT /v1/media/reorder — Reorder media items
    */
   app.put('/v1/media/reorder', {

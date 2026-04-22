@@ -48,6 +48,11 @@ const envSchema = z.object({
   GOOGLE_OAUTH_CLIENT_ID: z.string().optional(),
   GOOGLE_OAUTH_CLIENT_SECRET: z.string().optional(),
   GOOGLE_OAUTH_REDIRECT_URI: z.string().optional(),
+
+  // Instagram (Meta) OAuth — IG Business API via Facebook Login
+  META_APP_ID: z.string().optional(),
+  META_APP_SECRET: z.string().optional(),
+  INSTAGRAM_OAUTH_REDIRECT_URI: z.string().optional(),
   PUBLIC_API_URL: z.string().optional(),
   PUBLIC_WEB_URL: z.string().optional(),
 

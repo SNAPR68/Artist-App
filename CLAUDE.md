@@ -1,5 +1,50 @@
 # GRID — CLAUDE.md
-_Last updated: 2026-04-10_
+_Last updated: 2026-04-22_
+
+## CRITICAL PIVOT (2026-04-22): Event Company OS Expansion
+
+GRID is no longer "artist booking with voice." It is the **Event Company Operating System** — one event file covering all vendors, crew, client, call sheets, day-of ops.
+
+**What changed:** Audit found we cover ~15% of one operational domain (artist booking). Event companies run 10 domains. Expansion targets the 5 with highest voice-leverage.
+
+**MVP scope (~56 working days / ~11 weeks, all OUTBOUND voice only) — LOCKED 2026-04-22 post-review:**
+
+**Categories (5):** `artist | av | photo | decor | license` (Model A: license agents as vendors, not managed service).
+**Sprint D wk1 add-on (2):** `promoters | transport`.
+**AV = bundled** sound+lights+stage.
+
+**Features (10):**
+1. Multi-vendor booking across 5 categories (JSONB `category_attributes` shortcut)
+2. Unified Event File (client_id + call_time)
+3. Outbound voice extended to all 5 categories
+4. Auto call sheet PDF + Excel → **SMS + WhatsApp + Email**
+5. Day-of check-in voice calls
+6. Tech rider consolidation (merged PDF + Excel; both upload paths)
+7. BOQ builder (PDF + Excel; re-upload = file-of-record, no parse-back)
+8. Standardized artist microsite `/a/[slug]` + FFmpeg/Sharp transcode pipeline
+9. Instagram OAuth (Option A, IG Business API) — Meta app review submitted Day 1 Sprint A
+10. EPK export bundle (PDF + Excel + PPTX + MP4 reel) — ships Sprint D wk2
+
+**Explicitly cut from MVP (permanent):**
+- Inbound voice / public phone number
+- **Caterer category** (dropped entirely — wedding-heavy, not ICP)
+- **Venue** (client-decided in target workflow)
+- **Managed license service** (marketplace Model A only)
+- Financial reconciliation (v2)
+- Live ROS editor (call sheet PDF = 80% of value)
+- Crew/freelancer voice polling (v2)
+- Post-event debrief calls (v2)
+- Venue RFP/BEO, guest RSVP/ticketing, creative/mood boards, marketing pipeline
+
+**Pilot + pricing:** pilots NOT pre-committed (recruit during Sprint C). **Free pilot, no pricing until post-pilot.**
+
+**Strategic shortcut:** Don't refactor `artist_profiles` → polymorphic `vendors` now. Add `category` column (artist|caterer|av|photo|decor). UI shows "vendors" umbrella. Refactor schema month 3+ when paying customers force it.
+
+**See:** `docs/strategy/prd.md` (Part 2 appendix) for full expansion PRD.
+
+---
+
+## Previous Direction (pre-2026-04-22, retained for context)
 
 ## CRITICAL: Context Hygiene Rules
 1. **Read MEMORY.md first** — it has project state, feedback rules, and references. Don't re-explore.

@@ -43,7 +43,11 @@ export class VoiceExecutionService {
     userId: string,
     conversationContext: ConversationContext,
   ): Promise<VoiceExecutionResult> {
-    const userRole = (conversationContext.session_state?.user_role as string) || 'artist';
+    // Event Company OS pivot (2026-04-22): defaulting to 'artist' silently
+    // mis-routed non-artist users (event_company, agent, client) through
+    // artist-specific flows. Require explicit role; fall back to 'client'
+    // which is the most common role with broadest route coverage.
+    const userRole = (conversationContext.session_state?.user_role as string) || 'client';
 
     switch (parsedIntent.intent) {
       case 'DISCOVER':
@@ -85,7 +89,7 @@ export class VoiceExecutionService {
     parsedIntent: VoiceParsedIntent,
     _userId: string,
   ): Promise<VoiceExecutionResult> {
-    const { city, event_type, budget, date, genre } = parsedIntent.entities;
+    const { city, event_type, budget, date, genre, category } = parsedIntent.entities;
 
     // Lazy import to avoid circular dependencies
     const { searchService } = await import('../search/search.service.js');
@@ -102,60 +106,79 @@ export class VoiceExecutionService {
     if (date) searchParams.date = date;
 
     let results: Array<Record<string, unknown>>;
-    try {
-      const searchResult = await searchService.searchArtists({
-        ...searchParams,
-        page: 1,
-        per_page: 5,
-      });
-      results = searchResult.data || [];
-    } catch {
-      // Fallback: direct DB query if search service fails
+    // Event Company OS pivot (2026-04-22): if a non-artist category was spoken,
+    // bypass searchService (artist-only ranking) and hit artist_profiles directly
+    // filtered by `category`. Rank by trust_score.
+    if (category && category !== 'artist') {
       const query = db('artist_profiles as ap')
         .leftJoin('users as u', 'u.id', 'ap.user_id')
         .where('ap.deleted_at', null)
+        .where('ap.category', category)
         .orderBy('ap.trust_score', 'desc')
         .limit(5);
-
       if (city) query.where('ap.base_city', 'ilike', `%${city}%`);
-      if (genre) query.whereRaw('ap.genres @> ?', [JSON.stringify([genre])]);
-
-      const rawResults = await query.select(
-        'ap.id', 'ap.stage_name', 'ap.genres', 'ap.trust_score', 'ap.base_city',
-        'ap.bio', 'ap.total_bookings', 'ap.pricing',
+      results = await query.select(
+        'ap.id', 'ap.stage_name', 'ap.category', 'ap.category_attributes',
+        'ap.trust_score', 'ap.base_city', 'ap.bio', 'ap.total_bookings',
         db.raw('COALESCE(u.is_verified, false) as is_verified'),
       );
+    } else {
+      try {
+        const searchResult = await searchService.searchArtists({
+          ...searchParams,
+          page: 1,
+          per_page: 5,
+        });
+        results = searchResult.data || [];
+      } catch {
+        // Fallback: direct DB query if search service fails
+        const query = db('artist_profiles as ap')
+          .leftJoin('users as u', 'u.id', 'ap.user_id')
+          .where('ap.deleted_at', null)
+          .orderBy('ap.trust_score', 'desc')
+          .limit(5);
 
-      // Fetch thumbnails for fallback results
-      const ids = rawResults.map((a: any) => a.id);
-      const thumbs = ids.length > 0
-        ? await db('media_items')
-            .whereIn('artist_id', ids)
-            .where({ deleted_at: null })
-            .orderBy('sort_order', 'asc')
-            .select('artist_id', 'thumbnail_url', 'original_url')
-        : [];
-      const thumbMap = new Map(thumbs.map((t: any) => [t.artist_id, t.thumbnail_url ?? t.original_url]));
+        if (city) query.where('ap.base_city', 'ilike', `%${city}%`);
+        if (genre) query.whereRaw('ap.genres @> ?', [JSON.stringify([genre])]);
 
-      results = rawResults.map((a: any) => ({
-        ...a,
-        thumbnail_url: thumbMap.get(a.id) ?? null,
-      }));
+        const rawResults = await query.select(
+          'ap.id', 'ap.stage_name', 'ap.genres', 'ap.trust_score', 'ap.base_city',
+          'ap.bio', 'ap.total_bookings', 'ap.pricing',
+          db.raw('COALESCE(u.is_verified, false) as is_verified'),
+        );
+
+        const ids = rawResults.map((a: any) => a.id);
+        const thumbs = ids.length > 0
+          ? await db('media_items')
+              .whereIn('artist_id', ids)
+              .where({ deleted_at: null })
+              .orderBy('sort_order', 'asc')
+              .select('artist_id', 'thumbnail_url', 'original_url')
+          : [];
+        const thumbMap = new Map(thumbs.map((t: any) => [t.artist_id, t.thumbnail_url ?? t.original_url]));
+
+        results = rawResults.map((a: any) => ({
+          ...a,
+          thumbnail_url: thumbMap.get(a.id) ?? null,
+        }));
+      }
     }
 
+    const noun = category && category !== 'artist' ? category : 'artist';
+    const nounPlural = category && category !== 'artist' ? `${category} vendors` : 'artists';
     if (results.length === 0) {
       const location = city ? ` in ${city}` : '';
       return {
-        response_text: `I couldn't find any artists matching your criteria${location}. Try broadening your search or checking a different city.`,
+        response_text: `I couldn't find any ${nounPlural} matching your criteria${location}. Try broadening your search or checking a different city.`,
         suggestions: [
-          'Show me all available DJs',
+          'Show me all vendors',
           'Search in nearby cities',
-          'Find artists for any genre',
+          'Plan my event',
         ],
       };
     }
 
-    const response = `I found ${results.length} artist${results.length > 1 ? 's' : ''} matching your search. Here are the top picks.`;
+    const response = `I found ${results.length} ${noun}${results.length > 1 ? 's' : ''} matching your search. Here are the top picks.`;
     const firstArtist = results[0] as Record<string, unknown>;
     const firstName = firstArtist.stage_name as string;
 
@@ -752,6 +775,9 @@ export class VoiceExecutionService {
       backup: { artist: '/artist/settings/backup' },
       voice: { artist: '/voice', client: '/voice', agent: '/voice', event_company: '/voice', admin: '/voice' },
       brief: { artist: '/brief', client: '/brief', agent: '/brief', event_company: '/brief', admin: '/brief' },
+      // Event Company OS pivot (2026-04-22)
+      vendors: { artist: '/vendors', client: '/vendors', agent: '/vendors', event_company: '/vendors', admin: '/vendors' },
+      'event-files': { client: '/event-company/events', event_company: '/event-company/events' },
     };
 
     const routeMap = ROUTE_MAP[pageTarget];
@@ -775,6 +801,8 @@ export class VoiceExecutionService {
       payments: 'your payments', team: 'team management', roster: 'your artist roster',
       commissions: 'your commissions', backup: 'backup settings', voice: 'voice assistant',
       brief: 'the event planner',
+      vendors: 'the vendor directory',
+      'event-files': 'your event files',
     };
 
     return {

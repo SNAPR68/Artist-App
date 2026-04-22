@@ -186,7 +186,7 @@ export function Navbar() {
               <motion.div className="flex-1 p-4 space-y-1">
                 {[
                   { href: '/brief', label: 'Plan Your Event', icon: Sparkles },
-                  { href: '/search', label: 'Find Artists', icon: Search },
+                  { href: '/vendors', label: 'Find Vendors', icon: Search },
                   { href: '/login', label: 'Event Company Login', icon: Building2 },
                   { href: '/artist/onboarding', label: 'List as Artist', icon: Mic },
                 ].map((item, index) => (
