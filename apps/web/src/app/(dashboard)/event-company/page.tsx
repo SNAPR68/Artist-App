@@ -226,7 +226,8 @@ export default function EventCompanyDashboard() {
         <div>
           <h2 className="text-xl font-display font-bold text-white mb-4">Run Your Agency</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <KpiCard href="/event-company/deals" icon={Kanban} label="Active Deals" value={agencyKpis.deals} accent="#c39bff" />
+            <KpiCard href="/event-company/event-files" icon={FolderKanban} label="Event Files" value="Open" accent="#c39bff" />
+            <KpiCard href="/event-company/deals" icon={Kanban} label="Active Deals" value={agencyKpis.deals} accent="#a1faff" />
             <KpiCard href="/event-company/templates" icon={FileText} label="Proposal Templates" value={agencyKpis.templates} accent="#a1faff" />
             <KpiCard href="/event-company/invoices" icon={Receipt} label="Unpaid Invoices" value={agencyKpis.unpaidInvoices} accent="#ffbf00" />
             <KpiCard href="/event-company/billing" icon={CreditCard} label="Subscription" value="Manage" accent="#c39bff" />
