@@ -52,7 +52,11 @@ async function loadEventFile(eventFileId: string) {
   const ef = await db('event_files').where({ id: eventFileId, deleted_at: null }).first();
   if (!ef) throw new Error('EVENT_FILE_NOT_FOUND');
 
-  const client = await db('users').where({ id: ef.client_id }).select('name', 'phone', 'email').first();
+  const client = await db('users as u')
+    .leftJoin('client_profiles as cp', 'cp.user_id', 'u.id')
+    .where('u.id', ef.client_id)
+    .select('cp.company_name as name', 'u.phone', 'u.email')
+    .first();
 
   const vendors: VendorRow[] = await db('event_file_vendors as efv')
     .leftJoin('artist_profiles as ap', 'efv.vendor_profile_id', 'ap.id')
@@ -142,13 +146,13 @@ async function renderPDF(
 
     doc.fillColor(COLORS.purple).fontSize(8).font('Helvetica-Bold')
       .text('CLIENT / EVENT COMPANY', 40, clientY + 10, { characterSpacing: 1.2 });
+    const clientLine = [
+      client?.name ?? `${ef.event_name} · ${ef.city}`,
+      client?.phone,
+      client?.email,
+    ].filter(Boolean).join('   ·   ');
     doc.fillColor(COLORS.text).fontSize(10).font('Helvetica')
-      .text(
-        `${client?.name ?? '—'}   ·   ${client?.phone ?? '—'}   ·   ${client?.email ?? '—'}`,
-        40,
-        clientY + 24,
-        { width: doc.page.width - 80 },
-      );
+      .text(clientLine, 40, clientY + 24, { width: doc.page.width - 80 });
 
     // Vendor roster header
     let tableY = clientY + 54;
