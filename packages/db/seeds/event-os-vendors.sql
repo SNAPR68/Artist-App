@@ -55,7 +55,7 @@ SELECT
   ARRAY['Bollywood','Electronic']::text[],
   ARRAY['Hindi','English']::text[],
   (ARRAY['Mumbai','Delhi','Bangalore','Pune','Hyderabad'])[(idx % 5) + 1],
-  100, ARRAY['wedding','corporate','private_party']::text[], 60, 180,
+  100, ARRAY['wedding','corporate','private_party']::event_type[], 60, 180,
   '[{"event_type":"wedding","price_min":50000,"price_max":200000}]'::jsonb,
   60, 'artist'::vendor_category,
   jsonb_build_object(
@@ -98,7 +98,7 @@ SELECT
   'Bundled sound+lights+stage rental house.',
   ARRAY[]::text[], ARRAY[]::text[],
   (ARRAY['Mumbai','Delhi','Bangalore','Hyderabad','Chennai'])[(idx % 5) + 1],
-  150, ARRAY['wedding','corporate','concert']::text[], 0, 0,
+  150, ARRAY['wedding','corporate','concert']::event_type[], 0, 0,
   '[{"event_type":"corporate","price_min":80000,"price_max":500000}]'::jsonb,
   55, 'av'::vendor_category,
   jsonb_build_object(
@@ -141,7 +141,7 @@ SELECT
   'Photo + video production house.',
   ARRAY[]::text[], ARRAY[]::text[],
   (ARRAY['Mumbai','Delhi','Bangalore','Goa','Jaipur'])[(idx % 5) + 1],
-  200, ARRAY['wedding','corporate','private_party']::text[], 0, 0,
+  200, ARRAY['wedding','corporate','private_party']::event_type[], 0, 0,
   '[{"event_type":"wedding","price_min":80000,"price_max":400000}]'::jsonb,
   55, 'photo'::vendor_category,
   jsonb_build_object(
@@ -184,7 +184,7 @@ SELECT
   'Event decor, florals, and custom fabrication.',
   ARRAY[]::text[], ARRAY[]::text[],
   (ARRAY['Mumbai','Delhi','Jaipur','Udaipur','Goa'])[(idx % 5) + 1],
-  300, ARRAY['wedding','private_party','corporate']::text[], 0, 0,
+  300, ARRAY['wedding','private_party','corporate']::event_type[], 0, 0,
   '[{"event_type":"wedding","price_min":150000,"price_max":1200000}]'::jsonb,
   55, 'decor'::vendor_category,
   jsonb_build_object(
@@ -226,7 +226,7 @@ SELECT
   'Event license + permit clearance agent.',
   ARRAY[]::text[], ARRAY[]::text[],
   (ARRAY['Mumbai','Delhi','Bangalore','Hyderabad','Pune'])[(idx % 5) + 1],
-  500, ARRAY['concert','corporate','festival']::text[], 0, 0,
+  500, ARRAY['concert','corporate','festival']::event_type[], 0, 0,
   '[{"event_type":"concert","price_min":25000,"price_max":150000}]'::jsonb,
   55, 'license'::vendor_category,
   jsonb_build_object(
