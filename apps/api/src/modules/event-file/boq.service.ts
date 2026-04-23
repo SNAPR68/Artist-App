@@ -101,7 +101,10 @@ export class BOQService {
       });
 
     if (toInsert.length === 0) return { inserted: 0 };
-    await db('boq_line_items').insert(toInsert);
+    await db('boq_line_items')
+      .insert(toInsert)
+      .onConflict(['event_file_id', 'vendor_profile_id'])
+      .ignore();
     return { inserted: toInsert.length };
   }
 
