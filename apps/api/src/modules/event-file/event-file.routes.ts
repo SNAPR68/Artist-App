@@ -18,6 +18,9 @@ import { eventFileRepository } from './event-file.repository.js';
 import { callSheetService } from './call-sheet.service.js';
 import { consolidatedRiderService } from './consolidated-rider.service.js';
 import { boqService, type BOQItemInput } from './boq.service.js';
+import { generateCallSheet } from './call-sheet.generator.js';
+import { generateConsolidatedRider } from './consolidated-rider.generator.js';
+import { generateBOQ } from './boq.generator.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
 import {
@@ -614,5 +617,99 @@ export async function eventFileRoutes(app: FastifyInstance) {
       });
     }
     return reply.send({ success: true, data: file, errors: [] });
+  });
+
+  /**
+   * DEMO downloads — public, no auth. Gated to DEMO: event files only, so
+   * leaking the generator over the wire can't expose a real client's roster.
+   * Formats: ?format=pdf (default) | xlsx
+   */
+  async function assertDemoFile(id: string, reply: any): Promise<boolean> {
+    const file = await eventFileRepository.findDemoById(id);
+    if (!file) {
+      reply.status(404).send({
+        success: false,
+        errors: [{ code: 'NOT_FOUND', message: 'Demo event file not found' }],
+      });
+      return false;
+    }
+    return true;
+  }
+
+  function pickFormat(request: any): 'pdf' | 'xlsx' {
+    const fmt = String((request.query as any)?.format ?? 'pdf').toLowerCase();
+    return fmt === 'xlsx' ? 'xlsx' : 'pdf';
+  }
+
+  function slugify(name: string): string {
+    return name.replace(/^DEMO:\s*/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+
+  app.get('/v1/demo/event-files/:id/call-sheet', {
+    preHandler: [rateLimit('READ')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    if (!(await assertDemoFile(id, reply))) return;
+    const format = pickFormat(request);
+    const bundle = await generateCallSheet(id);
+    const slug = slugify(bundle.snapshot.event_name);
+    if (format === 'xlsx') {
+      return reply
+        .header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        .header('Content-Disposition', `attachment; filename="call-sheet-${slug}.xlsx"`)
+        .send(bundle.xlsx);
+    }
+    return reply
+      .header('Content-Type', 'application/pdf')
+      .header('Content-Disposition', `inline; filename="call-sheet-${slug}.pdf"`)
+      .send(bundle.pdf);
+  });
+
+  app.get('/v1/demo/event-files/:id/consolidated-rider', {
+    preHandler: [rateLimit('READ')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    if (!(await assertDemoFile(id, reply))) return;
+    const format = pickFormat(request);
+    const bundle = await generateConsolidatedRider(id);
+    const slug = slugify(bundle.snapshot.event_name);
+    if (format === 'xlsx') {
+      return reply
+        .header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        .header('Content-Disposition', `attachment; filename="rider-${slug}.xlsx"`)
+        .send(bundle.xlsx);
+    }
+    return reply
+      .header('Content-Type', 'application/pdf')
+      .header('Content-Disposition', `inline; filename="rider-${slug}.pdf"`)
+      .send(bundle.pdf);
+  });
+
+  app.get('/v1/demo/event-files/:id/boq', {
+    preHandler: [rateLimit('READ')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const file = await eventFileRepository.findDemoById(id);
+    if (!file) {
+      return reply.status(404).send({
+        success: false,
+        errors: [{ code: 'NOT_FOUND', message: 'Demo event file not found' }],
+      });
+    }
+    const format = pickFormat(request);
+    // Auto-seed roster line items so the PDF is never blank on first click.
+    await boqService.seedFromRoster(id).catch(() => { /* already seeded */ });
+    const bundle = await generateBOQ(id);
+    const slug = slugify(file.event_name);
+    if (format === 'xlsx') {
+      return reply
+        .header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        .header('Content-Disposition', `attachment; filename="boq-${slug}.xlsx"`)
+        .send(bundle.xlsx);
+    }
+    return reply
+      .header('Content-Type', 'application/pdf')
+      .header('Content-Disposition', `inline; filename="boq-${slug}.pdf"`)
+      .send(bundle.pdf);
   });
 }

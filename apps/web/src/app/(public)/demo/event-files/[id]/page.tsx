@@ -277,9 +277,9 @@ export default async function DemoEventFileDetail({
 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { label: 'Call sheet', sub: 'SMS + WhatsApp + Email in one tap', color: '#c39bff' },
-            { label: 'Consolidated rider', sub: 'All vendor riders, merged PDF + Excel', color: '#a1faff' },
-            { label: 'BOQ', sub: 'Bill of quantities, auto-seeded from roster', color: '#ffbf00' },
+            { label: 'Call sheet', sub: 'One-page PDF, Excel for ops', slug: 'call-sheet', color: '#c39bff' },
+            { label: 'Consolidated rider', sub: 'All vendor riders, merged', slug: 'consolidated-rider', color: '#a1faff' },
+            { label: 'BOQ', sub: 'Auto-seeded from roster', slug: 'boq', color: '#ffbf00' },
           ].map((x) => (
             <div
               key={x.label}
@@ -294,10 +294,31 @@ export default async function DemoEventFileDetail({
                   className="text-[10px] tracking-widest uppercase font-bold mb-2"
                   style={{ color: x.color }}
                 >
-                  Ready to generate
+                  Live download
                 </div>
                 <div className="text-white font-bold mb-1">{x.label}</div>
-                <div className="text-white/40 text-xs">{x.sub}</div>
+                <div className="text-white/40 text-xs mb-4">{x.sub}</div>
+                <div className="flex gap-2">
+                  <a
+                    href={`${API_BASE_URL}/v1/demo/event-files/${file.id}/${x.slug}?format=pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] tracking-widest uppercase font-bold px-3 py-1.5 rounded-full border transition-colors"
+                    style={{
+                      color: x.color,
+                      borderColor: `${x.color}40`,
+                      backgroundColor: `${x.color}10`,
+                    }}
+                  >
+                    PDF
+                  </a>
+                  <a
+                    href={`${API_BASE_URL}/v1/demo/event-files/${file.id}/${x.slug}?format=xlsx`}
+                    className="text-[10px] tracking-widest uppercase font-bold px-3 py-1.5 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-white/30 transition-colors"
+                  >
+                    Excel
+                  </a>
+                </div>
               </div>
             </div>
           ))}
