@@ -377,6 +377,32 @@ export const NOTIFICATION_TEMPLATES: Record<string, NotificationTemplate> = {
     email_body: 'Your GRID Pro trial ends in 3 days. Keep unlimited briefs, branded proposal PDFs, deal pipeline, and concierge support for ₹15K/mo. <a href="https://artist-booking-web.vercel.app/pricing">Continue on Pro →</a>',
   },
 
+  // ─── Event Company OS — Call Sheet + Vendor Confirmation ────
+  call_sheet_ready: {
+    whatsapp_template_id: 'call_sheet_ready_v1',
+    sms_flow_id: 'flow_call_sheet',
+    push_title: 'Call Sheet Ready',
+    push_body: 'Call sheet for {{event_name}} on {{event_date}} at {{city}}. PDF: {{pdf_url}}',
+    email_subject: 'Call Sheet — {{event_name}} ({{event_date}})',
+    email_body: 'Hi, the call sheet for <strong>{{event_name}}</strong> on <strong>{{event_date}}</strong> at <strong>{{city}}</strong> is ready.<br/><br/>• PDF: <a href="{{pdf_url}}">{{pdf_url}}</a><br/>• Excel: <a href="{{xlsx_url}}">{{xlsx_url}}</a>',
+  },
+  vendor_confirm: {
+    whatsapp_template_id: 'vendor_confirm_v1',
+    sms_flow_id: 'flow_vendor_confirm',
+    push_title: 'Confirm your slot',
+    push_body: 'Please confirm {{event_name}} on {{event_date}}. Reply YES or NO.',
+    email_subject: 'Confirm — {{event_name}} on {{event_date}}',
+    email_body: 'Please confirm your slot for <strong>{{event_name}}</strong> on <strong>{{event_date}}</strong> at <strong>{{city}}</strong>.<br/><br/>Tap to confirm: <a href="{{confirm_url}}">{{confirm_url}}</a><br/>Tap to decline: <a href="{{decline_url}}">{{decline_url}}</a>',
+  },
+  day_of_checkin: {
+    whatsapp_template_id: 'day_of_checkin_v1',
+    sms_flow_id: 'flow_day_of_checkin',
+    push_title: 'Day-of check-in',
+    push_body: '{{event_name}} today at {{city}}. Are you on track? Reply YES / DELAYED / HELP.',
+    email_subject: 'Day-of check-in — {{event_name}}',
+    email_body: '<strong>{{event_name}}</strong> is today at <strong>{{city}}</strong>. Reply with your status: YES (on track), DELAYED, or HELP (need assistance).',
+  },
+
   financial_light_month_alert: {
     whatsapp_template_id: 'financial_light_v1',
     sms_flow_id: 'flow_financial_light',

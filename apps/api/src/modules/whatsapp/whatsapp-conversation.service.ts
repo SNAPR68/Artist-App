@@ -5,7 +5,18 @@ import { db } from '../../infrastructure/database.js';
 import { WHATSAPP_SESSION_TIMEOUT_HOURS } from '@artist-booking/shared';
 import { decisionEngineService } from '../decision-engine/decision-engine.service.js';
 import { decisionEngineConversationService } from '../decision-engine/decision-engine-conversation.service.js';
+import { callSheetService } from '../event-file/call-sheet.service.js';
 import { config } from '../../config/index.js';
+
+/** Parse a short reply for YES/NO/DELAYED/HELP intent. */
+function parseShortReply(text: string): 'yes' | 'no' | 'delayed' | 'help' | null {
+  const t = text.trim().toLowerCase();
+  if (/^(yes|y|confirmed?|ok|okay|haan|ha|👍|✅)$/i.test(t)) return 'yes';
+  if (/^(no|n|cannot|can't|cant|decline|nahi|nahin|❌)$/i.test(t)) return 'no';
+  if (/^(delay|delayed|late|running late)$/i.test(t)) return 'delayed';
+  if (/^(help|sos|urgent|issue|problem)$/i.test(t)) return 'help';
+  return null;
+}
 
 /**
  * Conversation state machine for WhatsApp booking flow.
@@ -17,6 +28,91 @@ export class WhatsAppConversationService {
   async handleInboundMessage(phoneNumber: string, content: string, providerMessageId?: string) {
     // Get or create conversation
     const conversation = await whatsAppRepository.findOrCreateConversation(phoneNumber);
+
+    // Short-circuit: vendor call-sheet confirmation YES/NO, or day-of check-in.
+    // Runs BEFORE decision-engine intent parsing — template replies should
+    // never be interpreted as search briefs.
+    const shortReply = parseShortReply(content);
+    if (shortReply) {
+      // 1) Day-of check-in takes priority if there's an active one.
+      //    Reason: a confirmed vendor who already said YES yesterday may reply
+      //    YES again on the morning of the event — that's an on-track signal,
+      //    not a re-confirmation.
+      if (shortReply === 'yes' || shortReply === 'delayed' || shortReply === 'help') {
+        const pendingCheckin = await callSheetService.findPendingCheckinByPhone(phoneNumber);
+        if (pendingCheckin) {
+          const status = shortReply === 'yes' ? 'on_track' : shortReply;
+          await callSheetService.recordVendorCheckin(pendingCheckin.roster_id, status, content);
+
+          await whatsAppRepository.addMessage({
+            conversation_id: conversation.id,
+            direction: 'inbound',
+            message_type: 'text',
+            content,
+            parsed_intent: `day_of_checkin_${status}`,
+            parsed_entities: { event_file_id: pendingCheckin.event_file_id },
+            provider_message_id: providerMessageId,
+            status: 'received',
+          });
+
+          const ack =
+            status === 'on_track'
+              ? 'On track — thanks. See you on site.'
+              : status === 'delayed'
+                ? 'Got it — flagged as delayed. The production team has been alerted.'
+                : 'Help flagged. Production lead will call you in under 5 minutes.';
+
+          const outboundId = await whatsAppProviderService.sendText(phoneNumber, ack);
+          await whatsAppRepository.addMessage({
+            conversation_id: conversation.id,
+            direction: 'outbound',
+            message_type: 'text',
+            content: ack,
+            provider_message_id: outboundId,
+          });
+
+          return { conversation_id: conversation.id, intent: 'day_of_checkin', response: ack };
+        }
+      }
+
+      // 2) Otherwise fall through to confirmation YES/NO.
+      if (shortReply === 'yes' || shortReply === 'no') {
+        const pending = await callSheetService.findPendingByPhone(phoneNumber);
+        if (pending?.confirmation_token) {
+          await callSheetService.recordVendorResponse(
+            pending.confirmation_token,
+            shortReply === 'yes' ? 'confirmed' : 'declined',
+            content,
+          );
+
+          await whatsAppRepository.addMessage({
+            conversation_id: conversation.id,
+            direction: 'inbound',
+            message_type: 'text',
+            content,
+            parsed_intent: shortReply === 'yes' ? 'vendor_confirm_yes' : 'vendor_confirm_no',
+            parsed_entities: { event_file_id: pending.event_file_id },
+            provider_message_id: providerMessageId,
+            status: 'received',
+          });
+
+          const ack = shortReply === 'yes'
+            ? 'Confirmed. Thanks — call sheet and day-of check-in will land here.'
+            : 'Got it — marked as declined. The production team will be in touch.';
+
+          const outboundId = await whatsAppProviderService.sendText(phoneNumber, ack);
+          await whatsAppRepository.addMessage({
+            conversation_id: conversation.id,
+            direction: 'outbound',
+            message_type: 'text',
+            content: ack,
+            provider_message_id: outboundId,
+          });
+
+          return { conversation_id: conversation.id, intent: 'vendor_confirm', response: ack };
+        }
+      }
+    }
 
     // Parse intent
     const parsed = await whatsAppIntentService.parseMessage(content);

@@ -5,13 +5,16 @@
  * call_sheet_dispatches row, returns signed/CDN URLs.
  *
  * dispatch() → loads a generated row, fans out links to vendor roster via
- * WhatsApp (fallback SMS) + Email. Updates per-recipient status in dispatch_log.
+ * WhatsApp + Email. Updates per-recipient status in dispatch_log.
  *
  * Outbound channels:
  *   - WhatsApp (primary) — preferred, text + link
- *   - SMS (fallback)     — if WhatsApp send throws
  *   - Email              — always sent when vendor has email on file
+ *
+ * SMS path intentionally removed (2026-04-23) — MSG91 DLT dependency dropped;
+ * WhatsApp via Interakt is the only transactional SMS-like channel we rely on.
  */
+import crypto from 'node:crypto';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { db } from '../../infrastructure/database.js';
 import { config } from '../../config/index.js';
@@ -154,7 +157,7 @@ export class CallSheetService {
         continue;
       }
 
-      // WhatsApp → fallback SMS
+      // WhatsApp only — SMS fallback removed 2026-04-23 (MSG91 DLT dropped)
       if (v.phone_e164 && v.user_id) {
         try {
           await notificationService.send({
@@ -172,31 +175,14 @@ export class CallSheetService {
           });
           success++;
         } catch (err: any) {
-          try {
-            await notificationService.send({
-              userId: v.user_id,
-              channel: NotificationChannel.SMS,
-              template: 'call_sheet_ready',
-              variables: vars,
-              phone: v.phone_e164,
-            });
-            log.push({
-              vendor_profile_id: v.vendor_profile_id,
-              channel: 'sms',
-              status: 'sent',
-              sent_at: new Date().toISOString(),
-            });
-            success++;
-          } catch (err2: any) {
-            log.push({
-              vendor_profile_id: v.vendor_profile_id,
-              channel: 'sms',
-              status: 'failed',
-              error: String(err2?.message ?? err?.message ?? err2),
-              sent_at: new Date().toISOString(),
-            });
-            failure++;
-          }
+          log.push({
+            vendor_profile_id: v.vendor_profile_id,
+            channel: 'whatsapp',
+            status: 'failed',
+            error: String(err?.message ?? err),
+            sent_at: new Date().toISOString(),
+          });
+          failure++;
         }
       }
 
@@ -249,6 +235,243 @@ export class CallSheetService {
       ]);
 
     return { ...updated, dispatch_log: log };
+  }
+
+  /**
+   * Send vendor confirmation templates (YES/NO) for an event file.
+   * Generates a per-vendor token, sends `vendor_confirm` template via WhatsApp,
+   * stamps confirmation_sent_at. Idempotent per (event_file, vendor):
+   * vendors already confirmed/declined are skipped.
+   */
+  async sendVendorConfirmations(eventFileId: string) {
+    const file = await db('event_files').where({ id: eventFileId }).first();
+    if (!file) throw new Error('EVENT_FILE_NOT_FOUND');
+
+    const vendors = await db('event_file_vendors as efv')
+      .leftJoin('artist_profiles as ap', 'efv.vendor_profile_id', 'ap.id')
+      .leftJoin('users as u', 'u.id', 'ap.user_id')
+      .where('efv.event_file_id', eventFileId)
+      .whereIn('efv.confirmation_status', ['pending', 'no_response'])
+      .select(
+        'efv.id as roster_id',
+        'efv.vendor_profile_id',
+        'ap.stage_name',
+        'u.id as user_id',
+        'u.phone as phone_e164',
+        'u.email',
+      );
+
+    const log: Array<{
+      roster_id: string;
+      vendor_profile_id: string;
+      channel: 'whatsapp' | 'email' | 'none';
+      status: 'sent' | 'failed' | 'skipped';
+      error?: string;
+    }> = [];
+    let sent = 0;
+
+    for (const v of vendors) {
+      if (!v.phone_e164 && !v.email) {
+        log.push({ roster_id: v.roster_id, vendor_profile_id: v.vendor_profile_id, channel: 'none', status: 'skipped', error: 'NO_CONTACT' });
+        continue;
+      }
+
+      const token = crypto.randomBytes(24).toString('base64url');
+      const confirmUrl = `${config.WEB_BASE_URL.replace(/\/$/, '')}/v/confirm/${token}`;
+      const declineUrl = `${config.WEB_BASE_URL.replace(/\/$/, '')}/v/decline/${token}`;
+
+      await db('event_file_vendors').where({ id: v.roster_id }).update({
+        confirmation_token: token,
+        confirmation_sent_at: db.fn.now(),
+        confirmation_status: 'pending',
+      });
+
+      const vars = {
+        event_name: file.event_name ?? '',
+        event_date: file.event_date ? new Date(file.event_date).toISOString().slice(0, 10) : '',
+        city: file.city ?? '',
+        confirm_url: confirmUrl,
+        decline_url: declineUrl,
+      };
+
+      if (v.phone_e164 && v.user_id) {
+        try {
+          await notificationService.send({
+            userId: v.user_id,
+            channel: NotificationChannel.WHATSAPP,
+            template: 'vendor_confirm',
+            variables: vars,
+            phone: v.phone_e164,
+          });
+          log.push({ roster_id: v.roster_id, vendor_profile_id: v.vendor_profile_id, channel: 'whatsapp', status: 'sent' });
+          sent++;
+        } catch (err: any) {
+          log.push({ roster_id: v.roster_id, vendor_profile_id: v.vendor_profile_id, channel: 'whatsapp', status: 'failed', error: String(err?.message ?? err) });
+        }
+      }
+
+      if (v.email && v.user_id) {
+        try {
+          await notificationService.send({
+            userId: v.user_id,
+            channel: NotificationChannel.EMAIL,
+            template: 'vendor_confirm',
+            variables: vars,
+            email: v.email,
+          });
+          log.push({ roster_id: v.roster_id, vendor_profile_id: v.vendor_profile_id, channel: 'email', status: 'sent' });
+        } catch (err: any) {
+          log.push({ roster_id: v.roster_id, vendor_profile_id: v.vendor_profile_id, channel: 'email', status: 'failed', error: String(err?.message ?? err) });
+        }
+      }
+    }
+
+    return { event_file_id: eventFileId, sent, attempted: vendors.length, log };
+  }
+
+  /**
+   * Apply a vendor's YES/NO response. Called by:
+   *   - WhatsApp inbound webhook (matches token OR vendor phone+recent send)
+   *   - Public GET /v/confirm/:token or /v/decline/:token tap-throughs
+   * Returns null if token invalid.
+   */
+  async recordVendorResponse(token: string, response: 'confirmed' | 'declined', responseText?: string) {
+    const row = await db('event_file_vendors').where({ confirmation_token: token }).first();
+    if (!row) return null;
+
+    await db('event_file_vendors').where({ id: row.id }).update({
+      confirmation_status: response,
+      confirmation_responded_at: db.fn.now(),
+      confirmation_response_text: responseText ?? response,
+    });
+
+    return { roster_id: row.id, event_file_id: row.event_file_id, vendor_profile_id: row.vendor_profile_id, confirmation_status: response };
+  }
+
+  /**
+   * Match an inbound phone number to the most recent pending confirmation.
+   * Used when vendor replies YES/NO to the template without us parsing the
+   * button payload (e.g. they type YES instead of tapping).
+   */
+  async findPendingByPhone(phoneE164: string) {
+    const clean = phoneE164.replace(/\D/g, '');
+    return db('event_file_vendors as efv')
+      .join('artist_profiles as ap', 'efv.vendor_profile_id', 'ap.id')
+      .join('users as u', 'u.id', 'ap.user_id')
+      .where('efv.confirmation_status', 'pending')
+      .whereNotNull('efv.confirmation_sent_at')
+      .whereNotNull('efv.confirmation_token')
+      .whereRaw("regexp_replace(u.phone, '[^0-9]', '', 'g') = ?", [clean])
+      .orderBy('efv.confirmation_sent_at', 'desc')
+      .select('efv.id as roster_id', 'efv.event_file_id', 'efv.vendor_profile_id', 'efv.confirmation_token')
+      .first();
+  }
+
+  /**
+   * Send day-of check-in templates to confirmed vendors. Idempotent: vendors
+   * already on_track / delayed / help are skipped; pending + no_response get
+   * (re)nudged. Only confirmed vendors are contacted — declined vendors are
+   * not our problem on event day.
+   */
+  async sendDayOfCheckins(eventFileId: string) {
+    const file = await db('event_files').where({ id: eventFileId }).first();
+    if (!file) throw new Error('EVENT_FILE_NOT_FOUND');
+
+    const vendors = await db('event_file_vendors as efv')
+      .leftJoin('artist_profiles as ap', 'efv.vendor_profile_id', 'ap.id')
+      .leftJoin('users as u', 'u.id', 'ap.user_id')
+      .where('efv.event_file_id', eventFileId)
+      .where('efv.confirmation_status', 'confirmed')
+      .whereIn('efv.checkin_status', ['pending', 'no_response'])
+      .select(
+        'efv.id as roster_id',
+        'efv.vendor_profile_id',
+        'ap.stage_name',
+        'u.id as user_id',
+        'u.phone as phone_e164',
+      );
+
+    const log: Array<{
+      roster_id: string;
+      vendor_profile_id: string;
+      channel: 'whatsapp' | 'none';
+      status: 'sent' | 'failed' | 'skipped';
+      error?: string;
+    }> = [];
+    let sent = 0;
+
+    for (const v of vendors) {
+      if (!v.phone_e164 || !v.user_id) {
+        log.push({ roster_id: v.roster_id, vendor_profile_id: v.vendor_profile_id, channel: 'none', status: 'skipped', error: 'NO_PHONE' });
+        continue;
+      }
+
+      const vars = {
+        event_name: file.event_name ?? '',
+        event_date: file.event_date ? new Date(file.event_date).toISOString().slice(0, 10) : '',
+        city: file.city ?? '',
+      };
+
+      try {
+        await notificationService.send({
+          userId: v.user_id,
+          channel: NotificationChannel.WHATSAPP,
+          template: 'day_of_checkin',
+          variables: vars,
+          phone: v.phone_e164,
+        });
+        await db('event_file_vendors').where({ id: v.roster_id }).update({
+          checkin_sent_at: db.fn.now(),
+          checkin_status: 'pending',
+        });
+        log.push({ roster_id: v.roster_id, vendor_profile_id: v.vendor_profile_id, channel: 'whatsapp', status: 'sent' });
+        sent++;
+      } catch (err: any) {
+        log.push({ roster_id: v.roster_id, vendor_profile_id: v.vendor_profile_id, channel: 'whatsapp', status: 'failed', error: String(err?.message ?? err) });
+      }
+    }
+
+    return { event_file_id: eventFileId, sent, attempted: vendors.length, log };
+  }
+
+  /**
+   * Apply a vendor's day-of reply. Status mapping:
+   *   yes     → on_track
+   *   delayed → delayed
+   *   help    → help
+   */
+  async recordVendorCheckin(
+    rosterId: string,
+    status: 'on_track' | 'delayed' | 'help',
+    responseText?: string,
+  ) {
+    const [row] = await db('event_file_vendors')
+      .where({ id: rosterId })
+      .update({
+        checkin_status: status,
+        checkin_responded_at: db.fn.now(),
+        checkin_response_text: responseText ?? status,
+      })
+      .returning(['id', 'event_file_id', 'vendor_profile_id', 'checkin_status']);
+    return row ?? null;
+  }
+
+  /**
+   * Match an inbound phone number to the most recent pending day-of check-in.
+   * Only looks at confirmed vendors whose check-in was sent but not answered.
+   */
+  async findPendingCheckinByPhone(phoneE164: string) {
+    const clean = phoneE164.replace(/\D/g, '');
+    return db('event_file_vendors as efv')
+      .join('artist_profiles as ap', 'efv.vendor_profile_id', 'ap.id')
+      .join('users as u', 'u.id', 'ap.user_id')
+      .where('efv.confirmation_status', 'confirmed')
+      .whereIn('efv.checkin_status', ['pending', 'no_response'])
+      .whereNotNull('efv.checkin_sent_at')
+      .whereRaw("regexp_replace(u.phone, '[^0-9]', '', 'g') = ?", [clean])
+      .orderBy('efv.checkin_sent_at', 'desc')
+      .select('efv.id as roster_id', 'efv.event_file_id', 'efv.vendor_profile_id')
+      .first();
   }
 }
 

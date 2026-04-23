@@ -495,6 +495,66 @@ export async function eventFileRoutes(app: FastifyInstance) {
   });
 
   /**
+   * POST /v1/event-files/:id/vendor-confirmations — Trigger vendor_confirm
+   * template fan-out. Generates per-vendor token + sends WhatsApp (+ Email).
+   * Idempotent: skips rows already confirmed/declined.
+   */
+  app.post('/v1/event-files/:id/vendor-confirmations', {
+    preHandler: [authMiddleware, rateLimit('WRITE')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    if (!(await assertOwns(request, reply, id))) return;
+    try {
+      const result = await callSheetService.sendVendorConfirmations(id);
+      return reply.send({ success: true, data: result, errors: [] });
+    } catch (err: any) {
+      if (err?.message === 'EVENT_FILE_NOT_FOUND') {
+        return reply.status(404).send({ success: false, errors: [{ code: 'NOT_FOUND', message: 'Event file not found' }] });
+      }
+      throw err;
+    }
+  });
+
+  /**
+   * POST /v1/event-files/:id/day-of-checkins — Trigger day_of_checkin
+   * template fan-out. Sends only to vendors who have confirmation_status =
+   * 'confirmed'. Idempotent: skips vendors already on_track/delayed/help.
+   */
+  app.post('/v1/event-files/:id/day-of-checkins', {
+    preHandler: [authMiddleware, rateLimit('WRITE')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    if (!(await assertOwns(request, reply, id))) return;
+    try {
+      const result = await callSheetService.sendDayOfCheckins(id);
+      return reply.send({ success: true, data: result, errors: [] });
+    } catch (err: any) {
+      if (err?.message === 'EVENT_FILE_NOT_FOUND') {
+        return reply.status(404).send({ success: false, errors: [{ code: 'NOT_FOUND', message: 'Event file not found' }] });
+      }
+      throw err;
+    }
+  });
+
+  /**
+   * Public vendor tap-through — no auth, token IS the credential.
+   * GET /v1/vendor-confirm/:token?response=confirmed|declined
+   */
+  app.get('/v1/vendor-confirm/:token', {
+    preHandler: [rateLimit('WRITE')],
+  }, async (request, reply) => {
+    const { token } = request.params as { token: string };
+    const query = request.query as { response?: string };
+    const response = query.response === 'declined' ? 'declined' : 'confirmed';
+
+    const result = await callSheetService.recordVendorResponse(token, response, `tap_${response}`);
+    if (!result) {
+      return reply.status(404).send({ success: false, errors: [{ code: 'INVALID_TOKEN', message: 'Confirmation link is invalid or expired' }] });
+    }
+    return reply.send({ success: true, data: result, errors: [] });
+  });
+
+  /**
    * DEMO-ONLY public routes — no auth. Only return event_files whose
    * event_name begins with 'DEMO:'. Used by /demo surface for Shows of India
    * stage walkthrough where stage WiFi + login = demo risk.

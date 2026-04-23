@@ -48,6 +48,12 @@ interface VendorRow {
   base_city: string | null;
   booking_status: string | null;
   booking_amount: number | null;
+  confirmation_status?: 'pending' | 'confirmed' | 'declined' | 'no_response';
+  confirmation_sent_at?: string | null;
+  confirmation_responded_at?: string | null;
+  checkin_status?: 'pending' | 'on_track' | 'delayed' | 'help' | 'no_response';
+  checkin_sent_at?: string | null;
+  checkin_responded_at?: string | null;
 }
 
 interface EventFileDetail {
@@ -155,11 +161,47 @@ export default function EventFileDetailPage() {
     }
   }
 
-  async function dispatchDayOfCheckin() {
-    await apiClient(`/v1/outbound-voice/event-files/${id}/day-of-checkin`, {
-      method: 'POST',
-    });
-    alert('Day-of check-in calls queued for all vendors on this event.');
+  const [sendingConfirm, setSendingConfirm] = useState(false);
+  const [sendingCheckin, setSendingCheckin] = useState(false);
+  const [lastDispatchResult, setLastDispatchResult] = useState<string | null>(null);
+
+  async function refreshFile() {
+    const res = await apiClient<EventFileDetail>(`/v1/event-files/${id}`);
+    if (res.success) setFile(res.data);
+  }
+
+  async function sendVendorConfirmations() {
+    setSendingConfirm(true);
+    setLastDispatchResult(null);
+    try {
+      const res = await apiClient<{ sent: number; attempted: number }>(
+        `/v1/event-files/${id}/vendor-confirmations`,
+        { method: 'POST' },
+      );
+      if (res.success) {
+        setLastDispatchResult(`Confirmations: ${res.data.sent}/${res.data.attempted} sent via WhatsApp.`);
+        await refreshFile();
+      }
+    } finally {
+      setSendingConfirm(false);
+    }
+  }
+
+  async function sendDayOfCheckins() {
+    setSendingCheckin(true);
+    setLastDispatchResult(null);
+    try {
+      const res = await apiClient<{ sent: number; attempted: number }>(
+        `/v1/event-files/${id}/day-of-checkins`,
+        { method: 'POST' },
+      );
+      if (res.success) {
+        setLastDispatchResult(`Check-ins: ${res.data.sent}/${res.data.attempted} sent via WhatsApp.`);
+        await refreshFile();
+      }
+    } finally {
+      setSendingCheckin(false);
+    }
   }
 
   if (loading) {
@@ -261,7 +303,16 @@ export default function EventFileDetailPage() {
         )}
         {tab === 'rider' && <RiderTab fileId={file.id} />}
         {tab === 'boq' && <BOQTab fileId={file.id} />}
-        {tab === 'day-of' && <DayOfTab file={file} onDispatch={dispatchDayOfCheckin} />}
+        {tab === 'day-of' && (
+          <DayOfTab
+            file={file}
+            sendingConfirm={sendingConfirm}
+            sendingCheckin={sendingCheckin}
+            lastResult={lastDispatchResult}
+            onSendConfirmations={sendVendorConfirmations}
+            onSendCheckins={sendDayOfCheckins}
+          />
+        )}
       </section>
     </div>
   );
@@ -306,6 +357,10 @@ function RosterTab({ file }: { file: EventFileDetail }) {
               {v.booking_amount && <span>{formatRupees(v.booking_amount)}</span>}
             </div>
             {v.notes && <p className="text-xs text-white/40 mt-1 italic">{v.notes}</p>}
+          </div>
+          <div className="flex flex-col items-end gap-1.5">
+            <ConfirmationChip status={v.confirmation_status ?? 'pending'} />
+            {v.checkin_status && v.checkin_status !== 'pending' && <CheckinChip status={v.checkin_status} />}
           </div>
         </div>
       ))}
@@ -751,59 +806,144 @@ function BOQItemForm({
   );
 }
 
-// ─── Day-of tab ──────────────────────────────────────────────────────────────
-interface CallRow {
-  id: string;
-  vendor_name?: string;
-  vendor_profile_id: string;
-  purpose: string;
-  status: string;
-  available?: boolean;
-}
-function DayOfTab({ file, onDispatch }: { file: EventFileDetail; onDispatch: () => void }) {
-  const [calls, setCalls] = useState<CallRow[]>([]);
-  const [loading, setLoading] = useState(true);
+// ─── Status chips ────────────────────────────────────────────────────────────
+const CONFIRM_STYLES: Record<NonNullable<VendorRow['confirmation_status']>, { label: string; cls: string }> = {
+  pending:     { label: 'Pending',      cls: 'bg-white/5 text-white/50 border-white/10' },
+  confirmed:   { label: 'Confirmed',    cls: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' },
+  declined:    { label: 'Declined',     cls: 'bg-red-500/10 text-red-300 border-red-500/30' },
+  no_response: { label: 'No response',  cls: 'bg-[#ffbf00]/10 text-[#ffbf00] border-[#ffbf00]/30' },
+};
 
-  useEffect(() => {
-    apiClient<CallRow[]>(`/v1/outbound-voice/event-files/${file.id}/calls`)
-      .then((res) => res.success && setCalls((res.data as CallRow[] | null) ?? []))
-      .finally(() => setLoading(false));
-  }, [file.id]);
+const CHECKIN_STYLES: Record<NonNullable<VendorRow['checkin_status']>, { label: string; cls: string }> = {
+  pending:     { label: 'Check-in pending', cls: 'bg-white/5 text-white/50 border-white/10' },
+  on_track:    { label: 'On track',         cls: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' },
+  delayed:     { label: 'Delayed',          cls: 'bg-[#ffbf00]/10 text-[#ffbf00] border-[#ffbf00]/30' },
+  help:        { label: 'Help',             cls: 'bg-red-500/10 text-red-300 border-red-500/30' },
+  no_response: { label: 'No response',      cls: 'bg-white/5 text-white/40 border-white/10' },
+};
+
+function ConfirmationChip({ status }: { status: NonNullable<VendorRow['confirmation_status']> }) {
+  const s = CONFIRM_STYLES[status];
+  return <span className={`nocturne-chip text-[10px] ${s.cls}`}>{s.label}</span>;
+}
+function CheckinChip({ status }: { status: NonNullable<VendorRow['checkin_status']> }) {
+  const s = CHECKIN_STYLES[status];
+  return <span className={`nocturne-chip text-[10px] ${s.cls}`}>{s.label}</span>;
+}
+
+// ─── Day-of tab ──────────────────────────────────────────────────────────────
+function DayOfTab({
+  file, sendingConfirm, sendingCheckin, lastResult, onSendConfirmations, onSendCheckins,
+}: {
+  file: EventFileDetail;
+  sendingConfirm: boolean;
+  sendingCheckin: boolean;
+  lastResult: string | null;
+  onSendConfirmations: () => void;
+  onSendCheckins: () => void;
+}) {
+  const totals = file.vendors.reduce(
+    (acc, v) => {
+      acc.confirm[v.confirmation_status ?? 'pending']++;
+      if (v.checkin_status) acc.checkin[v.checkin_status]++;
+      return acc;
+    },
+    {
+      confirm: { pending: 0, confirmed: 0, declined: 0, no_response: 0 },
+      checkin: { pending: 0, on_track: 0, delayed: 0, help: 0, no_response: 0 },
+    },
+  );
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="font-display text-xl font-extrabold tracking-tight">Day-of Check-in Calls</h3>
-          <p className="text-white/50 text-sm mt-1">
-            AI-dialed voice check-ins to all vendors on the roster.
+    <div className="space-y-6">
+      {/* Dispatch controls */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="glass-card rounded-xl p-6 border border-white/5">
+          <div className="flex items-center gap-3 mb-2">
+            <CheckCircle2 className="w-5 h-5 text-[#c39bff]" />
+            <h4 className="font-display text-lg font-extrabold tracking-tight">Vendor Confirmations</h4>
+          </div>
+          <p className="text-white/50 text-sm mb-4">
+            Send each vendor a WhatsApp message asking them to confirm this booking (YES / NO).
           </p>
+          <div className="flex flex-wrap gap-2 mb-4 text-xs">
+            <span className="nocturne-chip bg-emerald-500/10 text-emerald-300 border-emerald-500/30">
+              Confirmed: {totals.confirm.confirmed}
+            </span>
+            <span className="nocturne-chip bg-white/5 text-white/50 border-white/10">
+              Pending: {totals.confirm.pending}
+            </span>
+            <span className="nocturne-chip bg-red-500/10 text-red-300 border-red-500/30">
+              Declined: {totals.confirm.declined}
+            </span>
+          </div>
+          <button
+            onClick={onSendConfirmations}
+            disabled={sendingConfirm}
+            className="btn-nocturne-primary flex items-center gap-2 px-5 py-2.5 disabled:opacity-50"
+          >
+            {sendingConfirm ? <Loader2 className="w-4 h-4 animate-spin" /> : <Phone className="w-4 h-4" />}
+            Send Confirmations
+          </button>
         </div>
-        <button onClick={onDispatch} className="btn-nocturne-primary flex items-center gap-2 px-5 py-2.5">
-          <Phone className="w-4 h-4" /> Dispatch to All
-        </button>
+
+        <div className="glass-card rounded-xl p-6 border border-white/5">
+          <div className="flex items-center gap-3 mb-2">
+            <Clock className="w-5 h-5 text-[#a1faff]" />
+            <h4 className="font-display text-lg font-extrabold tracking-tight">Day-of Check-ins</h4>
+          </div>
+          <p className="text-white/50 text-sm mb-4">
+            Morning-of WhatsApp ping: reply YES / DELAYED / HELP. Sent only to confirmed vendors.
+          </p>
+          <div className="flex flex-wrap gap-2 mb-4 text-xs">
+            <span className="nocturne-chip bg-emerald-500/10 text-emerald-300 border-emerald-500/30">
+              On track: {totals.checkin.on_track}
+            </span>
+            <span className="nocturne-chip bg-[#ffbf00]/10 text-[#ffbf00] border-[#ffbf00]/30">
+              Delayed: {totals.checkin.delayed}
+            </span>
+            <span className="nocturne-chip bg-red-500/10 text-red-300 border-red-500/30">
+              Help: {totals.checkin.help}
+            </span>
+          </div>
+          <button
+            onClick={onSendCheckins}
+            disabled={sendingCheckin}
+            className="btn-nocturne-primary flex items-center gap-2 px-5 py-2.5 disabled:opacity-50"
+          >
+            {sendingCheckin ? <Loader2 className="w-4 h-4 animate-spin" /> : <Phone className="w-4 h-4" />}
+            Send Check-ins
+          </button>
+        </div>
       </div>
 
-      {loading && <div className="nocturne-skeleton h-32 rounded-xl" />}
-      {!loading && calls.length === 0 && (
-        <div className="glass-card rounded-xl p-12 text-center border border-white/5">
-          <Phone className="w-10 h-10 text-[#c39bff] mx-auto mb-4" />
-          <h3 className="font-display text-xl font-extrabold">No calls yet</h3>
-          <p className="text-white/50 mt-2">Dispatch day-of check-ins on event day to confirm arrivals.</p>
+      {lastResult && (
+        <div className="glass-card rounded-xl p-4 border border-[#c39bff]/20 text-sm text-[#c39bff]">
+          {lastResult}
         </div>
       )}
 
-      <div className="space-y-2">
-        {calls.map((c) => (
-          <div key={c.id} className="glass-card rounded-xl p-4 border border-white/5 flex items-center gap-3">
-            <Phone className="w-4 h-4 text-[#a1faff]" />
-            <div className="flex-1 text-sm">
-              <div className="font-medium">{c.vendor_name || c.vendor_profile_id}</div>
-              <div className="text-xs text-white/40">{c.purpose} · {c.status}</div>
-            </div>
-            {c.available === true && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
+      {/* Vendor status list */}
+      <div>
+        <h4 className="font-display text-base font-extrabold tracking-tight mb-3">Per-vendor status</h4>
+        {file.vendors.length === 0 ? (
+          <div className="glass-card rounded-xl p-8 text-center border border-white/5 text-white/40">
+            Add vendors to the roster to enable WhatsApp dispatch.
           </div>
-        ))}
+        ) : (
+          <div className="space-y-2">
+            {file.vendors.map((v) => (
+              <div key={v.id} className="glass-card rounded-xl p-4 border border-white/5 flex items-center gap-3">
+                <div className="flex-1 text-sm">
+                  <div className="font-medium">{v.stage_name || 'Unnamed vendor'}</div>
+                  <div className="text-xs text-white/40">{v.category ?? 'vendor'} · {v.role}</div>
+                </div>
+                <ConfirmationChip status={v.confirmation_status ?? 'pending'} />
+                {v.checkin_status && v.checkin_status !== 'pending' && <CheckinChip status={v.checkin_status} />}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
