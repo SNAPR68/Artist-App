@@ -18,6 +18,8 @@ interface Vendor {
   base_city: string | null;
   booking_status: string | null;
   booking_amount: number | null;
+  confirmation_status: string | null;
+  checkin_status: string | null;
 }
 
 interface DemoEventFile {
@@ -103,7 +105,7 @@ export default async function DemoEventFileDetail({
     0,
   );
   const confirmed = file.vendors.filter(
-    (v) => v.booking_status === 'CONFIRMED' || v.booking_status === 'EVENT_COMPLETED',
+    (v) => v.confirmation_status === 'confirmed',
   ).length;
 
   return (
@@ -232,15 +234,32 @@ export default async function DemoEventFileDetail({
                           Call {v.call_time_override.slice(0, 5)}
                         </div>
                       )}
-                      {v.booking_status && (
+                      {v.confirmation_status && v.confirmation_status !== 'pending' && (
                         <div
                           className="text-[10px] tracking-widest uppercase font-bold px-2 py-1 rounded-full"
                           style={{
-                            backgroundColor: `${color}15`,
-                            color,
+                            backgroundColor: v.confirmation_status === 'confirmed' ? '#a1faff15' : '#ff8fb115',
+                            color: v.confirmation_status === 'confirmed' ? '#a1faff' : '#ff8fb1',
                           }}
                         >
-                          {v.booking_status}
+                          {v.confirmation_status}
+                        </div>
+                      )}
+                      {v.checkin_status && v.checkin_status !== 'pending' && (
+                        <div
+                          className="text-[10px] tracking-widest uppercase font-bold px-2 py-1 rounded-full"
+                          style={{
+                            backgroundColor:
+                              v.checkin_status === 'on_track' ? '#8affc115' :
+                              v.checkin_status === 'delayed' ? '#ffbf0015' :
+                              v.checkin_status === 'help' ? '#ff4d4d15' : '#ffffff10',
+                            color:
+                              v.checkin_status === 'on_track' ? '#8affc1' :
+                              v.checkin_status === 'delayed' ? '#ffbf00' :
+                              v.checkin_status === 'help' ? '#ff4d4d' : '#ffffff50',
+                          }}
+                        >
+                          {v.checkin_status === 'on_track' ? 'On track' : v.checkin_status}
                         </div>
                       )}
                       {v.booking_amount !== null && (
