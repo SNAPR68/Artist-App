@@ -14,6 +14,9 @@
 import 'dotenv/config';
 import { db } from '../src/infrastructure/database.js';
 
+type ConfirmStatus = 'pending' | 'confirmed' | 'declined' | 'no_response';
+type CheckinStatus = 'pending' | 'on_track' | 'delayed' | 'help' | 'no_response';
+
 interface Plan {
   name: string;
   date: string;
@@ -21,7 +24,15 @@ interface Plan {
   venue: string;
   call: string;
   brief: Record<string, unknown>;
-  categories: Array<{ cat: string; role: string; count: number; note?: string; call_offset_min?: number }>;
+  categories: Array<{
+    cat: string;
+    role: string;
+    count: number;
+    note?: string;
+    call_offset_min?: number;
+    confirmation_status?: ConfirmStatus;
+    checkin_status?: CheckinStatus;
+  }>;
 }
 
 const PLANS: Plan[] = [
@@ -39,13 +50,13 @@ const PLANS: Plan[] = [
       dietary: ['vegetarian', 'jain'],
     },
     categories: [
-      { cat: 'artist', role: 'Sangeet Band',    count: 1, call_offset_min: 120 },
-      { cat: 'artist', role: 'DJ',              count: 1, call_offset_min: 60 },
-      { cat: 'av',     role: 'Sound + Lights',  count: 2, call_offset_min: 240, note: 'Full stage rig, ~8kW' },
-      { cat: 'photo',  role: 'Lead Photog',     count: 1, call_offset_min: 90 },
-      { cat: 'photo',  role: 'Candid Team',     count: 1, call_offset_min: 90 },
-      { cat: 'decor',  role: 'Floral + Mandap', count: 2, call_offset_min: 360, note: '6hr build-out' },
-      { cat: 'transport', role: 'Guest Shuttle', count: 1, note: '3x Tempo Traveller, airport pickups' },
+      { cat: 'artist', role: 'Sangeet Band',    count: 1, call_offset_min: 120, confirmation_status: 'confirmed', checkin_status: 'on_track' },
+      { cat: 'artist', role: 'DJ',              count: 1, call_offset_min: 60,  confirmation_status: 'confirmed', checkin_status: 'on_track' },
+      { cat: 'av',     role: 'Sound + Lights',  count: 2, call_offset_min: 240, confirmation_status: 'confirmed', checkin_status: 'delayed', note: 'Full stage rig, ~8kW' },
+      { cat: 'photo',  role: 'Lead Photog',     count: 1, call_offset_min: 90,  confirmation_status: 'confirmed', checkin_status: 'on_track' },
+      { cat: 'photo',  role: 'Candid Team',     count: 1, call_offset_min: 90,  confirmation_status: 'confirmed', checkin_status: 'on_track' },
+      { cat: 'decor',  role: 'Floral + Mandap', count: 2, call_offset_min: 360, confirmation_status: 'confirmed', checkin_status: 'on_track', note: '6hr build-out' },
+      { cat: 'transport', role: 'Guest Shuttle', count: 1, confirmation_status: 'no_response', checkin_status: 'pending', note: '3x Tempo Traveller, airport pickups' },
     ],
   },
   {
@@ -62,12 +73,12 @@ const PLANS: Plan[] = [
       livestream: true,
     },
     categories: [
-      { cat: 'av',         role: 'Broadcast AV',  count: 2, call_offset_min: 240, note: '4K multi-cam, IMAG' },
-      { cat: 'photo',      role: 'Event Coverage', count: 2, call_offset_min: 60 },
-      { cat: 'decor',      role: 'Stage Design',  count: 2, call_offset_min: 480, note: 'LED backdrop + truss' },
-      { cat: 'artist',     role: 'Entertainment', count: 1, call_offset_min: 30, note: 'Post-keynote slot' },
-      { cat: 'license',    role: 'PPL + IPRS',    count: 1, note: 'Music clearance' },
-      { cat: 'transport',  role: 'VIP Transfer',  count: 1, note: '2x sedan, board-level' },
+      { cat: 'av',         role: 'Broadcast AV',  count: 2, call_offset_min: 240, confirmation_status: 'confirmed', checkin_status: 'on_track', note: '4K multi-cam, IMAG' },
+      { cat: 'photo',      role: 'Event Coverage', count: 2, call_offset_min: 60, confirmation_status: 'confirmed', checkin_status: 'on_track' },
+      { cat: 'decor',      role: 'Stage Design',  count: 2, call_offset_min: 480, confirmation_status: 'confirmed', checkin_status: 'on_track', note: 'LED backdrop + truss' },
+      { cat: 'artist',     role: 'Entertainment', count: 1, call_offset_min: 30,  confirmation_status: 'confirmed', checkin_status: 'on_track', note: 'Post-keynote slot' },
+      { cat: 'license',    role: 'PPL + IPRS',    count: 1, confirmation_status: 'confirmed', checkin_status: 'pending', note: 'Music clearance' },
+      { cat: 'transport',  role: 'VIP Transfer',  count: 1, confirmation_status: 'confirmed', checkin_status: 'on_track', note: '2x sedan, board-level' },
     ],
   },
   {
@@ -84,14 +95,14 @@ const PLANS: Plan[] = [
       budget_tier: 'festival',
     },
     categories: [
-      { cat: 'artist',    role: 'Headliner',       count: 3, call_offset_min: 180 },
-      { cat: 'artist',    role: 'Support Act',     count: 4, call_offset_min: 120 },
-      { cat: 'av',        role: 'Main Stage Rig',  count: 2, call_offset_min: 720, note: 'Line array, intelligent lighting' },
-      { cat: 'photo',     role: 'Festival Crew',   count: 2, call_offset_min: 60 },
-      { cat: 'decor',     role: 'Scenic + SFX',    count: 2, call_offset_min: 600, note: 'Pyro + CO2, confetti cannons' },
-      { cat: 'license',   role: 'Performance Rights', count: 1 },
-      { cat: 'promoters', role: 'Ticketing',       count: 1, note: 'BookMyShow integration' },
-      { cat: 'transport', role: 'Artist Transfer', count: 2, note: 'GOI airport \u2192 Vagator' },
+      { cat: 'artist',    role: 'Headliner',       count: 3, call_offset_min: 180, confirmation_status: 'confirmed', checkin_status: 'on_track' },
+      { cat: 'artist',    role: 'Support Act',     count: 4, call_offset_min: 120, confirmation_status: 'confirmed', checkin_status: 'on_track' },
+      { cat: 'av',        role: 'Main Stage Rig',  count: 2, call_offset_min: 720, confirmation_status: 'confirmed', checkin_status: 'delayed', note: 'Line array, intelligent lighting' },
+      { cat: 'photo',     role: 'Festival Crew',   count: 2, call_offset_min: 60,  confirmation_status: 'confirmed', checkin_status: 'on_track' },
+      { cat: 'decor',     role: 'Scenic + SFX',    count: 2, call_offset_min: 600, confirmation_status: 'confirmed', checkin_status: 'on_track', note: 'Pyro + CO2, confetti cannons' },
+      { cat: 'license',   role: 'Performance Rights', count: 1, confirmation_status: 'confirmed', checkin_status: 'pending' },
+      { cat: 'promoters', role: 'Ticketing',       count: 1, confirmation_status: 'confirmed', checkin_status: 'on_track', note: 'BookMyShow integration' },
+      { cat: 'transport', role: 'Artist Transfer', count: 2, confirmation_status: 'confirmed', checkin_status: 'help', note: 'GOI airport \u2192 Vagator' },
     ],
   },
 ];
@@ -165,6 +176,8 @@ async function main() {
           role: roleSlot,
           call_time_override: callOverride,
           notes: c.note ?? null,
+          confirmation_status: c.confirmation_status ?? 'pending',
+          checkin_status: c.checkin_status ?? 'pending',
         }).onConflict(['event_file_id', 'vendor_profile_id', 'role']).ignore();
         vendorsInserted++;
       }
