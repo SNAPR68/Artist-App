@@ -158,6 +158,22 @@ export class EventFileRepository {
     return row;
   }
 
+  async overrideVendorStatus(
+    eventFileId: string,
+    vendorRowId: string,
+    confirmation_status?: string,
+    checkin_status?: string,
+  ) {
+    const update: Record<string, unknown> = { updated_at: db.fn.now() };
+    if (confirmation_status) update.confirmation_status = confirmation_status;
+    if (checkin_status) update.checkin_status = checkin_status;
+    const [row] = await db('event_file_vendors')
+      .where({ id: vendorRowId, event_file_id: eventFileId })
+      .update(update)
+      .returning(['id', 'confirmation_status', 'checkin_status']);
+    return row ?? null;
+  }
+
   async isOwner(id: string, clientId: string): Promise<boolean> {
     const row = await db('event_files')
       .where({ id, client_id: clientId, deleted_at: null })

@@ -311,6 +311,7 @@ export default function EventFileDetailPage() {
             lastResult={lastDispatchResult}
             onSendConfirmations={sendVendorConfirmations}
             onSendCheckins={sendDayOfCheckins}
+            onRefresh={refreshFile}
           />
         )}
       </section>
@@ -833,7 +834,7 @@ function CheckinChip({ status }: { status: NonNullable<VendorRow['checkin_status
 
 // ─── Day-of tab ──────────────────────────────────────────────────────────────
 function DayOfTab({
-  file, sendingConfirm, sendingCheckin, lastResult, onSendConfirmations, onSendCheckins,
+  file, sendingConfirm, sendingCheckin, lastResult, onSendConfirmations, onSendCheckins, onRefresh,
 }: {
   file: EventFileDetail;
   sendingConfirm: boolean;
@@ -841,7 +842,10 @@ function DayOfTab({
   lastResult: string | null;
   onSendConfirmations: () => void;
   onSendCheckins: () => void;
+  onRefresh: () => Promise<void>;
 }) {
+  const [overriding, setOverriding] = useState<string | null>(null);
+
   const totals = file.vendors.reduce(
     (acc, v) => {
       acc.confirm[v.confirmation_status ?? 'pending']++;
@@ -853,6 +857,23 @@ function DayOfTab({
       checkin: { pending: 0, on_track: 0, delayed: 0, help: 0, no_response: 0 },
     },
   );
+
+  async function overrideStatus(
+    vendorId: string,
+    field: 'confirmation_status' | 'checkin_status',
+    value: string,
+  ) {
+    setOverriding(vendorId);
+    try {
+      await apiClient(`/v1/event-files/${file.id}/vendors/${vendorId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ [field]: value }),
+      });
+      await onRefresh();
+    } finally {
+      setOverriding(null);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -925,23 +946,57 @@ function DayOfTab({
 
       {/* Vendor status list */}
       <div>
-        <h4 className="font-display text-base font-extrabold tracking-tight mb-3">Per-vendor status</h4>
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="font-display text-base font-extrabold tracking-tight">Per-vendor status</h4>
+          <span className="text-xs text-white/30">Use dropdowns to override status manually</span>
+        </div>
         {file.vendors.length === 0 ? (
           <div className="glass-card rounded-xl p-8 text-center border border-white/5 text-white/40">
             Add vendors to the roster to enable WhatsApp dispatch.
           </div>
         ) : (
           <div className="space-y-2">
-            {file.vendors.map((v) => (
-              <div key={v.id} className="glass-card rounded-xl p-4 border border-white/5 flex items-center gap-3">
-                <div className="flex-1 text-sm">
-                  <div className="font-medium">{v.stage_name || 'Unnamed vendor'}</div>
-                  <div className="text-xs text-white/40">{v.category ?? 'vendor'} · {v.role}</div>
+            {file.vendors.map((v) => {
+              const isOverriding = overriding === v.id;
+              return (
+                <div key={v.id} className="glass-card rounded-xl p-4 border border-white/5 flex items-center gap-3 flex-wrap">
+                  <div className="flex-1 min-w-0 text-sm">
+                    <div className="font-medium truncate">{v.stage_name || 'Unnamed vendor'}</div>
+                    <div className="text-xs text-white/40">{v.category ?? 'vendor'} · {v.role}</div>
+                  </div>
+                  {/* Confirmation override */}
+                  <div className="flex items-center gap-2">
+                    {isOverriding
+                      ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white/30" />
+                      : null}
+                    <select
+                      disabled={isOverriding}
+                      value={v.confirmation_status ?? 'pending'}
+                      onChange={(e) => overrideStatus(v.id, 'confirmation_status', e.target.value)}
+                      className="input-nocturne text-xs py-1 px-2 rounded-lg border border-white/10 bg-white/5 text-white/80 disabled:opacity-40"
+                    >
+                      <option value="pending">Confirm: Pending</option>
+                      <option value="confirmed">Confirm: Confirmed</option>
+                      <option value="declined">Confirm: Declined</option>
+                      <option value="no_response">Confirm: No Response</option>
+                    </select>
+                    {/* Check-in override */}
+                    <select
+                      disabled={isOverriding}
+                      value={v.checkin_status ?? 'pending'}
+                      onChange={(e) => overrideStatus(v.id, 'checkin_status', e.target.value)}
+                      className="input-nocturne text-xs py-1 px-2 rounded-lg border border-white/10 bg-white/5 text-white/80 disabled:opacity-40"
+                    >
+                      <option value="pending">Check-in: Pending</option>
+                      <option value="on_track">Check-in: On Track</option>
+                      <option value="delayed">Check-in: Delayed</option>
+                      <option value="help">Check-in: Help</option>
+                      <option value="no_response">Check-in: No Response</option>
+                    </select>
+                  </div>
                 </div>
-                <ConfirmationChip status={v.confirmation_status ?? 'pending'} />
-                {v.checkin_status && v.checkin_status !== 'pending' && <CheckinChip status={v.checkin_status} />}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

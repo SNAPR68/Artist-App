@@ -555,6 +555,42 @@ export async function eventFileRoutes(app: FastifyInstance) {
   });
 
   /**
+   * PATCH /v1/event-files/:id/vendors/:vendorId/status
+   * Manual override for confirmation_status and/or checkin_status.
+   * Demo/fallback when WhatsApp is unavailable.
+   */
+  const vendorStatusOverrideSchema = z.object({
+    confirmation_status: z.enum(['pending', 'confirmed', 'declined', 'no_response']).optional(),
+    checkin_status: z.enum(['pending', 'on_track', 'delayed', 'help', 'no_response']).optional(),
+  }).refine((d) => d.confirmation_status || d.checkin_status, {
+    message: 'At least one of confirmation_status or checkin_status is required',
+  });
+
+  app.patch('/v1/event-files/:id/vendors/:vendorId/status', {
+    preHandler: [authMiddleware, rateLimit('WRITE')],
+  }, async (request, reply) => {
+    const parsed = vendorStatusOverrideSchema.safeParse(request.body);
+    if (!parsed.success) return zodFail(reply, 400, parsed.error.issues);
+
+    const { id, vendorId } = request.params as { id: string; vendorId: string };
+    if (!(await assertOwns(request, reply, id))) return;
+
+    const row = await eventFileRepository.overrideVendorStatus(
+      id,
+      vendorId,
+      parsed.data.confirmation_status,
+      parsed.data.checkin_status,
+    );
+    if (!row) {
+      return reply.status(404).send({
+        success: false,
+        errors: [{ code: 'NOT_FOUND', message: 'Vendor row not found' }],
+      });
+    }
+    return reply.send({ success: true, data: row, errors: [] });
+  });
+
+  /**
    * DEMO-ONLY public routes — no auth. Only return event_files whose
    * event_name begins with 'DEMO:'. Used by /demo surface for Shows of India
    * stage walkthrough where stage WiFi + login = demo risk.
