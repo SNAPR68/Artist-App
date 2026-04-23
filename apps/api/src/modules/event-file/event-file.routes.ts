@@ -493,4 +493,30 @@ export async function eventFileRoutes(app: FastifyInstance) {
     const rows = await boqService.list(id);
     return reply.send({ success: true, data: rows, errors: [] });
   });
+
+  /**
+   * DEMO-ONLY public routes — no auth. Only return event_files whose
+   * event_name begins with 'DEMO:'. Used by /demo surface for Shows of India
+   * stage walkthrough where stage WiFi + login = demo risk.
+   */
+  app.get('/v1/demo/event-files', {
+    preHandler: [rateLimit('READ')],
+  }, async (_request, reply) => {
+    const rows = await eventFileRepository.listDemo();
+    return reply.send({ success: true, data: rows, errors: [] });
+  });
+
+  app.get('/v1/demo/event-files/:id', {
+    preHandler: [rateLimit('READ')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const file = await eventFileRepository.findDemoById(id);
+    if (!file) {
+      return reply.status(404).send({
+        success: false,
+        errors: [{ code: 'NOT_FOUND', message: 'Demo event file not found' }],
+      });
+    }
+    return reply.send({ success: true, data: file, errors: [] });
+  });
 }

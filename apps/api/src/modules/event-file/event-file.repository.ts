@@ -159,6 +159,51 @@ export class EventFileRepository {
       .first();
     return !!row;
   }
+
+  /**
+   * DEMO-ONLY: list all event_files with names prefixed 'DEMO:'.
+   * Used by the public /demo surface for stage walkthroughs — no auth.
+   * Safe because DEMO files are seeded manually; no real client data leaks.
+   */
+  async listDemo() {
+    return db('event_files')
+      .where('event_name', 'like', 'DEMO:%')
+      .whereNull('deleted_at')
+      .select(EVENT_FILE_COLUMNS)
+      .orderBy('event_date', 'asc');
+  }
+
+  /**
+   * DEMO-ONLY: find a DEMO-prefixed event file by id with full vendor roster.
+   */
+  async findDemoById(id: string) {
+    const file = await db('event_files')
+      .where({ id, deleted_at: null })
+      .where('event_name', 'like', 'DEMO:%')
+      .select(EVENT_FILE_COLUMNS)
+      .first();
+    if (!file) return null;
+
+    const vendors = await db('event_file_vendors as efv')
+      .leftJoin('artist_profiles as ap', 'efv.vendor_profile_id', 'ap.id')
+      .leftJoin('bookings as b', 'efv.booking_id', 'b.id')
+      .where('efv.event_file_id', id)
+      .select(
+        'efv.id',
+        'efv.vendor_profile_id',
+        'efv.booking_id',
+        'efv.role',
+        'efv.call_time_override',
+        'efv.notes',
+        'ap.stage_name',
+        'ap.category',
+        'ap.base_city',
+        'b.state as booking_status',
+        'b.agreed_amount as booking_amount',
+      );
+
+    return { ...file, vendors };
+  }
 }
 
 export const eventFileRepository = new EventFileRepository();
