@@ -5,6 +5,7 @@
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { DemoViewTracker, DemoDownloadLink } from './demo-tracker';
 
 interface Vendor {
   id: string;
@@ -110,6 +111,7 @@ export default async function DemoEventFileDetail({
 
   return (
     <div className="relative min-h-screen">
+      <DemoViewTracker eventFileId={file.id} eventName={cleanName(file.event_name)} />
       <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#c39bff]/10 blur-[140px] rounded-full pointer-events-none" />
       <div className="absolute top-40 -right-32 w-[500px] h-[500px] bg-[#a1faff]/10 blur-[140px] rounded-full pointer-events-none" />
 
@@ -299,8 +301,11 @@ export default async function DemoEventFileDetail({
                 <div className="text-white font-bold mb-1">{x.label}</div>
                 <div className="text-white/40 text-xs mb-4">{x.sub}</div>
                 <div className="flex gap-2">
-                  <a
-                    href={`${API_BASE_URL}/v1/demo/event-files/${file.id}/${x.slug}?format=pdf`}
+                  <DemoDownloadLink
+                    href={`/api/demo/event-files/${file.id}/${x.slug}?format=pdf`}
+                    eventFileId={file.id}
+                    kind={x.slug as 'call-sheet' | 'consolidated-rider' | 'boq'}
+                    format="pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[10px] tracking-widest uppercase font-bold px-3 py-1.5 rounded-full border transition-colors"
@@ -311,13 +316,16 @@ export default async function DemoEventFileDetail({
                     }}
                   >
                     PDF
-                  </a>
-                  <a
-                    href={`${API_BASE_URL}/v1/demo/event-files/${file.id}/${x.slug}?format=xlsx`}
+                  </DemoDownloadLink>
+                  <DemoDownloadLink
+                    href={`/api/demo/event-files/${file.id}/${x.slug}?format=xlsx`}
+                    eventFileId={file.id}
+                    kind={x.slug as 'call-sheet' | 'consolidated-rider' | 'boq'}
+                    format="xlsx"
                     className="text-[10px] tracking-widest uppercase font-bold px-3 py-1.5 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-white/30 transition-colors"
                   >
                     Excel
-                  </a>
+                  </DemoDownloadLink>
                 </div>
               </div>
             </div>
