@@ -7,12 +7,13 @@
  */
 
 import { logger } from '../../utils/logger.js';
+import { config } from '../../config/index.js';
 
 export class WhisperService {
   private readonly apiKey: string;
 
   constructor() {
-    this.apiKey = process.env.OPENAI_API_KEY ?? '';
+    this.apiKey = config.OPENAI_API_KEY ?? '';
   }
 
   get enabled(): boolean {
@@ -34,8 +35,8 @@ export class WhisperService {
       const mediaRes = await fetch(mediaUrl, {
         headers: {
           // Interakt CDN requires the API key as a bearer token
-          ...(process.env.WHATSAPP_API_KEY
-            ? { Authorization: `Basic ${process.env.WHATSAPP_API_KEY}` }
+          ...(config.WHATSAPP_API_KEY
+            ? { Authorization: `Basic ${config.WHATSAPP_API_KEY}` }
             : {}),
         },
       });

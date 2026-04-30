@@ -77,6 +77,15 @@ const envSchema = z.object({
   // Firebase
   FIREBASE_PROJECT_ID: z.string().optional(),
 
+  // WhatsApp (Interakt)
+  WHATSAPP_PROVIDER: z.string().default('stub'),
+  WHATSAPP_API_KEY: z.string().optional(),
+  WHATSAPP_WEBHOOK_SECRET: z.string().optional(),
+  WHATSAPP_FROM_NUMBER: z.string().optional(),
+
+  // OpenAI (Whisper transcription + future LLM)
+  OPENAI_API_KEY: z.string().optional(),
+
   // Resend (Email)
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default('Artist Booking <noreply@artistbooking.in>'),

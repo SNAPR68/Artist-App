@@ -10,6 +10,7 @@
  */
 
 import { createHmac } from 'crypto';
+import { config } from '../../config/index.js';
 
 export interface WhatsAppProviderConfig {
   provider: string;
@@ -57,10 +58,10 @@ export class WhatsAppProviderService {
 
   constructor() {
     this.config = {
-      provider: process.env.WHATSAPP_PROVIDER || 'stub',
-      apiKey: process.env.WHATSAPP_API_KEY || '',
-      webhookSecret: process.env.WHATSAPP_WEBHOOK_SECRET || '',
-      fromNumber: process.env.WHATSAPP_FROM_NUMBER || '',
+      provider: config.WHATSAPP_PROVIDER,
+      apiKey: config.WHATSAPP_API_KEY ?? '',
+      webhookSecret: config.WHATSAPP_WEBHOOK_SECRET ?? '',
+      fromNumber: config.WHATSAPP_FROM_NUMBER ?? '',
     };
   }
 
