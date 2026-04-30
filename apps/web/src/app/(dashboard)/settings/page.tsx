@@ -26,11 +26,12 @@ const DEFAULT_PREFS: NotificationPreferences = {
   marketing: false,
 };
 
+// GRID uses WhatsApp + Email only (SMS/voice removed 2026-04-23). Push is
+// optional browser-side; it never carries booking data.
 const CHANNEL_OPTIONS: { key: keyof NotificationPreferences; label: string; description: string }[] = [
-  { key: 'whatsapp', label: 'WhatsApp', description: 'Receive notifications via WhatsApp messages' },
-  { key: 'sms', label: 'SMS', description: 'Receive notifications via text messages' },
-  { key: 'push', label: 'Push Notifications', description: 'Receive push notifications on your device' },
-  { key: 'email', label: 'Email', description: 'Receive notifications via email' },
+  { key: 'whatsapp', label: 'WhatsApp', description: 'Booking confirmations, call sheets, and day-of check-ins' },
+  { key: 'email', label: 'Email', description: 'Call sheets, BOQs, invoices, and long-form notifications' },
+  { key: 'push', label: 'Push Notifications', description: 'Lightweight browser alerts (no booking details)' },
 ];
 
 const CATEGORY_OPTIONS: { key: keyof NotificationPreferences; label: string; description: string }[] = [

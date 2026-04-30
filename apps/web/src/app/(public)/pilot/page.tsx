@@ -35,8 +35,8 @@ const PERKS = [
 const WHATS_IN_IT = [
   { kpi: 'Event File', line: 'One URL per event. Client, vendors, call times, riders, BOQ \u2014 unified.' },
   { kpi: 'Auto Call Sheet', line: 'PDF + Excel + WhatsApp broadcast. Generated in 2 seconds, not 2 hours.' },
-  { kpi: 'Outbound Voice', line: 'We call vendors T-24h to confirm. You see green/red on one screen.' },
-  { kpi: 'Day-of Check-ins', line: 'Every vendor gets a GPS + voice ping. No more phone-tree Sunday mornings.' },
+  { kpi: 'Vendor Confirmations', line: 'T-24h WhatsApp + email with YES/NO buttons. You see green/red on one screen.' },
+  { kpi: 'Day-of Check-ins', line: 'Every vendor gets a single WhatsApp ping: on track / delayed / need help.' },
   { kpi: 'EPK on demand', line: 'Artist one-pager PDF + PPTX + reel. Generated from their profile, branded to you.' },
   { kpi: 'BOQ Builder', line: 'Your internal bill-of-quantity, per event, in one shared file.' },
 ];

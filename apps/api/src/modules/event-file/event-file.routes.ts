@@ -23,6 +23,7 @@ import { generateConsolidatedRider } from './consolidated-rider.generator.js';
 import { generateBOQ } from './boq.generator.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
+import { trackServerEvent, ANALYTICS_EVENTS } from '../../lib/analytics.js';
 import {
   createEventFileSchema,
   updateEventFileSchema,
@@ -50,6 +51,10 @@ export async function eventFileRoutes(app: FastifyInstance) {
 
     const clientId = request.user!.user_id;
     const row = await eventFileRepository.create(clientId, parsed.data);
+    trackServerEvent(ANALYTICS_EVENTS.EVENT_FILE_CREATED, clientId, {
+      event_file_id: row.id,
+      event_date: parsed.data.event_date,
+    });
     return reply.status(201).send({ success: true, data: row, errors: [] });
   });
 
@@ -152,6 +157,11 @@ export async function eventFileRoutes(app: FastifyInstance) {
 
     try {
       const row = await eventFileRepository.addVendor(id, parsed.data);
+      trackServerEvent(ANALYTICS_EVENTS.VENDOR_ATTACHED_TO_EVENT_FILE, request.user!.user_id, {
+        event_file_id: id,
+        vendor_row_id: row.id,
+        role: parsed.data.role,
+      });
       return reply.status(201).send({ success: true, data: row, errors: [] });
     } catch (err: any) {
       // unique_violation (event_file_id, vendor_profile_id, role)
@@ -203,6 +213,10 @@ export async function eventFileRoutes(app: FastifyInstance) {
       });
     }
     const row = await callSheetService.generate(id, request.user!.user_id);
+    trackServerEvent(ANALYTICS_EVENTS.CALL_SHEET_GENERATED, request.user!.user_id, {
+      event_file_id: id,
+      dispatch_id: row.id,
+    });
     return reply.status(201).send({ success: true, data: row, errors: [] });
   });
 
@@ -269,6 +283,10 @@ export async function eventFileRoutes(app: FastifyInstance) {
       });
     }
     const row = await consolidatedRiderService.generate(id, request.user!.user_id);
+    trackServerEvent(ANALYTICS_EVENTS.CONSOLIDATED_RIDER_GENERATED, request.user!.user_id, {
+      event_file_id: id,
+      artifact_id: row.id,
+    });
     return reply.status(201).send({ success: true, data: row, errors: [] });
   });
 
@@ -441,6 +459,10 @@ export async function eventFileRoutes(app: FastifyInstance) {
     const { id } = request.params as { id: string };
     if (!(await assertOwns(request, reply, id))) return;
     const row = await boqService.generate(id, request.user!.user_id);
+    trackServerEvent(ANALYTICS_EVENTS.BOQ_GENERATED, request.user!.user_id, {
+      event_file_id: id,
+      artifact_id: row.id,
+    });
     return reply.status(201).send({ success: true, data: row, errors: [] });
   });
 

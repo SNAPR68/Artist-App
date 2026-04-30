@@ -81,6 +81,11 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default('Artist Booking <noreply@artistbooking.in>'),
 
+  // Slack webhook for pilot lead notifications (sprint FINAL D6.3).
+  // Optional: when unset, pilot submissions still persist — only the Slack
+  // ping is skipped. Channel recommended: #grid-pilot-leads.
+  SLACK_PILOT_WEBHOOK_URL: z.string().url().optional(),
+
   // OTP Bypass (only enable in dev/staging, NEVER in production)
   OTP_BYPASS_ENABLED: z.string().default('false'),
 

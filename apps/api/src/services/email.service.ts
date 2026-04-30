@@ -183,6 +183,62 @@ class EmailService {
   }
 
   /**
+   * Vendor onboarding email (sprint FINAL D4.3, 2026-04-26).
+   *
+   * Sent when an event company adds a new vendor to their roster — welcomes
+   * the vendor to GRID, explains the WhatsApp + email workflow (confirmation,
+   * call sheet, day-of check-in), and provides a link to complete their
+   * profile (stage name, category, rider, base rate).
+   */
+  async sendVendorOnboarding(
+    email: string,
+    vendor: {
+      stageName: string;
+      agencyName: string;
+      profileUrl: string;
+    },
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    const { stageName, agencyName, profileUrl } = vendor;
+    return this.send({
+      to: email,
+      subject: `${agencyName} just added you to GRID — complete your profile`,
+      html: `
+        <div style="font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #1a1a1a;">
+          <h2 style="color: #8A2BE2; margin-bottom: 8px;">Welcome to GRID</h2>
+          <p style="margin-top: 0; color: #555;">India's event company operating system.</p>
+          <p>Hi ${stageName},</p>
+          <p><strong>${agencyName}</strong> just added you to their vendor roster on GRID. To receive booking confirmations, call sheets, and day-of check-ins, complete your profile in 2 minutes.</p>
+          <p style="margin: 24px 0;">
+            <a href="${profileUrl}" style="background-color: #8A2BE2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Complete my profile</a>
+          </p>
+          <h3 style="margin-top: 32px; font-size: 16px;">How GRID works for vendors</h3>
+          <ul style="padding-left: 20px; line-height: 1.6;">
+            <li><strong>Confirmation:</strong> You get a WhatsApp + email ping when an agency wants to book you. Reply YES/NO.</li>
+            <li><strong>Call sheet:</strong> Event details, venue, call time, and BOQ arrive by email as a PDF + Excel.</li>
+            <li><strong>Day-of check-in:</strong> A single WhatsApp message the morning of the show — "On track / Delayed / Need help".</li>
+            <li><strong>No voice calls.</strong> GRID is WhatsApp + email only.</li>
+          </ul>
+          <p style="color: #777; font-size: 13px; margin-top: 32px;">If you didn't expect this email, you can ignore it — ${agencyName} will see you haven't onboarded and may reach out directly.</p>
+          <p style="color: #777; font-size: 13px;">— The GRID Team</p>
+        </div>
+      `,
+      text: `Welcome to GRID.
+
+${agencyName} just added you to their vendor roster. Complete your profile to receive booking confirmations, call sheets, and day-of check-ins:
+
+${profileUrl}
+
+How GRID works for vendors:
+- Confirmation: WhatsApp + email when an agency wants to book you (reply YES/NO)
+- Call sheet: PDF + Excel by email with event details, venue, call time, and BOQ
+- Day-of check-in: one WhatsApp message — "On track / Delayed / Need help"
+- No voice calls. GRID is WhatsApp + email only.
+
+— The GRID Team`,
+    });
+  }
+
+  /**
    * Validate email format
    */
   private isValidEmail(email: string): boolean {

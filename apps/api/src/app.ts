@@ -17,7 +17,9 @@ import { authRoutes } from './modules/auth/auth.routes.js';
 import { artistRoutes } from './modules/artist/artist.routes.js';
 import { vendorRoutes } from './modules/vendor/vendor.routes.js';
 import { eventFileRoutes } from './modules/event-file/event-file.routes.js';
-import { outboundVoiceRoutes } from './modules/outbound-voice/outbound-voice.routes.js';
+// Dormant — outbound voice removed from MVP 2026-04-23. Module kept on disk for
+// future reactivation. Do not re-register without explicit product sign-off.
+// import { outboundVoiceRoutes } from './modules/outbound-voice/outbound-voice.routes.js';
 import { clientRoutes } from './modules/client/client.routes.js';
 import { mediaRoutes } from './modules/media/media.routes.js';
 import { calendarRoutes } from './modules/calendar/calendar.routes.js';
@@ -85,11 +87,13 @@ const app = Fastify({
 // Capture raw request body for Razorpay webhook signature verification
 await app.register(rawBody, { field: 'rawBody', global: true, encoding: 'utf8', runFirst: true });
 
+// CORS — tightened 2026-04-26 (sprint FINAL D3.3). Exact allowlist in prod:
+// main web app + vercel preview deployments for artist-booking-web only.
 await app.register(cors, {
   origin: config.NODE_ENV === 'production'
     ? [
-        /\.vercel\.app$/,
-        /\.onrender\.com$/,
+        'https://artist-booking-web.vercel.app',
+        /^https:\/\/artist-booking-web-[a-z0-9-]+\.vercel\.app$/,
         'https://artist-booking-api.onrender.com',
       ]
     : true,
@@ -159,20 +163,26 @@ if (config.SENTRY_DSN) {
 }
 
 // ─── Health Check ────────────────────────────────────────────
-app.get('/health', async () => {
+// Shallow: process up. Used by Render's uptime probe — must stay cheap.
+app.get('/health', async (_request, reply) => {
+  return reply.status(200).send({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Deep: verifies DB + Redis reachable. Returns 503 if any dependency fails
+// so load balancers + monitors can detect real degradation.
+app.get('/health/deep', async (_request, reply) => {
   const [dbResult, redisOk] = await Promise.all([checkDatabaseHealth(), checkRedisHealth()]);
+  const healthy = dbResult.ok && redisOk;
 
-  const status = dbResult.ok && redisOk ? 'ok' : 'degraded';
-
-  return {
-    status,
+  return reply.status(healthy ? 200 : 503).send({
+    status: healthy ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
     services: {
       database: dbResult.ok ? 'ok' : 'error',
       redis: redisOk ? 'ok' : 'error',
     },
     ...(dbResult.error && { dbError: dbResult.error }),
-  };
+  });
 });
 
 // ─── API Version Root ────────────────────────────────────────
@@ -241,7 +251,7 @@ await app.register(authRoutes);
 await app.register(artistRoutes);
 await app.register(vendorRoutes);
 await app.register(eventFileRoutes);
-await app.register(outboundVoiceRoutes);
+// await app.register(outboundVoiceRoutes); // dormant — see import note above
 await app.register(clientRoutes);
 await app.register(mediaRoutes);
 await app.register(calendarRoutes);

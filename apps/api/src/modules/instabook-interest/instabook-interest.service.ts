@@ -1,4 +1,6 @@
 import { instabookInterestRepository } from './instabook-interest.repository.js';
+import { config } from '../../config/index.js';
+import { logger } from '../../utils/logger.js';
 
 export class InstabookInterestError extends Error {
   constructor(
@@ -51,7 +53,42 @@ class InstabookInterestService {
       user_agent: userAgent,
     });
 
+    // Fire-and-forget Slack ping for pilot leads (D6.3). Never block the
+    // response on webhook latency/failure — the lead is already persisted.
+    if (data.role_specific_data?.pilot === true) {
+      void this.notifySlack(data).catch((err) => {
+        logger.warn('Slack pilot notification failed (non-fatal)', { err: err instanceof Error ? err.message : String(err) });
+      });
+    }
+
     return { id: row.id, created_at: row.created_at };
+  }
+
+  private async notifySlack(data: SubmitData): Promise<void> {
+    const url = config.SLACK_PILOT_WEBHOOK_URL;
+    if (!url) return;
+
+    const rsd = data.role_specific_data as Record<string, unknown>;
+    const company = (rsd.company_name as string) || 'Unknown company';
+    const epm = (rsd.events_per_month as string) || '?';
+    const start = (rsd.start_when as string) || '?';
+    const pains = Array.isArray(rsd.pain_points) ? (rsd.pain_points as string[]).join(', ') : '';
+
+    const text = [
+      ':rocket: *New GRID pilot request*',
+      `*${company}* — ${data.name}`,
+      `${data.city} · ${epm} events/mo · start: ${start}`,
+      `📞 ${data.phone}${data.email ? ` · ✉️ ${data.email}` : ''}`,
+      pains ? `Pain: ${pains}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
   }
 
   async list(filters: { page: number; per_page: number; role?: string; city?: string; pilot?: boolean }) {

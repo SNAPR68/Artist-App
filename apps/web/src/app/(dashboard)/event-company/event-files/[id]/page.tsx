@@ -292,7 +292,7 @@ export default function EventFileDetailPage() {
 
       {/* Tab content */}
       <section className="max-w-7xl mx-auto px-6 py-8">
-        {tab === 'roster' && <RosterTab file={file} />}
+        {tab === 'roster' && <RosterTab file={file} onVendorAdded={refreshFile} />}
         {tab === 'call-sheets' && (
           <CallSheetTab
             sheets={callSheets}
@@ -320,51 +320,204 @@ export default function EventFileDetailPage() {
 }
 
 // ─── Roster tab ──────────────────────────────────────────────────────────────
-function RosterTab({ file }: { file: EventFileDetail }) {
-  if (file.vendors.length === 0) {
-    return (
-      <div className="glass-card rounded-xl p-12 text-center border border-white/5">
-        <Users className="w-10 h-10 text-[#c39bff] mx-auto mb-4" />
-        <h3 className="font-display text-xl font-extrabold tracking-tight">No vendors yet</h3>
-        <p className="text-white/50 mt-2">Add artists, AV, photo, decor, or licensing partners.</p>
-        <Link href="/search" className="btn-nocturne-primary mt-6 inline-flex items-center gap-2 px-5 py-2.5">
-          <Plus className="w-4 h-4" /> Browse Vendors
-        </Link>
-      </div>
-    );
+interface SearchResult { id: string; stage_name: string; category: string; base_city: string }
+
+function RosterTab({ file, onVendorAdded }: { file: EventFileDetail; onVendorAdded: () => void }) {
+  const [showAdd, setShowAdd] = useState(false);
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [selected, setSelected] = useState<SearchResult | null>(null);
+  const [role, setRole] = useState('');
+  const [callOverride, setCallOverride] = useState('');
+  const [notes, setNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!query.trim() || query.length < 2) { setResults([]); return; }
+    const t = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const res = await apiClient<{ artists: SearchResult[] }>(`/v1/search/artists?q=${encodeURIComponent(query)}&limit=8`);
+        if (res.success) setResults((res.data as { artists?: SearchResult[] })?.artists ?? []);
+      } finally { setSearching(false); }
+    }, 300);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  async function handleAdd() {
+    if (!selected) return;
+    setSaving(true);
+    try {
+      await apiClient(`/v1/event-files/${file.id}/vendors`, {
+        method: 'POST',
+        body: JSON.stringify({
+          vendor_profile_id: selected.id,
+          role: role.trim() || selected.category,
+          ...(callOverride ? { call_time_override: callOverride } : {}),
+          ...(notes ? { notes } : {}),
+        }),
+      });
+      setShowAdd(false);
+      setQuery(''); setResults([]); setSelected(null); setRole(''); setCallOverride(''); setNotes('');
+      onVendorAdded();
+    } catch { /* silent */ } finally { setSaving(false); }
+  }
+
+  async function handleRemove(rowId: string) {
+    setRemoving(rowId);
+    try {
+      await apiClient(`/v1/event-files/${file.id}/vendors/${rowId}`, { method: 'DELETE' });
+      onVendorAdded();
+    } finally { setRemoving(null); }
   }
 
   return (
-    <div className="space-y-3">
-      {file.vendors.map((v) => (
-        <div key={v.id} className="glass-card rounded-xl p-5 border border-white/5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[#c39bff]/10 border border-[#c39bff]/30 flex items-center justify-center text-[#c39bff] font-bold text-sm">
-            {(v.stage_name || '?').slice(0, 2).toUpperCase()}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-display text-xl font-extrabold tracking-tight">Vendor Roster</h3>
+          <p className="text-white/50 text-sm mt-0.5">{file.vendors.length} vendor{file.vendors.length !== 1 ? 's' : ''} on this event.</p>
+        </div>
+        <button
+          onClick={() => setShowAdd((v) => !v)}
+          className="btn-nocturne-primary flex items-center gap-2 px-5 py-2.5"
+        >
+          <Plus className="w-4 h-4" /> Add Vendor
+        </button>
+      </div>
+
+      {/* Add vendor panel */}
+      {showAdd && (
+        <div className="glass-card rounded-xl p-5 border border-white/10 space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-white/70">Add vendor to roster</span>
+            <button onClick={() => setShowAdd(false)} className="text-white/30 hover:text-white"><X className="w-4 h-4" /></button>
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h4 className="font-bold truncate">{v.stage_name || 'Unnamed vendor'}</h4>
-              <span className="nocturne-chip text-xs bg-white/5 text-white/60 border-white/10">
-                {v.category || 'vendor'}
-              </span>
-              <span className="nocturne-chip text-xs bg-[#c39bff]/10 text-[#c39bff] border-[#c39bff]/30">
-                {v.role}
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-white/50">
-              {v.base_city && <span>{v.base_city}</span>}
-              {v.call_time_override && <span>Call: {v.call_time_override.slice(0, 5)}</span>}
-              {v.booking_status && <span>Booking: {v.booking_status}</span>}
-              {v.booking_amount && <span>{formatRupees(v.booking_amount)}</span>}
-            </div>
-            {v.notes && <p className="text-xs text-white/40 mt-1 italic">{v.notes}</p>}
+
+          {/* Search */}
+          <div className="relative">
+            <input
+              className="input-nocturne w-full text-sm"
+              placeholder="Search by name, city, category…"
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); setSelected(null); }}
+            />
+            {searching && <Loader2 className="w-3.5 h-3.5 animate-spin absolute right-3 top-3 text-white/30" />}
+            {results.length > 0 && !selected && (
+              <div className="absolute z-20 left-0 right-0 mt-1 glass-card border border-white/10 rounded-xl overflow-hidden">
+                {results.map((r) => (
+                  <button
+                    key={r.id}
+                    onClick={() => { setSelected(r); setRole(r.category); setQuery(r.stage_name); setResults([]); }}
+                    className="w-full text-left px-4 py-3 hover:bg-white/5 transition text-sm flex items-center gap-3 border-b border-white/5 last:border-0"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-[#c39bff]/10 border border-[#c39bff]/30 flex items-center justify-center text-[#c39bff] font-bold text-xs">
+                      {r.stage_name.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="font-medium">{r.stage_name}</div>
+                      <div className="text-xs text-white/40">{r.category} · {r.base_city}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="flex flex-col items-end gap-1.5">
-            <ConfirmationChip status={v.confirmation_status ?? 'pending'} />
-            {v.checkin_status && v.checkin_status !== 'pending' && <CheckinChip status={v.checkin_status} />}
+
+          {selected && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-white/40 uppercase tracking-widest mb-1 block">Role</label>
+                <input
+                  className="input-nocturne w-full text-sm"
+                  placeholder="e.g. DJ, Lead Photographer…"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-white/40 uppercase tracking-widest mb-1 block">Call Time Override</label>
+                <input
+                  type="time"
+                  className="input-nocturne w-full text-sm"
+                  value={callOverride}
+                  onChange={(e) => setCallOverride(e.target.value)}
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="text-xs text-white/40 uppercase tracking-widest mb-1 block">Notes</label>
+                <input
+                  className="input-nocturne w-full text-sm"
+                  placeholder="e.g. Full stage rig, ~8kW"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-2 justify-end">
+            <button onClick={() => setShowAdd(false)} className="text-sm px-4 py-2 rounded-lg border border-white/10 text-white/50 hover:text-white transition">Cancel</button>
+            <button
+              onClick={handleAdd}
+              disabled={!selected || saving}
+              className="btn-nocturne-primary text-sm px-5 py-2 rounded-lg flex items-center gap-2 disabled:opacity-40"
+            >
+              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              Add to Roster
+            </button>
           </div>
         </div>
-      ))}
+      )}
+
+      {file.vendors.length === 0 && !showAdd ? (
+        <div className="glass-card rounded-xl p-12 text-center border border-white/5">
+          <Users className="w-10 h-10 text-[#c39bff] mx-auto mb-4" />
+          <h3 className="font-display text-xl font-extrabold tracking-tight">No vendors yet</h3>
+          <p className="text-white/50 mt-2">Add artists, AV, photo, decor, or licensing partners.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {file.vendors.map((v) => (
+            <div key={v.id} className="glass-card rounded-xl p-5 border border-white/5 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-[#c39bff]/10 border border-[#c39bff]/30 flex items-center justify-center text-[#c39bff] font-bold text-sm">
+                {(v.stage_name || '?').slice(0, 2).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-bold truncate">{v.stage_name || 'Unnamed vendor'}</h4>
+                  <span className="nocturne-chip text-xs bg-white/5 text-white/60 border-white/10">
+                    {v.category || 'vendor'}
+                  </span>
+                  <span className="nocturne-chip text-xs bg-[#c39bff]/10 text-[#c39bff] border-[#c39bff]/30">
+                    {v.role}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-white/50">
+                  {v.base_city && <span>{v.base_city}</span>}
+                  {v.call_time_override && <span>Call: {v.call_time_override.slice(0, 5)}</span>}
+                  {v.booking_status && <span>Booking: {v.booking_status}</span>}
+                  {v.booking_amount && <span>{formatRupees(v.booking_amount)}</span>}
+                </div>
+                {v.notes && <p className="text-xs text-white/40 mt-1 italic">{v.notes}</p>}
+              </div>
+              <div className="flex flex-col items-end gap-1.5">
+                <ConfirmationChip status={v.confirmation_status ?? 'pending'} />
+                {v.checkin_status && v.checkin_status !== 'pending' && <CheckinChip status={v.checkin_status} />}
+                <button
+                  onClick={() => handleRemove(v.id)}
+                  disabled={removing === v.id}
+                  className="text-white/20 hover:text-red-400 transition mt-1"
+                >
+                  {removing === v.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -437,31 +590,77 @@ function CallSheetTab({
 }
 
 // ─── Rider tab ───────────────────────────────────────────────────────────────
-interface RiderData { pdf_url?: string }
+interface RiderData { pdf_url?: string; xlsx_url?: string; generated_at?: string }
 function RiderTab({ fileId }: { fileId: string }) {
   const [data, setData] = useState<RiderData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+
+  async function load() {
+    const res = await apiClient<RiderData>(`/v1/event-files/${fileId}/consolidated-rider`);
+    if (res.success) setData(res.data as RiderData | null);
+  }
 
   useEffect(() => {
-    apiClient<RiderData>(`/v1/event-files/${fileId}/consolidated-rider`)
-      .then((res) => res.success && setData(res.data))
-      .finally(() => setLoading(false));
+    load().finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileId]);
+
+  async function handleGenerate() {
+    setGenerating(true);
+    try {
+      await apiClient(`/v1/event-files/${fileId}/consolidated-rider`, { method: 'POST' });
+      await load();
+    } catch { /* silent */ } finally { setGenerating(false); }
+  }
 
   if (loading) return <div className="nocturne-skeleton h-48 rounded-xl" />;
 
   return (
-    <div className="glass-card rounded-xl p-8 border border-white/5">
-      <h3 className="font-display text-xl font-extrabold tracking-tight mb-4">Consolidated Tech Rider</h3>
-      <p className="text-white/50 text-sm mb-6">
-        Merged rider across all vendors on this event. Ready to hand to the venue.
-      </p>
-      {data?.pdf_url ? (
-        <a href={data.pdf_url} target="_blank" rel="noreferrer" className="btn-nocturne-primary inline-flex items-center gap-2 px-5 py-2.5">
-          <Download className="w-4 h-4" /> Download Rider PDF
-        </a>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-display text-xl font-extrabold tracking-tight">Consolidated Tech Rider</h3>
+          <p className="text-white/50 text-sm mt-0.5">
+            Merged rider across all vendors. Ready to hand to the venue.
+          </p>
+        </div>
+        <button
+          onClick={handleGenerate}
+          disabled={generating}
+          className="btn-nocturne-primary flex items-center gap-2 px-5 py-2.5 disabled:opacity-50"
+        >
+          {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+          {generating ? 'Generating…' : 'Generate Rider'}
+        </button>
+      </div>
+
+      {data?.pdf_url || data?.xlsx_url ? (
+        <div className="glass-card rounded-xl p-6 border border-white/5">
+          {data.generated_at && (
+            <p className="text-xs text-white/40 mb-4">
+              Generated {new Date(data.generated_at).toLocaleString('en-IN')}
+            </p>
+          )}
+          <div className="flex gap-3">
+            {data.pdf_url && (
+              <a href={data.pdf_url} target="_blank" rel="noreferrer" className="btn-nocturne-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm">
+                <Download className="w-4 h-4" /> Rider PDF
+              </a>
+            )}
+            {data.xlsx_url && (
+              <a href={data.xlsx_url} target="_blank" rel="noreferrer" className="btn-nocturne-secondary inline-flex items-center gap-2 px-5 py-2.5 text-sm">
+                <Download className="w-4 h-4" /> Rider Excel
+              </a>
+            )}
+          </div>
+        </div>
       ) : (
-        <p className="text-white/40 italic">No consolidated rider yet. Add vendors to generate.</p>
+        <div className="glass-card rounded-xl p-12 text-center border border-white/5">
+          <Wrench className="w-10 h-10 text-[#a1faff] mx-auto mb-4" />
+          <h3 className="font-display text-xl font-extrabold">No rider generated yet</h3>
+          <p className="text-white/50 mt-2 text-sm">Click Generate to merge all vendor riders into one document.</p>
+        </div>
       )}
     </div>
   );

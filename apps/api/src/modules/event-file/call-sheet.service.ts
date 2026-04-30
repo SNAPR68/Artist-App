@@ -244,7 +244,7 @@ export class CallSheetService {
    * vendors already confirmed/declined are skipped.
    */
   async sendVendorConfirmations(eventFileId: string) {
-    const file = await db('event_files').where({ id: eventFileId }).first();
+    const file = await db('event_files').where({ id: eventFileId, deleted_at: null }).first();
     if (!file) throw new Error('EVENT_FILE_NOT_FOUND');
 
     const vendors = await db('event_file_vendors as efv')
@@ -374,7 +374,7 @@ export class CallSheetService {
    * not our problem on event day.
    */
   async sendDayOfCheckins(eventFileId: string) {
-    const file = await db('event_files').where({ id: eventFileId }).first();
+    const file = await db('event_files').where({ id: eventFileId, deleted_at: null }).first();
     if (!file) throw new Error('EVENT_FILE_NOT_FOUND');
 
     const vendors = await db('event_file_vendors as efv')

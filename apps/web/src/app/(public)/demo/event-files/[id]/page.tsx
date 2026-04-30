@@ -302,7 +302,7 @@ export default async function DemoEventFileDetail({
                 <div className="text-white/40 text-xs mb-4">{x.sub}</div>
                 <div className="flex gap-2">
                   <DemoDownloadLink
-                    href={`/api/demo/event-files/${file.id}/${x.slug}?format=pdf`}
+                    href={`${API_BASE_URL}/v1/demo/event-files/${file.id}/${x.slug}?format=pdf`}
                     eventFileId={file.id}
                     kind={x.slug as 'call-sheet' | 'consolidated-rider' | 'boq'}
                     format="pdf"
@@ -318,7 +318,7 @@ export default async function DemoEventFileDetail({
                     PDF
                   </DemoDownloadLink>
                   <DemoDownloadLink
-                    href={`/api/demo/event-files/${file.id}/${x.slug}?format=xlsx`}
+                    href={`${API_BASE_URL}/v1/demo/event-files/${file.id}/${x.slug}?format=xlsx`}
                     eventFileId={file.id}
                     kind={x.slug as 'call-sheet' | 'consolidated-rider' | 'boq'}
                     format="xlsx"
