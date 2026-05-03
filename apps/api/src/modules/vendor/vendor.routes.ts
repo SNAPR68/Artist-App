@@ -11,6 +11,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { vendorRepository } from './vendor.repository.js';
+import { workspaceRepository } from '../workspace/workspace.repository.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { rateLimit } from '../../middleware/rate-limiter.middleware.js';
 import {
@@ -18,6 +19,37 @@ import {
   PAGINATION,
   getAttributesSchemaForCategory,
 } from '@artist-booking/shared';
+
+const ratingScore = z.number().min(0).max(5);
+const SubmitRatingBody = z.object({
+  event_file_id: z.string().uuid(),
+  workspace_id: z.string().uuid().optional(),
+  overall: ratingScore,
+  quality: ratingScore.nullable().optional(),
+  punctuality: ratingScore.nullable().optional(),
+  communication: ratingScore.nullable().optional(),
+  professionalism: ratingScore.nullable().optional(),
+  was_ontime: z.boolean().optional(),
+  would_rebook: z.boolean().optional(),
+  comment: z.string().max(2000).nullable().optional(),
+});
+
+const SetFlagBody = z.object({
+  workspace_id: z.string().uuid().optional(),
+  is_preferred: z.boolean().optional(),
+  is_blacklisted: z.boolean().optional(),
+  blacklist_reason: z.string().max(500).nullable().optional(),
+  notes: z.string().max(1000).nullable().optional(),
+});
+
+async function resolveWorkspaceId(
+  userId: string,
+  bodyWorkspaceId?: string,
+): Promise<string | null> {
+  if (bodyWorkspaceId) return bodyWorkspaceId;
+  const list = await workspaceRepository.findByOwnerId(userId);
+  return list?.[0]?.id ?? null;
+}
 
 const vendorCategoryValues = Object.values(VendorCategory) as [string, ...string[]];
 
@@ -127,5 +159,137 @@ export async function vendorRoutes(app: FastifyInstance) {
     );
 
     return reply.send({ success: true, data: updated, errors: [] });
+  });
+
+  // ── Ratings ──────────────────────────────────────────────────────────────
+  /** POST /v1/vendors/:id/ratings — submit a rating after an event. */
+  app.post('/v1/vendors/:id/ratings', {
+    preHandler: [authMiddleware, rateLimit('WRITE')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const userId = request.user!.user_id;
+
+    const parsed = SubmitRatingBody.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({
+        success: false,
+        errors: parsed.error.issues.map((i) => ({
+          code: 'INVALID_BODY',
+          message: `${i.path.join('.') || '(root)'}: ${i.message}`,
+        })),
+      });
+    }
+
+    const vendor = await vendorRepository.findById(id);
+    if (!vendor) {
+      return reply.status(404).send({
+        success: false,
+        errors: [{ code: 'NOT_FOUND', message: 'Vendor not found' }],
+      });
+    }
+
+    const workspaceId = await resolveWorkspaceId(userId, parsed.data.workspace_id);
+    if (!workspaceId) {
+      return reply.status(400).send({
+        success: false,
+        errors: [{ code: 'NO_WORKSPACE', message: 'No workspace found for user; pass workspace_id explicitly.' }],
+      });
+    }
+
+    const row = await vendorRepository.submitRating({
+      workspaceId,
+      vendorProfileId: id,
+      eventFileId: parsed.data.event_file_id,
+      raterUserId: userId,
+      overall: parsed.data.overall,
+      quality: parsed.data.quality ?? null,
+      punctuality: parsed.data.punctuality ?? null,
+      communication: parsed.data.communication ?? null,
+      professionalism: parsed.data.professionalism ?? null,
+      wasOntime: parsed.data.was_ontime,
+      wouldRebook: parsed.data.would_rebook,
+      comment: parsed.data.comment ?? null,
+    });
+
+    return reply.status(201).send({ success: true, data: row, errors: [] });
+  });
+
+  /** GET /v1/vendors/:id/ratings — list ratings for a vendor. */
+  app.get('/v1/vendors/:id/ratings', {
+    preHandler: [rateLimit('READ')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const query = request.query as Record<string, string>;
+    const limit = query.limit ? Math.min(100, Math.max(1, parseInt(query.limit))) : 20;
+    const rows = await vendorRepository.listRatings(id, {
+      workspaceId: query.workspace_id,
+      limit,
+    });
+    return reply.send({ success: true, data: rows, errors: [] });
+  });
+
+  // ── Per-workspace flags (preferred / blacklist) ──────────────────────────
+  /** PUT /v1/vendors/:id/flags — set workspace-scoped preferred/blacklist. */
+  app.put('/v1/vendors/:id/flags', {
+    preHandler: [authMiddleware, rateLimit('WRITE')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const userId = request.user!.user_id;
+
+    const parsed = SetFlagBody.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({
+        success: false,
+        errors: parsed.error.issues.map((i) => ({
+          code: 'INVALID_BODY',
+          message: `${i.path.join('.') || '(root)'}: ${i.message}`,
+        })),
+      });
+    }
+
+    const vendor = await vendorRepository.findById(id);
+    if (!vendor) {
+      return reply.status(404).send({
+        success: false,
+        errors: [{ code: 'NOT_FOUND', message: 'Vendor not found' }],
+      });
+    }
+
+    const workspaceId = await resolveWorkspaceId(userId, parsed.data.workspace_id);
+    if (!workspaceId) {
+      return reply.status(400).send({
+        success: false,
+        errors: [{ code: 'NO_WORKSPACE', message: 'No workspace found for user; pass workspace_id explicitly.' }],
+      });
+    }
+
+    const row = await vendorRepository.setWorkspaceFlag({
+      workspaceId,
+      vendorProfileId: id,
+      flaggedBy: userId,
+      isPreferred: parsed.data.is_preferred,
+      isBlacklisted: parsed.data.is_blacklisted,
+      blacklistReason: parsed.data.blacklist_reason ?? null,
+      notes: parsed.data.notes ?? null,
+    });
+
+    return reply.send({ success: true, data: row, errors: [] });
+  });
+
+  /** GET /v1/vendors/:id/flags — get workspace-scoped flag for current user's workspace. */
+  app.get('/v1/vendors/:id/flags', {
+    preHandler: [authMiddleware, rateLimit('READ')],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const userId = request.user!.user_id;
+    const query = request.query as Record<string, string>;
+
+    const workspaceId = await resolveWorkspaceId(userId, query.workspace_id);
+    if (!workspaceId) {
+      return reply.send({ success: true, data: null, errors: [] });
+    }
+
+    const row = await vendorRepository.getWorkspaceFlag(workspaceId, id);
+    return reply.send({ success: true, data: row ?? null, errors: [] });
   });
 }

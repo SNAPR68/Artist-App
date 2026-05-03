@@ -17,6 +17,9 @@ import {
   Search,
   ChevronRight,
   SlidersHorizontal,
+  Heart,
+  Ban,
+  Clock,
 } from 'lucide-react';
 import { apiClient } from '../../../../lib/api-client';
 
@@ -40,6 +43,13 @@ interface Vendor {
   total_bookings: number;
   is_verified: boolean;
   profile_completion_pct: number;
+  rating: number | string | null;
+  rating_count: number;
+  ontime_rate: number | string | null;
+  events_done: number;
+  is_preferred: boolean;
+  is_blacklisted: boolean;
+  last_used_at: string | null;
 }
 
 interface ListResponse {
@@ -87,6 +97,8 @@ export default function VendorsPage() {
   const [category, setCategory] = useState<VendorCategory | 'all'>('all');
   const [city, setCity] = useState('All Cities');
   const [search, setSearch] = useState('');
+  const [preferredOnly, setPreferredOnly] = useState(false);
+  const [hideBlacklisted, setHideBlacklisted] = useState(true);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -123,12 +135,15 @@ export default function VendorsPage() {
     if (page > 1) load(category, city, page);
   }, [page, category, city, load]);
 
-  const filtered = search.trim()
-    ? vendors.filter((v) =>
-        v.stage_name.toLowerCase().includes(search.toLowerCase()) ||
-        v.base_city.toLowerCase().includes(search.toLowerCase()),
-      )
-    : vendors;
+  let filtered = vendors;
+  if (search.trim()) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(
+      (v) => v.stage_name.toLowerCase().includes(q) || v.base_city.toLowerCase().includes(q),
+    );
+  }
+  if (preferredOnly) filtered = filtered.filter((v) => v.is_preferred);
+  if (hideBlacklisted) filtered = filtered.filter((v) => !v.is_blacklisted);
 
   const selectedCat = CATEGORIES.find((c) => c.value === category)!;
 
@@ -180,8 +195,30 @@ export default function VendorsPage() {
             ))}
           </div>
 
-          {/* City + Search */}
-          <div className="flex gap-2 ml-auto">
+          {/* City + Search + Preferred toggles */}
+          <div className="flex gap-2 ml-auto items-center flex-wrap">
+            <button
+              onClick={() => setPreferredOnly((v) => !v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all h-8 ${
+                preferredOnly
+                  ? 'bg-pink-500/15 border-pink-400/40 text-pink-300'
+                  : 'bg-transparent border-white/10 text-white/50 hover:text-white/80 hover:border-white/20'
+              }`}
+              title="Show only your preferred vendors"
+            >
+              <Heart className="w-3 h-3" /> Preferred
+            </button>
+            <button
+              onClick={() => setHideBlacklisted((v) => !v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all h-8 ${
+                hideBlacklisted
+                  ? 'bg-transparent border-white/10 text-white/50 hover:text-white/80 hover:border-white/20'
+                  : 'bg-red-500/10 border-red-400/30 text-red-300'
+              }`}
+              title={hideBlacklisted ? 'Blacklisted hidden' : 'Showing blacklisted'}
+            >
+              <Ban className="w-3 h-3" /> {hideBlacklisted ? 'Hide BL' : 'Show BL'}
+            </button>
             <select
               value={city}
               onChange={(e) => setCity(e.target.value)}
@@ -240,7 +277,7 @@ export default function VendorsPage() {
                 return (
                   <Link
                     key={v.id}
-                    href={`/vendors/${v.id}`}
+                    href={`/event-company/vendors/${v.id}`}
                     className="glass-card rounded-xl p-5 border border-white/5 hover:border-white/15 transition-all group relative overflow-hidden"
                   >
                     {/* Glow */}
@@ -249,7 +286,7 @@ export default function VendorsPage() {
                       style={{ backgroundColor: accent }}
                     />
 
-                    {/* Category badge */}
+                    {/* Category + status badges */}
                     <div className="flex items-center justify-between mb-3">
                       <span
                         className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border"
@@ -258,9 +295,27 @@ export default function VendorsPage() {
                         {catMeta?.icon}
                         {catMeta?.label ?? v.category}
                       </span>
-                      {v.is_verified && (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                      )}
+                      <div className="flex items-center gap-1.5">
+                        {v.is_preferred && (
+                          <span
+                            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border border-pink-400/30 bg-pink-500/15 text-pink-300"
+                            title="Preferred vendor"
+                          >
+                            <Heart className="w-2.5 h-2.5" /> Pref
+                          </span>
+                        )}
+                        {v.is_blacklisted && (
+                          <span
+                            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border border-red-400/30 bg-red-500/15 text-red-300"
+                            title="Blacklisted"
+                          >
+                            <Ban className="w-2.5 h-2.5" /> BL
+                          </span>
+                        )}
+                        {v.is_verified && !v.is_blacklisted && (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        )}
+                      </div>
                     </div>
 
                     <h3 className="font-display font-extrabold text-lg tracking-tight truncate">
@@ -278,13 +333,32 @@ export default function VendorsPage() {
                         <MapPin className="w-3 h-3" />
                         {v.base_city}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-[#ffbf00]" />
-                        {Number(v.trust_score ?? 0).toFixed(1)}
-                        {v.total_bookings > 0 && (
-                          <span className="ml-1 text-white/30">· {v.total_bookings} bookings</span>
-                        )}
+                      <span className="flex items-center gap-1.5">
+                        <span className="flex items-center gap-1">
+                          <Star className="w-3 h-3 text-[#ffbf00]" />
+                          <span className="text-white/80 font-bold">
+                            {v.rating != null
+                              ? Number(v.rating).toFixed(1)
+                              : Number(v.trust_score ?? 0).toFixed(1)}
+                          </span>
+                          {v.rating_count > 0 && (
+                            <span className="text-white/30">({v.rating_count})</span>
+                          )}
+                        </span>
                       </span>
+                    </div>
+
+                    {/* Ops quality strip */}
+                    <div className="mt-2 flex items-center gap-3 text-[11px] text-white/40">
+                      {v.ontime_rate != null && (
+                        <span className="flex items-center gap-1" title="On-time rate">
+                          <Clock className="w-3 h-3 text-[#a1faff]" />
+                          {Number(v.ontime_rate).toFixed(0)}% on-time
+                        </span>
+                      )}
+                      {v.events_done > 0 && (
+                        <span className="text-white/30">{v.events_done} events</span>
+                      )}
                     </div>
 
                     <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
