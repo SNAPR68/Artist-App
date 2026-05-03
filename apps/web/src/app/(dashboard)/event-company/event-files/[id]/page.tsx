@@ -591,14 +591,65 @@ function CallSheetTab({
 
 // ─── Rider tab ───────────────────────────────────────────────────────────────
 interface RiderData { pdf_url?: string; xlsx_url?: string; generated_at?: string }
+
+interface FulfillmentRow {
+  id: string;
+  rider_id: string;
+  line_item_id: string;
+  assigned_vendor_id: string | null;
+  fulfillment_status: 'not_checked' | 'available' | 'partial' | 'unavailable' | 'alternative_offered';
+  cross_check_status: 'pending' | 'matched' | 'mismatched' | 'partial';
+  cross_check_notes: string | null;
+  notes: string | null;
+  item_name: string;
+  category: string;
+  priority: 'must_have' | 'nice_to_have' | 'flexible';
+  quantity: number;
+  specifications: string | null;
+  artist_name: string | null;
+  vendor_name: string | null;
+  vendor_category: string | null;
+}
+interface FulfillmentSummary {
+  total_items: number;
+  fulfilled_items: number;
+  fulfillment_pct: number;
+  mismatch_count: number;
+  missing_must_haves: number;
+  is_rider_satisfied: boolean;
+}
+interface FulfillmentResponse {
+  items: FulfillmentRow[];
+  summary: FulfillmentSummary;
+}
+
+const FULFILLMENT_OPTIONS: Array<{ value: FulfillmentRow['fulfillment_status']; label: string }> = [
+  { value: 'not_checked', label: 'Not checked' },
+  { value: 'available', label: 'Available' },
+  { value: 'partial', label: 'Partial' },
+  { value: 'unavailable', label: 'Unavailable' },
+  { value: 'alternative_offered', label: 'Alternative offered' },
+];
+
 function RiderTab({ fileId }: { fileId: string }) {
   const [data, setData] = useState<RiderData | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
 
+  // Fulfillment state
+  const [fulfillment, setFulfillment] = useState<FulfillmentResponse | null>(null);
+  const [vendors, setVendors] = useState<Array<{ id: string; stage_name: string; category: string }>>([]);
+  const [savingRow, setSavingRow] = useState<string | null>(null);
+
   async function load() {
-    const res = await apiClient<RiderData>(`/v1/event-files/${fileId}/consolidated-rider`);
-    if (res.success) setData(res.data as RiderData | null);
+    const [docRes, fulfilRes, vendorsRes] = await Promise.all([
+      apiClient<RiderData>(`/v1/event-files/${fileId}/consolidated-rider`),
+      apiClient<FulfillmentResponse>(`/v1/event-files/${fileId}/rider-fulfillment`),
+      apiClient<Array<{ id: string; stage_name: string; category: string }>>(`/v1/event-files/${fileId}/vendors`),
+    ]);
+    if (docRes.success) setData(docRes.data as RiderData | null);
+    if (fulfilRes.success) setFulfillment(fulfilRes.data as FulfillmentResponse | null);
+    if (vendorsRes.success) setVendors((vendorsRes.data as Array<{ id: string; stage_name: string; category: string }>) ?? []);
   }
 
   useEffect(() => {
@@ -614,10 +665,25 @@ function RiderTab({ fileId }: { fileId: string }) {
     } catch { /* silent */ } finally { setGenerating(false); }
   }
 
+  async function updateRow(rowId: string, patch: Partial<FulfillmentRow>) {
+    setSavingRow(rowId);
+    try {
+      await apiClient(`/v1/event-files/${fileId}/rider-fulfillment/${rowId}`, {
+        method: 'PUT',
+        body: JSON.stringify(patch),
+      });
+      await load();
+    } catch { /* silent */ } finally { setSavingRow(null); }
+  }
+
   if (loading) return <div className="nocturne-skeleton h-48 rounded-xl" />;
 
+  const summary = fulfillment?.summary;
+  const items = fulfillment?.items ?? [];
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Generate / download */}
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-display text-xl font-extrabold tracking-tight">Consolidated Tech Rider</h3>
@@ -656,12 +722,131 @@ function RiderTab({ fileId }: { fileId: string }) {
           </div>
         </div>
       ) : (
-        <div className="glass-card rounded-xl p-12 text-center border border-white/5">
+        <div className="glass-card rounded-xl p-8 text-center border border-white/5">
           <Wrench className="w-10 h-10 text-[#a1faff] mx-auto mb-4" />
-          <h3 className="font-display text-xl font-extrabold">No rider generated yet</h3>
+          <h3 className="font-display text-lg font-extrabold">No rider generated yet</h3>
           <p className="text-white/50 mt-2 text-sm">Click Generate to merge all vendor riders into one document.</p>
         </div>
       )}
+
+      {/* ── Fulfilment tracker ──────────────────────────────────────────── */}
+      {summary && summary.total_items > 0 ? (
+        <div className="space-y-4">
+          {/* Summary strip */}
+          <div className="glass-card rounded-xl p-5 border border-white/5">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-display text-lg font-extrabold tracking-tight">Fulfilment Tracker</h4>
+              <span className={`text-xs tracking-widest uppercase font-bold ${summary.is_rider_satisfied ? 'text-emerald-400' : 'text-[#ffbf00]'}`}>
+                {summary.is_rider_satisfied ? '✓ Rider satisfied' : 'Open items'}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Stat label="Items" value={`${summary.fulfilled_items}/${summary.total_items}`} hint={`${summary.fulfillment_pct}%`} tone="cyan" />
+              <Stat label="Missing must-have" value={String(summary.missing_must_haves)} tone={summary.missing_must_haves ? 'gold' : 'mute'} />
+              <Stat label="Vendor mismatches" value={String(summary.mismatch_count)} tone={summary.mismatch_count ? 'red' : 'mute'} />
+              <Stat label="Fulfilled %" value={`${summary.fulfillment_pct}%`} tone="purple" />
+            </div>
+          </div>
+
+          {/* Items list */}
+          <div className="glass-card rounded-xl border border-white/5 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-white/[0.02] text-xs tracking-widest uppercase text-white/40">
+                <tr>
+                  <th className="text-left px-4 py-3 font-bold">Item</th>
+                  <th className="text-left px-4 py-3 font-bold">Artist</th>
+                  <th className="text-left px-4 py-3 font-bold">Assigned vendor</th>
+                  <th className="text-left px-4 py-3 font-bold">Status</th>
+                  <th className="text-left px-4 py-3 font-bold">Cross-check</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((row) => (
+                  <tr key={row.id} className="border-t border-white/5 hover:bg-white/[0.02]">
+                    <td className="px-4 py-3 align-top">
+                      <div className="font-medium text-white/90">{row.item_name}</div>
+                      <div className="text-xs text-white/40 mt-0.5">
+                        {row.category} · qty {row.quantity}
+                        {row.priority === 'must_have' && <span className="ml-2 text-[#ffbf00]">must-have</span>}
+                      </div>
+                      {row.specifications && (
+                        <div className="text-xs text-white/40 mt-0.5">{row.specifications}</div>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 align-top text-white/70">{row.artist_name ?? '—'}</td>
+                    <td className="px-4 py-3 align-top">
+                      <select
+                        value={row.assigned_vendor_id ?? ''}
+                        onChange={(e) => updateRow(row.id, { assigned_vendor_id: e.target.value || null })}
+                        disabled={savingRow === row.id}
+                        className="input-nocturne text-xs px-2 py-1.5 w-full max-w-[180px]"
+                      >
+                        <option value="">— Unassigned —</option>
+                        {vendors.map((v) => (
+                          <option key={v.id} value={v.id}>{v.stage_name} ({v.category})</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-4 py-3 align-top">
+                      <select
+                        value={row.fulfillment_status}
+                        onChange={(e) => updateRow(row.id, { fulfillment_status: e.target.value as FulfillmentRow['fulfillment_status'] })}
+                        disabled={savingRow === row.id}
+                        className="input-nocturne text-xs px-2 py-1.5"
+                      >
+                        {FULFILLMENT_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-4 py-3 align-top">
+                      <CrossCheckBadge status={row.cross_check_status} notes={row.cross_check_notes} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function Stat({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone: 'cyan' | 'purple' | 'gold' | 'red' | 'mute' }) {
+  const colors: Record<string, string> = {
+    cyan: 'text-[#a1faff]',
+    purple: 'text-[#c39bff]',
+    gold: 'text-[#ffbf00]',
+    red: 'text-red-400',
+    mute: 'text-white/60',
+  };
+  return (
+    <div className="rounded-lg bg-white/[0.02] border border-white/5 px-4 py-3">
+      <div className="text-[10px] tracking-widest uppercase font-bold text-white/40">{label}</div>
+      <div className={`mt-1 font-display text-2xl font-extrabold ${colors[tone]}`}>{value}</div>
+      {hint && <div className="text-xs text-white/30 mt-0.5">{hint}</div>}
+    </div>
+  );
+}
+
+function CrossCheckBadge({ status, notes }: { status: 'pending' | 'matched' | 'mismatched' | 'partial'; notes: string | null }) {
+  const styles: Record<string, string> = {
+    matched: 'bg-emerald-400/10 text-emerald-300 border-emerald-400/20',
+    mismatched: 'bg-red-400/10 text-red-300 border-red-400/20',
+    partial: 'bg-[#ffbf00]/10 text-[#ffbf00] border-[#ffbf00]/20',
+    pending: 'bg-white/5 text-white/40 border-white/10',
+  };
+  const labels: Record<string, string> = {
+    matched: '✓ Matched',
+    mismatched: '✗ Mismatched',
+    partial: '~ Partial',
+    pending: '— Pending',
+  };
+  return (
+    <div className={`inline-block rounded-md border px-2 py-1 text-[11px] font-bold ${styles[status]}`} title={notes ?? ''}>
+      {labels[status]}
+      {notes && <div className="text-[10px] mt-0.5 font-normal opacity-80 max-w-[260px] whitespace-normal">{notes}</div>}
     </div>
   );
 }

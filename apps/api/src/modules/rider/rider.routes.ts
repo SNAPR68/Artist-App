@@ -1,8 +1,32 @@
 import type { FastifyInstance } from 'fastify';
+import { z } from 'zod';
 import { riderService } from './rider.service.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { requirePermission } from '../../middleware/rbac.middleware.js';
 import { createRiderSchema, addRiderLineItemSchema, updateRiderLineItemSchema, updateRiderCheckSchema } from '@artist-booking/shared';
+
+// ── Phase 4: Rider sections + fulfilment validators ─────────────────────────
+const jsonRecord = z.record(z.unknown());
+const updateRiderSectionsSchema = z.object({
+  sound: jsonRecord.optional(),
+  backline: jsonRecord.optional(),
+  stage_plot: jsonRecord.optional(),
+  lighting: jsonRecord.optional(),
+  power: jsonRecord.optional(),
+  green_room: jsonRecord.optional(),
+  hospitality_requirements: jsonRecord.optional(),
+  travel_requirements: jsonRecord.optional(),
+  stage_plot_url: z.string().url().nullable().optional(),
+  notes: z.string().max(2000).nullable().optional(),
+});
+
+const fulfillmentStatuses = ['not_checked', 'available', 'partial', 'unavailable', 'alternative_offered'] as const;
+const updateFulfillmentSchema = z.object({
+  assigned_vendor_id: z.string().uuid().nullable().optional(),
+  fulfillment_status: z.enum(fulfillmentStatuses).optional(),
+  alternative_offered: z.string().max(500).nullable().optional(),
+  notes: z.string().max(1000).nullable().optional(),
+});
 
 export async function riderRoutes(app: FastifyInstance) {
   /**
@@ -102,5 +126,77 @@ export async function riderRoutes(app: FastifyInstance) {
     const updated = await riderService.updateRiderCheck(checkId, request.user!.user_id, data);
 
     return reply.send({ success: true, data: updated, errors: [] });
+  });
+
+  // ── Phase 4: Structured rider sections (artist-facing) ──────────────────
+  /**
+   * PUT /v1/artists/me/rider/sections — Replace any subset of rider sections.
+   * Body: { sound?, backline?, stage_plot?, lighting?, power?, green_room?,
+   *         hospitality_requirements?, travel_requirements?, stage_plot_url?,
+   *         notes? }
+   */
+  app.put('/v1/artists/me/rider/sections', {
+    preHandler: [authMiddleware, requirePermission('rider:manage')],
+  }, async (request, reply) => {
+    const parsed = updateRiderSectionsSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({
+        success: false,
+        errors: parsed.error.issues.map((i) => ({
+          code: 'INVALID_BODY',
+          message: `${i.path.join('.') || '(root)'}: ${i.message}`,
+        })),
+      });
+    }
+    const updated = await riderService.updateSections(request.user!.user_id, parsed.data);
+    return reply.send({ success: true, data: updated, errors: [] });
+  });
+
+  // ── Phase 4: Event rider fulfilment (event-company-facing) ──────────────
+  /**
+   * GET /v1/event-files/:id/rider-fulfillment — list every line item across
+   * all artist riders on this event with vendor assignment + cross-check.
+   * Auto-seeds on first call.
+   */
+  app.get('/v1/event-files/:id/rider-fulfillment', {
+    preHandler: [authMiddleware],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const data = await riderService.listEventFulfillment(id);
+    return reply.send({ success: true, data, errors: [] });
+  });
+
+  /**
+   * PUT /v1/event-files/:id/rider-fulfillment/:rowId — assign a vendor or
+   * change the fulfilment status of one line item. Re-runs cross-check.
+   */
+  app.put('/v1/event-files/:id/rider-fulfillment/:rowId', {
+    preHandler: [authMiddleware],
+  }, async (request, reply) => {
+    const { rowId } = request.params as { rowId: string };
+    const parsed = updateFulfillmentSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({
+        success: false,
+        errors: parsed.error.issues.map((i) => ({
+          code: 'INVALID_BODY',
+          message: `${i.path.join('.') || '(root)'}: ${i.message}`,
+        })),
+      });
+    }
+    const updated = await riderService.updateEventFulfillment(rowId, request.user!.user_id, parsed.data);
+    return reply.send({ success: true, data: updated, errors: [] });
+  });
+
+  /**
+   * POST /v1/event-files/:id/rider-fulfillment/seed — force re-seed of
+   * fulfilment rows from current rosters. Idempotent.
+   */
+  app.post('/v1/event-files/:id/rider-fulfillment/seed', {
+    preHandler: [authMiddleware],
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const rows = await riderService.seedEventFulfillment(id);
+    return reply.send({ success: true, data: { seeded: rows.length }, errors: [] });
   });
 }

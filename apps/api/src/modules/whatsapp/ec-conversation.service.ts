@@ -81,6 +81,15 @@ const EC_INTENT_PATTERNS: Array<{ intent: string; patterns: RegExp[] }> = [
     ],
   },
   {
+    intent: 'ec_rider_status',
+    patterns: [
+      /rider.*(status|fulfil|fulfill|gap|missing)/i,
+      /(status|fulfil|fulfill|gap|missing).*rider/i,
+      /rider.*ready/i,
+      /kya.*rider.*ready/i,
+    ],
+  },
+  {
     intent: 'ec_rider',
     patterns: [
       /rider/i,
@@ -295,6 +304,52 @@ async function executeAction(intent: string, eventFile: EventFileRow, userId: st
       return `Rider generated for *${name}*. Open your dashboard to download.`;
     }
 
+    case 'ec_rider_status': {
+      try {
+        const { riderService } = await import('../rider/rider.service.js');
+        const result = await riderService.listEventFulfillment(eventFile.id);
+        const s = result.summary;
+
+        if (s.total_items === 0) {
+          return `🎛️ *Rider — ${name}* (${date})\n\nNo rider items yet. Add artists with riders to the roster first.`;
+        }
+
+        let msg = `🎛️ *Rider Status — ${name}* (${date})\n\n`;
+        msg += `${s.fulfilled_items}/${s.total_items} fulfilled · ${s.fulfillment_pct}%\n`;
+        if (s.missing_must_haves) msg += `⚠️ ${s.missing_must_haves} must-have item(s) unfulfilled\n`;
+        if (s.mismatch_count) msg += `❌ ${s.mismatch_count} vendor mismatch(es)\n`;
+        msg += '\n';
+
+        const mismatches = result.items.filter((r) => r.cross_check_status === 'mismatched').slice(0, 5);
+        if (mismatches.length) {
+          msg += `*Mismatches:*\n`;
+          for (const m of mismatches) {
+            msg += `• ${m.item_name} → ${m.vendor_name ?? '(unassigned)'} — ${m.cross_check_notes ?? ''}\n`;
+          }
+          msg += '\n';
+        }
+
+        const unassigned = result.items.filter((r) => !r.assigned_vendor_id && r.priority === 'must_have').slice(0, 5);
+        if (unassigned.length) {
+          msg += `*Must-have, unassigned:*\n`;
+          for (const u of unassigned) {
+            msg += `• ${u.item_name} (${u.quantity}) — ${u.artist_name}\n`;
+          }
+          msg += '\n';
+        }
+
+        if (s.is_rider_satisfied) {
+          msg += `✅ Rider is fully fulfilled.`;
+        } else {
+          msg += `Open the dashboard to assign vendors / mark items.`;
+        }
+        return msg.trim();
+      } catch (err) {
+        logger.error('[EC_WA] rider status failed', { err });
+        return `Couldn't fetch rider status right now. Try the dashboard.`;
+      }
+    }
+
     default:
       return `I didn't understand that action. Try: "call sheet", "roster status", "send confirmations", "BOQ", "rider".`;
   }
@@ -346,6 +401,7 @@ export class EcConversationService {
         + `• "Send check-ins"\n`
         + `• "BOQ for [event name]"\n`
         + `• "Tech rider for [event name]"\n`
+        + `• "Rider status for [event name]"\n`
         + `• "My events"\n\n`
         + `Or send a voice note — I'll understand that too.`;
       await this.sendAndLog(phone, fallback, conversationId, 'ec_unknown');
