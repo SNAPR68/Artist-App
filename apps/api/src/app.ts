@@ -17,6 +17,8 @@ import { authRoutes } from './modules/auth/auth.routes.js';
 import { artistRoutes } from './modules/artist/artist.routes.js';
 import { vendorRoutes } from './modules/vendor/vendor.routes.js';
 import { eventFileRoutes } from './modules/event-file/event-file.routes.js';
+import { proposalRoutes } from './modules/proposal/proposal.routes.js';
+import { publicProposalRoutes } from './modules/proposal/proposal.public.routes.js';
 // Dormant — outbound voice removed from MVP 2026-04-23. Module kept on disk for
 // future reactivation. Do not re-register without explicit product sign-off.
 // import { outboundVoiceRoutes } from './modules/outbound-voice/outbound-voice.routes.js';
@@ -251,6 +253,8 @@ await app.register(authRoutes);
 await app.register(artistRoutes);
 await app.register(vendorRoutes);
 await app.register(eventFileRoutes);
+await app.register(proposalRoutes);
+await app.register(publicProposalRoutes);
 // await app.register(outboundVoiceRoutes); // dormant — see import note above
 await app.register(clientRoutes);
 await app.register(mediaRoutes);

@@ -1,90 +1,58 @@
 # GRID — CLAUDE.md
-_Last updated: 2026-04-22_
+_Last updated: 2026-05-05_
 
-## CRITICAL PIVOT (2026-04-22): Event Company OS Expansion
+## ACTIVE BUILD: Proposal-with-P&L (sprint #1)
 
-GRID is no longer "artist booking with voice." It is the **Event Company Operating System** — one event file covering all vendors, crew, client, call sheets, day-of ops.
+After the gap report (2026-04-30) and the channel-reality pushback that killed Lead-CRM-as-#1 (ECs work inbound in WhatsApp, not in GRID), the current build is **Proposal-with-P&L** — GRID's first inbound surface where the EC has actual reason to leave WhatsApp and open GRID.
 
-**What changed:** Audit found we cover ~15% of one operational domain (artist booking). Event companies run 10 domains. Expansion targets the 5 with highest voice-leverage.
+Roadmap: `docs/strategy/proposal-pnl-roadmap.md` — phase-wise build plan, progress tracked there.
 
-**MVP scope (~56 working days / ~11 weeks, all OUTBOUND voice only) — LOCKED 2026-04-22 post-review:**
+Working agreement: Claude proceeds autonomously through phases. No "what next?" questions. Update roadmap progress snapshot after each phase lands.
 
-**Categories (5):** `artist | av | photo | decor | license` (Model A: license agents as vendors, not managed service).
-**Sprint D wk1 add-on (2):** `promoters | transport`.
-**AV = bundled** sound+lights+stage.
-
-**Features (10):**
-1. Multi-vendor booking across 5 categories (JSONB `category_attributes` shortcut)
-2. Unified Event File (client_id + call_time)
-3. Outbound voice extended to all 5 categories
-4. Auto call sheet PDF + Excel → **SMS + WhatsApp + Email**
-5. Day-of check-in voice calls
-6. Tech rider consolidation (merged PDF + Excel; both upload paths)
-7. BOQ builder (PDF + Excel; re-upload = file-of-record, no parse-back)
-8. Standardized artist microsite `/a/[slug]` + FFmpeg/Sharp transcode pipeline
-9. Instagram OAuth (Option A, IG Business API) — Meta app review submitted Day 1 Sprint A
-10. EPK export bundle (PDF + Excel + PPTX + MP4 reel) — ships Sprint D wk2
-
-**Explicitly cut from MVP (permanent):**
-- Inbound voice / public phone number
-- **Caterer category** (dropped entirely — wedding-heavy, not ICP)
-- **Venue** (client-decided in target workflow)
-- **Managed license service** (marketplace Model A only)
-- Financial reconciliation (v2)
-- Live ROS editor (call sheet PDF = 80% of value)
-- Crew/freelancer voice polling (v2)
-- Post-event debrief calls (v2)
-- Venue RFP/BEO, guest RSVP/ticketing, creative/mood boards, marketing pipeline
-
-**Pilot + pricing:** pilots NOT pre-committed (recruit during Sprint C). **Free pilot, no pricing until post-pilot.**
-
-**Strategic shortcut:** Don't refactor `artist_profiles` → polymorphic `vendors` now. Add `category` column (artist|caterer|av|photo|decor). UI shows "vendors" umbrella. Refactor schema month 3+ when paying customers force it.
-
-**See:** `docs/strategy/prd.md` (Part 2 appendix) for full expansion PRD.
+Current phase: **Phase 1 — API CRUD** (Phase 0 DB schema ✅ done 2026-05-05).
 
 ---
 
-## Previous Direction (pre-2026-04-22, retained for context)
+## CURRENT STATE: Event Company OS, code-complete, pre-revenue
 
-## CRITICAL: Context Hygiene Rules
-1. **Read MEMORY.md first** — it has project state, feedback rules, and references. Don't re-explore.
-2. **Delegate heavy reads to sub-agents** — never read files >100 lines into main context. Use Agent(subagent_type="Explore") for codebase exploration, Agent(subagent_type="Plan") for design.
-3. **Targeted edits only in main context** — read specific line ranges (offset+limit), make edits, commit, deploy.
-4. **Never claim "done" without verifying** — test production API (curl) + verify frontend renders.
-5. **Production DB migrations** — run via Supabase SQL Editor, not CLI (no direct DB_URL). Generate raw SQL.
+GRID is the **Event Company Operating System** — one event file covering all vendors, crew, client, call sheets, day-of ops. Pivoted from "artist booking with voice" on 2026-04-22.
 
-## Product Direction (Revised 2026-04-09)
-**GRID** is pivoting from "decision engine for live entertainment" to **"The Operating System for India's live entertainment industry"** — the Agency OS play.
+**Channels:** WhatsApp + Email only. **SMS / MSG91 / DLT is OUT — do not re-introduce.** Outbound voice calls REMOVED 2026-04-23 (treat existing outbound-voice code as dead).
 
-### Current Sprint: Agency OS Pivot (90-day plan)
-**Sprint 1 (Days 1-30):** Homepage pivot, /agency/join, agency dashboard with Kanban, /pricing page
-**Sprint 2 (Days 31-60):** Deal vault, team collab, proposal templates, GST invoices
-**Sprint 3 (Days 61-90):** Razorpay subscriptions, admin analytics, concierge upgrade
-**Goal:** 10 paying agencies at ₹15K/mo = ₹1.5L MRR
+**Primary EC interface:** Event companies talk to GRID's official WhatsApp number (Interakt BSP, shared) via text or voice notes. GRID parses intent, executes actions (call sheet, BOQ, rider, confirmations, check-ins), replies on WhatsApp. They do NOT log in for routine ops. Voice notes transcribed via OpenAI Whisper (`whisper-1`, language `hi` for Hinglish).
 
-### What's Already Built & Deployed
-- Decision engine with Myra-style clarifying questions (verified in production 2026-04-09)
-- Homepage: white chat box with inline conversation, Voice mic, two entry cards
-- Voice assistant: rich visual cards, multi-turn memory, streaming TTS, 520px panel
-- GRID branding: Inter font-black navbar, clean minimal design
-- 38 API modules, 242+ endpoints, 79 migrations on Supabase
+**Categories (5):** `artist | av | photo | decor | license` (Model A: license agents as vendors). **AV = bundled** sound+lights+stage. Sprint D wk1 add-on: `promoters | transport`.
 
-### Non-Goals (Current Sprint)
-- Broad public marketplace with browse-first discovery
-- Dashboard redesigns beyond agency workflow
-- Long-tail artist onboarding before demand flow
-- New modules unrelated to the agency OS pivot
+**Cut from MVP (permanent):** inbound voice / public phone number, caterer category, venue, managed license service, financial reconciliation, live ROS editor, crew voice polling, post-event debrief calls, venue RFP/BEO, guest RSVP, mood boards, marketing pipeline.
 
-### Strategy Documents (Single Source of Truth)
+**Pricing:** free pilots first, no pricing until post-pilot. Target: 10 paying agencies @ ₹15K/mo = ₹1.5L MRR.
+
+**Strategic shortcut:** Don't refactor `artist_profiles` → polymorphic `vendors` now. Add `category` column. UI shows "vendors" umbrella. Refactor month 3+ when paying customers force it.
+
+**Strategy docs:**
 ```
-docs/strategy/prd.md                    — What we're building and why
-docs/strategy/build.md                  — 7-day build plan
+docs/strategy/prd.md                    — What & why (Part 2 = Event Company OS expansion)
+docs/strategy/sprint-final.md           — Latest sprint plan
 docs/strategy/system-architecture.md    — Technical architecture
-docs/strategy/ui.md                     — UI/UX specification
+docs/strategy/ui.md                     — UI/UX spec
 ```
+
+---
+
+## CRITICAL RULES (read before doing anything)
+
+1. **Read MEMORY.md first** — project state, feedback rules, references. Don't re-explore.
+2. **Delegate heavy reads to sub-agents** — never read files >100 lines into main context. Use Agent(subagent_type="Explore") for codebase exploration, Agent(subagent_type="Plan") for design.
+3. **Targeted edits only in main context** — read specific line ranges (offset+limit), edit, commit, deploy.
+4. **Never claim "done" without verifying** — DB → API → frontend render chain, end-to-end. Production curl + visible render.
+5. **Production DB migrations** — run via Supabase SQL Editor (no direct DB_URL). Generate raw SQL.
+6. **Token efficiency** — be terse, no preamble, no recap. Default effort low. Show only changed code.
+7. **No SMS / no MSG91 / no DLT / no outbound voice.** Channels = WhatsApp + Email.
+
+---
 
 ## Project Overview
-India's live entertainment decision and operations platform. Monorepo with Fastify API backend, Next.js frontend, and shared packages. 79 migrations, 38 API modules (including decision-engine), 247+ endpoints, 23 cron jobs, 50+ frontend pages.
+India's live entertainment Event Company OS. Monorepo: Fastify API, Next.js frontend, shared packages. ~108 migrations, 38 API modules, 250+ endpoints, 23 cron jobs, 50+ frontend pages.
 
 ## Tech Stack
 | Layer | Technology | Version |
@@ -101,20 +69,20 @@ India's live entertainment decision and operations platform. Monorepo with Fasti
 
 ## Monorepo Structure
 ```
-apps/api/          — Fastify REST API (38 modules, 242 endpoints, 6 middleware)
-apps/web/          — Next.js 14 frontend (49 pages)
-packages/shared/   — Zod validators, 35+ enums, types, constants
-packages/ui/       — Shared React component library
-packages/db/       — Knex migrations (77) + seeds
+apps/api/          — Fastify REST API
+apps/web/          — Next.js 14 frontend
+packages/shared/   — Zod validators, enums, types, constants
+packages/ui/       — Shared React components
+packages/db/       — Knex migrations + seeds
 infrastructure/    — Docker, deploy configs
-e2e/               — End-to-end tests
+e2e/               — End-to-end tests (incl. k6 load)
 ```
 
-## Deployment Architecture
-| Service | Platform | URL / Host |
-|---------|----------|------------|
+## Deployment
+| Service | Platform | URL |
+|---------|----------|-----|
 | Frontend | Vercel | `https://artist-booking-web.vercel.app` |
-| API | Render (free) | `https://artist-booking-api.onrender.com` |
+| API | Render (paid tier) | `https://artist-booking-api.onrender.com` |
 | Database | Supabase (Sydney) | `wqfzlkkkcsjrwksjpxfp.supabase.co` |
 | Redis | Upstash | env vars on Render |
 | Repo | GitHub | `SNAPR68/Artist-App` |
@@ -136,241 +104,185 @@ node dist/app.js
 pnpm turbo build --filter=@artist-booking/web
 ```
 
-## Key Architecture Decisions
-- **ESM throughout**: All packages use `"type": "module"`, imports need `.js` extensions in source
-- **Path aliases**: `@/*` maps to `./src/*` in both api and web, resolved by `tsc-alias` for API builds
-- **`@artist-booking/shared`**: workspace dependency via pnpm. In compiled API output, stays as bare specifier (resolved at runtime via node_modules)
-- **`tsconfig.build.json`**: Relaxed TypeScript config for API builds (strict: false) — separate from strict dev tsconfig
-- **SSL required**: Supabase pooler requires SSL; configured in `database.ts` for production
-- **Session pooler**: Must use Supabase's IPv4-compatible shared session pooler (not direct connection) for Render
+## Architecture Decisions
+- **ESM throughout** — `"type": "module"`, `.js` extensions in source imports
+- **Path aliases** — `@/*` → `./src/*`, resolved by `tsc-alias` for API builds
+- **`@artist-booking/shared`** — pnpm workspace dep, stays as bare specifier in API output
+- **`tsconfig.build.json`** — relaxed (strict: false) for API builds, separate from dev
+- **SSL required** — Supabase pooler needs SSL in `database.ts`
+- **Session pooler** — IPv4-compatible shared session pooler (NOT direct connection) for Render
 
 ## Environment Variables
 
 ### Render (API)
-- `DATABASE_URL` — Supabase session pooler URL (IPv4 compatible, `%40` encodes `@` in password)
+**Core:**
+- `DATABASE_URL` — Supabase session pooler URL (`%40` for `@` in password)
 - `REDIS_URL` — Upstash Redis URL
-- `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` — Supabase API access
-- `PII_ENCRYPTION_KEY` — 32+ char key for AES-256-GCM encryption
+- `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`
+- `PII_ENCRYPTION_KEY` — 32+ char AES-256-GCM key
 - `NODE_ENV=production`, `PORT=3001`, `LOG_LEVEL=info`
+
+**WhatsApp (Interakt):**
+- `WHATSAPP_PROVIDER=interakt` (or `stub` for dev)
+- `WHATSAPP_API_KEY` — Interakt API key (Basic auth)
+- `WHATSAPP_WEBHOOK_SECRET` — Interakt webhook secret
+- `WHATSAPP_FROM_NUMBER` — registered Interakt number (e.g. `919XXXXXXXXX`)
+
+**OpenAI:**
+- `OPENAI_API_KEY` — Whisper transcription (+ future LLM)
+
+**Optional:**
+- `RESEND_API_KEY`, `EMAIL_FROM` — email delivery
+- `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`
+- `ELEVENLABS_API_KEY` — voice TTS (graceful fallback)
+- `SENTRY_DSN`, `POSTHOG_*`
 
 ### Vercel (Web)
 - `NEXT_PUBLIC_API_URL` — Render API URL
-- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
-- `ENABLE_EXPERIMENTAL_COREPACK=1` — Required for pnpm on Vercel
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `ENABLE_EXPERIMENTAL_COREPACK=1` — pnpm on Vercel
+- `ELEVENLABS_API_KEY` — server-side TTS proxy
 
-## Common Issues & Solutions
-1. **Shared package not emitting dist/**: Delete `packages/shared/tsconfig.tsbuildinfo` (stale incremental build cache). All `*.tsbuildinfo` files are gitignored.
-2. **`@artist-booking/shared` not found during API build**: Ensure shared is built first (`pnpm --filter @artist-booking/shared build`).
-3. **Database connection error on Render**: Must use Supabase session pooler URL (IPv4), not direct connection. Password `@` must be URL-encoded as `%40`.
-4. **Vercel build fails**: Root directory must be blank (not `./` or `apps/web`). Build command: `pnpm turbo build --filter=@artist-booking/web`. Output dir: `apps/web/.next`.
-5. **CORS errors in browser**: API must whitelist the Vercel frontend origin in Fastify CORS config. Check `app.ts` for `origin` array and ensure the deployed frontend URL is included.
+## Common Issues
+1. **Shared not emitting `dist/`** — delete `packages/shared/tsconfig.tsbuildinfo`
+2. **`@artist-booking/shared` not found at API build** — build shared first
+3. **DB connection error on Render** — must use Supabase session pooler, password `@` → `%40`
+4. **Vercel build fails** — root dir blank, build cmd `pnpm turbo build --filter=@artist-booking/web`, output `apps/web/.next`
+5. **CORS errors** — whitelist Vercel origin in Fastify CORS in `app.ts`
+6. **Vercel lint gate** — `apps/web` build fails on any ESLint error. Run lint before push.
 
 ## Module Inventory (38 modules)
-| Module | Description |
-|--------|-------------|
-| admin | Platform admin dashboard, system health, user management |
-| agent | Agent profiles, commission tracking, artist roster management |
-| analytics | Platform-wide analytics, usage metrics, funnel reporting |
-| artist | Artist profiles, portfolio, availability, earnings dashboard |
-| artist-intelligence | Career metrics, gig advisor, earnings snapshots, growth signals |
-| auth | OTP login, session management, token refresh, role assignment |
-| booking | 12-state booking machine, quotes, negotiation, confirmation |
-| calendar | Calendar holds, availability, demand signals, fill rates |
-| client | Client profiles, booking history, preferences |
-| concierge | Search and book on behalf of clients, assisted booking flow |
-| coordination | Pre-event T-minus checklists, logistics, rider fulfillment, escalation |
-| dispute | Dispute submission, evidence upload, resolution, appeal pipeline |
-| decision-engine | Brief parsing, ranked recommendations, proposal generation, concierge lock handoff |
-| document | Contract and invoice PDF generation |
-| dynamic-pricing | Rule-based surge, elasticity tracking, demand-aware auto-adjustment |
-| emergency-substitution | Last-minute artist replacement matching and rebooking |
-| event-context | Crowd demographics, vibe matching, event metadata capture |
-| event-day | GPS arrival tracking, soundcheck, set timing, dual-party completion |
-| financial-command | Payout integration, bank accounts, settlement auto-payout |
-| gamification | Achievement badges, streaks, engagement rewards |
-| gig-marketplace | Open gig listings, artist applications, marketplace matching |
-| media | Image/video uploads, portfolio media management |
-| notification | 37 templates across 4 channels (WhatsApp, SMS, Push, Email) |
-| payment | Razorpay integration, escrow, refunds, payment lifecycle |
-| pricing-brain | Market positioning, percentile rank, fair price ranges, city comparison |
-| recommendation | Jaccard similarity, collaborative filtering, Rising Star detection |
-| reputation-defense | Trust score (70% behavioral / 30% stated), failure data capture |
-| review | Post-event reviews, ratings, response management |
-| rider | Technical rider management, venue cross-reference, gap reports |
-| search | Full-text artist search, filters, ranking |
-| seasonal-demand | Seasonal pricing trends, demand forecasting, temporal analysis |
-| shortlist | Client shortlists, comparison, favoriting |
-| social-analyzer | Social media presence scoring, audience analysis |
-| venue | Venue profiles, equipment inventory, artist compatibility scoring |
-| voice-query | Voice intent parsing (6 intents: DISCOVER, STATUS, ACTION, INTELLIGENCE, EMERGENCY, NAVIGATE), 20+ page targets, role-based routing, Hinglish support |
-| whatsapp | Conversational booking, intent parsing, conversation state machine |
-| workspace | Event company CRM, team roles, event grouping, booking pipeline |
+admin, agent, analytics, artist, artist-intelligence, auth, booking, calendar, client, concierge, coordination, decision-engine, dispute, document, dynamic-pricing, emergency-substitution, event-context, event-day, event-files (Event File OS), financial-command, gamification, gig-marketplace, media, notification, payment, pricing-brain, recommendation, reputation-defense, review, rider, search, seasonal-demand, shortlist, social-analyzer, venue, voice-query, **whatsapp** (incl. EC bot + Whisper), workspace.
 
 ## RBAC
-92 permissions across 5 roles: `artist`, `agent`, `client`, `event_company`, `admin`.
+92 permissions, 5 roles: `artist | agent | client | event_company | admin`.
 
 ## Middleware (6)
-`auth` | `error-handler` | `rate-limiter` | `rbac` | `request-logger` | `validation`
+`auth | error-handler | rate-limiter | rbac | request-logger | validation`
 
-## Design System: Nocturne Hollywood
-The frontend uses the **Nocturne Hollywood** dark theme — a cinematic glassmorphism design system from Stitch.
+---
 
-### Brand
-- **Name**: ArtistBook (NOT "Nocturne Elite" — that's the Stitch codename)
-- **Voice**: Human, direct, Indian market. No AI jargon or placeholder copy.
+## Design System: Nocturne Hollywood (dark glassmorphism)
+
+**Brand: GRID** (NOT ArtistBook, NOT Nocturne Elite — those are stale codenames). Voice: human, direct, Indian market. No AI jargon, no placeholder copy.
 
 ### Colors
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `bg-[#0e0e0f]` | Obsidian | Page backgrounds |
-| `bg-[#1a191b]` / `bg-[#1a1a1d]` | Surface | Card backgrounds |
+| `bg-[#0e0e0f]` | Obsidian | Page bg |
+| `bg-[#1a191b]` / `#1a1a1d` | Surface | Card bg |
 | `bg-[#201f21]` | Surface high | Elevated panels |
 | `bg-[#262627]` | Surface highest | Deep containers |
-| `bg-[#2c2c2d]` | Surface bright | Hover states |
-| `text-[#c39bff]` / `#8A2BE2` | Primary purple | Brand, CTAs, accents |
-| `text-[#a1faff]` | Cyan | AI/data highlights, labels |
-| `text-[#ffbf00]` | Gold | Ratings, badges, secondary accent |
-| `text-white/50` | — | Secondary text |
-| `text-white/30` | — | Tertiary/muted text |
-| `border-white/5` | — | Subtle borders |
-| `border-white/10` | — | Standard borders |
+| `bg-[#2c2c2d]` | Surface bright | Hover |
+| `text-[#c39bff]` / `#8A2BE2` | Primary purple | CTAs, brand |
+| `text-[#a1faff]` | Cyan | AI/data labels |
+| `text-[#ffbf00]` | Gold | Ratings, badges |
+| `text-white/50,30` | — | Secondary/muted |
+| `border-white/5,10` | — | Subtle/standard borders |
 
 ### Typography
-- **Display font**: `font-display` (Manrope) — headlines, page titles
-- **Body font**: `font-sans` (Inter) — paragraphs, labels
+- Display: `font-display` (Manrope) — headlines
+- Body: `font-sans` (Inter)
 - Headlines: `font-extrabold tracking-tighter`
 - Labels: `text-xs tracking-widest uppercase font-bold`
 
-### Layout Patterns
-- **Bento Hero**: `grid grid-cols-1 md:grid-cols-12 gap-6` with `md:col-span-8` main + `md:col-span-4` sidebar
+### Layout patterns
+- **Bento Hero**: `grid grid-cols-1 md:grid-cols-12 gap-6` (8+4)
 - **Glass Card**: `glass-card rounded-xl p-8 border border-white/5 relative overflow-hidden`
 - **Ambient Glow**: `<div className="absolute -top-20 -right-20 w-64 h-64 bg-[#c39bff]/10 blur-[100px] rounded-full pointer-events-none" />`
-- **Onboarding**: Full-screen `5+7` split with radial gradient background glows
-- **Artist Profile**: Cover hero (aspect-[21/9]) + `8+4` tabbed content + sticky booking card
+- **Onboarding**: 5+7 split with radial gradient bg
+- **Artist Profile**: aspect-[21/9] cover + 8+4 tabs + sticky booking card
 
-### CSS Utilities (defined in `apps/web/src/styles/globals.css`)
-```
-glass-card, glass-panel, glass-floating    — Glassmorphism surfaces
-btn-nocturne-primary/secondary/accent      — Button variants
-input-nocturne                             — Form inputs
-badge-nocturne, nocturne-chip              — Tags and pills
-nocturne-divider                           — Subtle 1px separator
-nocturne-table                             — Dark table styling
-text-gradient-nocturne                     — Purple-to-cyan gradient text
-nocturne-nav-item, nocturne-nav-item-active — Sidebar navigation
-stage-glow-violet, stage-glow-cyan         — Background radial glows
-inner-glow-status/success/warning/error    — Status indicator box-shadows
-nocturne-skeleton                          — Dark shimmer loading state
-nocturne-overlay                           — Modal backdrop
-```
+### CSS utilities (`apps/web/src/styles/globals.css`)
+`glass-card`, `glass-panel`, `glass-floating`, `btn-nocturne-{primary,secondary,accent}`, `input-nocturne`, `badge-nocturne`, `nocturne-chip`, `nocturne-divider`, `nocturne-table`, `text-gradient-nocturne`, `nocturne-nav-item{,-active}`, `stage-glow-{violet,cyan}`, `inner-glow-{status,success,warning,error}`, `nocturne-skeleton`, `nocturne-overlay`.
 
-### Stitch Reference Designs
-Full HTML/Tailwind reference designs live in: `stitch_product_requirements_document (2)/stitch_product_requirements_document/`
-Key folders: `premium_landing_page`, `artist_portfolio_hollywood_glamour`, `artist_management_hollywood_glamour`, `escrow_wallet_hollywood_glamour`, `ai_artist_discovery`, `booking_inquiry_management`, `onboarding_welcome_hollywood_glamour`, `fund_escrow_confirm_booking_1`, `booking_confirmed`
+### Frontend rules (global)
+- Check design system before writing UI (shadcn, figma, existing components)
+- Never hardcode colors/spacing/font sizes — use tokens / Tailwind
+- Prefer existing components; grep for similar before creating new
+- Tailwind utilities over inline `style={{}}` (only for dynamic values)
+- Mobile-first responsive: `sm: → md: → lg:`
+- Zero light-theme classes (exception: `presentations/[slug]` for print)
 
-### Rebuild Status (as of 2026-03-27)
-- **Hollywood Glamour complete**: All 50+ pages converted to Nocturne Hollywood
-- **Full structural rebuilds**: Landing page (cinematic hero + bento value props + poster gallery), artist public profile (3D perspective poster gallery + 4-col bento stats + sticky booking sidebar), search/discovery (bento results grid + glass pill search bar + filter chips)
-- **Hero**: "Live entertainment, reinvented." headline + "The entertainment OS for India" subtitle. 5 rotating Unsplash event images cycling every 3s with crossfade + Ken Burns zoom. 3 CTAs: "Hire an Artist" (purple gradient), "Event Company OS" (glass card with CRM subtitle), "Join as Artist" (outline). 3D Zara & Kabir mascots inline with float + glow animations
-- **Bento hero headers**: All dashboard pages have glass-card hero blocks with ambient glows
-- **Onboarding flows**: All 4 onboarding pages use 5+7 cinematic split with glass form cards
-- **Glass-card treatment**: All flat card containers converted to glassmorphism
-- **Zero light-theme classes remaining** (except presentations/[slug] which stays light for print)
+---
 
-## Current Build Status (as of 2026-03-27)
+## Current Build Status (2026-05-03)
 
-### Production Score: ~100/100 (code complete)
+### Code-complete & deployed
+- **Event File OS**: 5-tab dashboard (Roster | Call Sheets | Rider | BOQ | Day-of), add/remove vendors, rider generate, BOQ UI, demo proxy downloads
+- **WhatsApp EC bot**: voice notes via Whisper, EC intents (call sheet, roster status, confirmations, check-ins, BOQ, rider, list events), event disambiguation with numbered list, conversation state machine
+- **WhatsApp provider abstraction**: `stub` (dev) | `interakt` (prod). Webhook signature verification (HMAC-SHA256). Auto-routes EC users → EC bot, others → marketplace bot
+- **Day-of**: manual vendor status override, confirmation/check-in chips
+- **Demo data**: 80 vendors + 3 demo event files seeded; downloadable call sheet, rider, BOQ
+- **Auth**: OTP login (with bypass code `123456` in dev/staging), JWT 1h access / 30d refresh
+- **Voice (Zara/Kabir)**: 3D mascots, ElevenLabs TTS via `/api/tts` Next route, Web Speech API mic, 6 intents, 40+ page targets, Hinglish
+- **Payments**: Razorpay integration, escrow (8 states), idempotency with FOR UPDATE, refunds, webhooks
+- **Search**: 100 seeded artists + 80 vendors, full-text + filters
+- **Observability**: PostHog live, Sentry DSN-gated, Firebase push
+- **Security**: XSS sanitization, body size limits (1MB / 10MB media), rate limits (OTP 5/hr, payments 10/min), webhook signing
+- **Infrastructure**: Redis caching (search 2m, profiles 5m, homepage 10m), 30s query timeout, slow query log >1s, post-deploy smoke tests
+- **PWA**: 7 brand-purple icons, manifest with Nocturne theme
 
-### WORKING
-- Login/auth flow (OTP with bypass for dev, real MSG91 ready)
-- All 4 role dashboards: Artist, Client/Event Company, Agent, Admin
-- Search API with 100 seeded artists across 10 cities
-- Voice Assistant — **Zara & Kabir** (formerly Backstage AI):
-  - **3D mascot avatars** on homepage hero + fixed bottom-right (replace old FAB pill)
-  - Clicking Zara opens English chat, clicking Kabir opens Hindi chat
-  - **Cloud TTS**: ElevenLabs multilingual v2 via `/api/tts` Next.js route (falls back to browser TTS)
-  - **Zara** (English, female, purple `#c39bff`) + **Kabir** (Hindi, male, cyan `#a1faff`)
-  - CSS 3D: `perspective`, `mascotFloat`, `mascotGlow` keyframes in globals.css
-  - Web Speech API (mic input, works on HTTPS/Vercel deploy)
-  - Guest mode: public artist search without login
-  - Auth mode: full voice query API (6 intents, 40+ page targets)
-  - Text input fallback when mic unavailable
-  - Env: `ELEVENLABS_API_KEY` on Vercel (optional — graceful fallback to browser TTS)
-- Escrow payments (8 states, auto-settlement, refund webhooks)
-- PDF generation (branded multi-artist proposals)
-- Event company workspace CRM + onboarding wizard
-- PostHog analytics, Sentry error tracking, Firebase push notifications
-- SEO: dynamic OG tags, sitemap, robots.txt, JSON-LD ready
-- GDPR: account deletion endpoint, cookie consent banner
-- Swagger API docs at /docs
-- 100 seeded artist profiles with realistic data
-- Nocturne Hollywood dark theme applied across all 50+ pages (zero light-theme classes)
-- **pg type parser fix**: `pg.types.setTypeParser` for NUMERIC/FLOAT OIDs in `database.ts` — coerces all DECIMAL columns to JS numbers at driver level (fixes `.toFixed()` crashes across 45+ columns)
-- **Null safety**: All `.toFixed()` calls wrapped in `Number()` with `?? 0` guards across 10+ files
-- **PWA icons**: 7 brand-purple placeholder PNGs in `/public/icons/`, manifest updated to Nocturne theme colors
+### Pre-revenue blockers (manual, not code)
+| Item | Status | Days |
+|---|---|---|
+| Meta app review (IG OAuth) | not submitted | 7–14 |
+| Razorpay live KYC | mock mode | 5 |
+| Interakt WABA + 5 templates approved | not signed up | 3 |
+| Resend (email) credentials | missing | 0.5 |
+| Lawyer review of privacy/terms/pilot | not engaged | 3–5 |
+| `OPENAI_API_KEY` on Render | local only | 0.5 |
+| Pilot agencies recruited | 0 of 3 | parallel |
 
-### Security (Sprint 3)
-- JWT 1h access / 30d refresh tokens
-- XSS sanitization middleware on all POST/PUT/PATCH
-- Request body size limits (1MB default, 10MB media)
-- Rate limiting: OTP (5/hr per phone), payments (10/min per user)
-- Webhook signature verification (Razorpay)
-- Payment idempotency with FOR UPDATE locks
+**Realistic first paid customer:** ~5–6 weeks (3 weeks setup + 2–3 weeks free pilot).
 
-### Infrastructure
-- Redis caching on search (2min), artist profiles (5min), homepage (10min)
-- Cache-Control headers on public API responses
-- Database query timeout (30s), slow query logging (>1s)
-- Post-deploy smoke tests in CI
-
-### REMAINING (manual, not code)
-- MSG91 credentials (real SMS delivery)
-- Resend credentials (real email delivery)
-- Razorpay live KYC + credentials
-- Render paid tier upgrade ($7/mo)
+### Deferred / nice-to-have
 - BetterStack uptime monitoring
-- Log drain setup
-- Lawyer review of privacy/terms
-- Load testing with k6
+- Log drain
+- k6 load test execution (file exists at `e2e/tests/load/demo.k6.ts`)
+
+---
 
 ## Seed Data
-- 100 artist profiles seeded in production Supabase
-- Covers: DJ, Singer, Band, Comedian, Dancer across Mumbai, Delhi, Bangalore, etc.
-- OTP bypass enabled in dev/staging (env var `OTP_BYPASS_ENABLED=true`, code `123456`)
+- 100 artist profiles, 80 vendors across 5 categories, 3 demo event files
+- 10 cities, realistic data (DJ, Singer, Band, Comedian, Dancer + AV/photo/decor/license vendors)
+- OTP bypass: `OTP_BYPASS_ENABLED=true`, code `123456` (dev/staging only)
+
+---
 
 ## Platform Thesis
-This is NOT a booking marketplace. It is the **decision and operations layer** for India's live entertainment industry. The market has 4 layers: demand, supply, decision, execution. We own the decision layer first, then expand into execution using already-built capabilities.
+Not a booking marketplace. The **operating system** for India's live entertainment industry. Demand → Supply → **Decision** → **Execution**. We own decision + execution.
 
-The moat is built in 3 layers:
-1. **Decision intelligence** — every brief → recommendation → booking cycle improves pricing accuracy, recommendation quality, and trust scoring
-2. **Reputation and career infrastructure** that can't be ported
-3. **Operational workflow replacement** (booking, coordination, payment, escrow) that makes leaving expensive
+Moat (3 layers):
+1. Decision intelligence — every brief→recommendation→booking improves pricing, ranking, trust
+2. Reputation/career infrastructure that can't be ported
+3. Operational workflow replacement (booking, coordination, payment, escrow, day-of) that makes leaving expensive
 
-### Decision Engine Flow
+### Decision engine flow
 ```
-brief (web/WhatsApp/voice) → parse → rank candidates → return recommendations
-  → generate proposal PDF → lock availability → concierge handoff → booking
+brief (web/WhatsApp/voice) → parse → rank → recommendations
+  → proposal PDF → lock availability → concierge handoff → booking
 ```
 
-### Key Entry Surfaces
-- `/brief` — public decision page (primary entry for planners/agencies)
-- WhatsApp `CREATE_BRIEF` intent — same flow via messaging
-- Voice (Zara/Kabir) — can route into brief creation
+### Entry surfaces
+- `/brief` — public decision page
+- WhatsApp `CREATE_BRIEF` (artist marketplace) + EC bot (event_company role)
+- Voice (Zara/Kabir)
 - Concierge ops — internal deal desk
+
+---
 
 ## Testing
 ```bash
-pnpm turbo test          # Run all tests (vitest)
-pnpm turbo typecheck     # Type check all packages
-pnpm turbo lint          # Lint all packages
+pnpm turbo test          # vitest
+pnpm turbo typecheck
+pnpm turbo lint          # MUST pass — Vercel build gates on it
 ```
 
-## DOCX Generation
-When generating strategy/product documents:
-- Use `docx` npm package (globally installed): `NODE_PATH="$(npm root -g)" node script.js`
-- Styling: BRAND=`#1A3C6D`, ACCENT=`#2E86C1`, ACCENT2=`#E67E22`, Font: Arial, US Letter
-- Output to: `/Users/Artist APP/docs/`
+## DOCX generation
+- `docx` npm package (global): `NODE_PATH="$(npm root -g)" node script.js`
+- Brand colors: `#1A3C6D` / `#2E86C1` / `#E67E22`, Arial, US Letter
+- Output: `/Users/Artist APP/docs/`
 
 ## Documentation
-Full doc suite (PRD, Architecture, DB Schema, API Spec, User Stories, User Journeys, UI/UX, Integration, Roadmap, Launch Ops, Testing, Security, DevOps, Master Strategy) lives at:
-`/Users/Artist APP/docs/`
+Full doc suite at `/Users/Artist APP/docs/` — PRD, Architecture, DB Schema, API Spec, User Stories/Journeys, UI/UX, Integration, Roadmap, Launch Ops, Testing, Security, DevOps, Master Strategy.

@@ -117,5 +117,24 @@
   "financial.payouts": "Payouts",
   "financial.transactions": "Transactions",
 
-  "voice.assistant": "Voice Assistant"
+  "voice.assistant": "Voice Assistant",
+
+  "proposal.title": "Proposals",
+  "proposal.new": "New Proposal",
+  "proposal.empty": "No proposals yet",
+  "proposal.acceptCta": "Accept proposal",
+  "proposal.declineCta": "Decline",
+  "proposal.accepted": "Proposal accepted",
+  "proposal.declined": "Proposal declined",
+  "proposal.expired": "This proposal has expired",
+  "proposal.included": "What's included",
+  "proposal.total": "Total",
+  "proposal.preparedFor": "Prepared for",
+  "proposal.eventDate": "Event date",
+  "proposal.venue": "Venue",
+  "proposal.send": "Send",
+  "proposal.resend": "Re-send",
+  "proposal.preview": "Preview",
+  "proposal.newVersion": "New version",
+  "proposal.convertToEventFile": "Convert to Event File"
 }

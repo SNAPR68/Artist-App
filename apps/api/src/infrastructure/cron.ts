@@ -378,4 +378,20 @@ export function startCronJobs() {
       console.error('[CRON] Activation nudges failed:', err);
     }
   }, ACTIVATION_NUDGE_INTERVAL_MS);
+
+  // 25. Proposal expiry — flip sent/viewed proposals past valid_until to expired (every 6h)
+  setInterval(async () => {
+    try {
+      const expired = await db('proposals')
+        .whereIn('status', ['sent', 'viewed'])
+        .whereNotNull('valid_until')
+        .where('valid_until', '<', db.raw('CURRENT_DATE'))
+        .update({ status: 'expired', updated_at: new Date() });
+      if (expired > 0) {
+        console.log(`[CRON] Expired ${expired} stale proposals`);
+      }
+    } catch (err) {
+      console.error('[CRON] Proposal expiry check failed:', err);
+    }
+  }, 6 * 60 * 60 * 1000);
 }

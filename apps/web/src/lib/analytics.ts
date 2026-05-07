@@ -12,6 +12,17 @@ function initPostHog() {
 
   if (!apiKey) return;
 
+  // Consent gate (sprint FINAL D4.2): do not load PostHog until the user has
+  // explicitly accepted cookies. CookieConsent.tsx calls analytics.init() on
+  // accept. Declined users short-circuit here and never load the SDK.
+  let consent: string | null = null;
+  try {
+    consent = localStorage.getItem('cookie_consent');
+  } catch {
+    /* localStorage unavailable — fail closed, no analytics */
+  }
+  if (consent !== 'accepted') return;
+
   posthog.init(apiKey, {
     api_host: host,
     capture_pageview: true,

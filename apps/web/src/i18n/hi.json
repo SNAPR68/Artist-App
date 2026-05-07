@@ -117,5 +117,24 @@
   "financial.payouts": "पेआउट्स",
   "financial.transactions": "ट्रांज़ैक्शन्स",
 
-  "voice.assistant": "वॉइस असिस्टेंट"
+  "voice.assistant": "वॉइस असिस्टेंट",
+
+  "proposal.title": "प्रपोज़ल",
+  "proposal.new": "नया प्रपोज़ल",
+  "proposal.empty": "अभी कोई प्रपोज़ल नहीं",
+  "proposal.acceptCta": "प्रपोज़ल स्वीकार करें",
+  "proposal.declineCta": "अस्वीकार करें",
+  "proposal.accepted": "प्रपोज़ल स्वीकार किया गया",
+  "proposal.declined": "प्रपोज़ल अस्वीकार किया गया",
+  "proposal.expired": "इस प्रपोज़ल की वैधता समाप्त हो गई है",
+  "proposal.included": "क्या शामिल है",
+  "proposal.total": "कुल",
+  "proposal.preparedFor": "के लिए तैयार",
+  "proposal.eventDate": "इवेंट की तारीख",
+  "proposal.venue": "स्थान",
+  "proposal.send": "भेजें",
+  "proposal.resend": "दोबारा भेजें",
+  "proposal.preview": "प्रीव्यू",
+  "proposal.newVersion": "नया वर्ज़न",
+  "proposal.convertToEventFile": "इवेंट फ़ाइल में बदलें"
 }
